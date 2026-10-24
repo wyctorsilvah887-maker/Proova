@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -1032,10 +1031,6 @@ export default function DashPage() {
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Planos de Upgrade</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsTutorialOpen(true)} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Info className="mr-2 h-4 w-4 text-primary" />
-                <span>Tutorial</span>
-              </DropdownMenuItem>
               
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem 
@@ -1249,9 +1244,21 @@ export default function DashPage() {
         )}
 
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
-          <div className="space-y-1">
-            <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Painel de Controle</h1>
-            <p className="text-xs md:text-base text-muted-foreground">Gestão de prova social dinâmica</p>
+          <div className="flex items-center gap-3">
+            <div className="space-y-1">
+              <div className="flex items-center gap-3">
+                <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Painel de Controle</h1>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setIsTutorialOpen(true)} 
+                  className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5"
+                >
+                  <Info className="w-3.5 h-3.5" /> Tutorial
+                </Button>
+              </div>
+              <p className="text-xs md:text-base text-muted-foreground">Gestão de prova social dinâmica</p>
+            </div>
           </div>
           
           <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
@@ -1595,18 +1602,18 @@ export default function DashPage() {
               <Info className="w-6 h-6 text-primary" /> Guia do Dashboard
             </DialogTitle>
             <DialogDescription className="text-xs md:text-sm pl-8">
-              Aprenda a dominar sua central estratégica.
+              Aprenda a dominar sua central estratégica de autoridade.
             </DialogDescription>
           </DialogHeader>
           <ScrollArea className="flex-1 overflow-y-auto">
             <div className="space-y-8 md:space-y-10 py-6 px-5 md:px-10 overflow-x-hidden">
               <div className="flex gap-4">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
-                  <Calendar className="w-5 h-5" />
+                  <Sparkles className="w-5 h-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Filtro de Resumo</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Alterne entre períodos para acompanhar o crescimento do seu engajamento.</p>
+                  <p className="text-sm font-bold">Curadoria Inteligente</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Depoimentos que atendem aos seus critérios de qualidade aparecem no topo para aprovação rápida.</p>
                 </div>
               </div>
               <div className="flex gap-4">
@@ -1615,7 +1622,16 @@ export default function DashPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">Consultor Proova</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Um auditor proativo que avisa sobre falhas no Maps ou elogios parados no cofre.</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Um auditor proativo que avisa sobre falhas no perfil do Google Maps ou elogios parados no cofre.</p>
+                </div>
+              </div>
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
+                  <Calendar className="w-5 h-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Filtro de Resumo</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Acompanhe seu crescimento filtrando as métricas e depoimentos por período.</p>
                 </div>
               </div>
             </div>
