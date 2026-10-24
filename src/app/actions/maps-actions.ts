@@ -40,6 +40,48 @@ async function checkRateLimit(actionName: string) {
 }
 
 /**
+ * Consulta detalhes técnicos de um local no Google Maps para o Consultor Proova.
+ */
+export async function getGooglePlaceDetails(placeId: string) {
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+
+  if (!apiKey) {
+    return {
+      hasPhotos: true,
+      hasHours: true,
+      hasCategory: true,
+      hasDescription: true,
+      isMock: true
+    };
+  }
+
+  try {
+    const response = await fetch(`https://places.googleapis.com/v1/places/${placeId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': apiKey,
+        'X-Goog-FieldMask': 'photos,regularOpeningHours,types,editorialSummary,displayName',
+      },
+      next: { revalidate: 3600 } // Cache de 1 hora
+    });
+
+    const data = await response.json();
+
+    return {
+      hasPhotos: !!(data.photos && data.photos.length > 0),
+      hasHours: !!(data.regularOpeningHours),
+      hasCategory: !!(data.types && data.types.length > 0),
+      hasDescription: !!(data.editorialSummary),
+      isMock: false
+    };
+  } catch (err) {
+    console.error("Falha ao consultar detalhes do Google Places:", err);
+    return null;
+  }
+}
+
+/**
  * @fileOverview Server Actions para integração com Google Maps API.
  */
 export async function searchGooglePlaces(queryStr: string, city: string, state: string) {

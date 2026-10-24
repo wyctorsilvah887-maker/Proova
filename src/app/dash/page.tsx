@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -54,7 +55,11 @@ import {
   PartyPopper,
   MousePointer2,
   BarChart3,
-  Mail
+  Mail,
+  ShieldCheck,
+  ShieldAlert,
+  Camera,
+  Timer
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -77,7 +82,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from "@/dialog";
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebase';
@@ -89,8 +94,18 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useTheme } from 'next-themes';
 import { jsPDF } from 'jspdf';
 import { cn } from '@/lib/utils';
-import { searchGooglePlaces } from '@/app/actions/maps-actions';
+import { searchGooglePlaces, getGooglePlaceDetails } from '@/app/actions/maps-actions';
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
+
+interface AuditItem {
+  id: string;
+  label: string;
+  status: 'ok' | 'attention' | 'critical';
+  description: string;
+  actionLabel: string;
+  action: () => void;
+  icon: any;
+}
 
 export default function DashPage() {
   const { user, loading: authLoading } = useUser();
@@ -129,6 +144,10 @@ export default function DashPage() {
   const [isSearchingPlaces, setIsSearchingPlaces] = useState(false);
   const [placeResults, setPlaceResults] = useState<any[]>([]);
 
+  // Audit State
+  const [auditItems, setAuditItems] = useState<AuditItem[]>([]);
+  const [isAuditing, setIsAuditing] = useState(false);
+
   // Slug States
   const [tempSlug, setTempSlug] = useState('');
   const [isCheckingSlug, setIsCheckingSlug] = useState(false);
@@ -158,12 +177,12 @@ export default function DashPage() {
   const { data: activeAnnouncements, error: announcementsError, loading: announcementsLoading } = useCollection(announcementsQuery);
   const [isAnnouncementDismissed, setIsAnnouncementDismissed] = useState(false);
 
-  // Fetch Private Feedbacks for Consultant logic
+  // Fetch Private Feedbacks
   const privateFeedbacksQuery = useMemo(() => {
     if (!db || !user) return null;
-    return query(collection(db, 'users', user.uid, 'private_feedbacks'), limit(1));
+    return collection(db, 'users', user.uid, 'private_feedbacks');
   }, [db, user]);
-  const { data: hasPrivateFeedbacks } = useCollection(privateFeedbacksQuery);
+  const { data: privateFeedbacksList } = useCollection(privateFeedbacksQuery);
 
   const currentAnnouncement = useMemo(() => {
     if (announcementsError || announcementsLoading) return null;
@@ -205,6 +224,18 @@ export default function DashPage() {
       router.replace('/login');
     }
   }, [user, authLoading, router]);
+
+  // Main Testimonials Query
+  const testimonialsQuery = useMemo(() => {
+    if (!db || !user) return null;
+    return query(
+      collection(db, 'users', user.uid, 'testimonials'),
+      orderBy('createdAt', 'desc'),
+      limit(50)
+    );
+  }, [db, user]);
+
+  const { data: allFetchedTestimonials, loading: testimonialsLoading } = useCollection(testimonialsQuery);
 
   // Sequential Unlock Logic (Quest System)
   const setupSteps = useMemo(() => {
@@ -249,6 +280,132 @@ export default function DashPage() {
   const isCollectDone = setupSteps.find(s => s.id === 'collect')?.completed;
   const isGoogleDone = setupSteps.find(s => s.id === 'google')?.completed;
 
+  // Consultant Audit Logic 2.0 (No-AI)
+  useEffect(() => {
+    async function runAudit() {
+      if (!isSetupComplete || !userData || isAuditing) return;
+      setIsAuditing(true);
+      
+      const results: AuditItem[] = [];
+
+      // 1. Google Maps Check
+      const mapsUrl = userData.googleMapsUrl || '';
+      const isReviewLink = mapsUrl.includes('writereview') || mapsUrl.includes('local/writereview');
+      
+      if (!mapsUrl) {
+        results.push({
+          id: 'maps-unlinked',
+          label: 'Google Maps Desconectado',
+          status: 'critical',
+          description: 'Sua empresa não está recebendo redirecionamentos.',
+          actionLabel: 'Vincular Agora',
+          action: () => setIsGoogleMapsDialogOpen(true),
+          icon: MapPin
+        });
+      } else if (!isReviewLink) {
+        results.push({
+          id: 'maps-invalid',
+          label: 'Link de Avaliação Indireto',
+          status: 'attention',
+          description: 'Seu link atual não abre direto na caixa de texto do Google.',
+          actionLabel: 'Corrigir Link',
+          action: () => setIsGoogleMapsDialogOpen(true),
+          icon: ShieldAlert
+        });
+      }
+
+      // 2. Google Profile Audit (Photos, Hours, etc.)
+      if (userData.googlePlaceId) {
+        const details = await getGooglePlaceDetails(userData.googlePlaceId);
+        if (details) {
+          if (!details.hasPhotos) {
+            results.push({
+              id: 'profile-photos',
+              label: 'Perfil Sem Fotos',
+              status: 'attention',
+              description: 'Empresas com fotos recebem 42% mais cliques no Maps.',
+              actionLabel: 'Dica: Adicionar 5 fotos',
+              action: () => window.open(`https://www.google.com/maps/place/?q=place_id:${userData.googlePlaceId}`, '_blank'),
+              icon: Camera
+            });
+          }
+          if (!details.hasHours) {
+            results.push({
+              id: 'profile-hours',
+              label: 'Horário Pendente',
+              status: 'attention',
+              description: 'Clientes evitam empresas sem horário de funcionamento.',
+              actionLabel: 'Configurar no Google',
+              action: () => window.open(`https://business.google.com/`, '_blank'),
+              icon: Timer
+            });
+          }
+        }
+      }
+
+      // 3. Feedback Balance Audit
+      const publicCount = userData.testimonialsCount || 0;
+      const privateCount = privateFeedbacksList?.length || 0;
+
+      if (privateCount > 0 && publicCount === 0) {
+        results.push({
+          id: 'feedback-imbalance',
+          label: 'Elogios Ocultos',
+          status: 'critical',
+          description: `Você tem ${privateCount} feedbacks no privado e nada no site.`,
+          actionLabel: 'Publicar Melhores',
+          action: () => router.push('/widgets'),
+          icon: MessageSquare
+        });
+      }
+
+      // 4. Public Page Audit
+      const mainWidget = widgetsList?.[0];
+      if (mainWidget) {
+        if (!mainWidget.whatsappEnabled) {
+          results.push({
+            id: 'page-whatsapp',
+            label: 'Bio Sem WhatsApp',
+            status: 'attention',
+            description: 'Sua página pública está sem botão de contato direto.',
+            actionLabel: 'Ativar WhatsApp',
+            action: () => router.push(`/widgets/${mainWidget.id}`),
+            icon: MessageCircle
+          });
+        }
+        if (!mainWidget.selectedTestimonialIds || mainWidget.selectedTestimonialIds.length === 0) {
+          results.push({
+            id: 'page-empty',
+            label: 'Página Pública Vazia',
+            status: 'critical',
+            description: 'Seu link da bio está no ar mas não exibe depoimentos.',
+            actionLabel: 'Selecionar Elogios',
+            action: () => router.push(`/widgets/${mainWidget.id}`),
+            icon: Layout
+          });
+        }
+      }
+
+      // 5. Widget Generation Audit
+      if (!widgetsList || widgetsList.length === 0) {
+        results.push({
+          id: 'widget-missing',
+          label: 'Mural Não Gerado',
+          status: 'attention',
+          description: 'Você ainda não criou seu código para embutir no site.',
+          actionLabel: 'Criar Mural',
+          action: () => router.push('/widgets'),
+          icon: LayoutGrid
+        });
+      }
+
+      setAuditItems(results);
+      setIsAuditing(false);
+    }
+
+    runAudit();
+  }, [isSetupComplete, userData, widgetsList, privateFeedbacksList, router]);
+
   // Trigger reward dialog if complete and not yet used trial
   useEffect(() => {
     if (isSetupComplete && userData && userData.membershipStatus === 'base' && !userData.trialUsed) {
@@ -274,67 +431,6 @@ export default function DashPage() {
       toast({ variant: "destructive", title: "Erro ao ativar prêmio" });
     }
   };
-
-  // Consultant Logic - Only unlocked after setup
-  const consultantAlerts = useMemo(() => {
-    if (!isSetupComplete) return [];
-    
-    const alerts = [];
-
-    if (!userData?.googleMapsUrl) {
-      alerts.push({
-        id: 'google-setup',
-        type: 'warning',
-        icon: MapPin,
-        title: 'Google Maps pendente',
-        description: 'Configure o redirecionamento agora.',
-        action: () => setIsGoogleMapsDialogOpen(true),
-        label: 'Configurar'
-      });
-    }
-
-    if (hasPrivateFeedbacks && hasPrivateFeedbacks.length > 0) {
-      alerts.push({
-        id: 'private-inbox',
-        type: 'info',
-        icon: Inbox,
-        title: 'Inbox Privado Ativo',
-        description: 'Você recebeu feedbacks críticos.',
-        action: () => router.push('/private'),
-        label: 'Ver Inbox'
-      });
-    }
-
-    if (userData?.testimonialsCount === 0) {
-      alerts.push({
-        id: 'zero-testimonials',
-        type: 'success',
-        icon: MessageCircle,
-        title: 'Inicie sua coleta',
-        description: 'Envie seu link via WhatsApp.',
-        action: () => copyToClipboard(`${baseUrl}/c/${userData?.companySlug}`, "Link de coleta"),
-        label: 'Copiar Link'
-      });
-    }
-
-    return alerts;
-  }, [userData, hasPrivateFeedbacks, baseUrl, router, isSetupComplete]);
-
-  const companySlug = useMemo(() => {
-    return userData?.companySlug || '';
-  }, [userData]);
-
-  // Main Testimonials Query (increased limit for period calculations)
-  const testimonialsQuery = useMemo(() => {
-    if (!db || !user) return null;
-    return query(
-      collection(db, 'users', user.uid, 'testimonials'),
-      orderBy('createdAt', 'desc'),
-      limit(50)
-    );
-  }, [db, user]);
-
-  const { data: allFetchedTestimonials, loading: testimonialsLoading } = useCollection(testimonialsQuery);
 
   // Period Filtering Logic
   const filteredMetrics = useMemo(() => {
@@ -445,7 +541,7 @@ export default function DashPage() {
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-');
 
-    if (normalizedSlug === companySlug) {
+    if (normalizedSlug === userData?.companySlug) {
       setIsSlugDialogOpen(false);
       return;
     }
@@ -579,7 +675,7 @@ export default function DashPage() {
       pdf.setFont('helvetica', 'bold');
       pdf.text('BY PROOVA TECHNOLOGY', 105, 282, { align: 'center' });
 
-      pdf.save(`cartaz-proova-${companySlug}-${pdfTheme}.pdf`);
+      pdf.save(`cartaz-proova-${userData?.companySlug}-${pdfTheme}.pdf`);
       toast({ title: "PDF Gerado!", description: `O seu cartaz (${pdfTheme === 'light' ? 'Claro' : 'Escuro'}) foi baixado.` });
     } catch (err) {
       console.error("Erro ao gerar PDF:", err);
@@ -735,7 +831,7 @@ export default function DashPage() {
     }
   };
 
-  const collectionLink = `${baseUrl}/c/${companySlug}`;
+  const collectionLink = `${baseUrl}/c/${userData?.companySlug}`;
 
   if (authLoading || userDataLoading || (user && !userData)) {
     return (
@@ -747,8 +843,6 @@ export default function DashPage() {
       </div>
     );
   }
-
-  const totalGoogleRedirects = userData?.googleRedirectCount || 0;
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
@@ -914,7 +1008,7 @@ export default function DashPage() {
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden">
         
-        {/* SETUP PROGRESS SECTION (Gamified Quest System) - Hides when complete */}
+        {/* SETUP PROGRESS SECTION */}
         {!isSetupComplete && (
           <section className="animate-in fade-in slide-in-from-top-4 duration-1000">
             <Card className="border-none shadow-xl overflow-hidden rounded-[1.5rem] md:rounded-[2rem] bg-card">
@@ -929,14 +1023,13 @@ export default function DashPage() {
                     </div>
                     <Progress value={progressPercentage} className="h-2 md:h-2.5 bg-muted rounded-full" />
                     <p className="text-[10px] md:text-xs text-muted-foreground font-medium pt-0.5">
-                      Complete as missões para desbloquear seu prêmio e o Consultor.
+                      Complete as missões para desbloquear seu prêmio e o Consultor Inteligente.
                     </p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
                     {setupSteps.map((step) => {
                       const isUnlocked = step.unlocked;
-                      
                       return (
                         <div 
                           key={step.id} 
@@ -949,18 +1042,12 @@ export default function DashPage() {
                           )}
                         >
                           <div className={cn(
-                            "w-6 h-6 md:w-8 md:h-8 rounded-lg md:rounded-xl flex items-center justify-center shrink-0 transition-colors",
+                            "w-6 h-6 md:w-8 md:h-8 rounded-lg md:rounded-xl flex items-center justify-center shrink-0",
                             step.completed ? "bg-green-500 text-white shadow-lg" : 
                             isUnlocked ? "bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary group-hover:text-white" : 
                             "bg-muted border border-border"
                           )}>
-                            {step.completed ? (
-                              <Check className="w-3 h-3 md:w-4 md:h-4 stroke-[3]" />
-                            ) : !isUnlocked ? (
-                              <Lock className="w-2.5 h-2.5 md:w-3 md:h-3" />
-                            ) : (
-                              <Circle className="w-2.5 h-2.5 md:w-3 md:h-3 animate-pulse" />
-                            )}
+                            {step.completed ? <Check className="w-3 h-3 md:w-4 md:h-4 stroke-[3]" /> : <Circle className="w-2.5 h-2.5 md:w-3 md:h-3" />}
                           </div>
                           <div className="flex-1 min-w-0">
                             <span className={cn(
@@ -969,33 +1056,11 @@ export default function DashPage() {
                             )}>
                               {step.label}
                             </span>
-                            {!step.completed && isUnlocked && (
-                              <span className="text-[8px] md:text-[9px] text-primary font-black animate-in fade-in">DESBLOQUEADO</span>
-                            )}
                           </div>
-                          {isUnlocked && !step.completed && <ChevronRight className="w-3 h-3 ml-auto text-primary transition-transform group-hover:translate-x-0.5" />}
+                          {isUnlocked && !step.completed && <ChevronRight className="w-3 h-3 ml-auto text-primary" />}
                         </div>
                       );
                     })}
-                  </div>
-                </div>
-                
-                <div className="hidden lg:flex bg-primary/5 lg:w-72 p-8 flex-col items-center justify-center text-center gap-4 border-l border-primary/10">
-                  <div className="bg-white dark:bg-black p-4 rounded-3xl shadow-xl ring-1 ring-primary/10 relative group">
-                    <QRCodeSVG value={collectionLink} size={100} level="H" />
-                    {!isGoogleDone && (
-                      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-inherit p-4">
-                        <Lock className="w-6 h-6 text-muted-foreground mb-1" />
-                        <span className="text-[8px] font-black uppercase text-center leading-tight">Libere conectando o Google</span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-primary">Prêmio Final</p>
-                    <div className="flex items-center gap-1.5 justify-center">
-                      <Trophy className="w-4 h-4 text-primary" />
-                      <p className="text-[9px] text-muted-foreground font-medium">14 Dias de Conta Gold</p>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -1003,49 +1068,71 @@ export default function DashPage() {
           </section>
         )}
 
-        {/* CONSULTANT SECTION - Only visible after setup is complete */}
-        {isSetupComplete && consultantAlerts.length > 0 && (
-          <section className="space-y-3 animate-in fade-in slide-in-from-top-4 duration-700">
-            <div className="flex items-center gap-2">
-              <h2 className="text-[9px] md:text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Consultor Proova (Estratégico)</h2>
+        {/* CONSULTOR PROOVA 2.0 (STRATEGIC AUDIT) */}
+        {isSetupComplete && (
+          <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
+            <div className="flex items-center justify-between">
+              <h2 className="text-[9px] md:text-xs font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-primary" /> Auditoria Consultiva Proova
+              </h2>
+              {isAuditing && <Loader2 className="w-3 h-3 animate-spin text-primary" />}
             </div>
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {consultantAlerts.map((alert) => (
-                <div 
-                  key={alert.id} 
-                  onClick={alert.action}
-                  className={cn(
-                    "p-3 rounded-xl border flex items-center justify-between cursor-pointer transition-all hover:shadow-sm active:scale-[0.98]",
-                    alert.type === 'warning' ? "bg-orange-500/5 border-orange-500/20" : "bg-primary/5 border-primary/20"
-                  )}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
+            
+            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              {auditItems.length > 0 ? (
+                auditItems.map((item) => (
+                  <Card key={item.id} className={cn(
+                    "border-none shadow-sm overflow-hidden rounded-2xl relative",
+                    item.status === 'critical' ? "bg-destructive/5" : "bg-orange-500/5"
+                  )}>
                     <div className={cn(
-                      "p-1.5 rounded-lg",
-                      alert.type === 'warning' ? "bg-orange-500/20 text-orange-600" : "bg-primary/20 text-primary"
-                    )}>
-                      <alert.icon className="w-4 h-4" />
+                      "absolute top-0 left-0 w-1.5 h-full",
+                      item.status === 'critical' ? "bg-destructive" : "bg-orange-500"
+                    )} />
+                    <CardContent className="p-4 flex flex-col h-full justify-between gap-4">
+                      <div className="flex gap-3">
+                        <div className={cn(
+                          "p-2 rounded-xl shrink-0",
+                          item.status === 'critical' ? "bg-destructive/10 text-destructive" : "bg-orange-500/10 text-orange-600"
+                        )}>
+                          <item.icon className="w-5 h-5" />
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-black uppercase tracking-tight">{item.label}</p>
+                          <p className="text-[11px] text-muted-foreground leading-snug">{item.description}</p>
+                        </div>
+                      </div>
+                      <Button 
+                        size="sm" 
+                        variant="secondary" 
+                        className="w-full text-[10px] font-black uppercase h-8 rounded-lg shadow-sm"
+                        onClick={item.action}
+                      >
+                        {item.actionLabel} <ArrowRight className="ml-1 w-3 h-3" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <Card className="md:col-span-2 lg:col-span-3 border-none shadow-sm bg-green-500/5 overflow-hidden rounded-2xl">
+                  <CardContent className="p-6 flex items-center gap-4">
+                    <div className="bg-green-500/10 p-3 rounded-full text-green-600">
+                      <PartyPopper className="w-8 h-8" />
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-[10px] font-black uppercase truncate">{alert.title}</p>
-                      <p className="text-[9px] text-muted-foreground truncate">{alert.description}</p>
+                    <div className="space-y-1">
+                      <h3 className="font-black font-headline text-green-700">Tudo impecável!</h3>
+                      <p className="text-sm text-green-600/80 font-medium">Sua conta passou em todos os testes de saúde digital e SEO local. Continue assim!</p>
                     </div>
-                  </div>
-                  <ChevronRight className="w-3 h-3 text-muted-foreground/30 shrink-0" />
-                </div>
-              ))}
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </section>
         )}
 
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Painel de Controle</h1>
-              <Button variant="link" size="sm" onClick={() => setIsTutorialOpen(true)} className="text-[10px] font-bold gap-1 text-primary p-0 h-auto">
-                <Info className="w-3 h-3" /> Tutorial
-              </Button>
-            </div>
+            <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Painel de Controle</h1>
             <p className="text-xs md:text-base text-muted-foreground">Gestão de prova social dinâmica</p>
           </div>
           
@@ -1063,16 +1150,6 @@ export default function DashPage() {
                 </SelectContent>
               </Select>
             </div>
-            <Link href={isCollectDone ? "/widgets" : "#"} onClick={(e) => !isCollectDone && e.preventDefault()}>
-              <Button 
-                disabled={!isCollectDone}
-                className="w-full sm:w-auto shadow-lg hover:shadow-xl transition-all h-11 rounded-xl" 
-                size="lg"
-              >
-                {!isCollectDone && <Lock className="w-3.5 h-3.5 mr-2" />}
-                Meus Murais
-              </Button>
-            </Link>
           </div>
         </header>
 
@@ -1128,7 +1205,7 @@ export default function DashPage() {
               </CardHeader>
               <CardContent className="p-4 md:p-6 pt-0">
                 <div className="flex items-center gap-2">
-                  <div className="text-xl md:text-2xl font-bold">{totalGoogleRedirects}</div>
+                  <div className="text-xl md:text-2xl font-bold">{userData?.googleRedirectCount || 0}</div>
                   {userData?.googleMapsUrl ? (
                     <Badge variant="secondary" className="text-[8px] md:text-[10px] h-4 md:h-5 bg-primary/10 text-primary border-none">
                       G-Boost Ativo
@@ -1145,7 +1222,7 @@ export default function DashPage() {
           </div>
         </div>
 
-        {/* QUICK ACTIONS SECTION (Respecting Unlocked State) */}
+        {/* QUICK ACTIONS SECTION */}
         <section className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="flex items-center gap-2">
             <h2 className="text-[9px] md:text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Ações Rápidas</h2>
@@ -1209,7 +1286,7 @@ export default function DashPage() {
                   variant="ghost" 
                   size="sm" 
                   onClick={() => {
-                    setTempSlug(companySlug);
+                    setTempSlug(userData?.companySlug || '');
                     setSlugError(null);
                     setIsSlugDialogOpen(true);
                   }}
@@ -1222,12 +1299,12 @@ export default function DashPage() {
             </CardHeader>
             <CardContent className="p-4 md:p-6 pt-0 space-y-4">
               <div className="flex flex-col sm:flex-row gap-2 md:gap-3">
-                <div className="bg-muted/30 font-mono text-[9px] md:text-xs h-9 md:h-10 border flex items-center px-3 flex-1 rounded-xl overflow-x-auto whitespace-nowrap scrollbar-hide select-all relative group">
+                <div className="bg-muted/30 font-mono text-[9px] md:text-xs h-9 md:h-10 border border-primary/10 flex items-center px-3 flex-1 rounded-xl overflow-x-auto whitespace-nowrap scrollbar-hide select-all relative group">
                   {collectionLink}
                   {!isGoogleDone && (
-                    <div className="absolute inset-0 bg-muted/80 backdrop-blur-sm flex items-center justify-center">
+                    <div className="absolute inset-0 bg-muted/80 backdrop-blur-sm flex items-center justify-center rounded-inherit">
                       <Lock className="w-3 h-3 mr-2 text-muted-foreground" />
-                      <span className="text-[8px] font-black uppercase text-muted-foreground">Libere conectando o Google Maps</span>
+                      <span className="text-[8px] font-black uppercase text-muted-foreground">Vincule o Google primeiro</span>
                     </div>
                   )}
                 </div>
@@ -1249,7 +1326,7 @@ export default function DashPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-              <h2 className="text-lg md:text-xl font-bold font-headline tracking-tight">Depoimentos {period !== 'all' ? `(${period}d)` : ''}</h2>
+              <h2 className="text-lg md:text-xl font-bold font-headline tracking-tight">Depoimentos Recentes</h2>
             </div>
             <Link href={isSetupComplete ? "/private" : "#"} onClick={(e) => !isSetupComplete && e.preventDefault()}>
               <Button 
@@ -1321,17 +1398,15 @@ export default function DashPage() {
         </div>
       </main>
 
+      {/* FOOTER */}
       <footer className="py-8 md:py-16 border-t flex flex-col items-center gap-6 md:gap-8 mt-auto">
-        <div className="flex items-center gap-2 relative w-[180px] h-[60px] md:w-[320px] md:h-[105px] -mb-2">
+        <div className="flex items-center gap-2 relative w-[180px] h-[60px] md:w-[320px] md:h-[105px]">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain dark:hidden" />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain hidden dark:block" />
         </div>
-        <div className="container px-4 md:px-6 mx-auto flex flex-col justify-center items-center gap-3 text-center">
-          <p className="text-[10px] md:text-sm text-muted-foreground">© 2026 Proova - Prova Social de Verdade.</p>
-          <p className="text-[8px] md:text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-40">
-            Proova Technology
-          </p>
-        </div>
+        <p className="text-[9px] md:text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-40">
+          Proova Technology
+        </p>
       </footer>
 
       {/* Identity Dialog */}
@@ -1361,18 +1436,11 @@ export default function DashPage() {
                         setTempSlug(val);
                         setSlugError(null);
                       }}
-                      className="h-14 pl-28 rounded-2xl border-2 focus:ring-primary/20 text-sm font-bold"
+                      className="h-14 rounded-2xl border-2 focus:ring-primary/20 text-sm font-bold"
                       style={{ paddingLeft: `${(displayDomain.length * 7) + 30}px` }}
                     />
                   </div>
                   {slugError && <p className="text-[10px] text-destructive font-bold flex items-center gap-1 animate-in slide-in-from-top-1"><AlertTriangle className="w-3 h-3" /> {slugError}</p>}
-                </div>
-
-                <div className="bg-primary/5 p-4 rounded-2xl border border-primary/10 flex gap-3 items-start">
-                   <AlertTriangle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                   <p className="text-[10px] text-muted-foreground leading-relaxed font-medium">
-                     <strong className="text-foreground">Aviso Importante:</strong> Ao mudar seu link personalizado, os links e QR codes impressos anteriormente <strong className="text-destructive">deixarão de funcionar</strong> instantaneamente.
-                   </p>
                 </div>
               </div>
               <DialogFooter>
@@ -1389,22 +1457,19 @@ export default function DashPage() {
               </div>
               <div className="space-y-2">
                 <DialogTitle className="text-2xl font-black font-headline">Recurso Profissional</DialogTitle>
-                <DialogDescription className="max-w-[280px] mx-auto">
-                  A personalização de links (URLs memoráveis) é exclusiva para membros ativos em planos profissionais.
+                <DialogDescription>
+                  A personalização de links é exclusiva para membros em planos profissionais.
                 </DialogDescription>
               </div>
-              <div className="pt-2">
-                 <Button className="w-full h-14 rounded-2xl text-lg font-black shadow-xl" onClick={() => router.push('/pricing')}>
-                   Ver Planos e Upgrade
-                 </Button>
-                 <Button variant="ghost" className="w-full mt-2 text-xs font-bold text-muted-foreground" onClick={() => setIsSlugDialogOpen(false)}>Depois</Button>
-              </div>
+              <Button className="w-full h-14 rounded-2xl text-lg font-black shadow-xl" onClick={() => router.push('/pricing')}>
+                Ver Planos e Upgrade
+              </Button>
             </div>
           )}
         </DialogContent>
       </Dialog>
 
-      {/* Tutorial Dialog - Otimizado para Mobile sem clipping lateral */}
+      {/* Tutorial Dialog */}
       <Dialog open={isTutorialOpen} onOpenChange={setIsTutorialOpen}>
         <DialogContent className="rounded-[2rem] md:rounded-[2.5rem] w-[92vw] sm:w-full sm:max-w-lg border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-5 md:p-10 pt-10 md:pt-14 pb-4 bg-background shrink-0">
@@ -1423,59 +1488,16 @@ export default function DashPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">Filtro de Resumo</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Alterne entre "7 dias", "30 dias" ou "Total" para acompanhar o crescimento do seu engajamento.</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Alterne entre períodos para acompanhar o crescimento do seu engajamento.</p>
                 </div>
               </div>
-
               <div className="flex gap-4">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
-                  <MousePointer2 className="w-5 h-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Cliques Google</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Acompanhe redirecionamentos para o Maps. O selo <strong>G-Boost Ativo</strong> confirma sua configuração.</p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
-                  <Zap className="w-5 h-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Ações Rápidas</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Acesse os 4 pilares com um clique. Estes botões são desbloqueados conforme você avança nas missões.</p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
-                  <Fingerprint className="w-5 h-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Link e Personalização</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Copie sua URL de coleta. Membros Gold podem criar links memoráveis como: <code className="bg-primary/10 text-primary px-1 rounded font-bold break-all">{displayDomain}/c/sua-marca</code>.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
-                  <Shield className="w-5 h-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Depoimentos e Inbox</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Veja elogios no feed público. Críticas (1-3 estrelas) ficam salvas apenas no seu Inbox Privado.</p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
-                  <Navigation className="w-5 h-5" />
+                  <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">Consultor Proova</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Um aliado estratégico que aparece após o setup para avisar sobre pendências ou novos feedbacks críticos.</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Um auditor proativo que avisa sobre falhas no Maps ou elogios parados no cofre.</p>
                 </div>
               </div>
             </div>
@@ -1486,77 +1508,58 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
       
-      {/* Google Maps Zero-Click Configuration Dialog */}
+      {/* Google Maps Configuration Dialog */}
       <Dialog open={isGoogleMapsDialogOpen} onOpenChange={setIsGoogleMapsDialogOpen}>
         <DialogContent className="rounded-3xl sm:max-w-md overflow-hidden">
           <DialogHeader>
             <DialogTitle className="text-2xl font-black font-headline flex items-center gap-2">
               <MapPin className="w-6 h-6 text-primary" /> Google Business
             </DialogTitle>
-            <DialogDescription>
-              Turbine seu SEO Local conectando sua account oficial do Google.
-            </DialogDescription>
           </DialogHeader>
 
           <div className="py-4">
             {googleStep === 'info' && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+              <div className="space-y-6">
                 <div className="bg-primary/5 p-5 rounded-2xl border border-primary/10 flex flex-col items-center text-center gap-3">
-                  <div className="bg-primary/20 p-3 rounded-full text-primary">
-                    <Navigation className="w-8 h-8" />
-                  </div>
-                  <h3 className="font-bold text-sm">Configuração Zero-Click</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Em vez de procurar links técnicos, nós buscaremos sua empresa no banco de dados do Google para você.
-                  </p>
+                  <Navigation className="w-8 h-8 text-primary" />
+                  <p className="text-xs text-muted-foreground">Configuraremos seu link oficial para turbinar seu SEO Local.</p>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <Button className="h-12 rounded-xl font-bold shadow-lg" onClick={() => setGoogleStep(userData?.city ? 'search' : 'location')}>
-                    Começar Busca Automática
-                  </Button>
-                  <Button variant="ghost" className="text-[10px] uppercase font-black tracking-widest text-muted-foreground" onClick={() => setGoogleStep('manual')}>
-                    Eu já tenho o link (Manual)
-                  </Button>
-                </div>
+                <Button className="w-full h-12 rounded-xl font-bold shadow-lg" onClick={() => setGoogleStep(userData?.city ? 'search' : 'location')}>
+                  Começar Busca Automática
+                </Button>
               </div>
             )}
 
             {googleStep === 'location' && (
-              <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-                <p className="text-xs font-medium text-muted-foreground px-1">Onde sua empresa está localizada?</p>
+              <div className="space-y-4">
                 <div className="grid grid-cols-1 gap-3">
                   <div className="space-y-1.5">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Cidade</Label>
+                    <Label className="text-[10px] font-black ml-1">Cidade</Label>
                     <Input placeholder="Ex: São Paulo" value={userCity} onChange={(e) => setUserCity(e.target.value)} className="h-12 rounded-xl" />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Estado (UF)</Label>
+                    <Label className="text-[10px] font-black ml-1">Estado (UF)</Label>
                     <Input placeholder="Ex: SP" value={userState} onChange={(e) => setUserState(e.target.value.toUpperCase())} maxLength={2} className="h-12 rounded-xl" />
                   </div>
                 </div>
                 <Button className="w-full h-12 rounded-xl font-bold shadow-lg mt-2" onClick={handleSaveLocation} disabled={isUpdatingUrl || !userCity || !userState}>
-                  {isUpdatingUrl ? <Loader2 className="animate-spin mr-2" /> : <CheckCircle2 className="w-4 h-4 mr-2" />}
                   Confirmar Localização
                 </Button>
               </div>
             )}
 
             {googleStep === 'search' && (
-              <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
-                <div className="space-y-2">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Nome da Empresa no Google</Label>
-                  <div className="flex gap-2">
-                    <Input 
-                      placeholder="Ex: Pizzaria do Mario" 
-                      value={searchQuery} 
-                      onChange={(e) => setSearchQuery(e.target.value)} 
-                      className="h-12 rounded-xl"
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearchPlaces()}
-                    />
-                    <Button size="icon" className="h-12 w-12 rounded-xl shrink-0" onClick={handleSearchPlaces} disabled={isSearchingPlaces}>
-                      {isSearchingPlaces ? <Loader2 className="animate-spin w-4 h-4" /> : <Search className="w-4 h-4" />}
-                    </Button>
-                  </div>
+              <div className="space-y-4">
+                <div className="flex gap-2">
+                  <Input 
+                    placeholder="Nome da sua Empresa" 
+                    value={searchQuery} 
+                    onChange={(e) => setSearchQuery(e.target.value)} 
+                    className="h-12 rounded-xl"
+                  />
+                  <Button size="icon" className="h-12 w-12 rounded-xl" onClick={handleSearchPlaces} disabled={isSearchingPlaces}>
+                    {isSearchingPlaces ? <Loader2 className="animate-spin w-4 h-4" /> : <Search className="w-4 h-4" />}
+                  </Button>
                 </div>
 
                 <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
@@ -1564,57 +1567,34 @@ export default function DashPage() {
                     <div 
                       key={place.place_id} 
                       onClick={() => handleSelectPlace(place)}
-                      className="p-3 border rounded-xl hover:border-primary hover:bg-primary/5 cursor-pointer transition-all flex items-center gap-3 group"
+                      className="p-3 border rounded-xl hover:border-primary hover:bg-primary/5 cursor-pointer flex items-center gap-3"
                     >
-                      <div className="bg-primary/10 p-2 rounded-lg group-hover:bg-primary group-hover:text-white transition-colors">
-                        <Building2 className="w-4 h-4" />
-                      </div>
+                      <Building2 className="w-4 h-4 text-primary" />
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-bold truncate">{place.name}</p>
                         <p className="text-[10px] text-muted-foreground truncate">{place.address}</p>
-                        {place.isMock && <Badge variant="outline" className="text-[8px] h-4 mt-1 opacity-50">Simulação</Badge>}
                       </div>
-                      <ChevronRight className="w-3.5 h-3.5 opacity-30 group-hover:opacity-100" />
+                      <ChevronRight className="w-3.5 h-3.5 opacity-30" />
                     </div>
                   ))}
-                  {placeResults.length === 0 && !isSearchingPlaces && (
-                    <div className="py-8 text-center space-y-2 border-2 border-dashed rounded-xl">
-                      <AlertCircle className="w-8 h-8 text-muted-foreground/30 mx-auto" />
-                      <p className="text-[10px] text-muted-foreground px-4 italic">Digite o nome oficial e clique na lupa para buscar nos registros do Google.</p>
-                    </div>
-                  )}
-                  {isSearchingPlaces && (
-                    <div className="py-12 text-center space-y-3">
-                      <Loader2 className="animate-spin w-6 h-6 text-primary mx-auto" />
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Consultando Google Maps...</p>
-                    </div>
-                  )}
                 </div>
-                
-                <Button variant="ghost" className="w-full text-[10px] font-black uppercase" onClick={() => setGoogleStep('manual')}>Não encontrei minha empresa</Button>
               </div>
             )}
 
             {googleStep === 'manual' && (
-              <div className="space-y-4 animate-in fade-in slide-in-from-right-4">
+              <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="google-url" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Link do Perfil no Google Maps</Label>
+                  <Label className="text-[10px] font-black ml-1">Link Direto do Google Maps</Label>
                   <Input 
-                    id="google-url"
-                    placeholder="https://g.page/r/sua-empresa/review"
+                    placeholder="https://g.page/r/..."
                     value={newGoogleMapsUrl}
                     onChange={(e) => setNewGoogleMapsUrl(e.target.value)}
                     className="h-12 rounded-xl"
                   />
-                  <p className="text-[10px] text-muted-foreground px-1">Insira o link onde os clientes deixam avaliações.</p>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <Button className="w-full font-black h-12 rounded-xl shadow-xl" onClick={() => handleUpdateGoogleMapsUrl()} disabled={isUpdatingUrl || !newGoogleMapsUrl}>
-                    {isUpdatingUrl ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Save className="mr-2 h-4 w-4" />}
-                    Salvar Link Manual
-                  </Button>
-                  <Button variant="ghost" className="text-[10px] font-black uppercase tracking-widest" onClick={() => setGoogleStep('info')}>Voltar ao início</Button>
-                </div>
+                <Button className="w-full font-black h-12 rounded-xl shadow-xl" onClick={() => handleUpdateGoogleMapsUrl()} disabled={isUpdatingUrl || !newGoogleMapsUrl}>
+                  Salvar Link Manual
+                </Button>
               </div>
             )}
           </div>
@@ -1637,28 +1617,7 @@ export default function DashPage() {
                 size={180}
                 level="H"
                 includeMargin={false}
-                className="max-w-full h-auto"
               />
-            </div>
-
-            <div className="w-full space-y-3">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground text-center block">Escolha o Tema do Cartaz</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <Button 
-                  variant={pdfTheme === 'light' ? 'default' : 'outline'}
-                  onClick={() => setPdfTheme('light')}
-                  className="rounded-xl h-10 text-xs font-bold"
-                >
-                  <Sun className="w-3.5 h-3.5 mr-2" /> Claro
-                </Button>
-                <Button 
-                  variant={pdfTheme === 'dark' ? 'default' : 'outline'}
-                  onClick={() => setPdfTheme('dark')}
-                  className="rounded-xl h-10 text-xs font-bold"
-                >
-                  <Moon className="w-3.5 h-3.5 mr-2" /> Escuro
-                </Button>
-              </div>
             </div>
           </div>
 
@@ -1680,97 +1639,69 @@ export default function DashPage() {
         <DialogContent className="rounded-[2rem] sm:rounded-3xl sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-6 pt-10 pb-4 bg-background shrink-0">
             <DialogTitle className="text-xl md:text-2xl font-black font-headline text-center">Social Card VIP</DialogTitle>
-            <DialogDescription className="text-center text-xs md:text-sm">Transforme este depoimento em uma arte para seu Instagram.</DialogDescription>
           </DialogHeader>
 
           <div className="px-6 py-2 flex-1 overflow-y-auto flex flex-col items-center">
             {selectedTestimonialForCard && (
-              <div className="w-full aspect-square max-w-[340px] bg-gradient-to-br from-primary to-orange-600 rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-8 shadow-xl flex flex-col relative overflow-hidden shrink-0">
-                <div className="bg-white rounded-[1.25rem] md:rounded-[1.5rem] p-4 md:p-6 h-full flex flex-col shadow-inner overflow-hidden">
-                  <div className="flex items-center justify-between mb-2 md:mb-4">
-                    <span className="text-[8px] md:text-[10px] font-black text-primary tracking-widest">PROOVA</span>
-                    <Quote className="w-6 h-6 md:w-8 md:h-8 text-primary/10" />
-                  </div>
-                  
+              <div className="w-full aspect-square max-w-[340px] bg-gradient-to-br from-primary to-orange-600 rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-8 shadow-xl flex flex-col relative overflow-hidden">
+                <div className="bg-white rounded-[1.25rem] md:rounded-[1.5rem] p-4 md:p-6 h-full flex flex-col shadow-inner">
                   <div className="flex gap-1 mb-2 md:mb-4">
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Star key={i} className={cn("w-3 h-3 md:w-4 md:h-4", i < selectedTestimonialForCard.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20")} />
                     ))}
                   </div>
-
-                  <p className="text-sm md:text-xl font-medium italic text-gray-800 leading-relaxed mb-4 md:mb-6 flex-1 line-clamp-4 md:line-clamp-6 overflow-hidden">
+                  <p className="text-sm md:text-xl font-medium italic text-gray-800 leading-relaxed mb-4 md:mb-6 flex-1 line-clamp-4">
                     "{selectedTestimonialForCard.text}"
                   </p>
-
                   <div className="border-t pt-2 md:pt-4">
                     <p className="font-bold text-primary text-sm md:text-base truncate">{selectedTestimonialForCard.userName}</p>
-                    <p className="text-[8px] md:text-[10px] font-black text-muted-foreground uppercase tracking-widest">Avaliação Verificada</p>
+                    <p className="text-[8px] md:text-[10px] font-black text-muted-foreground uppercase">Avaliação Verificada</p>
                   </div>
-                </div>
-                <div className="absolute bottom-2 left-0 right-0 text-center">
-                   <p className="text-[7px] md:text-[8px] font-black text-white/40 uppercase tracking-[0.3em]">Gerado via {displayDomain}</p>
                 </div>
               </div>
             )}
           </div>
 
-          <DialogFooter className="p-6 pt-4 pb-8 bg-background flex flex-col gap-4 shrink-0">
+          <DialogFooter className="p-6 pt-4 pb-8 bg-background flex flex-col gap-4">
             <div className="grid grid-cols-2 gap-3 w-full">
               <Button 
                 variant="outline"
-                className="h-12 md:h-14 rounded-xl md:rounded-2xl text-xs md:text-sm font-black shadow-sm gap-2 border-primary/20 text-primary hover:bg-primary/5 px-2" 
+                className="h-12 md:h-14 rounded-xl font-black border-primary/20 text-primary" 
                 onClick={handleDownloadSocialCard}
                 disabled={isGeneratingCard}
               >
-                {isGeneratingCard ? <Loader2 className="animate-spin w-4 h-4" /> : <Download className="w-4 h-4" />}
-                <span>Baixar</span>
+                Baixar
               </Button>
-              
               <Button 
-                className="h-12 md:h-14 rounded-xl md:rounded-2xl text-xs md:text-sm font-black shadow-xl gap-2 px-2" 
+                className="h-12 md:h-14 rounded-xl font-black shadow-xl" 
                 onClick={handleShareSocialCard}
                 disabled={isSharingCard}
               >
-                {isSharingCard ? <Loader2 className="animate-spin w-4 h-4" /> : <Share className="w-4 h-4" />}
-                <span>Compartilhar</span>
+                Compartilhar
               </Button>
-            </div>
-            <div className="flex flex-col items-center gap-1">
-              <p className="text-[8px] md:text-[10px] text-center text-muted-foreground uppercase font-black tracking-widest opacity-60">Resolução 1080x1080 (Feed & Stories)</p>
             </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Reward / Celebration Dialog */}
+      {/* Reward Dialog */}
       <Dialog open={isRewardDialogOpen} onOpenChange={setIsRewardDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 text-center">
-          <div className="h-2 bg-primary w-full" />
           <div className="p-10 space-y-6">
             <div className="mx-auto bg-primary/10 p-5 rounded-full w-fit animate-bounce">
               <PartyPopper className="w-12 h-12 text-primary" />
             </div>
             <div className="space-y-2">
               <DialogTitle className="text-3xl font-black font-headline">Setup Concluído!</DialogTitle>
-              <DialogDescription className="text-base text-muted-foreground font-medium">
+              <DialogDescription className="text-base font-medium">
                 Parabéns! Você concluiu todas as missões e sua máquina de prova social está 100% pronta.
               </DialogDescription>
             </div>
-            
-            <div className="bg-primary/5 p-6 rounded-3xl border border-primary/20 space-y-4">
-              <div className="flex items-center justify-center gap-2 text-primary font-black uppercase tracking-widest text-xs">
-                <Trophy className="w-4 h-4 text-primary" /> Sua Recompensa
-              </div>
-              <p className="text-sm font-bold leading-relaxed">
-                Você acaba de ganhar <span className="text-primary">14 DIAS DE CONTA GOLD</span> para experimentar todos os nossos recursos premium!
-              </p>
-            </div>
-
             <Button 
               className="w-full h-16 rounded-2xl text-lg font-black shadow-xl gap-2 transition-all hover:scale-105"
               onClick={handleClaimReward}
             >
-              Resgatar Meu Prêmio <Gem className="w-5 h-5" />
+              Resgatar 14 Dias Gold <Gem className="w-5 h-5" />
             </Button>
           </div>
         </DialogContent>
