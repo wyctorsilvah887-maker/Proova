@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -16,6 +15,7 @@ import {
   Star,
   Clock,
   Layout,
+  LayoutGrid,
   Plus,
   QrCode,
   Download,
@@ -25,6 +25,7 @@ import {
   Edit3,
   ChevronRight,
   ArrowLeft,
+  ArrowRight,
   Sun,
   Moon,
   TrendingDown,
@@ -82,7 +83,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/dialog";
+} from "@/components/ui/dialog";
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebase';
