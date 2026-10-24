@@ -1594,7 +1594,7 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Tutorial Dialog */}
+      {/* Tutorial Dialog - COMPLETO */}
       <Dialog open={isTutorialOpen} onOpenChange={setIsTutorialOpen}>
         <DialogContent className="rounded-[2rem] md:rounded-[2.5rem] w-[92vw] sm:w-full sm:max-w-lg border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-5 md:p-10 pt-10 md:pt-14 pb-4 bg-background shrink-0">
@@ -1602,42 +1602,96 @@ export default function DashPage() {
               <Info className="w-6 h-6 text-primary" /> Guia do Dashboard
             </DialogTitle>
             <DialogDescription className="text-xs md:text-sm pl-8">
-              Aprenda a dominar sua central estratégica de autoridade.
+              Aprenda a dominar sua central estratégica de autoridade digital.
             </DialogDescription>
           </DialogHeader>
           <ScrollArea className="flex-1 overflow-y-auto">
             <div className="space-y-8 md:space-y-10 py-6 px-5 md:px-10 overflow-x-hidden">
+              
               <div className="flex gap-4">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
                   <Sparkles className="w-5 h-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Curadoria Inteligente</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Depoimentos que atendem aos seus critérios de qualidade aparecem no topo para aprovação rápida.</p>
+                  <p className="text-sm font-bold">Fila de Curadoria</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Depoimentos qualificados (nota 4-5 e texto rico) aparecem aqui. Com 1 clique, eles vão direto para seu site.</p>
                 </div>
               </div>
+
               <div className="flex gap-4">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">Consultor Proova</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Um auditor proativo que avisa sobre falhas no perfil do Google Maps ou elogios parados no cofre.</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Seu auditor de SEO local. Ele avisa sobre fotos ausentes no Google, horários pendentes e falhas de conversão.</p>
                 </div>
               </div>
+
               <div className="flex gap-4">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
-                  <Calendar className="w-5 h-5" />
+                  <BarChart3 className="w-5 h-5" />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Filtro de Resumo</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Acompanhe seu crescimento filtrando as métricas e depoimentos por período.</p>
+                  <p className="text-sm font-bold">Resumo e Filtros</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Acompanhe seu volume de avaliações. Filtre por 7, 30 dias ou período total para ver seu crescimento.</p>
                 </div>
               </div>
+
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
+                  <MousePointer2 className="w-5 h-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Cliques e G-Boost</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Métricas de quantos clientes redirecionamos para seu Google Maps após um elogio 5 estrelas.</p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
+                  <Zap className="w-5 h-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Ações Rápidas</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Acesse em segundos seu Cartaz de Balcão (PDF), Gerenciador de Murais ou seu Inbox Privado.</p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
+                  <Link2 className="w-5 h-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Link de Coleta</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Sua URL estratégica. Personalize-a (ex: /c/minha-loja) para facilitar o envio via WhatsApp e Redes Sociais.</p>
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
+                  <Inbox className="w-5 h-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Inbox Privado</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Onde guardamos feedbacks de 1 a 3 estrelas. Resolva problemas em sigilo e evite danos à sua imagem pública.</p>
+                </div>
+              </div>
+
+              <div className="flex gap-4 pb-4">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
+                  <MessageSquare className="w-5 h-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Últimos Depoimentos</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Visualize seus elogios ativos. Use o botão "Gerar Card" para criar imagens prontas para o Instagram Stories.</p>
+                </div>
+              </div>
+
             </div>
           </ScrollArea>
           <DialogFooter className="p-5 md:p-10 pt-4 pb-8 md:pb-10 bg-background border-t shrink-0">
-            <Button className="w-full font-black h-12 rounded-2xl shadow-xl" onClick={() => setIsTutorialOpen(false)}>Começar Agora</Button>
+            <Button className="w-full font-black h-12 rounded-2xl shadow-xl" onClick={() => setIsTutorialOpen(false)}>Dominar Meu Painel</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1784,7 +1838,7 @@ export default function DashPage() {
                       <Star key={i} className={cn("w-3 h-3 md:w-4 md:h-4", i < selectedTestimonialForCard.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20")} />
                     ))}
                   </div>
-                  <p className="text-sm md:text-xl font-medium italic text-gray-800 leading-relaxed mb-4 md:mb-6 flex-1 line-clamp-4">
+                  <p className="text-sm md:text-xl font-medium italic text-gray-800 Birding-relaxed mb-4 md:mb-6 flex-1 line-clamp-4">
                     "{selectedTestimonialForCard.text}"
                   </p>
                   <div className="border-t pt-2 md:pt-4">
