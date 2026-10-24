@@ -3,7 +3,7 @@
 
 import { headers } from 'next/headers';
 import { initializeFirebase } from '@/firebase';
-import { collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp, doc, updateDoc, increment, getDoc, arrayUnion } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp, doc, updateDoc, increment, getDoc, arrayUnion, limit } from 'firebase/firestore';
 import { Resend } from 'resend';
 
 /**
@@ -26,7 +26,7 @@ async function checkRateLimit(actionName: string) {
   
   const snap = await getDocs(q);
   
-  if (snap.size >= 10) {
+  if (snap.size >= 15) {
     throw new Error('Limite de envios excedido. Tente novamente em instantes.');
   }
 
@@ -35,6 +35,18 @@ async function checkRateLimit(actionName: string) {
     action: actionName,
     createdAt: serverTimestamp()
   });
+}
+
+/**
+ * Verifica se o texto contém palavras positivas para curadoria.
+ */
+function hasPositiveWords(text: string): boolean {
+  const positiveWords = [
+    'recomendo', 'excelente', 'parabéns', 'ótimo', 'otimo', 'amei', 'melhor', 
+    'perfeito', 'incrível', 'incrivel', 'atencioso', 'rápido', 'rapido', 'nota 10'
+  ];
+  const lowerText = text.toLowerCase();
+  return positiveWords.some(word => lowerText.includes(word));
 }
 
 /**
@@ -62,7 +74,7 @@ async function sendCriticalFeedbackAlert(ownerEmail: string, feedbackData: any, 
               <p style="margin: 0; font-style: italic;">"${feedbackData.text}"</p>
               <p style="margin-top: 15px; font-size: 13px; color: #6b7280;">— ${feedbackData.userName} (${feedbackData.userEmail || 'E-mail não informado'})</p>
             </div>
-            <p>Recomendamos entrar em contato com o cliente para resolver a situation antes que ela se torne uma reclamação pública.</p>
+            <p>Recomendamos entrar em contato com o cliente para resolver a situação antes que ela se torne uma reclamação pública.</p>
             <div style="text-align: center; margin-top: 30px;">
               <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'https://proova.wsstudioscompany.com.br'}/private" style="background-color: #1f2937; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">Ver no Painel Proova</a>
             </div>
@@ -76,7 +88,44 @@ async function sendCriticalFeedbackAlert(ownerEmail: string, feedbackData: any, 
 }
 
 /**
- * Salva um depoimento com Rate Limit de 10 por minuto e executa Sincronização Automática em Widgets.
+ * Notifica o dono sobre um depoimento aguardando curadoria.
+ */
+async function sendCuratorshipAlert(ownerEmail: string, testimonialData: any, companyName: string) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey || !ownerEmail) return;
+
+  try {
+    const resend = new Resend(apiKey);
+    await resend.emails.send({
+      from: 'Proova Curadoria <proova@proova.wsstudioscompany.com.br>',
+      to: [ownerEmail],
+      subject: `✨ Novo Elogio para Curadoria - ${companyName}`,
+      html: `
+        <div style="font-family: sans-serif; color: #1f2937; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+          <div style="background-color: #f97316; padding: 20px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 20px;">Elogio Qualificado!</h1>
+          </div>
+          <div style="padding: 30px;">
+            <p>Olá,</p>
+            <p>Um cliente deixou um depoimento que atende aos seus critérios de qualidade e está aguardando aprovação para ir ao ar.</p>
+            <div style="background-color: #fff7ed; padding: 20px; border-radius: 8px; border-left: 4px solid #f97316; margin: 20px 0;">
+              <p style="margin: 0; font-style: italic;">"${testimonialData.text}"</p>
+              <p style="margin-top: 15px; font-size: 13px; color: #9a3412;">— ${testimonialData.userName}</p>
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+              <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'https://proova.wsstudioscompany.com.br'}/dash" style="background-color: #f97316; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; box-shadow: 0 4px 6px -1px rgba(249, 115, 22, 0.2);">Aprovar e Publicar agora</a>
+            </div>
+          </div>
+        </div>
+      `,
+    });
+  } catch (err) {
+    console.error("Erro ao enviar e-mail de curadoria:", err);
+  }
+}
+
+/**
+ * Salva um depoimento com lógica de Auto-Curadoria e Fila de Revisão.
  */
 export async function submitTestimonialAction(data: {
   targetUserId: string;
@@ -91,12 +140,15 @@ export async function submitTestimonialAction(data: {
     
     const { firestore } = initializeFirebase();
     
+    // Status inicial: Publicos entram como 'pending' para curadoria, privados entram como 'approved' (visiveis no inbox)
+    const initialStatus = data.destination === 'public' ? 'pending' : 'approved';
+
     const testimonialData = {
       userName: data.userName.trim(),
       userEmail: data.userEmail.trim().toLowerCase(),
       rating: data.rating,
       text: data.text.trim(),
-      status: 'approved',
+      status: initialStatus,
       createdAt: serverTimestamp(),
     };
 
@@ -112,20 +164,28 @@ export async function submitTestimonialAction(data: {
       testimonialsCount: increment(1)
     });
 
-    // Se for um feedback privado (crítico), envia alerta por e-mail para o dono
-    if (data.destination === 'private' || data.rating <= 3) {
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        const userData = userSnap.data();
+    // LÓGICA DE ALERTA E AUTO-CURADORIA
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      const userData = userSnap.data();
+
+      // Se for feedback crítico ou privado, alerta imediato
+      if (data.destination === 'private' || data.rating <= 3) {
         await sendCriticalFeedbackAlert(userData.email, testimonialData, userData.companyName);
+      } 
+      // Se for publico e qualificado, alerta de curadoria
+      else if (data.destination === 'public' && data.rating >= 4 && data.text.length >= 20) {
+        await sendCuratorshipAlert(userData.email, testimonialData, userData.companyName);
       }
     }
 
-    // --- LÓGICA DE SINCRONIZAÇÃO AUTOMÁTICA (AUTO-PUBLISH) ---
+    // LÓGICA DE SINCRONIZAÇÃO AUTOMÁTICA (Apenas se o widget permitir Auto-Publish direto)
     if (data.destination === 'public') {
       const widgetsRef = collection(firestore, 'users', data.targetUserId, 'widgets');
       const q = query(widgetsRef, where('autoPublishEnabled', '==', true));
       const widgetsSnap = await getDocs(q);
+
+      let wasAutoPublished = false;
 
       const updatePromises = widgetsSnap.docs.map(async (wDoc) => {
         const widget = wDoc.data();
@@ -133,6 +193,7 @@ export async function submitTestimonialAction(data: {
         const minChars = widget.autoPublishMinChars || 0;
 
         if (testimonialData.rating >= minRating && testimonialData.text.length >= minChars) {
+          wasAutoPublished = true;
           await updateDoc(wDoc.ref, {
             selectedTestimonialIds: arrayUnion(testimonialId)
           });
@@ -140,11 +201,59 @@ export async function submitTestimonialAction(data: {
       });
 
       await Promise.all(updatePromises);
+
+      // Se foi publicado automaticamente em pelo menos um widget, mudamos status para approved
+      if (wasAutoPublished) {
+        await updateDoc(docRef, { status: 'approved' });
+      }
     }
 
     return { success: true };
   } catch (error: any) {
     console.error("Testimonial Submission Error:", error.message);
     return { success: false, error: error.message };
+  }
+}
+
+/**
+ * Aprova um depoimento da fila de revisão e o publica no widget principal.
+ */
+export async function approveTestimonialAction(userId: string, testimonialId: string) {
+  try {
+    const { firestore } = initializeFirebase();
+    const testimonialRef = doc(firestore, 'users', userId, 'testimonials', testimonialId);
+    
+    // 1. Atualiza status para aprovado
+    await updateDoc(testimonialRef, { status: 'approved' });
+
+    // 2. Tenta injetar no primeiro widget que encontrar para dar o "1-clique" de publicação
+    const widgetsRef = collection(firestore, 'users', userId, 'widgets');
+    const widgetsSnap = await getDocs(query(widgetsRef, limit(1)));
+    
+    if (!widgetsSnap.empty) {
+      await updateDoc(widgetsSnap.docs[0].ref, {
+        selectedTestimonialIds: arrayUnion(testimonialId)
+      });
+    }
+
+    return { success: true };
+  } catch (err: any) {
+    console.error("Erro ao aprovar:", err);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Arquiva um depoimento (remove da fila sem deletar).
+ */
+export async function archiveTestimonialAction(userId: string, testimonialId: string) {
+  try {
+    const { firestore } = initializeFirebase();
+    const testimonialRef = doc(firestore, 'users', userId, 'testimonials', testimonialId);
+    await updateDoc(testimonialRef, { status: 'archived' });
+    return { success: true };
+  } catch (err: any) {
+    console.error("Erro ao arquivar:", err);
+    return { success: false, error: err.message };
   }
 }

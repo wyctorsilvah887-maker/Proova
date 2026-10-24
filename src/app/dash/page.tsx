@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -60,7 +61,10 @@ import {
   ShieldCheck,
   ShieldAlert,
   Camera,
-  Timer
+  Timer,
+  CheckCircle,
+  EyeOff,
+  Sparkles
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -97,6 +101,7 @@ import { jsPDF } from 'jspdf';
 import { cn } from '@/lib/utils';
 import { searchGooglePlaces, getGooglePlaceDetails } from '@/app/actions/maps-actions';
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
+import { approveTestimonialAction, archiveTestimonialAction } from '@/app/actions/testimonial-actions';
 
 interface AuditItem {
   id: string;
@@ -136,6 +141,7 @@ export default function DashPage() {
   const [isGeneratingCard, setIsGeneratingCard] = useState(false);
   const [isSharingCard, setIsSharingCard] = useState(false);
   const [isSendingReport, setIsSendingReport] = useState(false);
+  const [isProcessingCuratorship, setIsProcessingCuratorship] = useState<string | null>(null);
 
   // Zero-Click Google Search States
   const [googleStep, setGoogleStep] = useState<'info' | 'location' | 'search' | 'manual'>('info');
@@ -185,6 +191,25 @@ export default function DashPage() {
   }, [db, user]);
   const { data: privateFeedbacksList } = useCollection(privateFeedbacksQuery);
 
+  // Fetch Pending Testimonials (Review Queue)
+  const pendingTestimonialsQuery = useMemo(() => {
+    if (!db || !user) return null;
+    return query(
+      collection(db, 'users', user.uid, 'testimonials'),
+      where('status', '==', 'pending')
+    );
+  }, [db, user]);
+  const { data: rawPendingTestimonials } = useCollection(pendingTestimonialsQuery);
+  
+  const pendingTestimonials = useMemo(() => {
+    if (!rawPendingTestimonials) return [];
+    return [...rawPendingTestimonials].sort((a: any, b: any) => {
+      const dateA = a.createdAt?.toDate?.() || new Date(0);
+      const dateB = b.createdAt?.toDate?.() || new Date(0);
+      return dateB.getTime() - dateA.getTime();
+    });
+  }, [rawPendingTestimonials]);
+
   const currentAnnouncement = useMemo(() => {
     if (announcementsError || announcementsLoading) return null;
     return activeAnnouncements && activeAnnouncements.length > 0 ? activeAnnouncements[0] : null;
@@ -231,7 +256,7 @@ export default function DashPage() {
     if (!db || !user) return null;
     return query(
       collection(db, 'users', user.uid, 'testimonials'),
-      orderBy('createdAt', 'desc'),
+      where('status', '==', 'approved'),
       limit(50)
     );
   }, [db, user]);
@@ -406,6 +431,40 @@ export default function DashPage() {
 
     runAudit();
   }, [isSetupComplete, userData, widgetsList, privateFeedbacksList, router]);
+
+  const handleApproveTestimonial = async (id: string) => {
+    if (!user || isProcessingCuratorship) return;
+    setIsProcessingCuratorship(id);
+    try {
+      const res = await approveTestimonialAction(user.uid, id);
+      if (res.success) {
+        toast({ title: "Publicado!", description: "O depoimento agora brilha no seu site." });
+      } else {
+        throw new Error(res.error);
+      }
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "Erro ao publicar", description: e.message });
+    } finally {
+      setIsProcessingCuratorship(null);
+    }
+  };
+
+  const handleArchiveTestimonial = async (id: string) => {
+    if (!user || isProcessingCuratorship) return;
+    setIsProcessingCuratorship(id);
+    try {
+      const res = await archiveTestimonialAction(user.uid, id);
+      if (res.success) {
+        toast({ title: "Arquivado", description: "Removido da fila de revisão." });
+      } else {
+        throw new Error(res.error);
+      }
+    } catch (e: any) {
+      toast({ variant: "destructive", title: "Erro ao arquivar", description: e.message });
+    } finally {
+      setIsProcessingCuratorship(null);
+    }
+  };
 
   // Trigger reward dialog if complete and not yet used trial
   useEffect(() => {
@@ -1069,6 +1128,64 @@ export default function DashPage() {
           </section>
         )}
 
+        {/* CURATORSHIP QUEUE (NEW) */}
+        {pendingTestimonials.length > 0 && (
+          <section className="space-y-4 animate-in zoom-in-95 duration-500">
+            <div className="flex items-center justify-between">
+              <h2 className="text-[9px] md:text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                <Sparkles className="w-4 h-4 animate-pulse" /> Fila de Curadoria Inteligente
+              </h2>
+              <Badge className="bg-primary text-white text-[8px] font-black h-5">{pendingTestimonials.length} PENDENTES</Badge>
+            </div>
+            
+            <div className="grid gap-4 md:grid-cols-2">
+              {pendingTestimonials.map((t: any) => (
+                <Card key={t.id} className="border-2 border-primary/20 shadow-lg bg-card overflow-hidden rounded-2xl relative">
+                  <div className="absolute top-0 right-0 p-2">
+                     <Badge variant="secondary" className="text-[8px] font-black bg-primary/10 text-primary">REVISÃO MANUAL</Badge>
+                  </div>
+                  <CardContent className="p-5 md:p-6 space-y-4">
+                    <div className="flex items-start gap-3">
+                      <div className="bg-primary/10 p-2 rounded-xl">
+                        <User className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="font-bold text-sm">{t.userName}</p>
+                        <div className="flex gap-0.5">
+                          {Array.from({ length: t.rating || 5 }).map((_, i) => (
+                            <Star key={i} className="w-3 h-3 fill-primary text-primary" />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-xs md:text-sm italic leading-relaxed text-foreground/90 bg-muted/30 p-4 rounded-xl border-l-4 border-primary">
+                      "{t.text}"
+                    </p>
+                    <div className="flex gap-2 pt-2">
+                      <Button 
+                        className="flex-1 h-11 rounded-xl font-bold gap-2 shadow-md bg-primary hover:bg-primary/90"
+                        disabled={!!isProcessingCuratorship}
+                        onClick={() => handleApproveTestimonial(t.id)}
+                      >
+                        {isProcessingCuratorship === t.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                        Publicar no Site
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        className="h-11 rounded-xl font-bold text-muted-foreground border-border hover:bg-muted"
+                        disabled={!!isProcessingCuratorship}
+                        onClick={() => handleArchiveTestimonial(t.id)}
+                      >
+                        <EyeOff className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* CONSULTOR PROOVA 2.0 (STRATEGIC AUDIT) */}
         {isSetupComplete && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
@@ -1327,7 +1444,7 @@ export default function DashPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-              <h2 className="text-lg md:text-xl font-bold font-headline tracking-tight">Depoimentos Recentes</h2>
+              <h2 className="text-lg md:text-xl font-bold font-headline tracking-tight">Depoimentos Publicados</h2>
             </div>
             <Link href={isSetupComplete ? "/private" : "#"} onClick={(e) => !isSetupComplete && e.preventDefault()}>
               <Button 
@@ -1392,7 +1509,7 @@ export default function DashPage() {
             ) : (
               <div className="text-center py-10 md:py-16 border-2 border-dashed rounded-2xl bg-muted/10">
                 <MessageSquare className="w-8 h-8 md:w-10 md:h-10 text-muted-foreground/30 mx-auto mb-3" />
-                <p className="text-xs md:text-sm text-muted-foreground">Nenhum depoimento encontrado para este período.</p>
+                <p className="text-xs md:text-sm text-muted-foreground">Nenhum depoimento aprovado encontrado para este período.</p>
               </div>
             )}
           </div>

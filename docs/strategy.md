@@ -5,8 +5,8 @@ Este documento detalha as teses de evolução do produto para transformar prova 
 
 ## 🚀 1. Automação de Curadoria (AI Smart Pick)
 **Tese:** Reduzir o tempo que o cliente gasta escolhendo depoimentos.
-- **Implementação:** Botão "Auto-Curar" via Genkit.
-- **Lógica:** A IA analisa sentimento e diversidade (ex: um sobre atendimento, um sobre entrega, um sobre qualidade) e seleciona os 10 melhores automaticamente.
+- **Implementação:** Fila de Revisão Inteligente (No-AI) [IMPLEMENTADO].
+- **Lógica:** Filtra por nota, tamanho e palavras-chave. IA futura analisará sentimento e diversidade.
 
 ## 🧠 2. Moderação Automática (Genkit Shield)
 **Tese:** Eliminar o trabalho manual de aprovação de depoimentos óbvios.
