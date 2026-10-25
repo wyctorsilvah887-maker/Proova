@@ -1,4 +1,3 @@
-
 'use server';
 
 import { headers } from 'next/headers';
@@ -8,7 +7,6 @@ import { Resend } from 'resend';
 
 /**
  * Verifica o limite de requisições de forma robusta usando índices do Firestore.
- * Exige índice: ip (ASC), action (ASC), createdAt (DESC)
  */
 async function checkRateLimit(actionName: string) {
   const { firestore } = initializeFirebase();
@@ -144,7 +142,6 @@ export async function submitTestimonialAction(data: {
     
     const { firestore } = initializeFirebase();
     
-    // Status inicial: Publicos entram como 'pending' para curadoria, privados entram como 'approved'
     const initialStatus = data.destination === 'public' ? 'pending' : 'approved';
 
     const testimonialData = {
@@ -159,7 +156,7 @@ export async function submitTestimonialAction(data: {
     const collectionName = data.destination === 'public' ? 'testimonials' : 'private_feedbacks';
     const feedbacksRef = collection(firestore, 'users', data.targetUserId, collectionName);
 
-    // 2. Incrementa o contador do usuário ANTES para visibilidade imediata
+    // 2. Incrementa o contador do usuário ANTES
     const userRef = doc(firestore, 'users', data.targetUserId);
     await updateDoc(userRef, {
       testimonialsCount: increment(1)
@@ -169,7 +166,7 @@ export async function submitTestimonialAction(data: {
     const docRef = await addDoc(feedbacksRef, testimonialData);
     const testimonialId = docRef.id;
 
-    // 4. Busca dados do usuário para alertas
+    // 4. Alertas e Curadoria
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
       const userData = userSnap.data();
@@ -179,35 +176,6 @@ export async function submitTestimonialAction(data: {
       } 
       else if (data.destination === 'public' && data.rating >= 4 && data.text.length >= 20) {
         await sendCuratorshipAlert(userData.email, testimonialData, userData.companyName);
-      }
-    }
-
-    // 5. LÓGICA DE SINCRONIZAÇÃO AUTOMÁTICA
-    if (data.destination === 'public') {
-      const widgetsRef = collection(firestore, 'users', data.targetUserId, 'widgets');
-      const widgetsSnap = await getDocs(widgetsRef);
-
-      let wasAutoPublished = false;
-
-      const updatePromises = widgetsSnap.docs.map(async (wDoc) => {
-        const widget = wDoc.data();
-        if (!widget.autoPublishEnabled) return;
-
-        const minRating = widget.autoPublishMinRating || 5;
-        const minChars = widget.autoPublishMinChars || 0;
-
-        if (testimonialData.rating >= minRating && testimonialData.text.length >= minChars) {
-          wasAutoPublished = true;
-          await updateDoc(wDoc.ref, {
-            selectedTestimonialIds: arrayUnion(testimonialId)
-          });
-        }
-      });
-
-      await Promise.all(updatePromises);
-
-      if (wasAutoPublished) {
-        await updateDoc(docRef, { status: 'approved' });
       }
     }
 

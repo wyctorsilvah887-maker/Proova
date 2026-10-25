@@ -181,9 +181,10 @@ export default function DashPage() {
     );
   }, [db]);
   
-  const { data: rawAnnouncements, error: announcementsError, loading: announcementsLoading } = useCollection(announcementsQuery);
+  const { data: rawAnnouncements, loading: announcementsLoading } = useCollection(announcementsQuery);
   const [isAnnouncementDismissed, setIsAnnouncementDismissed] = useState(false);
 
+  // Variável para o banner de avisos
   const currentAnnouncement = useMemo(() => {
     if (!rawAnnouncements || rawAnnouncements.length === 0) return null;
     return rawAnnouncements[0];
