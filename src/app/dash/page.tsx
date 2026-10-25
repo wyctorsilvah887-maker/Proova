@@ -91,7 +91,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebase';
-import { doc, collection, query, updateDoc, orderBy, limit, where, getDocs, Timestamp, serverTimestamp } from 'firebase/firestore';
+import { doc, collection, query, updateDoc, orderBy, limit, where, getDocs, Timestamp, serverTimestamp, arrayUnion } from 'firebase/firestore';
 import Link from 'next/link';
 import { signOut } from 'firebase/auth';
 import { toast } from '@/hooks/use-toast';
@@ -101,7 +101,8 @@ import { jsPDF } from 'jspdf';
 import { cn } from '@/lib/utils';
 import { searchGooglePlaces, getGooglePlaceDetails } from '@/app/actions/maps-actions';
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
-import { approveTestimonialAction, archiveTestimonialAction } from '@/app/actions/testimonial-actions';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 
 interface AuditItem {
   id: string;
@@ -128,37 +129,13 @@ export default function DashPage() {
   const [isQrDialogOpenManual, setIsQrDialogOpenManual] = useState(false);
   const [isGoogleMapsDialogOpen, setIsGoogleMapsDialogOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
-  const [isSlugDialogOpen, setIsSlugDialogOpen] = useState(false);
-  const [isSocialCardDialogOpen, setIsSocialCardDialogOpen] = useState(false);
-  const [isRewardDialogOpen, setIsRewardDialogOpen] = useState(false);
   
   // Feature States
   const [newGoogleMapsUrl, setNewGoogleMapsUrl] = useState('');
   const [isUpdatingUrl, setIsUpdatingUrl] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-  const [pdfTheme, setPdfTheme] = useState<'light' | 'dark'>('light');
-  const [selectedTestimonialForCard, setSelectedTestimonialForCard] = useState<any>(null);
-  const [isGeneratingCard, setIsGeneratingCard] = useState(false);
-  const [isSharingCard, setIsSharingCard] = useState(false);
   const [isSendingReport, setIsSendingReport] = useState(false);
   const [isProcessingCuratorship, setIsProcessingCuratorship] = useState<string | null>(null);
-
-  // Google Search States
-  const [googleStep, setGoogleStep] = useState<'info' | 'location' | 'search' | 'manual'>('info');
-  const [userCity, setUserCity] = useState('');
-  const [userState, setUserState] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchingPlaces, setIsSearchingPlaces] = useState(false);
-  const [placeResults, setPlaceResults] = useState<any[]>([]);
-
-  // Audit State
-  const [auditItems, setAuditItems] = useState<AuditItem[]>([]);
-  const [isAuditing, setIsAuditing] = useState(false);
-
-  // Slug States
-  const [tempSlug, setTempSlug] = useState('');
-  const [isCheckingSlug, setIsCheckingSlug] = useState(false);
-  const [slugError, setSlugError] = useState<string | null>(null);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
@@ -170,19 +147,26 @@ export default function DashPage() {
   }, [db, user]);
   const { data: widgetsList } = useCollection(widgetsQuery);
 
-  // Fetch Announcements (SÓ ORDERBY PARA EVITAR ÍNDICE COMPOSTO)
+  // Fetch Announcements
   const announcementsQuery = useMemo(() => {
     if (!db) return null;
-    return query(collection(db, 'announcements'), orderBy('createdAt', 'desc'), limit(10));
+    return collection(db, 'announcements');
   }, [db]);
   
-  const { data: rawAnnouncements } = useCollection(announcementsQuery);
+  const { data: announcementsList } = useCollection(announcementsQuery);
   const [isAnnouncementDismissed, setIsAnnouncementDismissed] = useState(false);
 
   const currentAnnouncement = useMemo(() => {
-    if (!rawAnnouncements) return null;
-    return rawAnnouncements.filter((a: any) => a.isActive)[0] || null;
-  }, [rawAnnouncements]);
+    if (!announcementsList) return null;
+    // Filtro e ordenação em memória para evitar erros de índice composto
+    return announcementsList
+      .filter((a: any) => a.isActive)
+      .sort((a: any, b: any) => {
+        const da = a.createdAt?.toDate?.() || new Date(0);
+        const db = b.createdAt?.toDate?.() || new Date(0);
+        return db.getTime() - da.getTime();
+      })[0] || null;
+  }, [announcementsList]);
 
   // Fetch Private Feedbacks
   const privateFeedbacksQuery = useMemo(() => {
@@ -191,26 +175,33 @@ export default function DashPage() {
   }, [db, user]);
   const { data: privateFeedbacksList } = useCollection(privateFeedbacksQuery);
 
-  // Fetch All Testimonials (SÓ ORDERBY PARA EVITAR ÍNDICE COMPOSTO)
+  // Fetch All Testimonials
   const allTestimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
-    return query(collection(db, 'users', user.uid, 'testimonials'), orderBy('createdAt', 'desc'), limit(100));
+    return collection(db, 'users', user.uid, 'testimonials');
   }, [db, user]);
   const { data: allFetchedTestimonials, loading: testimonialsLoading } = useCollection(allTestimonialsQuery);
 
-  // Filtragem de Curadoria e Publicados em memória
+  // Filtragem em memória
   const pendingTestimonials = useMemo(() => {
-    return allFetchedTestimonials?.filter((t: any) => t.status === 'pending') || [];
+    return (allFetchedTestimonials || [])
+      .filter((t: any) => t.status === 'pending')
+      .sort((a: any, b: any) => {
+        const da = a.createdAt?.toDate?.() || new Date(0);
+        const db = b.createdAt?.toDate?.() || new Date(0);
+        return db.getTime() - da.getTime();
+      });
   }, [allFetchedTestimonials]);
 
   const approvedTestimonials = useMemo(() => {
-    return allFetchedTestimonials?.filter((t: any) => t.status === 'approved') || [];
+    return (allFetchedTestimonials || [])
+      .filter((t: any) => t.status === 'approved')
+      .sort((a: any, b: any) => {
+        const da = a.createdAt?.toDate?.() || new Date(0);
+        const db = b.createdAt?.toDate?.() || new Date(0);
+        return db.getTime() - da.getTime();
+      });
   }, [allFetchedTestimonials]);
-
-  const isProPlan = useMemo(() => {
-    const status = userData?.membershipStatus;
-    return status === 'gold' || status === 'enterprise' || status === 'trial';
-  }, [userData]);
 
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
@@ -225,17 +216,12 @@ export default function DashPage() {
     if (typeof window !== 'undefined') setBaseUrl(window.location.origin);
   }, []);
 
-  const displayDomain = useMemo(() => {
-    if (!baseUrl) return 'proova.wsstudioscompany.com.br';
-    try { return new URL(baseUrl).hostname; } catch (e) { return 'proova.wsstudioscompany.com.br'; }
-  }, [baseUrl]);
-
   useEffect(() => {
     if (!authLoading && !user) router.replace('/login');
   }, [user, authLoading, router]);
 
   const setupSteps = useMemo(() => {
-    const s0 = { id: 'location', label: 'Localização', completed: !!userData?.city, unlocked: true, action: () => { setGoogleStep('location'); setIsGoogleMapsDialogOpen(true); } };
+    const s0 = { id: 'location', label: 'Localização', completed: !!userData?.city, unlocked: true, action: () => setIsGoogleMapsDialogOpen(true) };
     const s1 = { id: 'google', label: 'Google Maps', completed: !!userData?.googleMapsUrl, unlocked: s0.completed, action: () => setIsGoogleMapsDialogOpen(true) };
     const s2 = { id: 'collect', label: 'Coleta Ativa', completed: (userData?.testimonialsCount || 0) > 0, unlocked: s1.completed, action: () => copyToClipboard(`${baseUrl}/c/${userData?.companySlug}`, "Link de coleta") };
     const s3 = { id: 'widget', label: 'Primeiro Mural', completed: !!(widgetsList && widgetsList.length > 0), unlocked: s2.completed, action: () => router.push('/widgets') };
@@ -249,6 +235,9 @@ export default function DashPage() {
   const isGoogleDone = setupSteps.find(s => s.id === 'google')?.completed;
 
   // Lógica do Auditor Consultivo
+  const [auditItems, setAuditItems] = useState<AuditItem[]>([]);
+  const [isAuditing, setIsAuditing] = useState(false);
+
   useEffect(() => {
     async function runAudit() {
       if (!isSetupComplete || !userData || isAuditing) return;
@@ -266,37 +255,67 @@ export default function DashPage() {
       if (userData.googlePlaceId) {
         const details = await getGooglePlaceDetails(userData.googlePlaceId);
         if (details) {
-          if (!details.hasPhotos) results.push({ id: 'profile-photos', label: 'Perfil Sem Fotos', status: 'attention', description: 'Empresas com fotos recebem 42% mais cliques no Maps.', actionLabel: 'Dica: Adicionar 5 fotos', action: () => window.open(`https://www.google.com/maps/place/?q=place_id:${userData.googlePlaceId}`, '_blank'), icon: Camera });
+          if (!details.hasPhotos) results.push({ id: 'profile-photos', label: 'Perfil Sem Fotos', status: 'attention', description: 'Empresas com fotos recebem 42% mais cliques no Maps.', actionLabel: 'Adicionar Fotos', action: () => window.open(`https://www.google.com/maps/place/?q=place_id:${userData.googlePlaceId}`, '_blank'), icon: Camera });
           if (!details.hasHours) results.push({ id: 'profile-hours', label: 'Horário Pendente', status: 'attention', description: 'Clientes evitam empresas sem horário de funcionamento.', actionLabel: 'Configurar no Google', action: () => window.open(`https://business.google.com/`, '_blank'), icon: Timer });
         }
       }
-
-      const publicCount = userData.testimonialsCount || 0;
-      const privateCount = privateFeedbacksList?.length || 0;
-      if (privateCount > 0 && publicCount === 0) results.push({ id: 'feedback-imbalance', label: 'Elogios Ocultos', status: 'critical', description: `Você tem ${privateCount} feedbacks no privado e nada no site.`, actionLabel: 'Publicar Melhores', action: () => router.push('/widgets'), icon: MessageSquare });
 
       setAuditItems(results);
       setIsAuditing(false);
     }
     runAudit();
-  }, [isSetupComplete, userData, widgetsList, privateFeedbacksList, router]);
+  }, [isSetupComplete, userData, widgetsList, privateFeedbacksList]);
 
-  const handleApproveTestimonial = async (id: string) => {
-    if (!user || isProcessingCuratorship) return;
+  // AÇÕES DE CURADORIA NO CLIENTE (DB LOCAL)
+  const handleApproveTestimonial = (id: string) => {
+    if (!db || !user || isProcessingCuratorship) return;
     setIsProcessingCuratorship(id);
-    try {
-      const res = await approveTestimonialAction(user.uid, id);
-      if (res.success) toast({ title: "Publicado!" }); else throw new Error(res.error);
-    } catch (e: any) { toast({ variant: "destructive", title: "Erro", description: e.message }); } finally { setIsProcessingCuratorship(null); }
+    
+    const testimonialRef = doc(db, 'users', user.uid, 'testimonials', id);
+    
+    updateDoc(testimonialRef, { status: 'approved' })
+      .then(async () => {
+        const widgetsRef = collection(db, 'users', user.uid, 'widgets');
+        const widgetsSnap = await getDocs(query(widgetsRef, limit(1)));
+        
+        if (!widgetsSnap.empty) {
+          updateDoc(widgetsSnap.docs[0].ref, {
+            selectedTestimonialIds: arrayUnion(id)
+          }).catch(err => console.warn("Widget sync failed", err));
+        }
+        
+        toast({ title: "Publicado!", description: "Depoimento aprovado e injetado no widget principal." });
+      })
+      .catch(async (err) => {
+        const permissionError = new FirestorePermissionError({
+          path: testimonialRef.path,
+          operation: 'update',
+          requestResourceData: { status: 'approved' },
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      })
+      .finally(() => setIsProcessingCuratorship(null));
   };
 
-  const handleArchiveTestimonial = async (id: string) => {
-    if (!user || isProcessingCuratorship) return;
+  const handleArchiveTestimonial = (id: string) => {
+    if (!db || !user || isProcessingCuratorship) return;
     setIsProcessingCuratorship(id);
-    try {
-      const res = await archiveTestimonialAction(user.uid, id);
-      if (res.success) toast({ title: "Arquivado" }); else throw new Error(res.error);
-    } catch (e: any) { toast({ variant: "destructive", title: "Erro", description: e.message }); } finally { setIsProcessingCuratorship(null); }
+    
+    const testimonialRef = doc(db, 'users', user.uid, 'testimonials', id);
+    
+    updateDoc(testimonialRef, { status: 'archived' })
+      .then(() => {
+        toast({ title: "Arquivado", description: "O depoimento foi removido da fila." });
+      })
+      .catch(async (err) => {
+        const permissionError = new FirestorePermissionError({
+          path: testimonialRef.path,
+          operation: 'update',
+          requestResourceData: { status: 'archived' },
+        });
+        errorEmitter.emit('permission-error', permissionError);
+      })
+      .finally(() => setIsProcessingCuratorship(null));
   };
 
   const filteredMetrics = useMemo(() => {
@@ -315,12 +334,11 @@ export default function DashPage() {
     toast({ title: "Copiado!", description: `${description} copiado.` });
   };
 
-  const handleUpdateGoogleMapsUrl = async (customUrl?: string, placeId?: string) => {
+  const handleUpdateGoogleMapsUrl = async () => {
     if (!db || !user || isUpdatingUrl) return;
     setIsUpdatingUrl(true);
-    const finalUrl = customUrl || newGoogleMapsUrl;
-    updateDoc(doc(db, 'users', user.uid), { googleMapsUrl: finalUrl.trim(), googlePlaceId: placeId || userData?.googlePlaceId || '' })
-      .then(() => { toast({ title: "Link Atualizado" }); setIsGoogleMapsDialogOpen(false); setGoogleStep('info'); })
+    updateDoc(doc(db, 'users', user.uid), { googleMapsUrl: newGoogleMapsUrl.trim() })
+      .then(() => { toast({ title: "Link Atualizado" }); setIsGoogleMapsDialogOpen(false); })
       .finally(() => setIsUpdatingUrl(false));
   };
 
@@ -385,10 +403,10 @@ export default function DashPage() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
                 <div className="flex flex-col items-end">
-                  <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] transition-colors group-hover:text-primary leading-tight">{userData?.companyName || 'Minha Empresa'}</span>
+                  <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] leading-tight">{userData?.companyName || 'Minha Empresa'}</span>
                   <span className={cn("text-[8px] uppercase tracking-widest font-black leading-tight", userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground")}>{membershipLabel}</span>
                 </div>
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 transition-colors"><User className="w-4 h-4" /></div>
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20"><User className="w-4 h-4" /></div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
@@ -449,7 +467,7 @@ export default function DashPage() {
                   <p className="text-xs md:text-sm italic leading-relaxed text-foreground/90 bg-muted/30 p-4 rounded-xl border-l-4 border-primary">"{t.text}"</p>
                   <div className="flex gap-2 pt-2">
                     <Button className="flex-1 h-11 rounded-xl font-bold gap-2 shadow-md" disabled={!!isProcessingCuratorship} onClick={() => handleApproveTestimonial(t.id)}>{isProcessingCuratorship === t.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}Publicar no Site</Button>
-                    <Button variant="outline" className="h-11 rounded-xl font-bold" disabled={!!isProcessingCuratorship} onClick={() => handleArchiveTestimonial(t.id)}><EyeOff className="w-4 h-4" /></Button>
+                    <Button variant="outline" size="icon" className="h-11 w-11 rounded-xl font-bold" disabled={!!isProcessingCuratorship} onClick={() => handleArchiveTestimonial(t.id)}><EyeOff className="w-4 h-4" /></Button>
                   </div>
                 </Card>
               ))}
@@ -504,7 +522,7 @@ export default function DashPage() {
             <div className="space-y-1"><div className="text-xl md:text-3xl font-bold">{filteredMetrics.count} <span className="text-sm md:text-lg font-medium text-muted-foreground">avaliações</span></div><Badge variant="secondary" className="border-none text-[8px] md:text-[10px] h-4 md:h-5 px-1.5 font-black bg-primary/10 text-primary">{filteredMetrics.trendLabel}</Badge></div>
           </Card>
           <Card className="border-none shadow-sm overflow-hidden rounded-2xl p-4 md:p-6 space-y-4 relative group">
-            <div onClick={() => { setNewGoogleMapsUrl(userData?.googleMapsUrl || ''); setGoogleStep(userData?.googleMapsUrl ? 'manual' : 'info'); setIsGoogleMapsDialogOpen(true); }} className="absolute -top-2 right-4 z-40 bg-primary text-white text-[8px] font-black uppercase px-2.5 py-1 rounded-full shadow-lg cursor-pointer hover:scale-105 transition-all flex items-center gap-1.5 ring-2 ring-white">Editar</div>
+            <div onClick={() => setIsGoogleMapsDialogOpen(true)} className="absolute -top-2 right-4 z-40 bg-primary text-white text-[8px] font-black uppercase px-2.5 py-1 rounded-full shadow-lg cursor-pointer hover:scale-105 transition-all flex items-center gap-1.5 ring-2 ring-white">Editar</div>
             <div className="flex items-center justify-between"><CardTitle className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Cliques Google</CardTitle><MousePointer2 className="h-4 w-4 text-primary" /></div>
             <div className="flex items-center gap-2"><div className="text-xl md:text-2xl font-bold">{userData?.googleRedirectCount || 0}</div>{userData?.googleMapsUrl ? <Badge variant="secondary" className="text-[8px] md:text-[10px] h-4 md:h-5 bg-primary/10 text-primary border-none">G-Boost Ativo</Badge> : <Badge variant="outline" className="text-[8px] h-4 md:h-5 opacity-50 uppercase font-black">Pendente</Badge>}</div>
             <p className="text-[10px] md:text-xs text-muted-foreground">Visitantes redirecionados ao Maps.</p>
@@ -539,7 +557,7 @@ export default function DashPage() {
 
       <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center"><div className="relative w-[180px] h-[60px] opacity-40 grayscale"><Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" /><Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" /></div><p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-30">© 2026 Proova Technology</p></footer>
 
-      {/* DIALOGS SIMPLIFICADOS */}
+      {/* DIALOGS */}
       <Dialog open={isTutorialOpen} onOpenChange={setIsTutorialOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-8 pt-16 pb-4 shrink-0 bg-background"><DialogTitle className="text-2xl font-black font-headline">Guia Estratégico</DialogTitle></DialogHeader>

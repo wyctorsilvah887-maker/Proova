@@ -1,4 +1,3 @@
-
 rules_version = '2';
 
 service cloud.firestore {
@@ -11,7 +10,7 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
 
-    // Regras para Rate Limiting (Necessário para Server Actions e Segurança)
+    // Regras para Rate Limiting
     match /rate_limits/{limitId} {
       allow create, list: if true;
     }
@@ -21,7 +20,6 @@ service cloud.firestore {
       allow create: if true;
       allow get, list: if true;
       
-      // Permite atualização de campos específicos (contadores e status) via Server Actions ou pelo próprio dono
       allow update: if (request.auth != null && request.auth.uid == userId) || 
         (request.resource.data.diff(resource.data).affectedKeys().hasAny(['testimonialsCount', 'googleRedirectCount', 'membershipStatus', 'trialUsed', 'trialStartedAt']));
       
@@ -30,7 +28,7 @@ service cloud.firestore {
       // Depoimentos Públicos (Fila de Curadoria e Mural)
       match /testimonials/{testimonialId} {
         allow create, read: if true; 
-        allow update, delete: if (request.auth != null && (request.auth.uid == userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true));
+        allow update, delete: if request.auth != null && (request.auth.uid == userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
       }
 
       // Feedbacks Privados (Inbox)
@@ -41,12 +39,13 @@ service cloud.firestore {
 
       // Configurações de Widgets e Páginas Públicas
       match /widgets/{widgetId} {
-        allow read, update: if true; // Aberto para leitura pública e sincronização automática
+        allow read: if true;
+        allow update: if request.auth != null && request.auth.uid == userId;
         allow create, delete: if request.auth != null && request.auth.uid == userId;
       }
     }
 
-    // Regras para Logs de Pagamento (Apenas Admin lê)
+    // Regras para Logs de Pagamento
     match /payment_events/{eventId} {
       allow create: if true;
       allow read: if request.auth != null && 
