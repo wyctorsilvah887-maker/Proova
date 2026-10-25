@@ -158,7 +158,7 @@ export default function DashPage() {
 
   const currentAnnouncement = useMemo(() => {
     if (!announcementsList) return null;
-    return announcementsList
+    return (announcementsList as any[])
       .filter((a: any) => a.isActive)
       .sort((a: any, b: any) => {
         const da = a.createdAt?.toDate?.() || new Date(0);
@@ -285,12 +285,7 @@ export default function DashPage() {
         toast({ title: "Publicado!", description: "Depoimento aprovado e injetado no widget principal." });
       })
       .catch(async (err) => {
-        const permissionError = new FirestorePermissionError({
-          path: testimonialRef.path,
-          operation: 'update',
-          requestResourceData: { status: 'approved' },
-        });
-        errorEmitter.emit('permission-error', permissionError);
+        toast({ variant: "destructive", title: "Erro", description: "Falha ao aprovar depoimento." });
       })
       .finally(() => setIsProcessingCuratorship(null));
   };
@@ -306,12 +301,7 @@ export default function DashPage() {
         toast({ title: "Arquivado", description: "O depoimento foi removido da fila." });
       })
       .catch(async (err) => {
-        const permissionError = new FirestorePermissionError({
-          path: testimonialRef.path,
-          operation: 'update',
-          requestResourceData: { status: 'archived' },
-        });
-        errorEmitter.emit('permission-error', permissionError);
+        toast({ variant: "destructive", title: "Erro", description: "Falha ao arquivar depoimento." });
       })
       .finally(() => setIsProcessingCuratorship(null));
   };
@@ -410,10 +400,37 @@ export default function DashPage() {
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
               <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary"><TrendingUp className="mr-2 h-4 w-4" /><span>Dash</span></DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5"><Layout className="mr-2 h-4 w-4 text-primary" /><span>Meus Widgets</span></DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5"><Inbox className="mr-2 h-4 w-4 text-primary" /><span>Inbox Privado</span></DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5"><Gem className="mr-2 h-4 w-4 text-primary" /><span>Upgrade</span></DropdownMenuItem>
+              
+              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
+                <TrendingUp className="mr-2 h-4 w-4 text-primary" />
+                <span>Dash</span>
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem 
+                disabled={!isSetupComplete}
+                onClick={() => isSetupComplete && router.push('/widgets')} 
+                className={cn("rounded-xl cursor-pointer font-bold py-2.5", !isSetupComplete && "opacity-50 cursor-not-allowed")}
+              >
+                <Layout className="mr-2 h-4 w-4 text-primary" />
+                <span>Meus Widgets</span>
+                {!isSetupComplete && <Lock className="ml-auto w-3 h-3 opacity-40" />}
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem 
+                disabled={!isCollectDone}
+                onClick={() => isCollectDone && router.push('/private')} 
+                className={cn("rounded-xl cursor-pointer font-bold py-2.5", !isCollectDone && "opacity-50 cursor-not-allowed")}
+              >
+                <Inbox className="mr-2 h-4 w-4 text-primary" />
+                <span>Inbox Privado</span>
+                {!isCollectDone && <Lock className="ml-auto w-3 h-3 opacity-40" />}
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Gem className="mr-2 h-4 w-4 text-primary" />
+                <span>Upgrade</span>
+              </DropdownMenuItem>
+              
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
@@ -567,19 +584,70 @@ export default function DashPage() {
       {/* DIALOGS */}
       <Dialog open={isTutorialOpen} onOpenChange={setIsTutorialOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
-          <DialogHeader className="p-8 pt-16 pb-4 shrink-0 bg-background"><DialogTitle className="text-2xl font-black font-headline">Guia Estratégico</DialogTitle></DialogHeader>
-          <ScrollArea className="flex-1 p-8 pt-0 space-y-6">
-            <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0"><Sparkles className="w-5 h-5" /></div>
-              <div className="min-w-0 flex-1"><p className="text-sm font-bold">Fila de Curadoria</p><p className="text-xs text-muted-foreground leading-relaxed">Depoimentos qualificados aparecem aqui. Com 1 clique, eles vão direto para seu site.</p></div>
-            </div>
-            <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0"><ShieldCheck className="w-5 h-5" /></div>
-              <div className="min-w-0 flex-1"><p className="text-sm font-bold">Consultor Proova</p><p className="text-xs text-muted-foreground leading-relaxed">Seu auditor de SEO local. Ele avisa sobre fotos ausentes e falhas de conversão no Google.</p></div>
-            </div>
-            <div className="flex gap-4">
-              <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0"><Inbox className="w-5 h-5" /></div>
-              <div className="min-w-0 flex-1"><p className="text-sm font-bold">Inbox Privado</p><p className="text-xs text-muted-foreground leading-relaxed">Resolva críticas em sigilo e evite danos à sua imagem pública.</p></div>
+          <DialogHeader className="p-8 pt-16 pb-4 shrink-0 bg-background">
+            <DialogTitle className="text-2xl font-black font-headline flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-primary" /> Guia Estratégico Proova
+            </DialogTitle>
+            <DialogDescription>Domine as ferramentas que aceleram sua autoridade.</DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="flex-1 p-8 pt-0">
+            <div className="space-y-8 pb-8">
+              <div className="flex gap-4 group">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Sparkles className="w-5 h-5" /></div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Fila de Curadoria</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Depoimentos qualificados aguardam aqui. Com 1 clique, você aprova e injeta no seu site instantaneamente.</p>
+                </div>
+              </div>
+              <div className="flex gap-4 group">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><ShieldCheck className="w-5 h-5" /></div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Consultor Proova</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Seu auditor de SEO Local. Ele avisa sobre falhas no link do Google, falta de fotos ou horários pendentes.</p>
+                </div>
+              </div>
+              <div className="flex gap-4 group">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><BarChart3 className="w-5 h-5" /></div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Resumos e Filtros</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Filtre seus resultados por períodos (7d, 30d ou Total) para entender o ritmo de crescimento da sua prova social.</p>
+                </div>
+              </div>
+              <div className="flex gap-4 group">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><MousePointer2 className="w-5 h-5" /></div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Cliques e G-Boost</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Monitore quantos clientes o Proova enviou diretamente para o seu perfil no Google Maps para te avaliar 5 estrelas.</p>
+                </div>
+              </div>
+              <div className="flex gap-4 group">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Link2 className="w-5 h-5" /></div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Link de Coleta & Personalização</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Sua URL exclusiva baseada no nome da sua marca. Use este link na bio do Instagram e WhatsApp para capturar elogios.</p>
+                </div>
+              </div>
+              <div className="flex gap-4 group">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Inbox className="w-5 h-5" /></div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Inbox Privado (Shield)</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Feedbacks sigilosos (1-3 estrelas) caem aqui. Resolva o problema internamente antes que vire uma reclamação pública.</p>
+                </div>
+              </div>
+              <div className="flex gap-4 group">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Mail className="w-5 h-5" /></div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Relatórios por E-mail</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Clique em "Enviar Relatório" no card de Resumo para receber uma auditoria de performance semanal em PDF.</p>
+                </div>
+              </div>
+              <div className="flex gap-4 group">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><MessageSquare className="w-5 h-5" /></div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Últimos Depoimentos</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Sua vitrine pública. Aqui você vê o que está rodando nos seus widgets e pode gerar Social Cards para o Instagram.</p>
+                </div>
+              </div>
             </div>
           </ScrollArea>
           <DialogFooter className="p-8 pt-4 pb-8 bg-background border-t"><Button className="w-full font-black h-12 rounded-2xl shadow-xl" onClick={() => setIsTutorialOpen(false)}>Dominar Meu Painel</Button></DialogFooter>
