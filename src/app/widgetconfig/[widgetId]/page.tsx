@@ -512,7 +512,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -541,11 +541,20 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
         {/* Main Workspace Area */}
         <div className="flex-1 overflow-y-auto bg-muted/30 p-4 sm:p-8 relative">
           <div className="max-w-4xl mx-auto space-y-8 pb-20">
-            <div className="flex items-center justify-between">
-              <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><Eye className="w-4 h-4" /> Preview do Mural</h2>
-              <Button variant="link" size="sm" onClick={() => setIsTutorialOpen(true)} className="text-[10px] font-bold gap-1 text-primary p-0 h-auto">
-                <Info className="w-3 h-3" /> Ver Tutorial
-              </Button>
+            <div className="flex flex-col gap-4">
+              <Link href="/widgets" className="inline-block group">
+                <Button variant="ghost" size="sm" className="gap-2 px-0 text-muted-foreground hover:text-primary transition-colors">
+                  <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Voltar para a Lista</span>
+                </Button>
+              </Link>
+              
+              <div className="flex items-center justify-between">
+                <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><Eye className="w-4 h-4" /> Preview do Mural</h2>
+                <Button variant="link" size="sm" onClick={() => setIsTutorialOpen(true)} className="text-[10px] font-bold gap-1 text-primary p-0 h-auto">
+                  <Info className="w-3 h-3" /> Ver Tutorial
+                </Button>
+              </div>
             </div>
             
             <div className="relative border shadow-xl bg-muted/20 p-8 rounded-[2rem] min-h-[400px] flex items-center justify-center ring-1 ring-primary/5">
@@ -635,7 +644,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
             </div>
           </div>
 
-          {/* Floating Save Button - Only visible when sidebar is closed (satisfies "outside menu when closed") */}
+          {/* Floating Save Button - Only visible when sidebar is closed */}
           {!isSidebarOpen && (
             <div className="fixed bottom-8 right-8 z-[70] animate-in fade-in zoom-in duration-300">
               <Button 
