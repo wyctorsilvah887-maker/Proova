@@ -223,7 +223,7 @@ export default function DashPage() {
 
   useEffect(() => {
     async function runAudit() {
-      if (!isSetupComplete || !userData || isAuditing) return;
+      if (!isSetupComplete || !userData) return;
       setIsAuditing(true);
       const results: AuditItem[] = [];
 
@@ -329,8 +329,7 @@ export default function DashPage() {
     try {
       await updateDoc(doc(db, 'users', user.uid), { city, state });
       toast({ title: "Localização Salva" });
-      // Se a localização foi salva, foca na busca
-      setSearchQuery(userData?.companyName || '');
+      setSearchQuery('');
     } catch (err) {
       toast({ variant: "destructive", title: "Erro ao salvar local" });
     } finally {
@@ -342,10 +341,8 @@ export default function DashPage() {
     if (isGoogleMapsDialogOpen && userData) {
       setCity(userData.city || '');
       setState(userData.state || '');
-      setSearchQuery(`${userData.companyName || ''} ${userData.city || ''} ${userData.state || ''}`);
-      if (userData.city && userData.state && userData.companyName) {
-        handleSearchPlaces();
-      }
+      setSearchQuery('');
+      setSearchResults([]);
     }
   }, [isGoogleMapsDialogOpen, userData]);
 
@@ -598,10 +595,10 @@ export default function DashPage() {
         </section>
       </main>
 
-      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 text-center bg-background/50">
-        <div className="relative w-[180px] h-[60px]">
-          <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
-          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" priority />
+      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
+        <div className="flex items-center gap-2 relative w-[200px] h-[65px] md:w-[320px] md:h-[105px]">
+          <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain dark:hidden" priority />
+          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain hidden dark:block" priority />
         </div>
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
@@ -615,7 +612,7 @@ export default function DashPage() {
             <DialogDescription>Domine as ferramentas que aceleram sua autoridade.</DialogDescription>
           </DialogHeader>
           
-          <div className="flex-1 overflow-y-auto px-8 pb-8">
+          <div className="flex-1 overflow-y-auto px-8 pb-8 scrollbar-hide">
             <div className="space-y-8">
               <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Inbox className="w-5 h-5" /></div>
@@ -678,7 +675,7 @@ export default function DashPage() {
             <DialogDescription>Conecte sua empresa ao motor de prova social Proova.</DialogDescription>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6">
+          <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6 scrollbar-hide">
             
             {/* ETAPA 1: LOCALIZAÇÃO (Cidade/Estado) */}
             <section className="space-y-4 pt-2">
@@ -778,7 +775,7 @@ export default function DashPage() {
                 
                 {searchResults.length === 0 && !isSearchingPlaces && searchQuery && (
                    <div className="py-6 text-center border-2 border-dashed rounded-2xl bg-muted/5">
-                     <p className="text-[10px] text-muted-foreground font-medium">Digite o nome da empresa e clique na bússola.</p>
+                     <p className="text-[10px] text-muted-foreground font-medium">Empresa não listada? Refine o nome.</p>
                    </div>
                 )}
               </div>
