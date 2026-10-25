@@ -6,7 +6,7 @@ import { collection, query, getDocs, addDoc, serverTimestamp, doc, updateDoc, in
 import { Resend } from 'resend';
 
 /**
- * Verifica o limite de requisições de forma robusta usando índices do Firestore.
+ * Verifica o limite de requisições de forma robusta sem exigir índices compostos.
  */
 async function checkRateLimit(actionName: string) {
   const { firestore } = initializeFirebase();
@@ -16,18 +16,23 @@ async function checkRateLimit(actionName: string) {
   const oneMinuteAgo = new Date(Date.now() - 60000);
   const rateLimitRef = collection(firestore, 'rate_limits');
   
-  // Consulta de alta performance (Exige índice composto)
+  // Consulta simples que não exige índice composto (apenas IP)
   const q = query(
     rateLimitRef, 
     where('ip', '==', ip),
-    where('action', '==', actionName),
-    where('createdAt', '>', Timestamp.fromDate(oneMinuteAgo)),
-    limit(15)
+    limit(50)
   );
   
   const snap = await getDocs(q);
   
-  if (snap.size >= 15) {
+  // Filtra ação e tempo em memória para evitar erro de índice
+  const recentRequests = snap.docs.filter(doc => {
+    const data = doc.data();
+    const createdAt = data.createdAt?.toDate?.() || new Date(0);
+    return data.action === actionName && createdAt > oneMinuteAgo;
+  });
+  
+  if (recentRequests.length >= 15) {
     throw new Error('Limite de envios excedido. Tente novamente em instantes.');
   }
 
@@ -137,7 +142,7 @@ export async function submitTestimonialAction(data: {
   text: string;
 }) {
   try {
-    // 1. Check Rate Limit (Robusto com consulta indexada)
+    // 1. Check Rate Limit (Robusto sem índice composto)
     await checkRateLimit('submit_testimonial');
     
     const { firestore } = initializeFirebase();

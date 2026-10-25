@@ -1,12 +1,11 @@
-
 'use server';
 
 import { headers } from 'next/headers';
 import { initializeFirebase } from '@/firebase';
-import { collection, query, getDocs, addDoc, serverTimestamp, limit } from 'firebase/firestore';
+import { collection, query, getDocs, addDoc, serverTimestamp, limit, where } from 'firebase/firestore';
 
 /**
- * Verifica o limite de requisições de forma 100% segura contra erros de índice.
+ * Verifica o limite de requisições sem exigir índices compostos.
  */
 async function checkRateLimit(actionName: string) {
   const { firestore } = initializeFirebase();
@@ -16,13 +15,13 @@ async function checkRateLimit(actionName: string) {
   const oneMinuteAgo = new Date(Date.now() - 60000);
   const rateLimitRef = collection(firestore, 'rate_limits');
   
-  // Busca bruta limitada para filtrar em memória
-  const snap = await getDocs(query(rateLimitRef, limit(50)));
+  // Busca apenas por IP para evitar erro de índice
+  const snap = await getDocs(query(rateLimitRef, where('ip', '==', ip), limit(50)));
   
   const recentRequests = snap.docs.filter(doc => {
     const data = doc.data();
     const createdAt = data.createdAt?.toDate?.() || new Date(0);
-    return data.ip === ip && data.action === actionName && createdAt > oneMinuteAgo;
+    return data.action === actionName && createdAt > oneMinuteAgo;
   });
   
   if (recentRequests.length >= 10) {
