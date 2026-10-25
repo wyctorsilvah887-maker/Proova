@@ -64,8 +64,7 @@ import {
   CheckCircle,
   EyeOff,
   Sparkles,
-  Settings2,
-  Globe
+  Settings2
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -99,7 +98,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useTheme } from 'next-themes';
 import { jsPDF } from 'jspdf';
 import { cn } from '@/lib/utils';
-import { searchGooglePlaces, getGooglePlaceDetails } from '@/app/actions/maps-actions';
+import { getGooglePlaceDetails } from '@/app/actions/maps-actions';
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
 
 interface AuditItem {
@@ -120,15 +119,11 @@ export default function DashPage() {
   const { theme, setTheme } = useTheme();
   const [baseUrl, setBaseUrl] = useState('');
   
-  // Period Filtering State
   const [period, setPeriod] = useState<'7' | '30' | 'all'>('7');
-  
-  // Dialog States
   const [isQrDialogOpenManual, setIsQrDialogOpenManual] = useState(false);
   const [isGoogleMapsDialogOpen, setIsGoogleMapsDialogOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   
-  // Feature States
   const [newGoogleMapsUrl, setNewGoogleMapsUrl] = useState('');
   const [isUpdatingUrl, setIsUpdatingUrl] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
@@ -138,14 +133,12 @@ export default function DashPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
-  // Fetch Widgets
   const widgetsQuery = useMemo(() => {
     if (!db || !user) return null;
     return collection(db, 'users', user.uid, 'widgets');
   }, [db, user]);
   const { data: widgetsList } = useCollection(widgetsQuery);
 
-  // Fetch Announcements
   const announcementsQuery = useMemo(() => {
     if (!db) return null;
     return collection(db, 'announcements');
@@ -165,21 +158,12 @@ export default function DashPage() {
       })[0] || null;
   }, [announcementsList]);
 
-  // Fetch Private Feedbacks
-  const privateFeedbacksQuery = useMemo(() => {
-    if (!db || !user) return null;
-    return query(collection(db, 'users', user.uid, 'private_feedbacks'), orderBy('createdAt', 'desc'));
-  }, [db, user]);
-  const { data: privateFeedbacksList } = useCollection(privateFeedbacksQuery);
-
-  // Fetch All Testimonials
   const allTestimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
     return collection(db, 'users', user.uid, 'testimonials');
   }, [db, user]);
   const { data: allFetchedTestimonials, loading: testimonialsLoading } = useCollection(allTestimonialsQuery);
 
-  // Memory filtering to avoid multiple indexes
   const pendingTestimonials = useMemo(() => {
     return (allFetchedTestimonials || [])
       .filter((t: any) => t.status === 'pending')
@@ -231,7 +215,6 @@ export default function DashPage() {
   const isCollectDone = setupSteps.find(s => s.id === 'collect')?.completed;
   const isGoogleDone = setupSteps.find(s => s.id === 'google')?.completed;
 
-  // Consultive Auditor Logic
   const [auditItems, setAuditItems] = useState<AuditItem[]>([]);
   const [isAuditing, setIsAuditing] = useState(false);
 
@@ -261,7 +244,7 @@ export default function DashPage() {
       setIsAuditing(false);
     }
     runAudit();
-  }, [isSetupComplete, userData, widgetsList]);
+  }, [isSetupComplete, userData, widgetsList, isAuditing]);
 
   const handleApproveTestimonial = async (id: string) => {
     if (!db || !user || isProcessingCuratorship) return;
@@ -590,7 +573,6 @@ export default function DashPage() {
             <DialogDescription>Domine as ferramentas que aceleram sua autoridade.</DialogDescription>
           </DialogHeader>
           
-          {/* Scrollable Container NATIVO para máxima compatibilidade mobile */}
           <div className="flex-1 overflow-y-auto px-8 pb-8">
             <div className="space-y-8">
               <div className="flex gap-4 group">
