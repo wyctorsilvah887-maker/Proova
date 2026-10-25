@@ -301,26 +301,26 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
                   <Button 
                     disabled={isSubmitting}
                     onClick={() => handleFinalSubmit('public')}
-                    className="h-24 rounded-2xl flex flex-col items-center justify-center gap-1 bg-[#4285F4] hover:bg-[#357ae8] shadow-xl transition-all hover:scale-[1.02] active:scale-95 border-none"
+                    className="h-auto min-h-24 py-5 rounded-2xl flex flex-col items-center justify-center gap-1 bg-[#4285F4] hover:bg-[#357ae8] shadow-xl transition-all hover:scale-[1.02] active:scale-95 border-none px-6"
                   >
                     <div className="flex items-center gap-2">
                       <Globe className="w-5 h-5" />
-                      <span className="font-bold text-lg">Público no Google & Site</span>
+                      <span className="font-bold text-base sm:text-lg">Público no Google & Site</span>
                     </div>
-                    <span className="text-[9px] opacity-70 uppercase font-black tracking-widest px-4 text-center">Copiaremos seu texto para você colar no perfil da empresa</span>
+                    <span className="text-[8px] sm:text-[9px] opacity-70 uppercase font-black tracking-widest text-center leading-tight">Copiaremos seu texto para você colar no perfil da empresa</span>
                   </Button>
                   
                   <Button 
                     disabled={isSubmitting}
                     variant="outline"
                     onClick={() => handleFinalSubmit('private')}
-                    className="h-24 rounded-2xl flex flex-col items-center justify-center gap-1 border-primary/20 text-primary hover:bg-primary/5 shadow-md transition-all hover:scale-[1.02] active:scale-95"
+                    className="h-auto min-h-24 py-5 rounded-2xl flex flex-col items-center justify-center gap-1 border-primary/20 text-primary hover:bg-primary/5 shadow-md transition-all hover:scale-[1.02] active:scale-95 px-6"
                   >
                     <div className="flex items-center gap-2">
                       <Shield className="w-5 h-5" />
-                      <span className="font-bold text-lg">Privado para a Empresa</span>
+                      <span className="font-bold text-base sm:text-lg">Privado para a Empresa</span>
                     </div>
-                    <span className="text-[9px] opacity-70 uppercase font-black tracking-widest">Sugestão sigilosa direta para a gerência</span>
+                    <span className="text-[8px] sm:text-[9px] opacity-70 uppercase font-black tracking-widest text-center leading-tight">Sugestão sigilosa direta para a gerência</span>
                   </Button>
                 </div>
 
