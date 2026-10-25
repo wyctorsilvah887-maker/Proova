@@ -59,7 +59,6 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import {
   Accordion,
@@ -125,7 +124,6 @@ const EmbedSettings = ({
   autoPublishMinChars, setAutoPublishMinChars,
   handleSave, isSaving,
   isGoldPlan,
-  showSaveButton = true,
   onClose
 }: any) => {
   const colors = ['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff'];
@@ -160,12 +158,10 @@ const EmbedSettings = ({
           </Button>
         </div>
         
-        {showSaveButton && (
-          <Button onClick={handleSave} disabled={isSaving} className="w-full shadow-lg h-12 font-bold gap-2 text-sm">
-            {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
-            Salvar Alterações
-          </Button>
-        )}
+        <Button onClick={handleSave} disabled={isSaving} className="w-full shadow-lg h-12 font-bold gap-2 text-sm">
+          {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
+          Salvar Alterações
+        </Button>
       </div>
 
       <ScrollArea className="flex-1">
@@ -349,7 +345,6 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const [muralIndex, setMuralIndex] = useState(0);
   const [showAll, setShowAll] = useState(false);
   
-  // Controle unificado de visibilidade da sidebar
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -468,18 +463,6 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          {/* Botão de salvar no topo (Apenas se a sidebar estiver fechada) */}
-          {!isSidebarOpen && (
-            <Button 
-              onClick={handleSave} 
-              disabled={isSaving} 
-              className="h-10 md:h-12 px-4 md:px-6 font-bold gap-2 shadow-lg rounded-xl animate-in fade-in zoom-in duration-300"
-            >
-              {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
-              <span className="hidden sm:inline">Salvar Alterações</span>
-            </Button>
-          )}
-
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
@@ -551,21 +534,16 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
       </header>
 
       <main className="flex-1 flex overflow-hidden relative w-full h-full">
-        {/* Sidebar dinâmica para Desktop */}
         <aside className={cn(
           "hidden lg:flex w-80 bg-background border-r flex-col shrink-0 transition-all duration-300 ease-in-out",
           !isSidebarOpen && "w-0 opacity-0 -ml-80 pointer-events-none"
         )}>
-          <EmbedSettings {...sidebarProps} showSaveButton={isSidebarOpen} />
+          <EmbedSettings {...sidebarProps} />
         </aside>
 
-        {/* Sidebar dinâmica para Mobile (Sheet) */}
         <Sheet open={isSidebarOpen && window.innerWidth < 1024} onOpenChange={setIsSidebarOpen}>
           <SheetContent side="left" className="p-0 w-80 border-none">
-            <SheetHeader className="sr-only">
-              <SheetTitle>Configurações do Mural</SheetTitle>
-            </SheetHeader>
-            <EmbedSettings {...sidebarProps} showSaveButton={true} />
+            <EmbedSettings {...sidebarProps} />
           </SheetContent>
         </Sheet>
 
