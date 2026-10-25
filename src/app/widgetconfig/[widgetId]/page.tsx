@@ -159,7 +159,7 @@ const EmbedSettings = ({
           </Button>
         </div>
         
-        <Button onClick={handleSave} disabled={isSaving} className="w-full shadow-lg h-12 font-bold gap-2 text-sm">
+        <Button onClick={handleSave} disabled={isSaving} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground">
           {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
           Salvar Alterações
         </Button>
@@ -167,7 +167,6 @@ const EmbedSettings = ({
 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-8 pb-10">
-          {/* AUTOMAÇÃO SECTION */}
           <div className="space-y-4">
             <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
               <Zap className="w-3 h-3" /> Automação Inteligente
@@ -215,7 +214,6 @@ const EmbedSettings = ({
             </div>
           </div>
 
-          {/* PRESETS SECTION */}
           <div className="space-y-4 pt-4 border-t">
             <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
               <Sparkles className="w-3 h-3 text-primary" /> Estilos Rápidos (Presets)
@@ -346,7 +344,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const [muralIndex, setMuralIndex] = useState(0);
   const [showAll, setShowAll] = useState(false);
   
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -450,8 +448,8 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const membershipLabel = isEnterprise ? 'Membro Enterprise' : (isGold ? 'Membro Gold' : (isTrial ? 'Período Trial' : 'Plano Base'));
 
   return (
-    <div className="min-h-screen bg-muted/20 flex flex-col font-body w-full overflow-hidden">
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
+    <div className="h-screen flex flex-col font-body w-full overflow-hidden bg-background">
+      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95 shrink-0">
         <div className="flex items-center gap-3 flex-1">
           <Button 
             variant="ghost" 
@@ -511,57 +509,38 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Planos de Upgrade</span>
               </DropdownMenuItem>
-              
               <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem 
-                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-                className="rounded-xl cursor-pointer font-bold py-2.5"
-              >
-                {theme === 'light' ? (
-                  <Moon className="mr-2 h-4 w-4 text-primary" />
-                ) : (
-                  <Sun className="mr-2 h-4 w-4 text-primary" />
-                )}
-                <span>Alternar Tema</span>
-              </DropdownMenuItem>
-
-              {userData?.isAdmin && (
-                <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                  <Shield className="mr-2 h-4 w-4 text-primary" />
-                  <span>Administração</span>
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-bold py-2.5">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sair</span>
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </header>
 
       <main className="flex-1 flex overflow-hidden relative w-full h-full">
+        {/* Desktop Sidebar */}
         <aside className={cn(
-          "hidden lg:flex w-80 bg-background border-r flex-col shrink-0 transition-all duration-300 ease-in-out",
+          "hidden lg:flex w-80 bg-background border-r flex-col shrink-0 transition-all duration-300 ease-in-out h-full",
           !isSidebarOpen && "w-0 opacity-0 -ml-80 pointer-events-none"
         )}>
           <EmbedSettings {...sidebarProps} />
         </aside>
 
+        {/* Mobile Sidebar */}
         <Sheet open={isSidebarOpen && isMobile} onOpenChange={setIsSidebarOpen}>
           <SheetContent side="left" className="p-0 w-80 border-none">
             <SheetHeader className="sr-only">
               <SheetTitle>Configurações do Mural</SheetTitle>
-              <SheetDescription>Personalize o visual e automação do seu mural.</SheetDescription>
+              <SheetDescription>Ajuste as regras e visual do seu widget.</SheetDescription>
             </SheetHeader>
             <EmbedSettings {...sidebarProps} />
           </SheetContent>
         </Sheet>
 
-        <div className="flex-1 overflow-y-auto bg-muted/30 p-4 sm:p-8">
+        {/* Main Workspace Area */}
+        <div className="flex-1 overflow-y-auto bg-muted/30 p-4 sm:p-8 relative">
           <div className="max-w-4xl mx-auto space-y-8 pb-20">
-            
             <div className="flex items-center justify-between">
               <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><Eye className="w-4 h-4" /> Preview do Mural</h2>
               <Button variant="link" size="sm" onClick={() => setIsTutorialOpen(true)} className="text-[10px] font-bold gap-1 text-primary p-0 h-auto">
@@ -655,75 +634,39 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
               </Accordion>
             </div>
           </div>
+
+          {/* Floating Save Button - Only visible when sidebar is closed (satisfies "outside menu when closed") */}
+          {!isSidebarOpen && (
+            <div className="fixed bottom-8 right-8 z-[70] animate-in fade-in zoom-in duration-300">
+              <Button 
+                onClick={handleSave} 
+                disabled={isSaving}
+                className="h-16 px-8 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest gap-3"
+              >
+                {isSaving ? <Loader2 className="animate-spin h-5 w-5" /> : <Save className="h-5 w-5" />}
+                Salvar Alterações
+              </Button>
+            </div>
+          )}
         </div>
       </main>
 
       <Dialog open={isTutorialOpen} onOpenChange={setIsTutorialOpen}>
-        <DialogContent className="rounded-[2.5rem] md:rounded-[2.5rem] w-[92vw] sm:w-full sm:max-w-lg border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
+        <DialogContent className="rounded-[2.5rem] w-[92vw] sm:w-full sm:max-w-lg border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-6 md:p-10 pt-10 md:pt-14 pb-4 bg-background shrink-0">
             <DialogTitle className="text-xl md:text-2xl font-black font-headline flex items-center gap-2">
               <Settings2 className="w-6 h-6 text-primary" /> Guia de Configuração
             </DialogTitle>
-            <DialogDescription className="text-xs md:text-sm pl-8">
-              Siga os passos para ativar sua prova social no site.
-            </DialogDescription>
+            <DialogDescription className="text-xs md:text-sm pl-8">Siga os passos para ativar sua prova social.</DialogDescription>
           </DialogHeader>
-          
-          <ScrollArea className="flex-1 overflow-y-auto">
-            <div className="space-y-8 md:space-y-10 py-6 px-5 md:px-10 overflow-x-hidden">
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
-                  <Palette className="w-5 h-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Estilo e Presets</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Clique no ícone de monitor para abrir o painel lateral. Use os <strong>Estilos Rápidos</strong> para aplicar combinações de cores profissionais com um clique.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
-                  <Zap className="w-5 h-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Automação Inteligente</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Ative o <strong>Auto-Publish</strong> na aba de automação. Defina uma nota mínima (ex: 5 estrelas) para que novos elogios entrem no seu site sem sua intervenção manual.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
-                  <CheckCircle2 className="w-5 h-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Curadoria Manual</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Abaixo do preview, você pode selecionar manualmente os depoimentos que já possui. Membros Gold podem ativar até <strong>50 depoimentos</strong> simultâneos.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0">
-                  <Terminal className="w-5 h-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Salvar e Instalar</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Sempre clique em <strong>Salvar Alterações</strong> antes de sair. Copie o snippet gerado e cole no HTML do seu site para ver a mágica acontecer.
-                  </p>
-                </div>
-              </div>
+          <ScrollArea className="flex-1 overflow-y-auto px-5 md:px-10 py-6">
+            <div className="space-y-8">
+              <div className="flex gap-4"><div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0"><Palette className="w-5 h-5" /></div><div className="min-w-0 flex-1"><p className="text-sm font-bold">Estilo e Presets</p><p className="text-xs text-muted-foreground leading-relaxed">Clique no ícone de monitor para abrir as configurações. Use os estilos rápidos para um visual profissional instantâneo.</p></div></div>
+              <div className="flex gap-4"><div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0"><Zap className="w-5 h-5" /></div><div className="min-w-0 flex-1"><p className="text-sm font-bold">Automação Inteligente</p><p className="text-xs text-muted-foreground leading-relaxed">Ative o Auto-Publish para que novos elogios 5 estrelas entrem no seu site sem sua intervenção manual.</p></div></div>
+              <div className="flex gap-4"><div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0"><Terminal className="w-5 h-5" /></div><div className="min-w-0 flex-1"><p className="text-sm font-bold">Salvar e Instalar</p><p className="text-xs text-muted-foreground leading-relaxed">O botão de salvar aparece na barra lateral ou flutuando no preview quando a barra está fechada. Copie o snippet gerado e cole no seu site.</p></div></div>
             </div>
           </ScrollArea>
-
-          <DialogFooter className="p-6 md:p-10 pt-4 pb-8 md:pb-10 bg-background border-t shrink-0">
-            <Button className="w-full font-black h-12 rounded-2xl shadow-xl" onClick={() => setIsTutorialOpen(false)}>Começar Configuração</Button>
-          </DialogFooter>
+          <DialogFooter className="p-6 md:p-10 pt-4 pb-8 md:pb-10 bg-background border-t shrink-0"><Button className="w-full font-black h-12 rounded-2xl shadow-xl" onClick={() => setIsTutorialOpen(false)}>Começar Agora</Button></DialogFooter>
         </DialogContent>
       </Dialog>
 
@@ -740,7 +683,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
               <Button size="icon" variant="secondary" className="absolute top-2 right-2 h-8 w-8" onClick={() => { navigator.clipboard.writeText(embedCode); toast({ title: "Copiado!" }); }}><Copy className="h-4 w-4" /></Button>
             </div>
           </div>
-          <DialogFooter><Button className="w-full font-black h-12" onClick={() => setIsCodeDialogOpen(false)}>Fechar</Button></DialogFooter>
+          <DialogFooter><Button className="w-full font-black h-12 rounded-xl" onClick={() => setIsCodeDialogOpen(false)}>Fechar</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
