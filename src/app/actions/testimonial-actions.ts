@@ -3,12 +3,12 @@
 
 import { headers } from 'next/headers';
 import { initializeFirebase } from '@/firebase';
-import { collection, query, getDocs, addDoc, serverTimestamp, doc, updateDoc, increment, getDoc, arrayUnion, limit } from 'firebase/firestore';
+import { collection, query, getDocs, addDoc, serverTimestamp, doc, updateDoc, increment, getDoc, arrayUnion, limit, where, orderBy, Timestamp } from 'firebase/firestore';
 import { Resend } from 'resend';
 
 /**
- * Verifica o limite de requisições de forma 100% segura contra erros de índice.
- * Busca os registros e filtra em memória.
+ * Verifica o limite de requisições de forma robusta usando índices do Firestore.
+ * Exige índice: ip (ASC), action (ASC), createdAt (DESC)
  */
 async function checkRateLimit(actionName: string) {
   const { firestore } = initializeFirebase();
@@ -18,17 +18,18 @@ async function checkRateLimit(actionName: string) {
   const oneMinuteAgo = new Date(Date.now() - 60000);
   const rateLimitRef = collection(firestore, 'rate_limits');
   
-  // Busca os últimos 50 registros sem NENHUM filtro para evitar erro de índice
-  const snap = await getDocs(query(rateLimitRef, limit(50)));
+  // Consulta de alta performance (Exige índice composto)
+  const q = query(
+    rateLimitRef, 
+    where('ip', '==', ip),
+    where('action', '==', actionName),
+    where('createdAt', '>', Timestamp.fromDate(oneMinuteAgo)),
+    limit(15)
+  );
   
-  // Filtra por IP, Ação e Tempo manualmente em memória
-  const recentRequests = snap.docs.filter(doc => {
-    const data = doc.data();
-    const createdAt = data.createdAt?.toDate?.() || new Date(0);
-    return data.ip === ip && data.action === actionName && createdAt > oneMinuteAgo;
-  });
+  const snap = await getDocs(q);
   
-  if (recentRequests.length >= 15) {
+  if (snap.size >= 15) {
     throw new Error('Limite de envios excedido. Tente novamente em instantes.');
   }
 
@@ -138,7 +139,7 @@ export async function submitTestimonialAction(data: {
   text: string;
 }) {
   try {
-    // 1. Check Rate Limit (Completamente index-safe)
+    // 1. Check Rate Limit (Robusto com consulta indexada)
     await checkRateLimit('submit_testimonial');
     
     const { firestore } = initializeFirebase();
@@ -158,7 +159,7 @@ export async function submitTestimonialAction(data: {
     const collectionName = data.destination === 'public' ? 'testimonials' : 'private_feedbacks';
     const feedbacksRef = collection(firestore, 'users', data.targetUserId, collectionName);
 
-    // 2. Incrementa o contador do usuário ANTES para garantir visibilidade no Dash
+    // 2. Incrementa o contador do usuário ANTES para visibilidade imediata
     const userRef = doc(firestore, 'users', data.targetUserId);
     await updateDoc(userRef, {
       testimonialsCount: increment(1)

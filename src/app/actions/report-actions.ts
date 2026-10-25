@@ -3,11 +3,11 @@
 
 import { Resend } from 'resend';
 import { initializeFirebase } from '@/firebase';
-import { collection, query, getDocs, doc, getDoc, Timestamp } from 'firebase/firestore';
+import { collection, query, getDocs, doc, getDoc, Timestamp, where, orderBy } from 'firebase/firestore';
 
 /**
  * @fileOverview Lógica para geração e envio de relatórios de performance via e-mail.
- * Totalmente index-safe.
+ * Utiliza consultas indexadas para máxima performance.
  */
 export async function sendWeeklyPerformanceReport(userId: string) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -28,22 +28,24 @@ export async function sendWeeklyPerformanceReport(userId: string) {
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
 
-    const testimonialsRef = collection(firestore, 'users', userId, 'testimonials');
-    const allSnap = await getDocs(testimonialsRef);
-    const allDocs = allSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Consulta de alta performance para o período atual (Exige índice)
+    const currentRef = collection(firestore, 'users', userId, 'testimonials');
+    const currentSnap = await getDocs(query(
+      currentRef, 
+      where('createdAt', '>=', Timestamp.fromDate(sevenDaysAgo)),
+      orderBy('createdAt', 'desc')
+    ));
+    const currentDocs = currentSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    const currentDocs = allDocs.filter((d: any) => {
-      const dt = d.createdAt?.toDate?.() || new Date(0);
-      return dt >= sevenDaysAgo;
-    });
-
-    const previousDocs = allDocs.filter((d: any) => {
-      const dt = d.createdAt?.toDate?.() || new Date(0);
-      return dt >= fourteenDaysAgo && dt < sevenDaysAgo;
-    });
+    // Consulta para o período anterior
+    const previousSnap = await getDocs(query(
+      currentRef,
+      where('createdAt', '>=', Timestamp.fromDate(fourteenDaysAgo)),
+      where('createdAt', '<', Timestamp.fromDate(sevenDaysAgo))
+    ));
 
     const currentCount = currentDocs.length;
-    const previousCount = previousDocs.length;
+    const previousCount = previousSnap.docs.length;
 
     let growth = 0;
     if (previousCount > 0) {
@@ -52,15 +54,10 @@ export async function sendWeeklyPerformanceReport(userId: string) {
       growth = 100;
     }
 
-    let topT = null;
+    let topT: any = null;
     if (currentDocs.length > 0) {
-      const sorted = [...currentDocs].sort((a: any, b: any) => {
-        if (b.rating !== a.rating) return b.rating - a.rating;
-        const dateA = a.createdAt?.toDate?.() || new Date(0);
-        const dateB = b.createdAt?.toDate?.() || new Date(0);
-        return dateB.getTime() - dateA.getTime();
-      });
-      topT = sorted[0];
+      // Já vem ordenado pela query
+      topT = currentDocs.sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0))[0];
     }
 
     const userFirstName = userData.name ? userData.name.split(' ')[0] : 'Parceiro';

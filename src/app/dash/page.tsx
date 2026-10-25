@@ -171,13 +171,13 @@ export default function DashPage() {
   }, [db, user]);
   const { data: widgetsList } = useCollection(widgetsQuery);
 
-  // Fetch Announcements (Index-Safe)
+  // Fetch Announcements (Robust query - Exige índice composto)
   const announcementsQuery = useMemo(() => {
     if (!db) return null;
-    // Removido orderBy para evitar erro de índice composto em ambiente de dev
     return query(
       collection(db, 'announcements'), 
       where('isActive', '==', true),
+      orderBy('createdAt', 'desc'),
       limit(5)
     );
   }, [db]);
@@ -192,36 +192,17 @@ export default function DashPage() {
   }, [db, user]);
   const { data: privateFeedbacksList } = useCollection(privateFeedbacksQuery);
 
-  // Fetch Pending Testimonials (Review Queue)
+  // Fetch Pending Testimonials (Review Queue - Exige índice)
   const pendingTestimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
     return query(
       collection(db, 'users', user.uid, 'testimonials'),
-      where('status', '==', 'pending')
+      where('status', '==', 'pending'),
+      orderBy('createdAt', 'desc')
     );
   }, [db, user]);
-  const { data: rawPendingTestimonials } = useCollection(pendingTestimonialsQuery);
+  const { data: pendingTestimonials } = useCollection(pendingTestimonialsQuery);
   
-  const pendingTestimonials = useMemo(() => {
-    if (!rawPendingTestimonials) return [];
-    return [...rawPendingTestimonials].sort((a: any, b: any) => {
-      const dateA = a.createdAt?.toDate?.() || new Date(0);
-      const dateB = b.createdAt?.toDate?.() || new Date(0);
-      return dateB.getTime() - dateA.getTime();
-    });
-  }, [rawPendingTestimonials]);
-
-  const currentAnnouncement = useMemo(() => {
-    if (announcementsError || announcementsLoading || !rawAnnouncements || rawAnnouncements.length === 0) return null;
-    // Ordenação em memória para ser index-safe
-    const sorted = [...rawAnnouncements].sort((a: any, b: any) => {
-      const dateA = a.createdAt?.toDate?.() || new Date(0);
-      const dateB = b.createdAt?.toDate?.() || new Date(0);
-      return dateB.getTime() - dateA.getTime();
-    });
-    return sorted[0];
-  }, [rawAnnouncements, announcementsError, announcementsLoading]);
-
   const isProPlan = useMemo(() => {
     const status = userData?.membershipStatus;
     return status === 'gold' || status === 'enterprise' || status === 'trial';
@@ -257,11 +238,13 @@ export default function DashPage() {
     }
   }, [user, authLoading, router]);
 
+  // Fetch Approved Testimonials (Robust query - Exige índice)
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
     return query(
       collection(db, 'users', user.uid, 'testimonials'),
       where('status', '==', 'approved'),
+      orderBy('createdAt', 'desc'),
       limit(50)
     );
   }, [db, user]);
@@ -1119,7 +1102,7 @@ export default function DashPage() {
           </section>
         )}
 
-        {pendingTestimonials.length > 0 && (
+        {pendingTestimonials && pendingTestimonials.length > 0 && (
           <section className="space-y-4 animate-in zoom-in-95 duration-500">
             <div className="flex items-center justify-between">
               <h2 className="text-[9px] md:text-xs font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
