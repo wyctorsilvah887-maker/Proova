@@ -124,7 +124,8 @@ const EmbedSettings = ({
   autoPublishMinRating, setAutoPublishMinRating,
   autoPublishMinChars, setAutoPublishMinChars,
   handleSave, isSaving,
-  isGoldPlan
+  isGoldPlan,
+  showSaveButton = true
 }: any) => {
   const colors = ['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff'];
   
@@ -152,10 +153,12 @@ const EmbedSettings = ({
             <span className="text-xs font-black uppercase tracking-[0.2em]">Voltar</span>
           </Button>
         </Link>
-        <Button onClick={handleSave} disabled={isSaving} className="w-full shadow-lg h-12 font-bold gap-2 text-sm">
-          {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
-          Salvar Alterações
-        </Button>
+        {showSaveButton && (
+          <Button onClick={handleSave} disabled={isSaving} className="w-full shadow-lg h-12 font-bold gap-2 text-sm">
+            {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
+            Salvar Alterações
+          </Button>
+        )}
       </div>
 
       <ScrollArea className="flex-1">
@@ -338,6 +341,9 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const [baseUrl, setBaseUrl] = useState('');
   const [muralIndex, setMuralIndex] = useState(0);
   const [showAll, setShowAll] = useState(false);
+  
+  // Controle de estado do menu lateral mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') setBaseUrl(window.location.origin);
@@ -436,7 +442,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
     <div className="min-h-screen bg-muted/20 flex flex-col font-body w-full">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-3 flex-1">
-          <Sheet>
+          <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/5 transition-all h-12 w-12 flex items-center justify-center">
                 <Monitor className="h-8 w-8" />
@@ -446,7 +452,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
               <SheetHeader className="sr-only">
                 <SheetTitle>Configurações do Mural</SheetTitle>
               </SheetHeader>
-              <EmbedSettings {...sidebarProps} />
+              <EmbedSettings {...sidebarProps} showSaveButton={true} />
             </SheetContent>
           </Sheet>
           <div className="flex items-center group -ml-2 md:-ml-4">
@@ -458,6 +464,18 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
+          {/* Botão de salvar no cabeçalho (apenas quando o menu está fechado e em telas menores que LG) */}
+          {!isSidebarOpen && (
+            <Button 
+              onClick={handleSave} 
+              disabled={isSaving} 
+              className="lg:hidden h-10 px-4 font-bold gap-2 shadow-md rounded-xl"
+            >
+              {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
+              <span className="hidden sm:inline">Salvar</span>
+            </Button>
+          )}
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
@@ -530,7 +548,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
 
       <main className="flex-1 flex overflow-hidden relative w-full">
         <aside className="hidden lg:flex w-80 bg-background border-r flex-col shrink-0">
-          <EmbedSettings {...sidebarProps} />
+          <EmbedSettings {...sidebarProps} showSaveButton={true} />
         </aside>
 
         <div className="flex-1 overflow-y-auto bg-muted/30 p-4 sm:p-8">
