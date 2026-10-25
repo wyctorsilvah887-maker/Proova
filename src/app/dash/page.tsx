@@ -80,7 +80,6 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Progress } from "@/components/ui/progress";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Dialog,
   DialogContent,
@@ -169,7 +168,7 @@ export default function DashPage() {
   // Fetch Private Feedbacks
   const privateFeedbacksQuery = useMemo(() => {
     if (!db || !user) return null;
-    return collection(db, 'users', user.uid, 'private_feedbacks');
+    return query(collection(db, 'users', user.uid, 'private_feedbacks'), orderBy('createdAt', 'desc'));
   }, [db, user]);
   const { data: privateFeedbacksList } = useCollection(privateFeedbacksQuery);
 
@@ -262,7 +261,7 @@ export default function DashPage() {
       setIsAuditing(false);
     }
     runAudit();
-  }, [isSetupComplete, userData, widgetsList, privateFeedbacksList]);
+  }, [isSetupComplete, userData, widgetsList]);
 
   const handleApproveTestimonial = async (id: string) => {
     if (!db || !user || isProcessingCuratorship) return;
@@ -284,7 +283,7 @@ export default function DashPage() {
       toast({ title: "Publicado!", description: "Depoimento aprovado e injetado no mural principal." });
     } catch (err) {
       console.error(err);
-      toast({ variant: "destructive", title: "Erro de Permissão", description: "Verifique suas regras do Firestore no console." });
+      toast({ variant: "destructive", title: "Erro de Permissão", description: "Falha na aprovação." });
     } finally {
       setIsProcessingCuratorship(null);
     }
@@ -300,7 +299,7 @@ export default function DashPage() {
       toast({ title: "Arquivado", description: "O depoimento foi removido da fila." });
     } catch (err) {
       console.error(err);
-      toast({ variant: "destructive", title: "Erro de Permissão", description: "Verifique suas regras do Firestore no console." });
+      toast({ variant: "destructive", title: "Erro", description: "Falha ao arquivar." });
     } finally {
       setIsProcessingCuratorship(null);
     }
@@ -532,10 +531,10 @@ export default function DashPage() {
             <div className="space-y-1"><div className="text-xl md:text-3xl font-bold">{filteredMetrics.count} <span className="text-sm md:text-lg font-medium text-muted-foreground">avaliações</span></div><Badge variant="secondary" className="border-none text-[8px] md:text-[10px] h-4 md:h-5 px-1.5 font-black bg-primary/10 text-primary">{filteredMetrics.trendLabel}</Badge></div>
           </Card>
           
-          <div className="relative group h-full">
+          <div className="relative h-full">
              <div 
                onClick={() => setIsGoogleMapsDialogOpen(true)} 
-               className="absolute -top-2 px-2.5 py-1 z-40 bg-primary text-white text-[8px] font-black uppercase rounded-full shadow-lg cursor-pointer hover:scale-105 active:scale-95 transition-all flex items-center gap-1 ring-2 ring-background right-4"
+               className="absolute -top-2 right-4 px-2 py-0.5 z-40 bg-primary text-white text-[8px] font-black uppercase rounded-full shadow-lg cursor-pointer hover:scale-105 active:scale-95 transition-all flex items-center gap-1 ring-2 ring-background"
              >
                <Edit3 className="w-2.5 h-2.5" /> Editar
              </div>
@@ -590,8 +589,10 @@ export default function DashPage() {
             </DialogTitle>
             <DialogDescription>Domine as ferramentas que aceleram sua autoridade.</DialogDescription>
           </DialogHeader>
-          <ScrollArea className="flex-1 p-8 pt-0">
-            <div className="space-y-8 pb-8">
+          
+          {/* Scrollable Container NATIVO para máxima compatibilidade mobile */}
+          <div className="flex-1 overflow-y-auto px-8 pb-8">
+            <div className="space-y-8">
               <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Sparkles className="w-5 h-5" /></div>
                 <div className="min-w-0 flex-1">
@@ -621,10 +622,17 @@ export default function DashPage() {
                 </div>
               </div>
               <div className="flex gap-4 group">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Zap className="w-5 h-5" /></div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Ações Rápidas</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Acessos rápidos para copiar seu link, baixar o cartaz de balcão ou gerenciar seus murais embutidos.</p>
+                </div>
+              </div>
+              <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Link2 className="w-5 h-5" /></div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">Link de Coleta & Personalização</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Sua URL exclusiva baseada no nome da sua marca. Use este link na bio do Instagram e WhatsApp para capturar elogios.</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Sua URL exclusiva baseada no nome da sua marca. Use este link na bio do Instagram para capturar elogios.</p>
                 </div>
               </div>
               <div className="flex gap-4 group">
@@ -638,7 +646,7 @@ export default function DashPage() {
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Mail className="w-5 h-5" /></div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">Relatórios por E-mail</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Clique em "Enviar Relatório" no card de Resumo para receber uma auditoria de performance semanal no seu e-mail.</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Receba uma auditoria de performance semanal no seu e-mail clicando em "Enviar Relatório" no card de Resumo.</p>
                 </div>
               </div>
               <div className="flex gap-4 group">
@@ -649,8 +657,11 @@ export default function DashPage() {
                 </div>
               </div>
             </div>
-          </ScrollArea>
-          <DialogFooter className="p-8 pt-4 pb-8 bg-background border-t shrink-0"><Button className="w-full font-black h-12 rounded-2xl shadow-xl" onClick={() => setIsTutorialOpen(false)}>Dominar Meu Painel</Button></DialogFooter>
+          </div>
+
+          <DialogFooter className="p-8 pt-4 pb-8 bg-background border-t shrink-0">
+            <Button className="w-full font-black h-12 rounded-2xl shadow-xl" onClick={() => setIsTutorialOpen(false)}>Dominar Meu Painel</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
       
