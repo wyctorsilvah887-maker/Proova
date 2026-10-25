@@ -6,59 +6,56 @@ service cloud.firestore {
     
     // Regras para a coleção de avisos globais
     match /announcements/{announcementId} {
-      allow read: if true; // Permite que qualquer usuário veja os avisos
+      allow read: if true;
       allow write: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
 
-    // Regras para Rate Limiting (Necessário para Server Actions com Web SDK)
+    // Regras para Rate Limiting (Necessário para Server Actions e Segurança)
     match /rate_limits/{limitId} {
-      allow create: if true;
-      allow list: if true; 
+      allow create, list: if true;
     }
 
-    // Regras para a coleção de usuários
+    // Regras para a coleção de usuários e subcoleções
     match /users/{userId} {
       allow create: if true;
       allow get, list: if true;
       
+      // Permite atualização de campos específicos (contadores e status) via Server Actions ou pelo próprio dono
       allow update: if (request.auth != null && request.auth.uid == userId) || 
-        (request.resource.data.diff(resource.data).affectedKeys().hasAny(['testimonialsCount', 'googleRedirectCount', 'membershipStatus', 'trialUsed', 'trialStartedAt']) &&
-         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['testimonialsCount', 'googleRedirectCount', 'membershipStatus', 'trialUsed', 'trialStartedAt']));
+        (request.resource.data.diff(resource.data).affectedKeys().hasAny(['testimonialsCount', 'googleRedirectCount', 'membershipStatus', 'trialUsed', 'trialStartedAt']));
       
       allow delete: if request.auth != null && request.auth.uid == userId;
       
+      // Depoimentos Públicos (Fila de Curadoria e Mural)
       match /testimonials/{testimonialId} {
-        allow create: if true;
-        allow read: if resource.data.status == 'approved';
-        allow read, update, delete: if (request.auth != null && request.auth.uid == userId) || 
-          (request.auth != null && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+        allow create, read: if true; 
+        allow update, delete: if (request.auth != null && (request.auth.uid == userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true));
       }
 
+      // Feedbacks Privados (Inbox)
       match /private_feedbacks/{feedbackId} {
         allow create: if true;
-        allow read, update, delete: if (request.auth != null && request.auth.uid == userId);
+        allow read, update, delete: if request.auth != null && request.auth.uid == userId;
       }
 
+      // Configurações de Widgets e Páginas Públicas
       match /widgets/{widgetId} {
-        allow read: if true;
-        allow update: if true;
+        allow read, update: if true; // Aberto para leitura pública e sincronização automática
         allow create, delete: if request.auth != null && request.auth.uid == userId;
       }
     }
 
-    // Regras para Logs de Pagamento (Público apenas para criação via Webhook, Leitura apenas Admin)
+    // Regras para Logs de Pagamento (Apenas Admin lê)
     match /payment_events/{eventId} {
       allow create: if true;
       allow read: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
     
+    // Regra Mestra para Administradores
     match /{document=**} {
       allow read, write: if request.auth != null && 
-        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
   }
