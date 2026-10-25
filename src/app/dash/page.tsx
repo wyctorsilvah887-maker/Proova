@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -184,6 +183,11 @@ export default function DashPage() {
   
   const { data: rawAnnouncements, error: announcementsError, loading: announcementsLoading } = useCollection(announcementsQuery);
   const [isAnnouncementDismissed, setIsAnnouncementDismissed] = useState(false);
+
+  const currentAnnouncement = useMemo(() => {
+    if (!rawAnnouncements || rawAnnouncements.length === 0) return null;
+    return rawAnnouncements[0];
+  }, [rawAnnouncements]);
 
   // Fetch Private Feedbacks
   const privateFeedbacksQuery = useMemo(() => {
