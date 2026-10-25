@@ -125,7 +125,8 @@ const EmbedSettings = ({
   autoPublishMinChars, setAutoPublishMinChars,
   handleSave, isSaving,
   isGoldPlan,
-  showSaveButton = true
+  showSaveButton = true,
+  onClose
 }: any) => {
   const colors = ['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff'];
   
@@ -145,14 +146,20 @@ const EmbedSettings = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-full overflow-hidden bg-background">
+    <div className="flex flex-col w-full h-full overflow-hidden bg-background border-r">
       <div className="p-4 border-b bg-muted/10 shrink-0 space-y-4">
-        <Link href="/widgets" className="w-full">
-          <Button variant="ghost" className="w-full justify-start gap-3 h-10 px-2 group">
-            <ArrowLeft className="w-4 h-4" />
-            <span className="text-xs font-black uppercase tracking-[0.2em]">Voltar</span>
+        <div className="flex items-center justify-between">
+           <Link href="/widgets">
+            <Button variant="ghost" size="sm" className="gap-2 px-0 group">
+              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Sair</span>
+            </Button>
+          </Link>
+          <Button variant="ghost" size="sm" onClick={onClose} className="lg:hidden text-muted-foreground">
+            Fechar
           </Button>
-        </Link>
+        </div>
+        
         {showSaveButton && (
           <Button onClick={handleSave} disabled={isSaving} className="w-full shadow-lg h-12 font-bold gap-2 text-sm">
             {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
@@ -342,7 +349,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const [muralIndex, setMuralIndex] = useState(0);
   const [showAll, setShowAll] = useState(false);
   
-  // Controle de estado do menu lateral mobile
+  // Controle unificado de visibilidade da sidebar
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -433,28 +440,25 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const sidebarProps = { 
     layout, setLayout, themeColor, setThemeColor, secondaryColor, setSecondaryColor, 
     autoPublishEnabled, setAutoPublishEnabled, autoPublishMinRating, setAutoPublishMinRating, autoPublishMinChars, setAutoPublishMinChars,
-    handleSave, isSaving, isGoldPlan 
+    handleSave, isSaving, isGoldPlan,
+    onClose: () => setIsSidebarOpen(false)
   };
 
   const membershipLabel = isEnterprise ? 'Membro Enterprise' : (isGold ? 'Membro Gold' : (isTrial ? 'Período Trial' : 'Plano Base'));
 
   return (
-    <div className="min-h-screen bg-muted/20 flex flex-col font-body w-full">
+    <div className="min-h-screen bg-muted/20 flex flex-col font-body w-full overflow-hidden">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-3 flex-1">
-          <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/5 transition-all h-12 w-12 flex items-center justify-center">
-                <Monitor className="h-8 w-8" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-80 border-none">
-              <SheetHeader className="sr-only">
-                <SheetTitle>Configurações do Mural</SheetTitle>
-              </SheetHeader>
-              <EmbedSettings {...sidebarProps} showSaveButton={true} />
-            </SheetContent>
-          </Sheet>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className={cn("text-primary hover:bg-primary/5 transition-all h-12 w-12 flex items-center justify-center rounded-xl", isSidebarOpen && "bg-primary/10")}
+          >
+            <Monitor className="h-8 w-8" />
+          </Button>
+
           <div className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
               <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
@@ -464,15 +468,15 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          {/* Botão de salvar no cabeçalho (apenas quando o menu está fechado e em telas menores que LG) */}
+          {/* Botão de salvar no topo (Apenas se a sidebar estiver fechada) */}
           {!isSidebarOpen && (
             <Button 
               onClick={handleSave} 
               disabled={isSaving} 
-              className="lg:hidden h-10 px-4 font-bold gap-2 shadow-md rounded-xl"
+              className="h-10 md:h-12 px-4 md:px-6 font-bold gap-2 shadow-lg rounded-xl animate-in fade-in zoom-in duration-300"
             >
               {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
-              <span className="hidden sm:inline">Salvar</span>
+              <span className="hidden sm:inline">Salvar Alterações</span>
             </Button>
           )}
 
@@ -546,21 +550,28 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
         </div>
       </header>
 
-      <main className="flex-1 flex overflow-hidden relative w-full">
-        <aside className="hidden lg:flex w-80 bg-background border-r flex-col shrink-0">
-          <EmbedSettings {...sidebarProps} showSaveButton={true} />
+      <main className="flex-1 flex overflow-hidden relative w-full h-full">
+        {/* Sidebar dinâmica para Desktop */}
+        <aside className={cn(
+          "hidden lg:flex w-80 bg-background border-r flex-col shrink-0 transition-all duration-300 ease-in-out",
+          !isSidebarOpen && "w-0 opacity-0 -ml-80 pointer-events-none"
+        )}>
+          <EmbedSettings {...sidebarProps} showSaveButton={isSidebarOpen} />
         </aside>
+
+        {/* Sidebar dinâmica para Mobile (Sheet) */}
+        <Sheet open={isSidebarOpen && window.innerWidth < 1024} onOpenChange={setIsSidebarOpen}>
+          <SheetContent side="left" className="p-0 w-80 border-none">
+            <SheetHeader className="sr-only">
+              <SheetTitle>Configurações do Mural</SheetTitle>
+            </SheetHeader>
+            <EmbedSettings {...sidebarProps} showSaveButton={true} />
+          </SheetContent>
+        </Sheet>
 
         <div className="flex-1 overflow-y-auto bg-muted/30 p-4 sm:p-8">
           <div className="max-w-4xl mx-auto space-y-8 pb-20">
             
-            <Link href="/widgets" className="inline-block group">
-              <Button variant="ghost" className="gap-2 px-0 hover:bg-transparent text-muted-foreground hover:text-primary transition-colors">
-                <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                <span className="text-[10px] font-black uppercase tracking-widest">Voltar para a Lista de Murais</span>
-              </Button>
-            </Link>
-
             <div className="flex items-center justify-between">
               <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><Eye className="w-4 h-4" /> Preview do Mural</h2>
               <Button variant="link" size="sm" onClick={() => setIsTutorialOpen(true)} className="text-[10px] font-bold gap-1 text-primary p-0 h-auto">
@@ -657,9 +668,8 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
         </div>
       </main>
 
-      {/* Tutorial Dialog - Otimizado para Mobile sem cortes */}
       <Dialog open={isTutorialOpen} onOpenChange={setIsTutorialOpen}>
-        <DialogContent className="rounded-[2rem] md:rounded-[2.5rem] w-[92vw] sm:w-full sm:max-w-lg border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
+        <DialogContent className="rounded-[2.5rem] md:rounded-[2.5rem] w-[92vw] sm:w-full sm:max-w-lg border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-6 md:p-10 pt-10 md:pt-14 pb-4 bg-background shrink-0">
             <DialogTitle className="text-xl md:text-2xl font-black font-headline flex items-center gap-2">
               <Settings2 className="w-6 h-6 text-primary" /> Guia de Configuração
