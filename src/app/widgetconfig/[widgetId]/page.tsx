@@ -57,6 +57,7 @@ import {
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -65,7 +66,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/components/accordion";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -346,9 +347,16 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const [showAll, setShowAll] = useState(false);
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') setBaseUrl(window.location.origin);
+    if (typeof window !== 'undefined') {
+      setBaseUrl(window.location.origin);
+      const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+      return () => window.removeEventListener('resize', checkMobile);
+    }
   }, []);
 
   useEffect(() => {
@@ -541,8 +549,12 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
           <EmbedSettings {...sidebarProps} />
         </aside>
 
-        <Sheet open={isSidebarOpen && window.innerWidth < 1024} onOpenChange={setIsSidebarOpen}>
+        <Sheet open={isSidebarOpen && isMobile} onOpenChange={setIsSidebarOpen}>
           <SheetContent side="left" className="p-0 w-80 border-none">
+            <SheetHeader className="sr-only">
+              <SheetTitle>Configurações do Mural</SheetTitle>
+              <SheetDescription>Personalize o visual e automação do seu mural.</SheetDescription>
+            </SheetHeader>
             <EmbedSettings {...sidebarProps} />
           </SheetContent>
         </Sheet>
