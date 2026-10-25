@@ -64,7 +64,9 @@ import {
   CheckCircle,
   EyeOff,
   Sparkles,
-  Settings2
+  Settings2,
+  Globe,
+  Rocket
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -250,8 +252,7 @@ export default function DashPage() {
       setIsAuditing(false);
     }
     runAudit();
-    // Removido isAuditing das dependências para evitar loop de Server Actions
-  }, [isSetupComplete, userData, widgetsList, pendingTestimonialsCount, router]);
+  }, [isSetupComplete, userData, widgetsList, pendingTestimonialsCount, router, isAuditing]);
 
   const filteredMetrics = useMemo(() => {
     const testimonials = approvedTestimonials;
@@ -340,7 +341,7 @@ export default function DashPage() {
                   <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] leading-tight">{userData?.companyName || 'Minha Empresa'}</span>
                   <span className={cn("text-[8px] uppercase tracking-widest font-black leading-tight", userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground")}>{membershipLabel}</span>
                 </div>
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20"><User className="w-4 h-4" /></div>
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
@@ -382,6 +383,61 @@ export default function DashPage() {
       </header>
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden">
+        {/* CHECKLIST DE MISSÕES (ONBOARDING) */}
+        {!isSetupComplete && (
+          <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
+             <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Rocket className="w-5 h-5 text-primary" />
+                  <h2 className="text-sm font-black uppercase tracking-widest">Missões de Sucesso Proova</h2>
+                </div>
+                <Badge variant="secondary" className="bg-primary/10 text-primary border-none font-black text-[10px]">
+                  {completedStepsCount} / {setupSteps.length} COMPLETAS
+                </Badge>
+             </div>
+             
+             <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden bg-background">
+                <div className="p-6 md:p-8 space-y-6">
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                      <span>Progresso do Setup</span>
+                      <span className="text-primary">{Math.round(progressPercentage)}%</span>
+                    </div>
+                    <Progress value={progressPercentage} className="h-2.5 bg-muted" />
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    {setupSteps.map((step, idx) => (
+                      <div 
+                        key={step.id}
+                        onClick={() => step.unlocked && step.action()}
+                        className={cn(
+                          "relative p-4 rounded-2xl border-2 transition-all cursor-pointer group",
+                          step.completed 
+                            ? "bg-primary/5 border-primary/20" 
+                            : (step.unlocked ? "bg-background border-dashed border-muted-foreground/30 hover:border-primary/50" : "bg-muted/30 border-transparent opacity-40 cursor-not-allowed")
+                        )}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={cn(
+                            "w-8 h-8 rounded-full flex items-center justify-center shrink-0 transition-colors",
+                            step.completed ? "bg-primary text-white" : "bg-muted text-muted-foreground group-hover:bg-primary/10 group-hover:text-primary"
+                          )}>
+                            {step.completed ? <Check className="w-4 h-4" /> : <span className="text-xs font-black">{idx + 1}</span>}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[11px] font-black uppercase tracking-tight truncate">{step.label}</p>
+                            <p className="text-[9px] text-muted-foreground font-bold uppercase">{step.completed ? 'Concluído' : (step.unlocked ? 'Pendente' : 'Bloqueado')}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+             </Card>
+          </section>
+        )}
+
         {isSetupComplete && auditItems.length > 0 && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
             <div className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" /><h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Auditoria Consultiva Proova</h2></div>
@@ -427,7 +483,7 @@ export default function DashPage() {
           <div className="relative h-full group">
              <div 
                onClick={() => setIsGoogleMapsDialogOpen(true)} 
-               className="absolute -top-1.5 right-4 px-2 py-0.5 z-40 bg-primary text-white text-[7px] font-black uppercase rounded-full shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all flex items-center gap-1 ring-2 ring-background border-none"
+               className="absolute -top-1 right-4 px-2 py-0.5 z-40 bg-primary text-white text-[7px] font-black uppercase rounded-full shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all flex items-center gap-1 ring-2 ring-background border-none"
              >
                <Edit3 className="w-2 h-2" /> Editar
              </div>
@@ -471,7 +527,7 @@ export default function DashPage() {
         </section>
       </main>
 
-      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
+      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 text-center">
         <div className="relative w-[180px] h-[60px]">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" priority />
@@ -488,7 +544,7 @@ export default function DashPage() {
             <DialogDescription>Domine as ferramentas que aceleram sua autoridade.</DialogDescription>
           </DialogHeader>
           
-          <div className="flex-1 overflow-y-auto px-8 pb-8 scrollbar-hide">
+          <div className="flex-1 overflow-y-auto px-8 pb-8">
             <div className="space-y-8">
               <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Inbox className="w-5 h-5" /></div>
