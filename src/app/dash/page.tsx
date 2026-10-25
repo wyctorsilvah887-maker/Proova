@@ -66,7 +66,8 @@ import {
   Sparkles,
   Settings2,
   Globe,
-  Rocket
+  Rocket,
+  MapPinned
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -100,7 +101,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useTheme } from 'next-themes';
 import { jsPDF } from 'jspdf';
 import { cn } from '@/lib/utils';
-import { getGooglePlaceDetails } from '@/app/actions/maps-actions';
+import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-actions';
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
 
 interface AuditItem {
@@ -130,6 +131,13 @@ export default function DashPage() {
   const [isUpdatingUrl, setIsUpdatingUrl] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [isSendingReport, setIsSendingReport] = useState(false);
+
+  // Estados para Busca de Local
+  const [city, setCity] = useState('');
+  const [state, setState] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearchingPlaces, setIsSearchingPlaces] = useState(false);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
@@ -252,7 +260,7 @@ export default function DashPage() {
       setIsAuditing(false);
     }
     runAudit();
-  }, [isSetupComplete, userData, widgetsList, pendingTestimonialsCount, router, isAuditing]);
+  }, [isSetupComplete, userData, widgetsList, pendingTestimonialsCount, router]);
 
   const filteredMetrics = useMemo(() => {
     const testimonials = approvedTestimonials;
@@ -277,6 +285,69 @@ export default function DashPage() {
       .then(() => { toast({ title: "Link Atualizado" }); setIsGoogleMapsDialogOpen(false); })
       .finally(() => setIsUpdatingUrl(false));
   };
+
+  const handleSearchPlaces = async () => {
+    if (!searchQuery.trim()) return;
+    setIsSearchingPlaces(true);
+    try {
+      const results = await searchGooglePlaces(searchQuery, city || userData?.city, state || userData?.state);
+      setSearchResults(results);
+    } catch (err) {
+      toast({ variant: "destructive", title: "Erro na busca" });
+    } finally {
+      setIsSearchingPlaces(false);
+    }
+  };
+
+  const handleSelectPlace = async (place: any) => {
+    if (!db || !user || isUpdatingUrl) return;
+    setIsUpdatingUrl(true);
+    
+    // Gera link de review baseado no Place ID
+    const reviewLink = `https://search.google.com/local/writereview?placeid=${place.place_id}`;
+    
+    try {
+      await updateDoc(doc(db, 'users', user.uid), {
+        googlePlaceId: place.place_id,
+        googleMapsUrl: reviewLink,
+        city: city || userData?.city || '',
+        state: state || userData?.state || ''
+      });
+      toast({ title: "Empresa Vinculada!", description: "Seu G-Boost está ativo." });
+      setIsGoogleMapsDialogOpen(false);
+      setSearchResults([]);
+    } catch (err) {
+      toast({ variant: "destructive", title: "Erro ao salvar" });
+    } finally {
+      setIsUpdatingUrl(false);
+    }
+  };
+
+  const handleUpdateLocation = async () => {
+    if (!db || !user || !city || !state) return;
+    setIsUpdatingUrl(true);
+    try {
+      await updateDoc(doc(db, 'users', user.uid), { city, state });
+      toast({ title: "Localização Salva" });
+      // Se a localização foi salva, foca na busca
+      setSearchQuery(userData?.companyName || '');
+    } catch (err) {
+      toast({ variant: "destructive", title: "Erro ao salvar local" });
+    } finally {
+      setIsUpdatingUrl(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isGoogleMapsDialogOpen && userData) {
+      setCity(userData.city || '');
+      setState(userData.state || '');
+      setSearchQuery(`${userData.companyName || ''} ${userData.city || ''} ${userData.state || ''}`);
+      if (userData.city && userData.state && userData.companyName) {
+        handleSearchPlaces();
+      }
+    }
+  }, [isGoogleMapsDialogOpen, userData]);
 
   const handleDownloadPdf = async () => {
     setIsGeneratingPdf(true);
@@ -483,7 +554,7 @@ export default function DashPage() {
           <div className="relative h-full group">
              <div 
                onClick={() => setIsGoogleMapsDialogOpen(true)} 
-               className="absolute -top-1 right-4 px-2 py-0.5 z-40 bg-primary text-white text-[7px] font-black uppercase rounded-full shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all flex items-center gap-1 ring-2 ring-background border-none"
+               className="absolute top-2 right-4 px-2 py-0.5 z-40 bg-primary text-white text-[7px] font-black uppercase rounded-full shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all flex items-center gap-1 border-none"
              >
                <Edit3 className="w-2 h-2" /> Editar
              </div>
@@ -527,7 +598,7 @@ export default function DashPage() {
         </section>
       </main>
 
-      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 text-center">
+      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 text-center bg-background/50">
         <div className="relative w-[180px] h-[60px]">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" priority />
@@ -597,12 +668,137 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
       
+      {/* DIALOGO DE CONFIGURAÇÃO DE BUSINESS (Maps + Location) */}
       <Dialog open={isGoogleMapsDialogOpen} onOpenChange={setIsGoogleMapsDialogOpen}>
-        <DialogContent className="rounded-3xl sm:max-w-md"><DialogHeader><DialogTitle className="text-2xl font-black font-headline flex items-center gap-2"><MapPin className="w-6 h-6 text-primary" /> Google Business</DialogTitle></DialogHeader>
-          <div className="py-4 space-y-4">
-            <p className="text-xs text-muted-foreground text-center">Configuraremos seu link oficial para turbinar seu SEO Local.</p>
-            <input placeholder="Link Direto do Google Maps" value={newGoogleMapsUrl} onChange={(e) => setNewGoogleMapsUrl(e.target.value)} className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
-            <Button className="w-full font-black h-12 rounded-xl shadow-xl" onClick={() => handleUpdateGoogleMapsUrl()} disabled={isUpdatingUrl || !newGoogleMapsUrl}>Salvar Link</Button>
+        <DialogContent className="rounded-[2rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
+          <DialogHeader className="p-6 pb-2 pt-10 shrink-0 bg-background">
+            <DialogTitle className="text-2xl font-black font-headline flex items-center gap-2">
+              <MapPinned className="w-6 h-6 text-primary" /> Perfil Comercial
+            </DialogTitle>
+            <DialogDescription>Conecte sua empresa ao motor de prova social Proova.</DialogDescription>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6">
+            
+            {/* ETAPA 1: LOCALIZAÇÃO (Cidade/Estado) */}
+            <section className="space-y-4 pt-2">
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-black flex items-center justify-center">1</div>
+                <h3 className="text-xs font-black uppercase tracking-widest">Localização do Negócio</h3>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-[9px] font-black uppercase opacity-60 ml-1">Cidade</Label>
+                  <Input 
+                    placeholder="Ex: São Paulo" 
+                    value={city} 
+                    onChange={(e) => setCity(e.target.value)} 
+                    className="h-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-[9px] font-black uppercase opacity-60 ml-1">Estado (UF)</Label>
+                  <Input 
+                    placeholder="Ex: SP" 
+                    value={state} 
+                    maxLength={2}
+                    onChange={(e) => setState(e.target.value.toUpperCase())} 
+                    className="h-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs uppercase"
+                  />
+                </div>
+              </div>
+              {(!userData?.city || !userData?.state) && (
+                <Button 
+                  onClick={handleUpdateLocation} 
+                  disabled={!city || !state || isUpdatingUrl}
+                  className="w-full h-10 rounded-xl font-bold text-[10px] uppercase tracking-widest gap-2"
+                >
+                  {isUpdatingUrl ? <Loader2 className="animate-spin w-3 h-3" /> : <Save className="w-3 h-3" />}
+                  Salvar Localização
+                </Button>
+              )}
+            </section>
+
+            {/* ETAPA 2: BUSCA NO GOOGLE (Apenas se tiver local) */}
+            <section className={cn("space-y-4 pt-4 border-t", (!userData?.city && !city) && "opacity-30 grayscale pointer-events-none")}>
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-black flex items-center justify-center">2</div>
+                <h3 className="text-xs font-black uppercase tracking-widest">Vincular Google Business</h3>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="relative group">
+                  <Search className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                  <Input 
+                    placeholder="Nome da sua empresa no Google" 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSearchPlaces()}
+                    className="h-11 pl-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs"
+                  />
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    onClick={handleSearchPlaces}
+                    disabled={isSearchingPlaces || !searchQuery}
+                    className="absolute right-1 top-1 h-9 rounded-lg hover:bg-primary/10 text-primary"
+                  >
+                    {isSearchingPlaces ? <Loader2 className="animate-spin w-4 h-4" /> : <Navigation className="w-4 h-4" />}
+                  </Button>
+                </div>
+              </div>
+
+              {/* RESULTADOS DA BUSCA */}
+              <div className="space-y-2">
+                {searchResults.map((place) => (
+                  <Card 
+                    key={place.place_id} 
+                    className="border-2 border-transparent hover:border-primary/20 cursor-pointer transition-all bg-muted/10 group"
+                    onClick={() => handleSelectPlace(place)}
+                  >
+                    <div className="p-3 flex items-center gap-3">
+                      <div className="p-2 rounded-xl bg-background group-hover:bg-primary/10 transition-colors">
+                        <MapPin className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-black truncate">{place.name}</p>
+                        <p className="text-[10px] text-muted-foreground truncate opacity-70">{place.address}</p>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground opacity-30 group-hover:translate-x-1 transition-all" />
+                    </div>
+                  </Card>
+                ))}
+                
+                {isSearchingPlaces && (
+                   <div className="py-8 text-center">
+                     <Loader2 className="animate-spin w-6 h-6 text-primary mx-auto mb-2" />
+                     <p className="text-[10px] font-bold text-muted-foreground uppercase">Consultando Satélite...</p>
+                   </div>
+                )}
+                
+                {searchResults.length === 0 && !isSearchingPlaces && searchQuery && (
+                   <div className="py-6 text-center border-2 border-dashed rounded-2xl bg-muted/5">
+                     <p className="text-[10px] text-muted-foreground font-medium">Digite o nome da empresa e clique na bússola.</p>
+                   </div>
+                )}
+              </div>
+            </section>
+
+            <section className="space-y-3 pt-4 border-t opacity-60">
+               <div className="flex items-center gap-2">
+                 <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+                 <h4 className="text-[10px] font-black uppercase tracking-widest">Como funciona o G-Boost?</h4>
+               </div>
+               <p className="text-[10px] text-muted-foreground leading-relaxed">
+                 O Proova detecta elogios 5 estrelas e redireciona o cliente para este local no Google. Isso sobe sua posição nas buscas e atrai novos clientes organicamente.
+               </p>
+            </section>
+          </div>
+
+          <div className="p-6 bg-background border-t shrink-0">
+            <Button variant="ghost" className="w-full text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setIsGoogleMapsDialogOpen(false)}>
+              Fechar Configurações
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
