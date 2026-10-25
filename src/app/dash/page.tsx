@@ -101,8 +101,6 @@ import { jsPDF } from 'jspdf';
 import { cn } from '@/lib/utils';
 import { searchGooglePlaces, getGooglePlaceDetails } from '@/app/actions/maps-actions';
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError, type SecurityRuleContext } from '@/firebase/errors';
 
 interface AuditItem {
   id: string;
@@ -181,7 +179,7 @@ export default function DashPage() {
   }, [db, user]);
   const { data: allFetchedTestimonials, loading: testimonialsLoading } = useCollection(allTestimonialsQuery);
 
-  // Filtragem em memória
+  // Memory filtering to avoid multiple indexes
   const pendingTestimonials = useMemo(() => {
     return (allFetchedTestimonials || [])
       .filter((t: any) => t.status === 'pending')
@@ -233,7 +231,7 @@ export default function DashPage() {
   const isCollectDone = setupSteps.find(s => s.id === 'collect')?.completed;
   const isGoogleDone = setupSteps.find(s => s.id === 'google')?.completed;
 
-  // Lógica do Auditor Consultivo
+  // Consultive Auditor Logic
   const [auditItems, setAuditItems] = useState<AuditItem[]>([]);
   const [isAuditing, setIsAuditing] = useState(false);
 
@@ -265,45 +263,46 @@ export default function DashPage() {
     runAudit();
   }, [isSetupComplete, userData, widgetsList, privateFeedbacksList]);
 
-  const handleApproveTestimonial = (id: string) => {
+  const handleApproveTestimonial = async (id: string) => {
     if (!db || !user || isProcessingCuratorship) return;
     setIsProcessingCuratorship(id);
     
-    const testimonialRef = doc(db, 'users', user.uid, 'testimonials', id);
-    
-    updateDoc(testimonialRef, { status: 'approved' })
-      .then(async () => {
-        const widgetsRef = collection(db, 'users', user.uid, 'widgets');
-        const widgetsSnap = await getDocs(query(widgetsRef, limit(1)));
-        
-        if (!widgetsSnap.empty) {
-          updateDoc(widgetsSnap.docs[0].ref, {
-            selectedTestimonialIds: arrayUnion(id)
-          }).catch(err => console.warn("Widget sync failed", err));
-        }
-        
-        toast({ title: "Publicado!", description: "Depoimento aprovado e injetado no widget principal." });
-      })
-      .catch(async (err) => {
-        toast({ variant: "destructive", title: "Erro", description: "Falha ao aprovar depoimento." });
-      })
-      .finally(() => setIsProcessingCuratorship(null));
+    try {
+      const testimonialRef = doc(db, 'users', user.uid, 'testimonials', id);
+      await updateDoc(testimonialRef, { status: 'approved' });
+      
+      const widgetsRef = collection(db, 'users', user.uid, 'widgets');
+      const widgetsSnap = await getDocs(query(widgetsRef, limit(1)));
+      
+      if (!widgetsSnap.empty) {
+        await updateDoc(widgetsSnap.docs[0].ref, {
+          selectedTestimonialIds: arrayUnion(id)
+        });
+      }
+      
+      toast({ title: "Publicado!", description: "Depoimento aprovado e injetado no mural principal." });
+    } catch (err) {
+      console.error(err);
+      toast({ variant: "destructive", title: "Erro de Permissão", description: "Verifique suas regras do Firestore no console." });
+    } finally {
+      setIsProcessingCuratorship(null);
+    }
   };
 
-  const handleArchiveTestimonial = (id: string) => {
+  const handleArchiveTestimonial = async (id: string) => {
     if (!db || !user || isProcessingCuratorship) return;
     setIsProcessingCuratorship(id);
     
-    const testimonialRef = doc(db, 'users', user.uid, 'testimonials', id);
-    
-    updateDoc(testimonialRef, { status: 'archived' })
-      .then(() => {
-        toast({ title: "Arquivado", description: "O depoimento foi removido da fila." });
-      })
-      .catch(async (err) => {
-        toast({ variant: "destructive", title: "Erro", description: "Falha ao arquivar depoimento." });
-      })
-      .finally(() => setIsProcessingCuratorship(null));
+    try {
+      const testimonialRef = doc(db, 'users', user.uid, 'testimonials', id);
+      await updateDoc(testimonialRef, { status: 'archived' });
+      toast({ title: "Arquivado", description: "O depoimento foi removido da fila." });
+    } catch (err) {
+      console.error(err);
+      toast({ variant: "destructive", title: "Erro de Permissão", description: "Verifique suas regras do Firestore no console." });
+    } finally {
+      setIsProcessingCuratorship(null);
+    }
   };
 
   const filteredMetrics = useMemo(() => {
@@ -535,9 +534,9 @@ export default function DashPage() {
           <div className="relative group h-full">
              <div 
                onClick={() => setIsGoogleMapsDialogOpen(true)} 
-               className="absolute -top-3 right-6 z-40 bg-primary text-white text-[9px] font-black uppercase px-3 py-1.5 rounded-full shadow-xl cursor-pointer hover:scale-110 active:scale-95 transition-all flex items-center gap-1.5 ring-4 ring-background"
+               className="absolute -top-2.5 right-4 z-40 bg-primary text-white text-[8px] font-black uppercase px-2.5 py-1 rounded-full shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all flex items-center gap-1 ring-2 ring-background"
              >
-               <Edit3 className="w-3 h-3" /> Editar
+               <Edit3 className="w-2.5 h-2.5" /> Editar
              </div>
              <Card className="border-none shadow-sm h-full rounded-2xl p-4 md:p-6 space-y-4 relative flex flex-col justify-center">
               <div className="flex items-center justify-between">
