@@ -7,7 +7,7 @@ import { collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp, 
 import { Resend } from 'resend';
 
 /**
- * Verifica o limite de requisições no Firestore.
+ * Verifica o limite de requisições no Firestore de forma index-safe.
  */
 async function checkRateLimit(actionName: string) {
   const { firestore } = initializeFirebase();
@@ -17,16 +17,23 @@ async function checkRateLimit(actionName: string) {
   const oneMinuteAgo = new Date(Date.now() - 60000);
   const rateLimitRef = collection(firestore, 'rate_limits');
   
+  // Consulta simplificada para evitar necessidade de índice composto
   const q = query(
     rateLimitRef,
     where('ip', '==', ip),
-    where('action', '==', actionName),
-    where('createdAt', '>', Timestamp.fromDate(oneMinuteAgo))
+    where('action', '==', actionName)
   );
   
   const snap = await getDocs(q);
   
-  if (snap.size >= 15) {
+  // Filtra por tempo em memória
+  const recentRequests = snap.docs.filter(doc => {
+    const data = doc.data();
+    const createdAt = data.createdAt?.toDate?.() || new Date(0);
+    return createdAt > oneMinuteAgo;
+  });
+  
+  if (recentRequests.length >= 15) {
     throw new Error('Limite de envios excedido. Tente novamente em instantes.');
   }
 
@@ -155,16 +162,17 @@ export async function submitTestimonialAction(data: {
     const collectionName = data.destination === 'public' ? 'testimonials' : 'private_feedbacks';
     const feedbacksRef = collection(firestore, 'users', data.targetUserId, collectionName);
 
+    // 1. Salva o depoimento primeiro
     const docRef = await addDoc(feedbacksRef, testimonialData);
     const testimonialId = docRef.id;
     
-    // Incrementa o contador do usuário
+    // 2. Incrementa o contador do usuário IMEDIATAMENTE para garantir que conte no Dash
     const userRef = doc(firestore, 'users', data.targetUserId);
     await updateDoc(userRef, {
       testimonialsCount: increment(1)
     });
 
-    // LÓGICA DE ALERTA E AUTO-CURADORIA
+    // 3. Busca dados do usuário para alertas
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
       const userData = userSnap.data();
@@ -179,16 +187,18 @@ export async function submitTestimonialAction(data: {
       }
     }
 
-    // LÓGICA DE SINCRONIZAÇÃO AUTOMÁTICA (Apenas se o widget permitir Auto-Publish direto)
+    // 4. LÓGICA DE SINCRONIZAÇÃO AUTOMÁTICA (Index-safe)
     if (data.destination === 'public') {
       const widgetsRef = collection(firestore, 'users', data.targetUserId, 'widgets');
-      const q = query(widgetsRef, where('autoPublishEnabled', '==', true));
-      const widgetsSnap = await getDocs(q);
+      // Busca todos os widgets para evitar erro de índice no 'where'
+      const widgetsSnap = await getDocs(widgetsRef);
 
       let wasAutoPublished = false;
 
       const updatePromises = widgetsSnap.docs.map(async (wDoc) => {
         const widget = wDoc.data();
+        if (!widget.autoPublishEnabled) return;
+
         const minRating = widget.autoPublishMinRating || 5;
         const minChars = widget.autoPublishMinChars || 0;
 

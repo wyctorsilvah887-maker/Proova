@@ -6,28 +6,33 @@ import { initializeFirebase } from '@/firebase';
 import { collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 
 /**
- * Verifica o limite de requisições (Rate Limit) no Firestore.
- * Limite: 10 requisições por minuto.
+ * Verifica o limite de requisições (Rate Limit) no Firestore de forma index-safe.
  */
 async function checkRateLimit(actionName: string) {
   const { firestore } = initializeFirebase();
   const headerList = await headers();
-  // Pega o primeiro IP da lista de proxies ou fallback para local
   const ip = (headerList.get('x-forwarded-for') ?? '127.0.0.1').split(',')[0].trim();
   
   const oneMinuteAgo = new Date(Date.now() - 60000);
   const rateLimitRef = collection(firestore, 'rate_limits');
   
+  // Consulta simplificada para evitar necessidade de índice composto
   const q = query(
     rateLimitRef,
     where('ip', '==', ip),
-    where('action', '==', actionName),
-    where('createdAt', '>', Timestamp.fromDate(oneMinuteAgo))
+    where('action', '==', actionName)
   );
   
   const snap = await getDocs(q);
   
-  if (snap.size >= 10) {
+  // Filtro de tempo em memória
+  const recentRequests = snap.docs.filter(doc => {
+    const data = doc.data();
+    const createdAt = data.createdAt?.toDate?.() || new Date(0);
+    return createdAt > oneMinuteAgo;
+  });
+  
+  if (recentRequests.length >= 10) {
     throw new Error('Limite de requisições excedido. Tente novamente em um minuto.');
   }
 
