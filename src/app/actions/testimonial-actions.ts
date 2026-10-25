@@ -7,7 +7,7 @@ import { collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp, 
 import { Resend } from 'resend';
 
 /**
- * Verifica o limite de requisições no Firestore de forma index-safe.
+ * Verifica o limite de requisições no Firestore de forma index-safe (Filtro único).
  */
 async function checkRateLimit(actionName: string) {
   const { firestore } = initializeFirebase();
@@ -17,20 +17,19 @@ async function checkRateLimit(actionName: string) {
   const oneMinuteAgo = new Date(Date.now() - 60000);
   const rateLimitRef = collection(firestore, 'rate_limits');
   
-  // Consulta simplificada para evitar necessidade de índice composto
+  // Consulta com APENAS UM filtro para evitar erro de índice composto
   const q = query(
     rateLimitRef,
-    where('ip', '==', ip),
-    where('action', '==', actionName)
+    where('ip', '==', ip)
   );
   
   const snap = await getDocs(q);
   
-  // Filtra por tempo em memória
+  // Filtra por ação e tempo em memória
   const recentRequests = snap.docs.filter(doc => {
     const data = doc.data();
     const createdAt = data.createdAt?.toDate?.() || new Date(0);
-    return createdAt > oneMinuteAgo;
+    return data.action === actionName && createdAt > oneMinuteAgo;
   });
   
   if (recentRequests.length >= 15) {
@@ -143,11 +142,12 @@ export async function submitTestimonialAction(data: {
   text: string;
 }) {
   try {
+    // 1. Check Rate Limit (Index-safe)
     await checkRateLimit('submit_testimonial');
     
     const { firestore } = initializeFirebase();
     
-    // Status inicial: Publicos entram como 'pending' para curadoria, privados entram como 'approved' (visiveis no inbox)
+    // Status inicial: Publicos entram como 'pending' para curadoria, privados entram como 'approved'
     const initialStatus = data.destination === 'public' ? 'pending' : 'approved';
 
     const testimonialData = {
@@ -162,35 +162,32 @@ export async function submitTestimonialAction(data: {
     const collectionName = data.destination === 'public' ? 'testimonials' : 'private_feedbacks';
     const feedbacksRef = collection(firestore, 'users', data.targetUserId, collectionName);
 
-    // 1. Salva o depoimento primeiro
-    const docRef = await addDoc(feedbacksRef, testimonialData);
-    const testimonialId = docRef.id;
-    
-    // 2. Incrementa o contador do usuário IMEDIATAMENTE para garantir que conte no Dash
+    // 2. Incrementa o contador do usuário PRIMEIRO para garantir que conte no Dash
     const userRef = doc(firestore, 'users', data.targetUserId);
     await updateDoc(userRef, {
       testimonialsCount: increment(1)
     });
 
-    // 3. Busca dados do usuário para alertas
+    // 3. Salva o depoimento
+    const docRef = await addDoc(feedbacksRef, testimonialData);
+    const testimonialId = docRef.id;
+
+    // 4. Busca dados do usuário para alertas
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
       const userData = userSnap.data();
 
-      // Se for feedback crítico ou privado, alerta imediato
       if (data.destination === 'private' || data.rating <= 3) {
         await sendCriticalFeedbackAlert(userData.email, testimonialData, userData.companyName);
       } 
-      // Se for publico e qualificado, alerta de curadoria
       else if (data.destination === 'public' && data.rating >= 4 && data.text.length >= 20) {
         await sendCuratorshipAlert(userData.email, testimonialData, userData.companyName);
       }
     }
 
-    // 4. LÓGICA DE SINCRONIZAÇÃO AUTOMÁTICA (Index-safe)
+    // 5. LÓGICA DE SINCRONIZAÇÃO AUTOMÁTICA (Index-safe)
     if (data.destination === 'public') {
       const widgetsRef = collection(firestore, 'users', data.targetUserId, 'widgets');
-      // Busca todos os widgets para evitar erro de índice no 'where'
       const widgetsSnap = await getDocs(widgetsRef);
 
       let wasAutoPublished = false;
@@ -212,7 +209,6 @@ export async function submitTestimonialAction(data: {
 
       await Promise.all(updatePromises);
 
-      // Se foi publicado automaticamente em pelo menos um widget, mudamos status para approved
       if (wasAutoPublished) {
         await updateDoc(docRef, { status: 'approved' });
       }
@@ -233,10 +229,8 @@ export async function approveTestimonialAction(userId: string, testimonialId: st
     const { firestore } = initializeFirebase();
     const testimonialRef = doc(firestore, 'users', userId, 'testimonials', testimonialId);
     
-    // 1. Atualiza status para aprovado
     await updateDoc(testimonialRef, { status: 'approved' });
 
-    // 2. Tenta injetar no primeiro widget que encontrar para dar o "1-clique" de publicação
     const widgetsRef = collection(firestore, 'users', userId, 'widgets');
     const widgetsSnap = await getDocs(query(widgetsRef, limit(1)));
     

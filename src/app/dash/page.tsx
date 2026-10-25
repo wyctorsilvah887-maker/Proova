@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -63,7 +64,8 @@ import {
   Timer,
   CheckCircle,
   EyeOff,
-  Sparkles
+  Sparkles,
+  Settings2
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -169,18 +171,18 @@ export default function DashPage() {
   }, [db, user]);
   const { data: widgetsList } = useCollection(widgetsQuery);
 
-  // Fetch Announcements
+  // Fetch Announcements (Index-Safe)
   const announcementsQuery = useMemo(() => {
     if (!db) return null;
+    // Removido orderBy para evitar erro de índice composto em ambiente de dev
     return query(
       collection(db, 'announcements'), 
-      where('isActive', '==', true), 
-      orderBy('createdAt', 'desc'), 
-      limit(1)
+      where('isActive', '==', true),
+      limit(5)
     );
   }, [db]);
   
-  const { data: activeAnnouncements, error: announcementsError, loading: announcementsLoading } = useCollection(announcementsQuery);
+  const { data: rawAnnouncements, error: announcementsError, loading: announcementsLoading } = useCollection(announcementsQuery);
   const [isAnnouncementDismissed, setIsAnnouncementDismissed] = useState(false);
 
   // Fetch Private Feedbacks
@@ -210,9 +212,15 @@ export default function DashPage() {
   }, [rawPendingTestimonials]);
 
   const currentAnnouncement = useMemo(() => {
-    if (announcementsError || announcementsLoading) return null;
-    return activeAnnouncements && activeAnnouncements.length > 0 ? activeAnnouncements[0] : null;
-  }, [activeAnnouncements, announcementsError, announcementsLoading]);
+    if (announcementsError || announcementsLoading || !rawAnnouncements || rawAnnouncements.length === 0) return null;
+    // Ordenação em memória para ser index-safe
+    const sorted = [...rawAnnouncements].sort((a: any, b: any) => {
+      const dateA = a.createdAt?.toDate?.() || new Date(0);
+      const dateB = b.createdAt?.toDate?.() || new Date(0);
+      return dateB.getTime() - dateA.getTime();
+    });
+    return sorted[0];
+  }, [rawAnnouncements, announcementsError, announcementsLoading]);
 
   const isProPlan = useMemo(() => {
     const status = userData?.membershipStatus;
@@ -234,7 +242,6 @@ export default function DashPage() {
     }
   }, []);
 
-  // Display domain for examples (Tutorial)
   const displayDomain = useMemo(() => {
     if (!baseUrl) return 'proova.wsstudioscompany.com.br';
     try {
@@ -250,7 +257,6 @@ export default function DashPage() {
     }
   }, [user, authLoading, router]);
 
-  // Main Testimonials Query
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
     return query(
@@ -262,7 +268,6 @@ export default function DashPage() {
 
   const { data: allFetchedTestimonials, loading: testimonialsLoading } = useCollection(testimonialsQuery);
 
-  // Sequential Unlock Logic (Quest System)
   const setupSteps = useMemo(() => {
     const s0 = { 
       id: 'location', 
@@ -305,7 +310,6 @@ export default function DashPage() {
   const isCollectDone = setupSteps.find(s => s.id === 'collect')?.completed;
   const isGoogleDone = setupSteps.find(s => s.id === 'google')?.completed;
 
-  // Consultant Audit Logic 2.0 (No-AI)
   useEffect(() => {
     async function runAudit() {
       if (!isSetupComplete || !userData || isAuditing) return;
@@ -313,7 +317,6 @@ export default function DashPage() {
       
       const results: AuditItem[] = [];
 
-      // 1. Google Maps Check
       const mapsUrl = userData.googleMapsUrl || '';
       const isReviewLink = mapsUrl.includes('writereview') || mapsUrl.includes('local/writereview');
       
@@ -339,7 +342,6 @@ export default function DashPage() {
         });
       }
 
-      // 2. Google Profile Audit (Photos, Hours, etc.)
       if (userData.googlePlaceId) {
         const details = await getGooglePlaceDetails(userData.googlePlaceId);
         if (details) {
@@ -368,7 +370,6 @@ export default function DashPage() {
         }
       }
 
-      // 3. Feedback Balance Audit
       const publicCount = userData.testimonialsCount || 0;
       const privateCount = privateFeedbacksList?.length || 0;
 
@@ -384,7 +385,6 @@ export default function DashPage() {
         });
       }
 
-      // 4. Public Page Audit
       const mainWidget = widgetsList?.[0];
       if (mainWidget) {
         if (!mainWidget.whatsappEnabled) {
@@ -411,7 +411,6 @@ export default function DashPage() {
         }
       }
 
-      // 5. Widget Generation Audit
       if (!widgetsList || widgetsList.length === 0) {
         results.push({
           id: 'widget-missing',
@@ -465,7 +464,6 @@ export default function DashPage() {
     }
   };
 
-  // Trigger reward dialog if complete and not yet used trial
   useEffect(() => {
     if (isSetupComplete && userData && userData.membershipStatus === 'base' && !userData.trialUsed) {
       setIsRewardDialogOpen(true);
@@ -491,7 +489,6 @@ export default function DashPage() {
     }
   };
 
-  // Period Filtering Logic
   const filteredMetrics = useMemo(() => {
     const testimonials = allFetchedTestimonials || [];
     const now = new Date();
@@ -1063,7 +1060,6 @@ export default function DashPage() {
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden">
         
-        {/* SETUP PROGRESS SECTION */}
         {!isSetupComplete && (
           <section className="animate-in fade-in slide-in-from-top-4 duration-1000">
             <Card className="border-none shadow-xl overflow-hidden rounded-[1.5rem] md:rounded-[2rem] bg-card">
@@ -1123,7 +1119,6 @@ export default function DashPage() {
           </section>
         )}
 
-        {/* CURATORSHIP QUEUE (NEW) */}
         {pendingTestimonials.length > 0 && (
           <section className="space-y-4 animate-in zoom-in-95 duration-500">
             <div className="flex items-center justify-between">
@@ -1181,7 +1176,6 @@ export default function DashPage() {
           </section>
         )}
 
-        {/* CONSULTOR PROOVA 2.0 (STRATEGIC AUDIT) */}
         {isSetupComplete && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
             <div className="flex items-center justify-between">
@@ -1278,7 +1272,6 @@ export default function DashPage() {
           </div>
         </header>
 
-        {/* METRICS CARDS */}
         <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2 relative">
           <Card className="border-none shadow-sm group cursor-default relative overflow-hidden rounded-2xl">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 p-4 md:p-6">
@@ -1347,7 +1340,6 @@ export default function DashPage() {
           </div>
         </div>
 
-        {/* QUICK ACTIONS SECTION */}
         <section className="space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="flex items-center gap-2">
             <h2 className="text-[9px] md:text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Ações Rápidas</h2>
@@ -1523,7 +1515,6 @@ export default function DashPage() {
         </div>
       </main>
 
-      {/* FOOTER */}
       <footer className="py-8 md:py-16 border-t flex flex-col items-center gap-6 md:gap-8 mt-auto">
         <div className="flex items-center gap-2 relative w-[180px] h-[60px] md:w-[320px] md:h-[105px]">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain dark:hidden" />
@@ -1534,7 +1525,6 @@ export default function DashPage() {
         </p>
       </footer>
 
-      {/* Identity Dialog */}
       <Dialog open={isSlugDialogOpen} onOpenChange={setIsSlugDialogOpen}>
         <DialogContent className="rounded-3xl sm:max-w-md">
           {isProPlan ? (
@@ -1594,7 +1584,6 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Tutorial Dialog - COMPLETO */}
       <Dialog open={isTutorialOpen} onOpenChange={setIsTutorialOpen}>
         <DialogContent className="rounded-[2rem] md:rounded-[2.5rem] w-[92vw] sm:w-full sm:max-w-lg border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-5 md:p-10 pt-10 md:pt-14 pb-4 bg-background shrink-0">
@@ -1696,7 +1685,6 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
       
-      {/* Google Maps Configuration Dialog */}
       <Dialog open={isGoogleMapsDialogOpen} onOpenChange={setIsGoogleMapsDialogOpen}>
         <DialogContent className="rounded-3xl sm:max-w-md overflow-hidden">
           <DialogHeader>
@@ -1789,7 +1777,6 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
       
-      {/* QR Code Dialog */}
       <Dialog open={isQrDialogOpenManual} onOpenChange={setIsQrDialogOpenManual}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0">
           <DialogHeader className="p-8 pt-10 pb-4 bg-background">
@@ -1822,7 +1809,6 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Social Card Dialog */}
       <Dialog open={isSocialCardDialogOpen} onOpenChange={setIsSocialCardDialogOpen}>
         <DialogContent className="rounded-[2rem] sm:rounded-3xl sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-6 pt-10 pb-4 bg-background shrink-0">
@@ -1872,7 +1858,6 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Reward Dialog */}
       <Dialog open={isRewardDialogOpen} onOpenChange={setIsRewardDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 text-center">
           <div className="p-10 space-y-6">

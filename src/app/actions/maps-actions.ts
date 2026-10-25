@@ -6,7 +6,7 @@ import { initializeFirebase } from '@/firebase';
 import { collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 
 /**
- * Verifica o limite de requisições (Rate Limit) no Firestore de forma index-safe.
+ * Verifica o limite de requisições (Rate Limit) no Firestore de forma index-safe (Filtro único).
  */
 async function checkRateLimit(actionName: string) {
   const { firestore } = initializeFirebase();
@@ -19,17 +19,16 @@ async function checkRateLimit(actionName: string) {
   // Consulta simplificada para evitar necessidade de índice composto
   const q = query(
     rateLimitRef,
-    where('ip', '==', ip),
-    where('action', '==', actionName)
+    where('ip', '==', ip)
   );
   
   const snap = await getDocs(q);
   
-  // Filtro de tempo em memória
+  // Filtro de ação e tempo em memória
   const recentRequests = snap.docs.filter(doc => {
     const data = doc.data();
     const createdAt = data.createdAt?.toDate?.() || new Date(0);
-    return createdAt > oneMinuteAgo;
+    return data.action === actionName && createdAt > oneMinuteAgo;
   });
   
   if (recentRequests.length >= 10) {
@@ -135,7 +134,6 @@ export async function searchGooglePlaces(queryStr: string, city: string, state: 
 
     const data = await response.json();
 
-    // Fallback para busca genérica se a busca localizada falhar
     if ((!data.places || data.places.length === 0) && textQuery !== queryStr) {
       const fallbackRes = await fetch('https://places.googleapis.com/v1/places:searchText', {
         method: 'POST',
