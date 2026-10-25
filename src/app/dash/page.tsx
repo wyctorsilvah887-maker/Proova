@@ -650,7 +650,7 @@ export default function DashPage() {
               </div>
             </div>
           </ScrollArea>
-          <DialogFooter className="p-8 pt-4 pb-8 bg-background border-t"><Button className="w-full font-black h-12 rounded-2xl shadow-xl" onClick={() => setIsTutorialOpen(false)}>Dominar Meu Painel</Button></DialogFooter>
+          <DialogFooter className="p-8 pt-4 pb-8 bg-background border-t shrink-0"><Button className="w-full font-black h-12 rounded-2xl shadow-xl" onClick={() => setIsTutorialOpen(false)}>Dominar Meu Painel</Button></DialogFooter>
         </DialogContent>
       </Dialog>
       
