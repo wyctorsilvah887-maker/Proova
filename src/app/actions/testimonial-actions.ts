@@ -3,11 +3,12 @@
 
 import { headers } from 'next/headers';
 import { initializeFirebase } from '@/firebase';
-import { collection, query, where, getDocs, addDoc, serverTimestamp, Timestamp, doc, updateDoc, increment, getDoc, arrayUnion, limit } from 'firebase/firestore';
+import { collection, query, getDocs, addDoc, serverTimestamp, doc, updateDoc, increment, getDoc, arrayUnion, limit } from 'firebase/firestore';
 import { Resend } from 'resend';
 
 /**
- * Verifica o limite de requisições no Firestore de forma index-safe (Filtro único).
+ * Verifica o limite de requisições de forma 100% segura contra erros de índice.
+ * Busca os registros e filtra em memória.
  */
 async function checkRateLimit(actionName: string) {
   const { firestore } = initializeFirebase();
@@ -17,19 +18,14 @@ async function checkRateLimit(actionName: string) {
   const oneMinuteAgo = new Date(Date.now() - 60000);
   const rateLimitRef = collection(firestore, 'rate_limits');
   
-  // Consulta com APENAS UM filtro para evitar erro de índice composto
-  const q = query(
-    rateLimitRef,
-    where('ip', '==', ip)
-  );
+  // Busca os últimos 50 registros sem NENHUM filtro para evitar erro de índice
+  const snap = await getDocs(query(rateLimitRef, limit(50)));
   
-  const snap = await getDocs(q);
-  
-  // Filtra por ação e tempo em memória
+  // Filtra por IP, Ação e Tempo manualmente em memória
   const recentRequests = snap.docs.filter(doc => {
     const data = doc.data();
     const createdAt = data.createdAt?.toDate?.() || new Date(0);
-    return data.action === actionName && createdAt > oneMinuteAgo;
+    return data.ip === ip && data.action === actionName && createdAt > oneMinuteAgo;
   });
   
   if (recentRequests.length >= 15) {
@@ -142,7 +138,7 @@ export async function submitTestimonialAction(data: {
   text: string;
 }) {
   try {
-    // 1. Check Rate Limit (Index-safe)
+    // 1. Check Rate Limit (Completamente index-safe)
     await checkRateLimit('submit_testimonial');
     
     const { firestore } = initializeFirebase();
@@ -162,7 +158,7 @@ export async function submitTestimonialAction(data: {
     const collectionName = data.destination === 'public' ? 'testimonials' : 'private_feedbacks';
     const feedbacksRef = collection(firestore, 'users', data.targetUserId, collectionName);
 
-    // 2. Incrementa o contador do usuário PRIMEIRO para garantir que conte no Dash
+    // 2. Incrementa o contador do usuário ANTES para garantir visibilidade no Dash
     const userRef = doc(firestore, 'users', data.targetUserId);
     await updateDoc(userRef, {
       testimonialsCount: increment(1)
@@ -185,7 +181,7 @@ export async function submitTestimonialAction(data: {
       }
     }
 
-    // 5. LÓGICA DE SINCRONIZAÇÃO AUTOMÁTICA (Index-safe)
+    // 5. LÓGICA DE SINCRONIZAÇÃO AUTOMÁTICA
     if (data.destination === 'public') {
       const widgetsRef = collection(firestore, 'users', data.targetUserId, 'widgets');
       const widgetsSnap = await getDocs(widgetsRef);

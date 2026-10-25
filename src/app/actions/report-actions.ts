@@ -1,11 +1,13 @@
+
 'use server';
 
 import { Resend } from 'resend';
 import { initializeFirebase } from '@/firebase';
-import { collection, query, where, getDocs, doc, getDoc, Timestamp, orderBy, limit } from 'firebase/firestore';
+import { collection, query, getDocs, doc, getDoc, Timestamp } from 'firebase/firestore';
 
 /**
  * @fileOverview Lógica para geração e envio de relatórios de performance via e-mail.
+ * Totalmente index-safe.
  */
 export async function sendWeeklyPerformanceReport(userId: string) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -18,59 +20,49 @@ export async function sendWeeklyPerformanceReport(userId: string) {
   const resend = new Resend(apiKey);
 
   try {
-    // 1. Buscar Dados do Usuário
     const userSnap = await getDoc(doc(firestore, 'users', userId));
-    if (!userSnap.exists()) return { success: false, error: "Sua conta não foi localizada no banco de dados." };
+    if (!userSnap.exists()) return { success: false, error: "Sua conta não foi localizada." };
     const userData = userSnap.data();
 
-    // 2. Definir Períodos (Semana Atual vs Anterior)
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
 
-    // 3. Coletar Depoimentos da Semana Atual
     const testimonialsRef = collection(firestore, 'users', userId, 'testimonials');
-    const qCurrent = query(
-      testimonialsRef, 
-      where('createdAt', '>=', Timestamp.fromDate(sevenDaysAgo))
-    );
-    const currentSnap = await getDocs(qCurrent);
-    const currentCount = currentSnap.size;
+    const allSnap = await getDocs(testimonialsRef);
+    const allDocs = allSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    // 4. Coletar Depoimentos da Semana Anterior
-    const qPrevious = query(
-      testimonialsRef, 
-      where('createdAt', '>=', Timestamp.fromDate(fourteenDaysAgo)),
-      where('createdAt', '<', Timestamp.fromDate(sevenDaysAgo))
-    );
-    const previousSnap = await getDocs(qPrevious);
-    const previousCount = previousSnap.size;
+    const currentDocs = allDocs.filter((d: any) => {
+      const dt = d.createdAt?.toDate?.() || new Date(0);
+      return dt >= sevenDaysAgo;
+    });
 
-    // 5. Calcular Crescimento
+    const previousDocs = allDocs.filter((d: any) => {
+      const dt = d.createdAt?.toDate?.() || new Date(0);
+      return dt >= fourteenDaysAgo && dt < sevenDaysAgo;
+    });
+
+    const currentCount = currentDocs.length;
+    const previousCount = previousDocs.length;
+
     let growth = 0;
     if (previousCount > 0) {
       growth = Math.round(((currentCount - previousCount) / previousCount) * 100);
     } else if (currentCount > 0) {
-      growth = 100; // Crescimento de zero para algo
+      growth = 100;
     }
 
-    // 6. Identificar o Melhor Depoimento (Destaque) - Otimizado para evitar erro de índice composto
     let topT = null;
-    if (!currentSnap.empty) {
-      // Processamos a ordenação em memória para garantir que funcione sem exigir criação manual de índices no console do Firebase
-      const testimonialsList = currentSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-      testimonialsList.sort((a: any, b: any) => {
-        // Primeiro por nota (desc)
+    if (currentDocs.length > 0) {
+      const sorted = [...currentDocs].sort((a: any, b: any) => {
         if (b.rating !== a.rating) return b.rating - a.rating;
-        // Depois por data (desc)
         const dateA = a.createdAt?.toDate?.() || new Date(0);
         const dateB = b.createdAt?.toDate?.() || new Date(0);
         return dateB.getTime() - dateA.getTime();
       });
-      topT = testimonialsList[0];
+      topT = sorted[0];
     }
 
-    // 7. Enviar E-mail via Resend
     const userFirstName = userData.name ? userData.name.split(' ')[0] : 'Parceiro';
     
     const { data, error } = await resend.emails.send({
@@ -83,11 +75,9 @@ export async function sendWeeklyPerformanceReport(userId: string) {
             <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.025em; text-transform: uppercase;">Proova Analytics</h1>
             <p style="color: rgba(255,255,255,0.9); margin-top: 10px; font-size: 14px; font-weight: 600;">Sua Prova Social em Números</p>
           </div>
-          
           <div style="padding: 40px 32px;">
             <p style="font-size: 18px; color: #111827; font-weight: 700; margin-bottom: 8px;">Olá, ${userFirstName}!</p>
             <p style="line-height: 1.6; color: #4b5563; margin-bottom: 32px;">Seus clientes continuam espalhando confiança. Veja como foi o desempenho da <strong>${userData.companyName}</strong> nos últimos 7 dias:</p>
-            
             <div style="background-color: #f9fafb; border-radius: 20px; padding: 32px; text-align: center; border: 1px solid #f3f4f6; margin-bottom: 32px;">
               <p style="margin: 0; font-size: 11px; font-weight: 800; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em;">Novos Depoimentos</p>
               <p style="margin: 12px 0; font-size: 48px; font-weight: 900; color: #111827;">${currentCount}</p>
@@ -97,25 +87,17 @@ export async function sendWeeklyPerformanceReport(userId: string) {
                 </span>
               </div>
             </div>
-
-            ${topT ? `
-              <div style="border-left: 4px solid #f97316; padding: 24px; background-color: #fff7ed; border-radius: 0 16px 16px 0; margin-bottom: 32px;">
+            ${topT ? `<div style="border-left: 4px solid #f97316; padding: 24px; background-color: #fff7ed; border-radius: 0 16px 16px 0; margin-bottom: 32px;">
                 <p style="margin: 0 0 12px 0; font-size: 10px; font-weight: 800; color: #ea580c; text-transform: uppercase;">🏆 Destaque da Semana</p>
                 <p style="margin: 0; font-size: 15px; color: #431407; font-style: italic; line-height: 1.6;">"${topT.text}"</p>
                 <p style="margin: 12px 0 0 0; font-size: 13px; font-weight: 700; color: #9a3412;">— ${topT.userName}</p>
-              </div>
-            ` : ''}
-
+              </div>` : ''}
             <div style="text-align: center;">
-              <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'https://proova.wsstudioscompany.com.br'}/dash" 
-                 style="background-color: #111827; color: #ffffff; padding: 18px 36px; text-decoration: none; border-radius: 14px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);">
-                Acessar Meu Painel Completo
-              </a>
+              <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'https://proova.wsstudioscompany.com.br'}/dash" style="background-color: #111827; color: #ffffff; padding: 18px 36px; text-decoration: none; border-radius: 14px; font-weight: 700; font-size: 15px; display: inline-block;">Ver Painel Completo</a>
             </div>
           </div>
-          
           <div style="padding: 24px; background-color: #f9fafb; border-top: 1px solid #e5e7eb; text-align: center;">
-            <p style="font-size: 11px; color: #9ca3af; margin: 0; font-weight: 600;">© 2026 PROOVA TECHNOLOGY. RELATÓRIO DE INTELIGÊNCIA.</p>
+            <p style="font-size: 11px; color: #9ca3af; margin: 0; font-weight: 600;">© 2026 PROOVA TECHNOLOGY.</p>
           </div>
         </div>
       `,
@@ -125,6 +107,6 @@ export async function sendWeeklyPerformanceReport(userId: string) {
     return { success: true };
   } catch (err: any) {
     console.error("Falha ao gerar relatório:", err);
-    return { success: false, error: err.message || "Erro desconhecido ao processar relatório." };
+    return { success: false, error: err.message };
   }
 }
