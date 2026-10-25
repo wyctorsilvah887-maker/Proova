@@ -64,7 +64,8 @@ import {
   CheckCircle,
   EyeOff,
   Sparkles,
-  Settings2
+  Settings2,
+  Globe
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -562,7 +563,7 @@ export default function DashPage() {
           </div>
         </section>
 
-        {/* COLETA ATIVA SECTION */}
+        {/* Link de Coleta Section */}
         <section className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <div className="flex items-center gap-2">
             <Link2 className="w-5 h-5 text-primary" />
@@ -677,7 +678,7 @@ export default function DashPage() {
               <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Inbox className="w-5 h-5" /></div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Inbox Privado (Shield)</p>
+                  <p className="text-sm font-bold">Inbox Privado (Reputation Shield)</p>
                   <p className="text-xs text-muted-foreground leading-relaxed">Feedbacks sigilosos (1-3 estrelas) caem aqui. Resolva o problema internamente antes que vire uma reclamação pública.</p>
                 </div>
               </div>
@@ -685,14 +686,14 @@ export default function DashPage() {
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Mail className="w-5 h-5" /></div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">Relatórios por E-mail</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Clique em "Enviar Relatório" no card de Resumo para receber uma auditoria de performance semanal em PDF.</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Clique em "Enviar Relatório" no card de Resumo para receber uma auditoria de performance semanal no seu e-mail.</p>
                 </div>
               </div>
               <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><MessageSquare className="w-5 h-5" /></div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">Últimos Depoimentos</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Sua vitrine pública. Aqui você vê o que está rodando nos seus widgets e pode gerar Social Cards para o Instagram.</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Sua vitrine pública. Aqui você vê o que está rodando nos seus widgets e pode gerenciar sua autoridade digital.</p>
                 </div>
               </div>
             </div>
