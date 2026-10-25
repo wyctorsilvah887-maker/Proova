@@ -19,7 +19,11 @@ import {
   ArrowLeft,
   Sun,
   Moon,
-  Gem
+  Gem,
+  CheckCircle2,
+  EyeOff,
+  Sparkles,
+  MessageSquare
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -32,8 +36,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebase';
-import { doc, collection, query, orderBy, deleteDoc } from 'firebase/firestore';
+import { doc, collection, query, orderBy, deleteDoc, updateDoc, getDocs, limit, arrayUnion, where } from 'firebase/firestore';
 import Link from 'next/link';
 import { signOut } from 'firebase/auth';
 import { toast } from '@/hooks/use-toast';
@@ -48,6 +53,8 @@ export default function PrivateInboxPage() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
+  const [isProcessing, setIsProcessing] = useState<string | null>(null);
+
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
@@ -57,15 +64,38 @@ export default function PrivateInboxPage() {
     }
   }, [user, authLoading, router]);
 
+  // Busca de Feedbacks Privados
   const feedbacksQuery = useMemo(() => {
     if (!db || !user) return null;
-    return query(
-      collection(db, 'users', user.uid, 'private_feedbacks'),
-      orderBy('createdAt', 'desc')
-    );
+    return query(collection(db, 'users', user.uid, 'private_feedbacks'));
   }, [db, user]);
+  const { data: privateFeedbacksList, loading: feedbacksLoading } = useCollection(feedbacksQuery);
 
-  const { data: privateFeedbacks, loading: feedbacksLoading } = useCollection(feedbacksQuery);
+  // Busca de Depoimentos para Curadoria
+  const testimonialsQuery = useMemo(() => {
+    if (!db || !user) return null;
+    return query(collection(db, 'users', user.uid, 'testimonials'));
+  }, [db, user]);
+  const { data: testimonialsList, loading: testimonialsLoading } = useCollection(testimonialsQuery);
+
+  const pendingTestimonials = useMemo(() => {
+    return (testimonialsList || [])
+      .filter((t: any) => t.status === 'pending')
+      .sort((a: any, b: any) => {
+        const da = a.createdAt?.toDate?.() || new Date(0);
+        const db = b.createdAt?.toDate?.() || new Date(0);
+        return db.getTime() - da.getTime();
+      });
+  }, [testimonialsList]);
+
+  const privateFeedbacks = useMemo(() => {
+    return (privateFeedbacksList || [])
+      .sort((a: any, b: any) => {
+        const da = a.createdAt?.toDate?.() || new Date(0);
+        const db = b.createdAt?.toDate?.() || new Date(0);
+        return db.getTime() - da.getTime();
+      });
+  }, [privateFeedbacksList]);
 
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
@@ -76,13 +106,52 @@ export default function PrivateInboxPage() {
     return 'Plano Base';
   }, [userData]);
 
+  const handleApproveTestimonial = async (id: string) => {
+    if (!db || !user || isProcessing) return;
+    setIsProcessing(id);
+    
+    try {
+      const testimonialRef = doc(db, 'users', user.uid, 'testimonials', id);
+      await updateDoc(testimonialRef, { status: 'approved' });
+      
+      // Injeta no primeiro widget encontrado para conveniência
+      const widgetsRef = collection(db, 'users', user.uid, 'widgets');
+      const widgetsSnap = await getDocs(query(widgetsRef, limit(1)));
+      if (!widgetsSnap.empty) {
+        await updateDoc(widgetsSnap.docs[0].ref, {
+          selectedTestimonialIds: arrayUnion(id)
+        });
+      }
+      
+      toast({ title: "Publicado!", description: "Depoimento aprovado e injetado no mural." });
+    } catch (err) {
+      toast({ variant: "destructive", title: "Erro na aprovação" });
+    } finally {
+      setIsProcessing(null);
+    }
+  };
+
+  const handleArchiveTestimonial = async (id: string) => {
+    if (!db || !user || isProcessing) return;
+    setIsProcessing(id);
+    try {
+      const testimonialRef = doc(db, 'users', user.uid, 'testimonials', id);
+      await updateDoc(testimonialRef, { status: 'archived' });
+      toast({ title: "Arquivado", description: "O depoimento foi removido da fila." });
+    } catch (e) {
+      toast({ variant: "destructive", title: "Erro ao arquivar" });
+    } finally {
+      setIsProcessing(null);
+    }
+  };
+
   const handleDeleteFeedback = async (id: string) => {
     if (!db || !user) return;
     try {
       await deleteDoc(doc(db, 'users', user.uid, 'private_feedbacks', id));
-      toast({ title: "Removido", description: "O feedback foi excluído do inbox privado." });
+      toast({ title: "Removido", description: "O feedback foi excluído permanentemente." });
     } catch (e) {
-      toast({ variant: "destructive", title: "Erro", description: "Não foi possível remover." });
+      toast({ variant: "destructive", title: "Erro ao remover" });
     }
   };
 
@@ -188,77 +257,119 @@ export default function PrivateInboxPage() {
             </Link>
             <div className="space-y-1">
               <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight flex items-center gap-3">
-                <Inbox className="w-8 h-8 text-primary" /> Inbox Privado
+                <Inbox className="w-8 h-8 text-primary" /> Moderação Unificada
               </h1>
-              <p className="text-sm text-muted-foreground">Críticas e feedbacks (1-3 estrelas) recebidos em sigilo.</p>
+              <p className="text-sm text-muted-foreground">Gerencie tudo o que entra na sua marca.</p>
             </div>
           </div>
-          <Badge variant="outline" className="w-fit h-8 px-4 rounded-full border-primary/20 text-primary font-black uppercase tracking-widest text-[10px]">
-            {privateFeedbacks?.length || 0} Mensagens
-          </Badge>
         </header>
 
-        <div className="grid gap-4">
-          {feedbacksLoading ? (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="h-10 w-10 animate-spin text-primary/30" />
-            </div>
-          ) : privateFeedbacks && privateFeedbacks.length > 0 ? (
-            privateFeedbacks.map((f: any) => (
-              <Card key={f.id} className="border-none shadow-sm overflow-hidden rounded-2xl group transition-all hover:shadow-md">
-                <CardContent className="p-5 sm:p-6 flex flex-col md:flex-row gap-6">
-                  <div className="flex-1 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="bg-primary/5 p-2.5 rounded-xl">
-                          <User className="w-4 h-4 text-primary" />
-                        </div>
-                        <div className="flex flex-col">
-                          <span className="font-bold text-sm">{f.userName}</span>
-                          <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                            <Mail className="w-3 h-3" /> {f.userEmail || 'Não informado'}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex gap-0.5">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star key={i} className={cn("w-3.5 h-3.5", i < f.rating ? "fill-primary text-primary" : "text-muted-foreground/20")} />
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="bg-muted/30 p-4 rounded-2xl border-l-4 border-primary/30 italic text-sm leading-relaxed">
-                      "{f.text}"
-                    </div>
+        <Tabs defaultValue="curatorship" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 mb-8 bg-muted/50 p-1 h-12 rounded-xl">
+            <TabsTrigger value="curatorship" className="rounded-lg gap-2 font-bold text-xs uppercase tracking-widest">
+              <Sparkles className="w-4 h-4" /> Curadoria {pendingTestimonials.length > 0 && <Badge className="ml-1 h-4 px-1 text-[8px] bg-primary">{pendingTestimonials.length}</Badge>}
+            </TabsTrigger>
+            <TabsTrigger value="private" className="rounded-lg gap-2 font-bold text-xs uppercase tracking-widest">
+              <Shield className="w-4 h-4" /> Inbox Privado {privateFeedbacks.length > 0 && <Badge variant="secondary" className="ml-1 h-4 px-1 text-[8px]">{privateFeedbacks.length}</Badge>}
+            </TabsTrigger>
+          </TabsList>
 
-                    <div className="flex items-center gap-4 text-[10px] text-muted-foreground font-bold uppercase tracking-widest">
-                      <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {f.createdAt?.toDate ? f.createdAt.toDate().toLocaleString('pt-BR') : 'Agora'}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex md:flex-col items-center justify-end gap-2 shrink-0">
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="text-destructive hover:bg-destructive/10 rounded-xl h-10 w-10"
-                      onClick={() => handleDeleteFeedback(f.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <div className="py-32 text-center border-2 border-dashed rounded-[2.5rem] bg-muted/5 space-y-4">
-              <MessageSquareOff className="w-16 h-16 text-muted-foreground/20 mx-auto" />
-              <div className="space-y-1">
-                <p className="font-bold textxl">Inbox Vazio</p>
-                <p className="text-sm text-muted-foreground max-w-xs mx-auto">Você não possui feedbacks críticos no momento. Continue prestando um ótimo serviço!</p>
+          <TabsContent value="curatorship" className="mt-0 space-y-4">
+            {testimonialsLoading ? (
+              <div className="py-20 text-center"><Loader2 className="animate-spin h-8 w-8 text-primary/30 mx-auto" /></div>
+            ) : pendingTestimonials.length > 0 ? (
+              <div className="grid gap-4">
+                <div className="bg-primary/5 p-4 rounded-2xl border border-primary/10 flex items-center gap-3 mb-2 animate-pulse">
+                   <Sparkles className="w-5 h-5 text-primary shrink-0" />
+                   <p className="text-xs font-bold text-primary">Estes elógios são qualificados para o seu site. Aprove-os agora!</p>
+                </div>
+                {pendingTestimonials.map((t: any) => (
+                  <Card key={t.id} className="border-none shadow-sm overflow-hidden rounded-2xl group transition-all hover:shadow-md">
+                    <CardContent className="p-5 sm:p-6 flex flex-col md:flex-row gap-6">
+                      <div className="flex-1 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="bg-primary/5 p-2.5 rounded-xl"><User className="w-4 h-4 text-primary" /></div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-sm">{t.userName}</span>
+                              <span className="text-[10px] text-muted-foreground flex items-center gap-1"><Mail className="w-3 h-3" /> {t.userEmail || 'Não informado'}</span>
+                            </div>
+                          </div>
+                          <div className="flex gap-0.5">{Array.from({ length: 5 }).map((_, i) => (<Star key={i} className={cn("w-3.5 h-3.5", i < (t.rating || 5) ? "fill-primary text-primary" : "text-muted-foreground/20")} />))}</div>
+                        </div>
+                        <div className="bg-muted/30 p-4 rounded-2xl border-l-4 border-primary italic text-sm leading-relaxed">"{t.text}"</div>
+                        <div className="flex items-center gap-4 text-[10px] text-muted-foreground font-bold uppercase tracking-widest"><span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleString('pt-BR') : 'Hoje'}</span></div>
+                      </div>
+                      <div className="flex md:flex-col items-center justify-end gap-2 shrink-0">
+                        <Button 
+                          className="w-full md:w-32 h-12 rounded-xl font-bold gap-2 shadow-lg"
+                          disabled={!!isProcessing}
+                          onClick={() => handleApproveTestimonial(t.id)}
+                        >
+                          {isProcessing === t.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />} Publicar
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          className="w-full md:w-32 h-12 rounded-xl font-bold gap-2"
+                          disabled={!!isProcessing}
+                          onClick={() => handleArchiveTestimonial(t.id)}
+                        >
+                          <EyeOff className="w-4 h-4" /> Ocultar
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
-            </div>
-          )}
-        </div>
+            ) : (
+              <div className="py-32 text-center border-2 border-dashed rounded-[2.5rem] bg-muted/5 space-y-4">
+                <Sparkles className="w-16 h-16 text-muted-foreground/20 mx-auto" />
+                <div className="space-y-1">
+                  <p className="font-bold text-lg">Curadoria em Dia</p>
+                  <p className="text-sm text-muted-foreground max-w-xs mx-auto">Você já processou todos os novos depoimentos qualificados.</p>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="private" className="mt-0 space-y-4">
+            {feedbacksLoading ? (
+              <div className="flex items-center justify-center py-20"><Loader2 className="h-10 w-10 animate-spin text-primary/30" /></div>
+            ) : privateFeedbacks && privateFeedbacks.length > 0 ? (
+              privateFeedbacks.map((f: any) => (
+                <Card key={f.id} className="border-none shadow-sm overflow-hidden rounded-2xl group transition-all hover:shadow-md">
+                  <CardContent className="p-5 sm:p-6 flex flex-col md:flex-row gap-6">
+                    <div className="flex-1 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="bg-primary/5 p-2.5 rounded-xl"><User className="w-4 h-4 text-primary" /></div>
+                          <div className="flex flex-col">
+                            <span className="font-bold text-sm">{f.userName}</span>
+                            <span className="text-[10px] text-muted-foreground flex items-center gap-1"><Mail className="w-3 h-3" /> {f.userEmail || 'Não informado'}</span>
+                          </div>
+                        </div>
+                        <div className="flex gap-0.5">{Array.from({ length: 5 }).map((_, i) => (<Star key={i} className={cn("w-3.5 h-3.5", i < f.rating ? "fill-orange-400 text-orange-400" : "text-muted-foreground/20")} />))}</div>
+                      </div>
+                      <div className="bg-muted/30 p-4 rounded-2xl border-l-4 border-orange-400/30 italic text-sm leading-relaxed">"{f.text}"</div>
+                      <div className="flex items-center gap-4 text-[10px] text-muted-foreground font-bold uppercase tracking-widest"><span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {f.createdAt?.toDate ? f.createdAt.toDate().toLocaleString('pt-BR') : 'Agora'}</span></div>
+                    </div>
+                    <div className="flex md:flex-col items-center justify-end gap-2 shrink-0">
+                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 rounded-xl h-10 w-10" onClick={() => handleDeleteFeedback(f.id)}><Trash2 className="w-4 h-4" /></Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="py-32 text-center border-2 border-dashed rounded-[2.5rem] bg-muted/5 space-y-4">
+                <MessageSquareOff className="w-16 h-16 text-muted-foreground/20 mx-auto" />
+                <div className="space-y-1">
+                  <p className="font-bold text-lg">Inbox Vazio</p>
+                  <p className="text-sm text-muted-foreground max-w-xs mx-auto">Nenhum feedback crítico recebido. Continue prestando um ótimo serviço!</p>
+                </div>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </main>
 
       <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8">
@@ -267,10 +378,8 @@ export default function PrivateInboxPage() {
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain hidden dark:block" priority />
         </div>
         <div className="container px-4 md:px-6 mx-auto text-center space-y-4">
-          <p className="text-xs text-muted-foreground">© 2026 Proova - Inbox Privado de Feedback.</p>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold opacity-50">
-            Proova Professional
-          </p>
+          <p className="text-xs text-muted-foreground">© 2026 Proova - Moderação de Autoridade e Blindagem Digital.</p>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold opacity-50">Proova Professional</p>
         </div>
       </footer>
     </div>

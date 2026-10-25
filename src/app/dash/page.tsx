@@ -128,7 +128,6 @@ export default function DashPage() {
   const [isUpdatingUrl, setIsUpdatingUrl] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [isSendingReport, setIsSendingReport] = useState(false);
-  const [isProcessingCuratorship, setIsProcessingCuratorship] = useState<string | null>(null);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
@@ -164,14 +163,8 @@ export default function DashPage() {
   }, [db, user]);
   const { data: allFetchedTestimonials, loading: testimonialsLoading } = useCollection(allTestimonialsQuery);
 
-  const pendingTestimonials = useMemo(() => {
-    return (allFetchedTestimonials || [])
-      .filter((t: any) => t.status === 'pending')
-      .sort((a: any, b: any) => {
-        const da = a.createdAt?.toDate?.() || new Date(0);
-        const db = b.createdAt?.toDate?.() || new Date(0);
-        return db.getTime() - da.getTime();
-      });
+  const pendingTestimonialsCount = useMemo(() => {
+    return (allFetchedTestimonials || []).filter((t: any) => t.status === 'pending').length;
   }, [allFetchedTestimonials]);
 
   const approvedTestimonials = useMemo(() => {
@@ -223,6 +216,20 @@ export default function DashPage() {
       if (!isSetupComplete || !userData || isAuditing) return;
       setIsAuditing(true);
       const results: AuditItem[] = [];
+
+      // 0. Testemunhos Pendentes (Novo Gatilho de Curadoria)
+      if (pendingTestimonialsCount > 0) {
+        results.push({ 
+          id: 'curatorship-pending', 
+          label: 'Elogios para Aprovar', 
+          status: 'critical', 
+          description: `Você tem ${pendingTestimonialsCount} novos elogios que ainda não estão no seu site.`, 
+          actionLabel: 'Ir para Curadoria', 
+          action: () => router.push('/private'), 
+          icon: Sparkles 
+        });
+      }
+
       const mapsUrl = userData.googleMapsUrl || '';
       const isReviewLink = mapsUrl.includes('writereview') || mapsUrl.includes('local/writereview');
       
@@ -244,49 +251,7 @@ export default function DashPage() {
       setIsAuditing(false);
     }
     runAudit();
-  }, [isSetupComplete, userData, widgetsList, isAuditing]);
-
-  const handleApproveTestimonial = async (id: string) => {
-    if (!db || !user || isProcessingCuratorship) return;
-    setIsProcessingCuratorship(id);
-    
-    try {
-      const testimonialRef = doc(db, 'users', user.uid, 'testimonials', id);
-      await updateDoc(testimonialRef, { status: 'approved' });
-      
-      const widgetsRef = collection(db, 'users', user.uid, 'widgets');
-      const widgetsSnap = await getDocs(query(widgetsRef, limit(1)));
-      
-      if (!widgetsSnap.empty) {
-        await updateDoc(widgetsSnap.docs[0].ref, {
-          selectedTestimonialIds: arrayUnion(id)
-        });
-      }
-      
-      toast({ title: "Publicado!", description: "Depoimento aprovado e injetado no mural principal." });
-    } catch (err) {
-      console.error(err);
-      toast({ variant: "destructive", title: "Erro de Permissão", description: "Falha na aprovação." });
-    } finally {
-      setIsProcessingCuratorship(null);
-    }
-  };
-
-  const handleArchiveTestimonial = async (id: string) => {
-    if (!db || !user || isProcessingCuratorship) return;
-    setIsProcessingCuratorship(id);
-    
-    try {
-      const testimonialRef = doc(db, 'users', user.uid, 'testimonials', id);
-      await updateDoc(testimonialRef, { status: 'archived' });
-      toast({ title: "Arquivado", description: "O depoimento foi removido da fila." });
-    } catch (err) {
-      console.error(err);
-      toast({ variant: "destructive", title: "Erro", description: "Falha ao arquivar." });
-    } finally {
-      setIsProcessingCuratorship(null);
-    }
-  };
+  }, [isSetupComplete, userData, widgetsList, isAuditing, pendingTestimonialsCount, router]);
 
   const filteredMetrics = useMemo(() => {
     const testimonials = approvedTestimonials;
@@ -448,30 +413,6 @@ export default function DashPage() {
           </section>
         )}
 
-        {pendingTestimonials.length > 0 && (
-          <section className="space-y-4 animate-in zoom-in-95 duration-500">
-            <div className="flex items-center justify-between">
-              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2"><Sparkles className="w-4 h-4 animate-pulse" /> Fila de Curadoria Inteligente</h2>
-              <Badge className="bg-primary text-white text-[8px] font-black h-5">{pendingTestimonials.length} PENDENTES</Badge>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              {pendingTestimonials.map((t: any) => (
-                <Card key={t.id} className="border-2 border-primary/20 shadow-lg bg-card overflow-hidden rounded-2xl p-5 md:p-6 space-y-4">
-                  <div className="flex items-start gap-3">
-                    <div className="bg-primary/10 p-2 rounded-xl"><User className="w-5 h-5 text-primary" /></div>
-                    <div className="space-y-1"><p className="font-bold text-sm">{t.userName}</p><div className="flex gap-0.5">{Array.from({ length: t.rating || 5 }).map((_, i) => <Star key={i} className="w-3 i-3 fill-primary text-primary" />)}</div></div>
-                  </div>
-                  <p className="text-xs md:text-sm italic leading-relaxed text-foreground/90 bg-muted/30 p-4 rounded-xl border-l-4 border-primary">"{t.text}"</p>
-                  <div className="flex gap-2 pt-2">
-                    <Button className="flex-1 h-11 rounded-xl font-bold gap-2 shadow-md" disabled={!!isProcessingCuratorship} onClick={() => handleApproveTestimonial(t.id)}>{isProcessingCuratorship === t.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}Publicar no Site</Button>
-                    <Button variant="outline" size="icon" className="h-11 w-11 rounded-xl font-bold" disabled={!!isProcessingCuratorship} onClick={() => handleArchiveTestimonial(t.id)}><EyeOff className="w-4 h-4" /></Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </section>
-        )}
-
         {isSetupComplete && auditItems.length > 0 && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
             <div className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" /><h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Auditoria Consultiva Proova</h2></div>
@@ -546,7 +487,7 @@ export default function DashPage() {
         </section>
 
         <section className="space-y-4">
-          <div className="flex items-center justify-between"><div className="flex items-center gap-2"><MessageSquare className="w-5 h-5 text-primary" /><h2 className="text-lg md:text-xl font-bold font-headline tracking-tight">Depoimentos Publicados</h2></div><Link href="/private"><Button variant="outline" size="sm" className="rounded-full gap-2 text-[10px] h-7 border-primary/20 text-primary hover:bg-primary/5"><Inbox className="w-3 h-3" /> Inbox Privado</Button></Link></div>
+          <div className="flex items-center justify-between"><div className="flex items-center gap-2"><MessageSquare className="w-5 h-5 text-primary" /><h2 className="text-lg md:text-xl font-bold font-headline tracking-tight">Últimos Depoimentos Publicados</h2></div><Link href="/private"><Button variant="outline" size="sm" className="rounded-full gap-2 text-[10px] h-7 border-primary/20 text-primary hover:bg-primary/5"><Inbox className="w-3 h-3" /> Ver Inbox Unificado</Button></Link></div>
           <div className="grid gap-3 md:gap-4">
             {testimonialsLoading ? <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary/50" /></div> : filteredMetrics.displayList.length > 0 ? filteredMetrics.displayList.map((t: any) => (
               <Card key={t.id} className="border-none shadow-sm overflow-hidden rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md">
@@ -576,17 +517,17 @@ export default function DashPage() {
           <div className="flex-1 overflow-y-auto px-8 pb-8">
             <div className="space-y-8">
               <div className="flex gap-4 group">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Sparkles className="w-5 h-5" /></div>
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Inbox className="w-5 h-5" /></div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Fila de Curadoria</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Depoimentos qualificados aguardam aqui. Com 1 clique, você aprova e injeta no seu site instantaneamente.</p>
+                  <p className="text-sm font-bold">Inbox de Moderação Unificado</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Centralizamos tudo o que entra: elógios para aprovar e feedbacks privados. É sua torre de comando de reputação.</p>
                 </div>
               </div>
               <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><ShieldCheck className="w-5 h-5" /></div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">Consultor Proova</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Seu auditor de SEO Local. Ele avisa sobre falhas no link do Google, falta de fotos ou horários pendentes.</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Seu auditor de SEO Local. Ele avisa sobre falhas no link do Google, elogios pendentes de aprovação ou horários desatualizados.</p>
                 </div>
               </div>
               <div className="flex gap-4 group">
@@ -611,31 +552,10 @@ export default function DashPage() {
                 </div>
               </div>
               <div className="flex gap-4 group">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Link2 className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Link de Coleta & Personalização</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Sua URL exclusiva baseada no nome da sua marca. Use este link na bio do Instagram para capturar elogios.</p>
-                </div>
-              </div>
-              <div className="flex gap-4 group">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Inbox className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Inbox Privado (Reputation Shield)</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Feedbacks sigilosos (1-3 estrelas) caem aqui. Resolva o problema internamente antes que vire uma reclamação pública.</p>
-                </div>
-              </div>
-              <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Mail className="w-5 h-5" /></div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">Relatórios por E-mail</p>
                   <p className="text-xs text-muted-foreground leading-relaxed">Receba uma auditoria de performance semanal no seu e-mail clicando em "Enviar Relatório" no card de Resumo.</p>
-                </div>
-              </div>
-              <div className="flex gap-4 group">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><MessageSquare className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Últimos Depoimentos</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Sua vitrine pública. Aqui você vê o que está rodando nos seus widgets e pode gerenciar sua autoridade digital.</p>
                 </div>
               </div>
             </div>
