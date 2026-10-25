@@ -158,7 +158,6 @@ export default function DashPage() {
 
   const currentAnnouncement = useMemo(() => {
     if (!announcementsList) return null;
-    // Filtro e ordenação em memória para evitar erros de índice composto
     return announcementsList
       .filter((a: any) => a.isActive)
       .sort((a: any, b: any) => {
@@ -266,7 +265,6 @@ export default function DashPage() {
     runAudit();
   }, [isSetupComplete, userData, widgetsList, privateFeedbacksList]);
 
-  // AÇÕES DE CURADORIA NO CLIENTE (DB LOCAL)
   const handleApproveTestimonial = (id: string) => {
     if (!db || !user || isProcessingCuratorship) return;
     setIsProcessingCuratorship(id);
@@ -462,7 +460,7 @@ export default function DashPage() {
                 <Card key={t.id} className="border-2 border-primary/20 shadow-lg bg-card overflow-hidden rounded-2xl p-5 md:p-6 space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="bg-primary/10 p-2 rounded-xl"><User className="w-5 h-5 text-primary" /></div>
-                    <div className="space-y-1"><p className="font-bold text-sm">{t.userName}</p><div className="flex gap-0.5">{Array.from({ length: t.rating || 5 }).map((_, i) => <Star key={i} className="w-3 h-3 fill-primary text-primary" />)}</div></div>
+                    <div className="space-y-1"><p className="font-bold text-sm">{t.userName}</p><div className="flex gap-0.5">{Array.from({ length: t.rating || 5 }).map((_, i) => <Star key={i} className="w-3 i-3 fill-primary text-primary" />)}</div></div>
                   </div>
                   <p className="text-xs md:text-sm italic leading-relaxed text-foreground/90 bg-muted/30 p-4 rounded-xl border-l-4 border-primary">"{t.text}"</p>
                   <div className="flex gap-2 pt-2">
@@ -475,11 +473,11 @@ export default function DashPage() {
           </section>
         )}
 
-        {isSetupComplete && (
+        {isSetupComplete && auditItems.length > 0 && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
             <div className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" /><h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Auditoria Consultiva Proova</h2></div>
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-              {auditItems.length > 0 ? auditItems.map((item) => (
+              {auditItems.map((item) => (
                 <Card key={item.id} className={cn("border-none shadow-sm overflow-hidden rounded-2xl relative", item.status === 'critical' ? "bg-destructive/5" : "bg-orange-500/5")}>
                   <div className={cn("absolute top-0 left-0 w-1.5 h-full", item.status === 'critical' ? "bg-destructive" : "bg-orange-500")} />
                   <CardContent className="p-4 flex flex-col h-full justify-between gap-4">
@@ -490,12 +488,7 @@ export default function DashPage() {
                     <Button size="sm" variant="secondary" className="w-full text-[10px] font-black uppercase h-8 rounded-lg shadow-sm" onClick={item.action}>{item.actionLabel} <ArrowRight className="ml-1 w-3 h-3" /></Button>
                   </CardContent>
                 </Card>
-              )) : (
-                <Card className="md:col-span-2 lg:col-span-3 border-none shadow-sm bg-green-500/5 overflow-hidden rounded-2xl p-6 flex items-center gap-4">
-                  <div className="bg-green-500/10 p-3 rounded-full text-green-600"><PartyPopper className="w-8 h-8" /></div>
-                  <div className="space-y-1"><h3 className="font-black font-headline text-green-700">Tudo impecável!</h3><p className="text-sm text-green-600/80 font-medium">Sua conta passou em todos os testes de saúde digital e SEO local.</p></div>
-                </Card>
-              )}
+              ))}
             </div>
           </section>
         )}
@@ -521,12 +514,26 @@ export default function DashPage() {
             </div>
             <div className="space-y-1"><div className="text-xl md:text-3xl font-bold">{filteredMetrics.count} <span className="text-sm md:text-lg font-medium text-muted-foreground">avaliações</span></div><Badge variant="secondary" className="border-none text-[8px] md:text-[10px] h-4 md:h-5 px-1.5 font-black bg-primary/10 text-primary">{filteredMetrics.trendLabel}</Badge></div>
           </Card>
-          <Card className="border-none shadow-sm overflow-hidden rounded-2xl p-4 md:p-6 space-y-4 relative group">
-            <div onClick={() => setIsGoogleMapsDialogOpen(true)} className="absolute -top-2 right-4 z-40 bg-primary text-white text-[8px] font-black uppercase px-2.5 py-1 rounded-full shadow-lg cursor-pointer hover:scale-105 transition-all flex items-center gap-1.5 ring-2 ring-white">Editar</div>
-            <div className="flex items-center justify-between"><CardTitle className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Cliques Google</CardTitle><MousePointer2 className="h-4 w-4 text-primary" /></div>
-            <div className="flex items-center gap-2"><div className="text-xl md:text-2xl font-bold">{userData?.googleRedirectCount || 0}</div>{userData?.googleMapsUrl ? <Badge variant="secondary" className="text-[8px] md:text-[10px] h-4 md:h-5 bg-primary/10 text-primary border-none">G-Boost Ativo</Badge> : <Badge variant="outline" className="text-[8px] h-4 md:h-5 opacity-50 uppercase font-black">Pendente</Badge>}</div>
-            <p className="text-[10px] md:text-xs text-muted-foreground">Visitantes redirecionados ao Maps.</p>
-          </Card>
+          
+          <div className="relative group h-full">
+             <div 
+               onClick={() => setIsGoogleMapsDialogOpen(true)} 
+               className="absolute -top-3 right-6 z-40 bg-primary text-white text-[9px] font-black uppercase px-3 py-1.5 rounded-full shadow-xl cursor-pointer hover:scale-110 active:scale-95 transition-all flex items-center gap-1.5 ring-4 ring-background"
+             >
+               <Edit3 className="w-3 h-3" /> Editar
+             </div>
+             <Card className="border-none shadow-sm h-full rounded-2xl p-4 md:p-6 space-y-4 relative flex flex-col justify-center">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Cliques Google</CardTitle>
+                <MousePointer2 className="h-4 w-4 text-primary" />
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="text-xl md:text-2xl font-bold">{userData?.googleRedirectCount || 0}</div>
+                {userData?.googleMapsUrl ? <Badge variant="secondary" className="text-[8px] md:text-[10px] h-4 md:h-5 bg-primary/10 text-primary border-none">G-Boost Ativo</Badge> : <Badge variant="outline" className="text-[8px] h-4 md:h-5 opacity-50 uppercase font-black">Pendente</Badge>}
+              </div>
+              <p className="text-[10px] md:text-xs text-muted-foreground">Visitantes redirecionados ao Maps.</p>
+            </Card>
+          </div>
         </div>
 
         <section className="space-y-3">
