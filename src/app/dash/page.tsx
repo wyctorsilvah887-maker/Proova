@@ -535,7 +535,7 @@ export default function DashPage() {
           <div className="relative group h-full">
              <div 
                onClick={() => setIsGoogleMapsDialogOpen(true)} 
-               className="absolute -top-2.5 right-4 z-40 bg-primary text-white text-[8px] font-black uppercase px-2 py-1 rounded-full shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all flex items-center gap-1 ring-2 ring-background"
+               className="absolute -top-2 px-2.5 py-1 z-40 bg-primary text-white text-[8px] font-black uppercase rounded-full shadow-lg cursor-pointer hover:scale-105 active:scale-95 transition-all flex items-center gap-1 ring-2 ring-background right-4"
              >
                <Edit3 className="w-2.5 h-2.5" /> Editar
              </div>
@@ -561,54 +561,6 @@ export default function DashPage() {
             <Button variant="outline" disabled={!isCollectDone} onClick={() => router.push('/widgets')} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all"><Layout className="w-5 h-5 text-primary" /><span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Meus Murais</span></Button>
             <Button variant="outline" disabled={!isSetupComplete} onClick={() => router.push('/private')} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all"><Inbox className="w-5 h-5 text-primary" /><span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Ver Inbox</span></Button>
           </div>
-        </section>
-
-        {/* Link de Coleta Section */}
-        <section className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <div className="flex items-center gap-2">
-            <Link2 className="w-5 h-5 text-primary" />
-            <h2 className="text-lg md:text-xl font-bold font-headline tracking-tight">Link de Coleta</h2>
-          </div>
-          <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem] bg-card">
-            <div className="p-5 md:p-6 flex flex-col md:flex-row items-center gap-6">
-              <div className="flex-1 space-y-2 w-full">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Sua URL Exclusiva</Label>
-                <div className="flex items-center gap-2 bg-muted/30 p-2 rounded-xl border group hover:border-primary/30 transition-colors">
-                  <Globe className="w-4 h-4 text-muted-foreground shrink-0 ml-2" />
-                  <Input 
-                    readOnly 
-                    value={collectionLink} 
-                    className="border-none bg-transparent h-10 text-xs font-mono focus-visible:ring-0 shadow-none px-2"
-                  />
-                  <Button 
-                    variant="secondary" 
-                    size="sm" 
-                    className="h-9 px-4 rounded-lg font-bold gap-2 text-[10px] uppercase tracking-widest shrink-0"
-                    onClick={() => copyToClipboard(collectionLink, "Link de coleta")}
-                  >
-                    <Copy className="w-3.5 h-3.5" /> Copiar
-                  </Button>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto shrink-0">
-                <Button 
-                  variant="outline" 
-                  className="h-14 md:h-12 px-6 rounded-xl font-bold gap-2 border-primary/20 text-primary hover:bg-primary/5 shadow-sm"
-                  asChild
-                >
-                  <a href={collectionLink} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="w-4 h-4" /> Ver Página
-                  </a>
-                </Button>
-                <Button 
-                  onClick={() => setIsQrDialogOpenManual(true)}
-                  className="h-14 md:h-12 px-6 rounded-xl font-bold gap-2 shadow-xl"
-                >
-                  <QrCode className="w-4 h-4" /> Cartaz QR
-                </Button>
-              </div>
-            </div>
-          </Card>
         </section>
 
         <section className="space-y-4">
@@ -706,7 +658,7 @@ export default function DashPage() {
         <DialogContent className="rounded-3xl sm:max-w-md"><DialogHeader><DialogTitle className="text-2xl font-black font-headline flex items-center gap-2"><MapPin className="w-6 h-6 text-primary" /> Google Business</DialogTitle></DialogHeader>
           <div className="py-4 space-y-4">
             <p className="text-xs text-muted-foreground text-center">Configuraremos seu link oficial para turbinar seu SEO Local.</p>
-            <Input placeholder="Link Direto do Google Maps" value={newGoogleMapsUrl} onChange={(e) => setNewGoogleMapsUrl(e.target.value)} className="h-12 rounded-xl" />
+            <input placeholder="Link Direto do Google Maps" value={newGoogleMapsUrl} onChange={(e) => setNewGoogleMapsUrl(e.target.value)} className="flex h-12 w-full rounded-xl border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" />
             <Button className="w-full font-black h-12 rounded-xl shadow-xl" onClick={() => handleUpdateGoogleMapsUrl()} disabled={isUpdatingUrl || !newGoogleMapsUrl}>Salvar Link</Button>
           </div>
         </DialogContent>
