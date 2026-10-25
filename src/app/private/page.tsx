@@ -114,7 +114,6 @@ export default function PrivateInboxPage() {
       const testimonialRef = doc(db, 'users', user.uid, 'testimonials', id);
       await updateDoc(testimonialRef, { status: 'approved' });
       
-      // Injeta no primeiro widget encontrado para conveniência
       const widgetsRef = collection(db, 'users', user.uid, 'widgets');
       const widgetsSnap = await getDocs(query(widgetsRef, limit(1)));
       if (!widgetsSnap.empty) {
@@ -217,31 +216,10 @@ export default function PrivateInboxPage() {
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Planos de Upgrade</span>
               </DropdownMenuItem>
-              {userData?.isAdmin && (
-                <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                  <Shield className="mr-2 h-4 w-4 text-primary" />
-                  <span>Administração</span>
-                </DropdownMenuItem>
-              )}
               <DropdownMenuSeparator className="mx-1" />
-              
-              <DropdownMenuItem 
-                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-                className="rounded-xl cursor-pointer font-bold py-2.5"
-              >
-                {theme === 'light' ? (
-                  <Moon className="mr-2 h-4 w-4 text-primary" />
-                ) : (
-                  <Sun className="mr-2 h-4 w-4 text-primary" />
-                )}
-                <span>Alternar Tema</span>
-              </DropdownMenuItem>
-
+              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sair do Sistema</span>
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -372,15 +350,12 @@ export default function PrivateInboxPage() {
         </Tabs>
       </main>
 
-      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8">
+      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
         <div className="flex items-center gap-2 relative w-[200px] h-[65px] md:w-[320px] md:h-[105px]">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain dark:hidden" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain hidden dark:block" priority />
         </div>
-        <div className="container px-4 md:px-6 mx-auto text-center space-y-4">
-          <p className="text-xs text-muted-foreground">© 2026 Proova - Moderação de Autoridade e Blindagem Digital.</p>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold opacity-50">Proova Professional</p>
-        </div>
+        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
     </div>
   );

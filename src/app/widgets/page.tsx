@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -157,7 +156,6 @@ export default function WidgetsPage() {
         title: "Mural Criado!",
         description: "Configurando sua página pública...",
       });
-      // Redireciona para o editor da Página Pública conforme solicitado
       router.push(`/widgets/${slug}`);
       
     } catch (error: any) {
@@ -251,35 +249,10 @@ export default function WidgetsPage() {
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Planos de Upgrade</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setIsTutorialOpen(true)} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Info className="mr-2 h-4 w-4 text-primary" />
-                <span>Tutorial</span>
-              </DropdownMenuItem>
-              
               <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem 
-                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-                className="rounded-xl cursor-pointer font-bold py-2.5"
-              >
-                {theme === 'light' ? (
-                  <Moon className="mr-2 h-4 w-4 text-primary" />
-                ) : (
-                  <Sun className="mr-2 h-4 w-4 text-primary" />
-                )}
-                <span>Alternar Tema</span>
-              </DropdownMenuItem>
-
-              {userData?.isAdmin && (
-                <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                  <Shield className="mr-2 h-4 w-4 text-primary" />
-                  <span>Administração</span>
-                </DropdownMenuItem>
-              )}
+              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sair do Sistema</span>
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -401,132 +374,13 @@ export default function WidgetsPage() {
         </div>
       </main>
 
-      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50">
+      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
         <div className="flex items-center gap-2 relative w-[200px] h-[65px] md:w-[320px] md:h-[105px]">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain dark:hidden" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain hidden dark:block" priority />
         </div>
-        <div className="container px-4 md:px-6 mx-auto text-center space-y-2">
-          <p className="text-xs md:text-sm text-muted-foreground font-medium">© 2026 Proova - Prova Social de Verdade.</p>
-          <p className="text-[10px] text-muted-foreground uppercase tracking-[0.3em] font-black opacity-30">
-            Feito por Proova
-          </p>
-        </div>
+        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
-
-      {/* Tutorial Dialog */}
-      <Dialog open={isTutorialOpen} onOpenChange={setIsTutorialOpen}>
-        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col">
-          <DialogHeader className="p-8 pt-16 pb-4 shrink-0 bg-background">
-            <DialogTitle className="text-2xl font-black font-headline flex items-center gap-2">
-              <Info className="w-6 h-6 text-primary" /> Como usar seus Murais
-            </DialogTitle>
-            <DialogDescription>
-              Aprenda a gerenciar seus destinos de prova social.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-6 py-6 px-8 overflow-y-auto">
-            <div className="flex gap-4 group">
-              <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 transition-colors group-hover:bg-primary group-hover:text-white">1</div>
-              <div>
-                <p className="text-sm font-bold">Crie novos destinos</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">Clique em "Novo Mural" para criar uma nova configuração. Cada mural pode ter depoimentos e layouts diferentes.</p>
-              </div>
-            </div>
-            <div className="flex gap-4 group">
-              <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 transition-colors group-hover:bg-primary group-hover:text-white">2</div>
-              <div>
-                <p className="text-sm font-bold">Página Pública vs Mural Embutido</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">A <strong>Página Pública</strong> é um link que você pode colocar na bio. O <strong>Mural Embutido</strong> é um código para você colar dentro do seu site.</p>
-              </div>
-            </div>
-            <div className="flex gap-4 group">
-              <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 transition-colors group-hover:bg-primary group-hover:text-white">3</div>
-              <div>
-                <p className="text-sm font-bold">Obtenha o Código</p>
-                <p className="text-xs text-muted-foreground leading-relaxed">Clique em "Obter Código" para copiar o snippet de instalação. Cole-o no seu site para ver a mágica acontecer!</p>
-              </div>
-            </div>
-          </div>
-          <DialogFooter className="p-8 pt-4 pb-8 bg-background">
-            <Button className="w-full font-black h-12 rounded-2xl shadow-xl" onClick={() => setIsTutorialOpen(false)}>Entendi!</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Dialog for Widget Code */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="rounded-3xl sm:max-w-lg border-none shadow-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-black font-headline">Código do Mural</DialogTitle>
-            <DialogDescription className="text-sm">
-              Copie o código abaixo e cole no HTML do seu site para exibir o mural "{selectedWidget?.name}".
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4 space-y-4">
-            <div className="relative bg-muted/50 rounded-xl p-5 border border-primary/20">
-              <Terminal className="absolute top-5 left-5 w-4 h-4 text-primary/50" />
-              <pre className="text-[11px] font-mono text-foreground break-all whitespace-pre-wrap pl-7 leading-relaxed select-all">
-                {selectedWidget ? getWidgetCode(selectedWidget.id) : ''}
-              </pre>
-              <Button 
-                size="icon" 
-                variant="secondary" 
-                className="absolute top-2 right-2 h-9 w-9 rounded-lg shadow-md hover:scale-105 active:scale-95 transition-all" 
-                onClick={() => { navigator.clipboard.writeText(getWidgetCode(selectedWidget.id)); toast({ title: "Copiado!" }); }}
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="bg-primary/5 p-4 rounded-xl border border-primary/10">
-              <p className="text-xs text-primary font-bold flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4" /> Dica de Instalação
-              </p>
-              <p className="text-[11px] text-muted-foreground mt-1.5 Birding-relaxed">
-                Recomendamos colar este código antes da tag final <code>&lt;/body&gt;</code> para garantir que o mural carregue sem afetar a velocidade do seu site.
-              </p>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button className="w-full font-black h-12 rounded-xl text-sm" onClick={() => setIsDialogOpen(false)}>Entendi, fechar</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Dialog for New Widget */}
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="rounded-3xl sm:max-w-md border-none shadow-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-black font-headline">Novo Mural</DialogTitle>
-            <DialogDescription className="text-sm">
-              Dê um nome para identificar seu novo mural de depoimentos.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="py-4 space-y-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Nome do Mural</label>
-              <Input 
-                placeholder="Ex: Landing Page Promoção" 
-                value={newWidgetName}
-                onChange={(e) => setNewWidgetName(e.target.value)}
-                className="h-12 rounded-xl text-sm"
-                autoFocus
-                onKeyDown={(e) => e.key === 'Enter' && handleCreateWidget()}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button 
-              className="w-full font-black h-12 rounded-xl shadow-lg text-sm" 
-              onClick={() => handleCreateWidget()}
-              disabled={isCreating || !newWidgetName.trim()}
-            >
-              {isCreating ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : <Plus className="mr-2 w-4 h-4" />}
-              Criar Mural Agora
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
