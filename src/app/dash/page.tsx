@@ -217,7 +217,6 @@ export default function DashPage() {
       setIsAuditing(true);
       const results: AuditItem[] = [];
 
-      // 0. Testemunhos Pendentes (Novo Gatilho de Curadoria)
       if (pendingTestimonialsCount > 0) {
         results.push({ 
           id: 'curatorship-pending', 
@@ -305,7 +304,6 @@ export default function DashPage() {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
-      {/* GLOBAL ANNOUNCEMENT BANNER */}
       {currentAnnouncement && !isAnnouncementDismissed && (
         <div className={cn(
           "w-full py-3 flex items-center relative overflow-hidden transition-all duration-500 z-[100] border-b border-white/10",
@@ -347,12 +345,10 @@ export default function DashPage() {
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
               <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator className="mx-1" />
-              
               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
               </DropdownMenuItem>
-              
               <DropdownMenuItem 
                 disabled={!isSetupComplete}
                 onClick={() => isSetupComplete && router.push('/widgets')} 
@@ -362,7 +358,6 @@ export default function DashPage() {
                 <span>Meus Widgets</span>
                 {!isSetupComplete && <Lock className="ml-auto w-3 h-3 opacity-40" />}
               </DropdownMenuItem>
-              
               <DropdownMenuItem 
                 disabled={!isCollectDone}
                 onClick={() => isCollectDone && router.push('/private')} 
@@ -372,12 +367,10 @@ export default function DashPage() {
                 <span>Inbox Privado</span>
                 {!isCollectDone && <Lock className="ml-auto w-3 h-3 opacity-40" />}
               </DropdownMenuItem>
-              
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Upgrade</span>
               </DropdownMenuItem>
-              
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
@@ -502,9 +495,14 @@ export default function DashPage() {
         </section>
       </main>
 
-      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center"><div className="relative w-[180px] h-[60px] opacity-40 grayscale"><Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" /><Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" /></div><p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-30">© 2026 Proova Technology</p></footer>
+      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
+        <div className="relative w-[180px] h-[60px]">
+          <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" />
+          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" />
+        </div>
+        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-30">© 2026 Proova Technology</p>
+      </footer>
 
-      {/* DIALOGS */}
       <Dialog open={isTutorialOpen} onOpenChange={setIsTutorialOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-8 pt-16 pb-4 shrink-0 bg-background">
