@@ -142,6 +142,11 @@ export default function DashPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
+  const isPremiumUser = useMemo(() => {
+    const status = userData?.membershipStatus;
+    return status === 'gold' || status === 'enterprise' || status === 'trial';
+  }, [userData]);
+
   const widgetsQuery = useMemo(() => {
     if (!db || !user) return null;
     return collection(db, 'users', user.uid, 'widgets');
@@ -248,7 +253,8 @@ export default function DashPage() {
         results.push({ id: 'maps-invalid', label: 'Link de Avaliação Indireto', status: 'attention', description: 'Seu link atual não abre direto na caixa de texto do Google.', actionLabel: 'Corrigir Link', action: () => setIsGoogleMapsDialogOpen(true), icon: ShieldAlert });
       }
 
-      if (userData.googlePlaceId) {
+      // Auditoria Avançada (Consultor Premium)
+      if (userData.googlePlaceId && isPremiumUser) {
         const details = await getGooglePlaceDetails(userData.googlePlaceId);
         if (details) {
           if (!details.hasPhotos) results.push({ id: 'profile-photos', label: 'Perfil Sem Fotos', status: 'attention', description: 'Empresas com fotos recebem 42% mais cliques no Maps.', actionLabel: 'Adicionar Fotos', action: () => window.open(`https://www.google.com/maps/place/?q=place_id:${userData.googlePlaceId}`, '_blank'), icon: Camera });
@@ -260,7 +266,7 @@ export default function DashPage() {
       setIsAuditing(false);
     }
     runAudit();
-  }, [isSetupComplete, userData, widgetsList, pendingTestimonialsCount, router]);
+  }, [isSetupComplete, userData, widgetsList, pendingTestimonialsCount, router, isPremiumUser]);
 
   const filteredMetrics = useMemo(() => {
     const testimonials = approvedTestimonials;
@@ -359,6 +365,10 @@ export default function DashPage() {
 
   const handleSendWeeklyReport = async () => {
     if (!user) return;
+    if (!isPremiumUser) {
+      router.push('/pricing');
+      return;
+    }
     setIsSendingReport(true);
     try {
       const result = await sendWeeklyPerformanceReport(user.uid);
@@ -522,6 +532,16 @@ export default function DashPage() {
                   </CardContent>
                 </Card>
               ))}
+              {!isPremiumUser && (
+                <Card className="border-none shadow-sm overflow-hidden rounded-2xl bg-muted/10 border-2 border-dashed flex flex-col items-center justify-center p-6 text-center space-y-3 opacity-70">
+                   <Lock className="w-6 h-6 text-muted-foreground" />
+                   <div className="space-y-1">
+                     <p className="text-[10px] font-black uppercase">Scanner de Saúde Digital</p>
+                     <p className="text-[9px] text-muted-foreground">Upgrade para Gold para auditoria de SEO no Google Maps.</p>
+                   </div>
+                   <Button variant="outline" size="sm" className="h-7 text-[9px] font-bold uppercase rounded-lg" onClick={() => router.push('/pricing')}>Ver Planos</Button>
+                </Card>
+              )}
             </div>
           </section>
         )}
@@ -542,7 +562,21 @@ export default function DashPage() {
         <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2">
           <Card className="border-none shadow-sm overflow-hidden rounded-2xl p-4 md:p-6 space-y-4">
             <div className="flex items-center justify-between">
-              <div className="space-y-0.5"><CardTitle className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Resumo {period !== 'all' ? `(${period}d)` : ''}</CardTitle><button onClick={handleSendWeeklyReport} disabled={isSendingReport} className="text-[9px] font-black text-primary uppercase tracking-widest flex items-center gap-1 hover:underline disabled:opacity-50">{isSendingReport ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <Mail className="w-2.5 h-2.5" />} Enviar Relatório</button></div>
+              <div className="space-y-0.5">
+                <CardTitle className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Resumo {period !== 'all' ? `(${period}d)` : ''}</CardTitle>
+                <button 
+                  onClick={handleSendWeeklyReport} 
+                  disabled={isSendingReport} 
+                  className={cn(
+                    "text-[9px] font-black uppercase tracking-widest flex items-center gap-1 hover:underline disabled:opacity-50",
+                    isPremiumUser ? "text-primary" : "text-muted-foreground opacity-50"
+                  )}
+                >
+                  {isSendingReport ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <Mail className="w-2.5 h-2.5" />} 
+                  {!isPremiumUser && <Lock className="w-2 h-2" />} 
+                  Enviar Relatório
+                </button>
+              </div>
               <BarChart3 className="h-4 w-4 text-primary" />
             </div>
             <div className="space-y-1"><div className="text-xl md:text-3xl font-bold">{filteredMetrics.count} <span className="text-sm md:text-lg font-medium text-muted-foreground">avaliações</span></div><Badge variant="secondary" className="border-none text-[8px] md:text-[10px] h-4 md:h-5 px-1.5 font-black bg-primary/10 text-primary">{filteredMetrics.trendLabel}</Badge></div>
@@ -749,7 +783,6 @@ export default function DashPage() {
               <div className="space-y-2">
                 {searchResults.map((place) => (
                   <Card 
-                    key={place.place_id} 
                     className="border-2 border-transparent hover:border-primary/20 cursor-pointer transition-all bg-muted/10 group"
                     onClick={() => handleSelectPlace(place)}
                   >

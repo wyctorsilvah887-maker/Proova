@@ -110,7 +110,7 @@ export default function PricingPage() {
         popular: false,
         highlight: false,
         disabled: status === 'trial',
-        hidden: true // Ocultado da página pricing conforme solicitado
+        hidden: true 
       },
       {
         id: 'gold',
@@ -123,6 +123,8 @@ export default function PricingPage() {
           "Mural de depoimentos avançado",
           "Link de coleta personalizado",
           "Redirecionamento Google Maps",
+          "Auto-curadoria inteligente",
+          "Relatório semanal por e-mail",
           "Suporte prioritário",
         ],
         cta: status === 'gold' ? "Plano Atual" : "Assinar Gold",
@@ -141,10 +143,11 @@ export default function PricingPage() {
         features: [
           "Depoimentos ilimitados",
           "Todos os widgets liberados",
+          "Auto-curadoria inteligente",
+          "Relatório semanal por e-mail",
           "Depoimentos em Vídeo (4K) (Em breve)",
           "Branding 100% customizado",
           "Remocão da marca Proova",
-          "Acesso ao ADS (Em breve)",
           "Suporte VIP via WhatsApp",
         ],
         cta: status === 'enterprise' ? "Plano Atual" : "Seja Enterprise",
@@ -165,7 +168,7 @@ export default function PricingPage() {
         <div className="flex items-center">
           <Link href="/" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
-              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="dark:hidden object-contain" />
+              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="dark:hidden object-contain" priority />
               <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="dark:block object-contain hidden" />
             </div>
           </Link>
@@ -176,7 +179,7 @@ export default function PricingPage() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-10 md:h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
                   <div className="hidden md:flex flex-col items-end">
-                    <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary Birding-tight">
+                    <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
                       {userData?.companyName || 'Minha Empresa'}
                     </span>
                     <span className={cn(

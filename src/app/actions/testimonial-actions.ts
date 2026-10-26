@@ -105,10 +105,16 @@ export async function submitTestimonialAction(data: {
     const userSnap = await getDoc(userRef);
     if (userSnap.exists()) {
       const userData = userSnap.data();
-      if (data.destination === 'private' || data.rating <= 3) {
-        await sendCriticalFeedbackAlert(userData.email, testimonialData, userData.companyName);
-      } else if (data.destination === 'public' && data.rating >= 4 && data.text.length >= 20) {
-        await sendCuratorshipAlert(userData.email, testimonialData, userData.companyName);
+      const status = userData.membershipStatus || 'base';
+      const isPremium = status === 'gold' || status === 'enterprise' || status === 'trial';
+
+      // Alertas por e-mail são benefícios Premium
+      if (isPremium) {
+        if (data.destination === 'private' || data.rating <= 3) {
+          await sendCriticalFeedbackAlert(userData.email, testimonialData, userData.companyName);
+        } else if (data.destination === 'public' && data.rating >= 4 && data.text.length >= 20) {
+          await sendCuratorshipAlert(userData.email, testimonialData, userData.companyName);
+        }
       }
     }
     return { success: true };

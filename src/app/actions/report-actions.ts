@@ -1,4 +1,3 @@
-
 'use server';
 
 import { Resend } from 'resend';
@@ -24,11 +23,17 @@ export async function sendWeeklyPerformanceReport(userId: string) {
     if (!userSnap.exists()) return { success: false, error: "Sua conta não foi localizada." };
     const userData = userSnap.data();
 
+    // Restrição de Plano
+    const status = userData.membershipStatus || 'base';
+    const isPremium = status === 'gold' || status === 'enterprise' || status === 'trial';
+    if (!isPremium) {
+      return { success: false, error: "Relatórios semanais por e-mail estão disponíveis apenas nos planos Gold e Enterprise." };
+    }
+
     const now = new Date();
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
     const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
 
-    // Consulta de alta performance para o período atual (Exige índice)
     const currentRef = collection(firestore, 'users', userId, 'testimonials');
     const currentSnap = await getDocs(query(
       currentRef, 
@@ -37,7 +42,6 @@ export async function sendWeeklyPerformanceReport(userId: string) {
     ));
     const currentDocs = currentSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-    // Consulta para o período anterior
     const previousSnap = await getDocs(query(
       currentRef,
       where('createdAt', '>=', Timestamp.fromDate(fourteenDaysAgo)),
@@ -56,7 +60,6 @@ export async function sendWeeklyPerformanceReport(userId: string) {
 
     let topT: any = null;
     if (currentDocs.length > 0) {
-      // Já vem ordenado pela query
       topT = currentDocs.sort((a: any, b: any) => (b.rating || 0) - (a.rating || 0))[0];
     }
 
