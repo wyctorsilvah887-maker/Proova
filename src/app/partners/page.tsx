@@ -29,7 +29,8 @@ import {
   Globe,
   Search,
   MousePointer2,
-  Megaphone
+  Megaphone,
+  Info
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -79,8 +80,8 @@ export default function PartnersPage() {
     {
       id: 'fitbase',
       name: 'FitBase',
-      category: 'Gestão Fitness',
-      description: 'O software de gestão mais completo para academias, estúdios e centros de treinamento.',
+      category: 'Software de Gestão Fitness',
+      description: 'O software de gestão mais completo que indicamos para academias, estúdios e centros de treinamento.',
       benefits: [
         'Controle de acesso e mensalidades',
         'Treinos e avaliações físicas via app',
@@ -88,11 +89,11 @@ export default function PartnersPage() {
         'Automação de cobranças Recorrentes'
       ],
       exclusiveOffer: isEnterprise && (businessType === 'academia' || businessType === 'artes_marciais') 
-        ? 'INCLUSO NO SEU PLANO' 
+        ? 'BENEFÍCIO ENTERPRISE: ACESSO INCLUSO' 
         : 'Condição Especial para Clientes Proova',
       ctaLabel: isEnterprise && (businessType === 'academia' || businessType === 'artes_marciais') 
-        ? 'Ativar Agora' 
-        : 'Conhecer Solução',
+        ? 'Ativar Indicação' 
+        : 'Conhecer Parceiro',
       ctaUrl: 'https://fitbase.com.br',
       highlight: true,
       icon: Rocket,
@@ -100,17 +101,17 @@ export default function PartnersPage() {
     },
     {
       id: 'traffic-agency',
-      name: 'Tráfego Pago Dominante',
-      category: 'Anúncios Online',
-      description: 'Atraia clientes prontos para comprar com campanhas de Google Ads e Meta Ads focadas no seu bairro.',
+      name: 'Agência de Tráfego Homologada',
+      category: 'Anúncios Online (Indicado)',
+      description: 'Especialistas que recomendamos para atrair clientes locais via Google Ads e Meta Ads com ROI comprovado.',
       benefits: [
         'Gestão de orçamento inteligente',
         'Configuração de raio de atuação local',
         'Anúncios focados em conversão direta',
-        'Relatórios mensais de ROI'
+        'Relatórios mensais de performance'
       ],
-      exclusiveOffer: 'Setup Inicial Grátis no primeiro mês',
-      ctaLabel: 'Atrair Clientes',
+      exclusiveOffer: 'Primeira Consultoria de Estratégia Grátis',
+      ctaLabel: 'Falar com Especialista',
       ctaUrl: '#',
       highlight: false,
       icon: Target,
@@ -118,16 +119,16 @@ export default function PartnersPage() {
     },
     {
       id: 'web-design',
-      name: 'LP Proova Express',
-      category: 'Criação de Sites',
-      description: 'Landing Pages ultra velozes e otimizadas para converter visitantes em clientes reais.',
+      name: 'Criação de Landing Pages',
+      category: 'Design e Web (Indicado)',
+      description: 'Designers parceiros que criam páginas ultra velozes integradas nativamente com a prova social do seu mural.',
       benefits: [
         'Design moderno e mobile-first',
         'Integração nativa com murais Proova',
         'Otimização para busca do Google',
-        'Hospedagem 4K inclusa'
+        'Hospedagem e manutenção inclusas'
       ],
-      exclusiveOffer: '20% de Desconto para Membros Proova',
+      exclusiveOffer: '20% de Desconto na primeira LP',
       ctaLabel: 'Solicitar Orçamento',
       ctaUrl: '#',
       highlight: false,
@@ -136,17 +137,17 @@ export default function PartnersPage() {
     },
     {
       id: 'google-boost',
-      name: 'Especialista em SEO Local',
-      category: 'Consultoria Maps',
-      description: 'Consultoria estratégica para colocar sua empresa no topo das buscas orgânicas do Google.',
+      name: 'Consultoria Especialista Maps',
+      category: 'SEO Local (Indicado)',
+      description: 'Profissionais certificados que indicamos para colocar sua empresa no topo das buscas orgânicas do Google.',
       benefits: [
         'Otimização completa do Google Business',
         'Estratégia de palavras-chave locais',
         'Auditoria de concorrência direta',
-        'Aumento de cliques no Maps'
+        'Aumento real de cliques no Maps'
       ],
-      exclusiveOffer: 'Primeira Auditoria de Perfil Grátis',
-      ctaLabel: 'Falar com Consultor',
+      exclusiveOffer: 'Auditoria de Perfil Cortesia Proova',
+      ctaLabel: 'Agendar Auditoria',
       ctaUrl: '#',
       highlight: false,
       icon: Search,
@@ -236,13 +237,13 @@ export default function PartnersPage() {
       <main className="flex-1 p-4 md:p-8 space-y-10 max-w-7xl mx-auto w-full">
         <section className="text-center space-y-4 py-8">
           <div className="inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-[10px] sm:text-xs font-bold text-primary border border-primary/20 backdrop-blur-sm">
-            🤝 Serviços que impulsionam seu faturamento
+            🤝 Indicações que impulsionam seu faturamento
           </div>
           <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
-            Hub de <span className="text-primary italic">Parceiros Proova</span>.
+            Hub de <span className="text-primary italic">Parceiros e Indicações</span>.
           </h1>
-          <p className="text-muted-foreground text-sm md:text-xl max-w-2xl mx-auto font-medium">
-            Conectamos seu negócio às ferramentas e serviços de elite que você precisa para dominar o mercado local.
+          <p className="text-muted-foreground text-sm md:text-xl max-w-2xl mx-auto font-medium leading-relaxed">
+            Conectamos seu negócio a serviços externos de elite que confiamos e indicamos para acelerar sua jornada rumo ao domínio do mercado local.
           </p>
         </section>
 
@@ -257,7 +258,7 @@ export default function PartnersPage() {
             >
               {partner.featured && (
                 <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[9px] font-black uppercase tracking-widest px-4 py-1.5 rounded-bl-2xl shadow-lg z-20 flex items-center gap-1.5">
-                  <Star className="w-3 h-3 fill-current" /> Recomendado
+                  <Star className="w-3 h-3 fill-current" /> Sugestão Proova
                 </div>
               )}
               
@@ -281,7 +282,7 @@ export default function PartnersPage() {
 
               <CardContent className="px-6 md:px-8 py-0 flex-1">
                 <div className="space-y-3">
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">O que você ganha:</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">Expertise do Parceiro:</p>
                   <ul className="space-y-2.5">
                     {partner.benefits.map((benefit, i) => (
                       <li key={i} className="flex items-start gap-2.5 text-xs font-medium">
@@ -295,7 +296,7 @@ export default function PartnersPage() {
 
               <CardFooter className="p-6 md:p-8 mt-auto flex flex-col gap-4">
                 <div className="w-full p-4 rounded-2xl bg-muted/30 border border-dashed flex flex-col items-center text-center gap-1">
-                   <p className="text-[9px] font-black uppercase tracking-widest opacity-50">Oferta Proova:</p>
+                   <p className="text-[9px] font-black uppercase tracking-widest opacity-50">Vantagem da Indicação:</p>
                    <p className="text-xs font-bold text-foreground">{partner.exclusiveOffer}</p>
                 </div>
                 <Button 
@@ -314,12 +315,19 @@ export default function PartnersPage() {
           ))}
         </div>
 
+        <div className="flex items-center justify-center p-6 bg-muted/30 rounded-3xl border border-dashed gap-4 max-w-3xl mx-auto">
+          <Info className="w-6 h-6 text-muted-foreground shrink-0" />
+          <p className="text-[10px] md:text-xs text-muted-foreground font-medium leading-relaxed">
+            <strong>Aviso Legal Proova:</strong> Os serviços acima são prestados por parceiros externos homologados que operam sob seus próprios Termos de Uso e Políticas de Privacidade. O Proova atua exclusivamente como facilitador da indicação e ponte de conexão estratégica.
+          </p>
+        </div>
+
         <section className="bg-primary/5 rounded-[2.5rem] p-8 md:p-12 border border-primary/10 relative overflow-hidden">
           <div className="relative z-10 grid md:grid-cols-[1fr_0.5fr] gap-8 items-center">
             <div className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-black font-headline">Deseja ser um Parceiro?</h2>
+              <h2 className="text-2xl md:text-3xl font-black font-headline">Deseja ser um Parceiro Indicado?</h2>
               <p className="text-muted-foreground text-sm md:text-lg font-medium">
-                Sua agência ou software atende negócios locais? Junte-se ao nosso ecossistema de confiança e ajude nossos clientes a escalarem faturamento.
+                Sua agência ou software atende negócios locais e possui alto nível de entrega? Junte-se ao nosso ecossistema de confiança.
               </p>
               <Button className="h-12 px-8 rounded-xl font-bold gap-2">
                 Falar com nosso time de parcerias <ArrowRight className="w-4 h-4" />
@@ -340,7 +348,7 @@ export default function PartnersPage() {
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain dark:hidden" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain hidden dark:block" priority />
         </div>
-        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology - Hub de Parceiros</p>
+        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology - Hub de Indicações Estratégicas</p>
       </footer>
     </div>
   );
