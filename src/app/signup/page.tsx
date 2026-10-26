@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Mail, User, Building2, Lock, Loader2, Eye, EyeOff, Briefcase, CheckCircle2, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Mail, User, Building2, Lock, Loader2, Eye, EyeOff, CheckCircle2, ShieldCheck } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -14,9 +14,6 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useFirestore, useAuth, useUser } from "@/firebase";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
-import { errorEmitter } from "@/firebase/error-emitter";
-import { FirestorePermissionError } from "@/firebase/errors";
-import { cn } from "@/lib/utils";
 
 export default function SignupPage() {
   const db = useFirestore();
@@ -155,7 +152,7 @@ export default function SignupPage() {
                   <SelectTrigger className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20">
                     <SelectValue placeholder="Selecione uma categoria..." />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-64">
                     <SelectItem value="academia">Academia/ Studio de musculação</SelectItem>
                     <SelectItem value="artes_marciais">Artes marciais/ Lutas</SelectItem>
                     <SelectItem value="clinica">Clinica/ Consultório</SelectItem>
@@ -172,7 +169,7 @@ export default function SignupPage() {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Seu Nome/CEO/Responsável</label>
+                    <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Seu Nome/Responsável</label>
                     <div className="relative">
                       <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground/50" />
                       <Input
