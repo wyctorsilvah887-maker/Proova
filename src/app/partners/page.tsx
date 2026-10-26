@@ -25,7 +25,11 @@ import {
   Loader2,
   User,
   Star,
-  Sparkles
+  Sparkles,
+  Globe,
+  Search,
+  MousePointer2,
+  Megaphone
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -95,9 +99,45 @@ export default function PartnersPage() {
       featured: (businessType === 'academia' || businessType === 'artes_marciais')
     },
     {
+      id: 'traffic-agency',
+      name: 'Tráfego Pago Dominante',
+      category: 'Anúncios Online',
+      description: 'Atraia clientes prontos para comprar com campanhas de Google Ads e Meta Ads focadas no seu bairro.',
+      benefits: [
+        'Gestão de orçamento inteligente',
+        'Configuração de raio de atuação local',
+        'Anúncios focados em conversão direta',
+        'Relatórios mensais de ROI'
+      ],
+      exclusiveOffer: 'Setup Inicial Grátis no primeiro mês',
+      ctaLabel: 'Atrair Clientes',
+      ctaUrl: '#',
+      highlight: false,
+      icon: Target,
+      featured: true
+    },
+    {
+      id: 'web-design',
+      name: 'LP Proova Express',
+      category: 'Criação de Sites',
+      description: 'Landing Pages ultra velozes e otimizadas para converter visitantes em clientes reais.',
+      benefits: [
+        'Design moderno e mobile-first',
+        'Integração nativa com murais Proova',
+        'Otimização para busca do Google',
+        'Hospedagem 4K inclusa'
+      ],
+      exclusiveOffer: '20% de Desconto para Membros Proova',
+      ctaLabel: 'Solicitar Orçamento',
+      ctaUrl: '#',
+      highlight: false,
+      icon: Globe,
+      featured: false
+    },
+    {
       id: 'google-boost',
       name: 'Especialista em SEO Local',
-      category: 'Consultoria',
+      category: 'Consultoria Maps',
       description: 'Consultoria estratégica para colocar sua empresa no topo das buscas orgânicas do Google.',
       benefits: [
         'Otimização completa do Google Business',
@@ -105,29 +145,11 @@ export default function PartnersPage() {
         'Auditoria de concorrência direta',
         'Aumento de cliques no Maps'
       ],
-      exclusiveOffer: 'Primeira Auditoria Grátis',
+      exclusiveOffer: 'Primeira Auditoria de Perfil Grátis',
       ctaLabel: 'Falar com Consultor',
       ctaUrl: '#',
       highlight: false,
-      icon: Target,
-      featured: false
-    },
-    {
-      id: 'social-design',
-      name: 'Pack Social Pro',
-      category: 'Design & Branding',
-      description: 'Artes profissionais prontas para Instagram e Facebook focadas em prova social.',
-      benefits: [
-        'Templates editáveis no Canva',
-        'Design focado em conversão',
-        'Acompanha manual de marca',
-        'Atualizações mensais inclusas'
-      ],
-      exclusiveOffer: '30% OFF com cupom PROOVA30',
-      ctaLabel: 'Resgatar Desconto',
-      ctaUrl: '#',
-      highlight: false,
-      icon: Sparkles,
+      icon: Search,
       featured: false
     }
   ];
@@ -214,17 +236,17 @@ export default function PartnersPage() {
       <main className="flex-1 p-4 md:p-8 space-y-10 max-w-7xl mx-auto w-full">
         <section className="text-center space-y-4 py-8">
           <div className="inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-[10px] sm:text-xs font-bold text-primary border border-primary/20 backdrop-blur-sm">
-            🤝 Parcerias que aceleram seu lucro
+            🤝 Serviços que impulsionam seu faturamento
           </div>
           <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
-            Ecossistema de <span className="text-primary italic">Crescimento</span>.
+            Hub de <span className="text-primary italic">Parceiros Proova</span>.
           </h1>
           <p className="text-muted-foreground text-sm md:text-xl max-w-2xl mx-auto font-medium">
-            Conectamos você com as melhores ferramentas e profissionais para elevar sua autoridade digital.
+            Conectamos seu negócio às ferramentas e serviços de elite que você precisa para dominar o mercado local.
           </p>
         </section>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {partners.map((partner) => (
             <Card 
               key={partner.id} 
@@ -248,19 +270,18 @@ export default function PartnersPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <CardTitle className="text-xl md:text-2xl font-black font-headline">{partner.name}</CardTitle>
-                    {partner.id === 'fitbase' && <Badge variant="secondary" className="bg-primary/10 text-primary text-[8px] font-black">NICHADO</Badge>}
+                    <CardTitle className="text-xl font-black font-headline truncate">{partner.name}</CardTitle>
                   </div>
                   <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-primary/70">{partner.category}</CardDescription>
                 </div>
-                <p className="text-muted-foreground text-xs md:text-sm leading-relaxed font-medium">
+                <p className="text-muted-foreground text-xs leading-relaxed font-medium">
                   {partner.description}
                 </p>
               </CardHeader>
 
               <CardContent className="px-6 md:px-8 py-0 flex-1">
                 <div className="space-y-3">
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">Vantagens Exclusivas:</p>
+                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">O que você ganha:</p>
                   <ul className="space-y-2.5">
                     {partner.benefits.map((benefit, i) => (
                       <li key={i} className="flex items-start gap-2.5 text-xs font-medium">
@@ -296,9 +317,9 @@ export default function PartnersPage() {
         <section className="bg-primary/5 rounded-[2.5rem] p-8 md:p-12 border border-primary/10 relative overflow-hidden">
           <div className="relative z-10 grid md:grid-cols-[1fr_0.5fr] gap-8 items-center">
             <div className="space-y-4">
-              <h2 className="text-2xl md:text-3xl font-black font-headline">Seja um Parceiro Proova</h2>
+              <h2 className="text-2xl md:text-3xl font-black font-headline">Deseja ser um Parceiro?</h2>
               <p className="text-muted-foreground text-sm md:text-lg font-medium">
-                Sua empresa oferece soluções que complementam a prova social? Junte-se ao nosso ecossistema e ajude milhares de negócios a crescerem.
+                Sua agência ou software atende negócios locais? Junte-se ao nosso ecossistema de confiança e ajude nossos clientes a escalarem faturamento.
               </p>
               <Button className="h-12 px-8 rounded-xl font-bold gap-2">
                 Falar com nosso time de parcerias <ArrowRight className="w-4 h-4" />
