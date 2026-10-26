@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { 
   Handshake, 
   ArrowLeft, 
+  ArrowRight,
   ExternalLink, 
   Gem, 
   CheckCircle2, 
