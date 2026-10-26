@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Mail, User, Building2, Lock, Loader2, Eye, EyeOff, MapPin, Globe, CheckCircle2, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Mail, User, Building2, Lock, Loader2, Eye, EyeOff, Briefcase, CheckCircle2, ShieldCheck } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -27,7 +28,7 @@ export default function SignupPage() {
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [businessType, setBusinessType] = useState<'local' | 'digital'>('local');
+  const [businessType, setBusinessType] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -50,12 +51,20 @@ export default function SignupPage() {
       return;
     }
 
+    if (!businessType) {
+      toast({
+        variant: "destructive",
+        title: "Tipo de Negócio",
+        description: "Por favor, selecione o tipo do seu negócio.",
+      });
+      return;
+    }
+
     if (!name.trim() || !company.trim() || !email.trim() || !password.trim() || !db) return;
 
     setIsSubmitting(true);
     
     try {
-      // Captura do IP do usuário para fins de auditoria jurídica (Proof of Acceptance)
       let userIp = 'Não capturado';
       try {
         const ipRes = await fetch('https://api.ipify.org?format=json');
@@ -85,30 +94,19 @@ export default function SignupPage() {
         testimonialsCount: 0,
         googleRedirectCount: 0,
         createdAt: serverTimestamp(),
-        // Campos de Compliance Jurídico
         termsAccepted: true,
         termsAcceptedAt: serverTimestamp(),
         userIp: userIp,
         legalConsentVersion: '4.0'
       };
 
-      setDoc(doc(db, "users", newUser.uid), userData)
-        .then(() => {
-          toast({
-            title: "Conta Criada!",
-            description: "Seu cadastro foi validado e o aceite dos termos foi registrado com seu IP.",
-          });
-          router.push('/dash');
-        })
-        .catch(async (err) => {
-          const permissionError = new FirestorePermissionError({
-            path: `users/${newUser.uid}`,
-            operation: 'create',
-            requestResourceData: userData,
-          });
-          errorEmitter.emit('permission-error', permissionError);
-          setIsSubmitting(false);
-        });
+      await setDoc(doc(db, "users", newUser.uid), userData);
+      
+      toast({
+        title: "Conta Criada!",
+        description: "Seu cadastro foi validado com sucesso.",
+      });
+      router.push('/dash');
 
     } catch (error: any) {
       toast({
@@ -146,44 +144,29 @@ export default function SignupPage() {
           <div className="h-2 bg-primary w-full" />
           <CardHeader className="pt-6 md:pt-8 text-center space-y-1">
             <CardTitle className="text-xl md:text-2xl font-black font-headline">Configuração do Perfil</CardTitle>
-            <CardDescription className="text-xs md:text-sm">Defina o perfil da sua operação para personalizar seu painel.</CardDescription>
+            <CardDescription className="text-xs md:text-sm">Preencha os dados abaixo para começar a coletar elogios.</CardDescription>
           </CardHeader>
           <CardContent className="px-5 sm:px-10 pb-8 md:pb-10">
-            <form onSubmit={handleSignup} className="space-y-6 md:space-y-8">
+            <form onSubmit={handleSignup} className="space-y-6">
               
-              <div className="space-y-3">
-                <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Tipo de Operação</label>
-                <div 
-                  onClick={() => setBusinessType(prev => prev === 'local' ? 'digital' : 'local')}
-                  className="relative flex bg-muted/50 p-1 rounded-[1.5rem] border border-border/50 shadow-inner cursor-pointer h-14 md:h-16 items-center group overflow-hidden select-none"
-                >
-                  <div 
-                    className={cn(
-                      "absolute top-1 bottom-1 w-[calc(50%-2px)] bg-background shadow-[0_8px_20px_-4px_rgba(0,0,0,0.15)] rounded-[1.25rem] transition-all duration-500 cubic-bezier(0.34, 1.56, 0.64, 1) z-0 border border-border/10",
-                      businessType === 'local' ? "left-1" : "left-[calc(50%+1px)]"
-                    )}
-                  >
-                    <div className="absolute inset-0 bg-primary/[0.03] rounded-inherit" />
-                  </div>
-                  
-                  <div className="relative z-10 flex w-full h-full items-center">
-                    <div className={cn(
-                      "flex-1 flex items-center justify-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-[0.05em] md:tracking-[0.1em] transition-all duration-500",
-                      businessType === 'local' ? "text-primary scale-100" : "text-muted-foreground/40 scale-90"
-                    )}>
-                      <MapPin className={cn("w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-500", businessType === 'local' ? "scale-110" : "")} /> 
-                      <span className="whitespace-nowrap">Negócio Local</span>
-                    </div>
-
-                    <div className={cn(
-                      "flex-1 flex items-center justify-center gap-2 text-[9px] md:text-[10px] font-black uppercase tracking-[0.05em] md:tracking-[0.1em] transition-all duration-500",
-                      businessType === 'digital' ? "text-primary scale-100" : "text-muted-foreground/40 scale-90"
-                    )}>
-                      <Globe className={cn("w-3.5 h-3.5 md:w-4 md:h-4 transition-transform duration-500", businessType === 'digital' ? "scale-110" : "")} /> 
-                      <span className="whitespace-nowrap">Digital / SaaS</span>
-                    </div>
-                  </div>
-                </div>
+              <div className="space-y-2">
+                <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Qual é o seu tipo de negócio?</label>
+                <Select value={businessType} onValueChange={setBusinessType}>
+                  <SelectTrigger className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20">
+                    <SelectValue placeholder="Selecione uma categoria..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="academia">Academia/ Studio de musculação</SelectItem>
+                    <SelectItem value="artes_marciais">Artes marciais/ Lutas</SelectItem>
+                    <SelectItem value="clinica">Clinica/ Consultório</SelectItem>
+                    <SelectItem value="estetica">Estética/ Salão de Beleza</SelectItem>
+                    <SelectItem value="barbearia">Barbearia</SelectItem>
+                    <SelectItem value="restaurante">Restaurante/ Lanchonete</SelectItem>
+                    <SelectItem value="oficina">Oficina/ Serviços automotivos</SelectItem>
+                    <SelectItem value="petshop">Pet shop</SelectItem>
+                    <SelectItem value="outros">Outros</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="space-y-4">
