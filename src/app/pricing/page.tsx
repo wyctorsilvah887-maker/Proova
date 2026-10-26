@@ -87,7 +87,6 @@ export default function PricingPage() {
           "Link padrão + QR Code",
           "Métricas básicas",
           "Checklist de Onboarding",
-          "Escolha Público / Privado",
         ],
         cta: status === 'base' ? "Plano Atual" : "Plano Gratuito",
         checkoutUrl: user ? "/dash" : "/signup",
@@ -95,22 +94,6 @@ export default function PricingPage() {
         highlight: false,
         disabled: status === 'base',
         hidden: false
-      },
-      {
-        id: 'trial',
-        name: "Trial",
-        price: "Grátis",
-        period: "/14 dias",
-        description: "Experimente o poder da prova social nível Gold sem custo por duas semanas.",
-        features: [
-          "14 dias de conta gold",
-        ],
-        cta: status === 'trial' ? "Plano Atual" : "Ativar Período Trial",
-        checkoutUrl: user ? "/payment-success?plan=trial" : "/signup",
-        popular: false,
-        highlight: false,
-        disabled: status === 'trial',
-        hidden: true 
       },
       {
         id: 'gold',
@@ -269,7 +252,6 @@ export default function PricingPage() {
         <section className="pb-24 px-4 container mx-auto">
           <div className={cn(
             "grid grid-cols-1 gap-8 max-w-7xl mx-auto items-stretch",
-            plans.length === 4 ? "md:grid-cols-2 lg:grid-cols-4" : 
             plans.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2 max-w-4xl"
           )}>
             {plans.map((plan, idx) => (
@@ -288,7 +270,6 @@ export default function PricingPage() {
                       {plan.name}
                     </CardTitle>
                     {plan.id === "base" && <Box className="w-5 h-5 text-muted-foreground" />}
-                    {plan.id === "trial" && <Clock className="w-5 h-5 text-muted-foreground" />}
                     {plan.id === "gold" && <Star className="w-5 h-5 text-primary" />}
                     {plan.id === "enterprise" && <Zap className="w-5 h-5 text-primary" />}
                   </div>
@@ -336,12 +317,6 @@ export default function PricingPage() {
           <div className="container px-4 mx-auto max-w-4xl">
             <h2 className="text-2xl sm:text-3xl font-black font-headline text-center mb-12 tracking-tight">Perguntas Frequentes</h2>
             <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="item-trial" className="border-b border-primary/10">
-                <AccordionTrigger className="text-left font-bold py-5 hover:text-primary transition-colors text-sm sm:text-base">Como funciona o plano Trial de 14 dias?</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-6 font-medium text-xs sm:text-sm">
-                  O plano Trial é gratuito e serve para você conhecer a ferramenta. Ele dá acesso a todas as funcionalidades do plano GOLD por duas semanas. Após os 14 dias, seus depoimentos continuam salvos, mas você retornará ao Plano Base ou precisará escolher um dos planos profissionais para continuar usando recursos avançados. O trial só pode ser usado uma vez por conta.
-                </AccordionContent>
-              </AccordionItem>
               <AccordionItem value="item-1" className="border-b border-primary/10">
                 <AccordionTrigger className="text-left font-bold py-5 hover:text-primary transition-colors text-sm sm:text-base">Posso mudar de plano a qualquer momento?</AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pb-6 font-medium text-xs sm:text-sm">
@@ -351,7 +326,7 @@ export default function PricingPage() {
               <AccordionItem value="item-2" className="border-b border-primary/10">
                 <AccordionTrigger className="text-left font-bold py-5 hover:text-primary transition-colors text-sm sm:text-base">Como funciona o redirecionamento para o Google Maps?</AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pb-6 font-medium text-xs sm:text-sm">
-                  Ao receber uma avaliação de 4 ou 5 estrelas, o Proova exibe um botão especial incentivando o cliente a replicar esse elogio no seu perfil do Google Business, aumentando seu SEO local. Disponível nos planos Gold, Enterprise e durante o período Trial.
+                  Ao receber uma avaliação de 4 ou 5 estrelas, o Proova exibe um botão especial incentivando o cliente a replicar esse elogio no seu perfil do Google Business, aumentando seu SEO local. Disponível nos planos Gold e Enterprise.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

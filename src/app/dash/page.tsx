@@ -314,7 +314,6 @@ export default function DashPage() {
     if (!db || !user || isUpdatingUrl) return;
     setIsUpdatingUrl(true);
     
-    // Gera link de review baseado no Place ID
     const reviewLink = `https://search.google.com/local/writereview?placeid=${place.place_id}`;
     
     try {
@@ -434,23 +433,13 @@ export default function DashPage() {
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
               </DropdownMenuItem>
-              <DropdownMenuItem 
-                disabled={!isSetupComplete}
-                onClick={() => isSetupComplete && router.push('/widgets')} 
-                className={cn("rounded-xl cursor-pointer font-bold py-2.5", !isSetupComplete && "opacity-50 cursor-not-allowed")}
-              >
+              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Widgets</span>
-                {!isSetupComplete && <Lock className="ml-auto w-3 h-3 opacity-40" />}
               </DropdownMenuItem>
-              <DropdownMenuItem 
-                disabled={!isCollectDone}
-                onClick={() => isCollectDone && router.push('/private')} 
-                className={cn("rounded-xl cursor-pointer font-bold py-2.5", !isCollectDone && "opacity-50 cursor-not-allowed")}
-              >
+              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>
-                {!isCollectDone && <Lock className="ml-auto w-3 h-3 opacity-40" />}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
@@ -788,6 +777,7 @@ export default function DashPage() {
               <div className="space-y-2">
                 {searchResults.map((place) => (
                   <Card 
+                    key={place.place_id}
                     className="border-2 border-transparent hover:border-primary/20 cursor-pointer transition-all bg-muted/10 group"
                     onClick={() => handleSelectPlace(place)}
                   >
