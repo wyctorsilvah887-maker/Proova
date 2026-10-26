@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -11,7 +12,7 @@ import {
   BadgeCheck, Loader2, Building2, Eye, EyeOff, Sun, Moon, 
   TrendingUp, CreditCard, AlertCircle, Copy, Hash, Calendar,
   BarChart3, MousePointer2, ExternalLink, Gem, ArrowLeft,
-  Settings
+  Settings, Handshake
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -357,6 +358,11 @@ export default function AdminPage() {
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Planos de Upgrade</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Handshake className="mr-2 h-4 w-4 text-primary" />
+                <span>Serviços de Parceiros</span>
               </DropdownMenuItem>
 
               <DropdownMenuItem 

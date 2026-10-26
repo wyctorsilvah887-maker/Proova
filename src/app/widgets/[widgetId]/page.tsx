@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect, use, useRef } from 'react';
@@ -41,7 +42,8 @@ import {
   Lock,
   MapPin,
   Sparkles,
-  Settings2
+  Settings2,
+  Handshake
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -814,6 +816,10 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Planos de Upgrade</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Handshake className="mr-2 h-4 w-4 text-primary" />
+                <span>Serviços de Parceiros</span>
               </DropdownMenuItem>
               
               <DropdownMenuSeparator className="mx-1" />
