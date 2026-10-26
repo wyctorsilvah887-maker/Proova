@@ -103,18 +103,14 @@ export default function PricingPage() {
         period: "/14 dias",
         description: "Experimente o poder da prova social nível Gold sem custo por duas semanas.",
         features: [
-          "Recursos GOLD por 14 dias",
-          "Até 50 depoimentos ativos",
-          "Link de coleta personalizado",
-          "Redirecionamento Google Maps",
-          "Uso único por conta",
+          "14 dias de conta gold",
         ],
         cta: status === 'trial' ? "Plano Atual" : "Ativar Período Trial",
         checkoutUrl: user ? "/payment-success?plan=trial" : "/signup",
         popular: false,
         highlight: false,
         disabled: status === 'trial',
-        hidden: !!userData?.trialUsed || status === 'gold' || status === 'enterprise'
+        hidden: true // Ocultado da página pricing conforme solicitado
       },
       {
         id: 'gold',
