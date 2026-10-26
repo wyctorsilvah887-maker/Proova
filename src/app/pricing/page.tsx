@@ -146,7 +146,7 @@ export default function PricingPage() {
           "Consultor Proova (Auditoria Digital)",
           "Auto-curadoria inteligente",
           "Relatório semanal por e-mail",
-          "Depoimentos em Vídeo (4K) (Em breve)",
+          ...(userData?.businessType === 'academia' || userData?.businessType === 'artes_marciais' ? ["FitBase incluso"] : []),
           "Branding 100% customizado",
           "Remocão da marca Proova",
           "Suporte VIP via WhatsApp",
