@@ -143,6 +143,7 @@ export default function PricingPage() {
         features: [
           "Depoimentos ilimitados",
           "Todos os widgets liberados",
+          "Consultor Proova (Auditoria Digital)",
           "Auto-curadoria inteligente",
           "Relatório semanal por e-mail",
           "Depoimentos em Vídeo (4K) (Em breve)",
@@ -168,7 +169,7 @@ export default function PricingPage() {
         <div className="flex items-center">
           <Link href="/" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
-              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="dark:hidden object-contain" priority />
+              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
               <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="dark:block object-contain hidden" />
             </div>
           </Link>

@@ -147,6 +147,11 @@ export default function DashPage() {
     return status === 'gold' || status === 'enterprise' || status === 'trial';
   }, [userData]);
 
+  const isEnterpriseUser = useMemo(() => {
+    const status = userData?.membershipStatus;
+    return status === 'enterprise';
+  }, [userData]);
+
   const widgetsQuery = useMemo(() => {
     if (!db || !user) return null;
     return collection(db, 'users', user.uid, 'widgets');
@@ -253,8 +258,8 @@ export default function DashPage() {
         results.push({ id: 'maps-invalid', label: 'Link de Avaliação Indireto', status: 'attention', description: 'Seu link atual não abre direto na caixa de texto do Google.', actionLabel: 'Corrigir Link', action: () => setIsGoogleMapsDialogOpen(true), icon: ShieldAlert });
       }
 
-      // Auditoria Avançada (Consultor Premium)
-      if (userData.googlePlaceId && isPremiumUser) {
+      // Auditoria Avançada (Consultor Proova - Apenas Enterprise)
+      if (userData.googlePlaceId && isEnterpriseUser) {
         const details = await getGooglePlaceDetails(userData.googlePlaceId);
         if (details) {
           if (!details.hasPhotos) results.push({ id: 'profile-photos', label: 'Perfil Sem Fotos', status: 'attention', description: 'Empresas com fotos recebem 42% mais cliques no Maps.', actionLabel: 'Adicionar Fotos', action: () => window.open(`https://www.google.com/maps/place/?q=place_id:${userData.googlePlaceId}`, '_blank'), icon: Camera });
@@ -266,7 +271,7 @@ export default function DashPage() {
       setIsAuditing(false);
     }
     runAudit();
-  }, [isSetupComplete, userData, widgetsList, pendingTestimonialsCount, router, isPremiumUser]);
+  }, [isSetupComplete, userData, widgetsList, pendingTestimonialsCount, router, isEnterpriseUser]);
 
   const filteredMetrics = useMemo(() => {
     const testimonials = approvedTestimonials;
@@ -516,7 +521,7 @@ export default function DashPage() {
           </section>
         )}
 
-        {isSetupComplete && auditItems.length > 0 && (
+        {isSetupComplete && (auditItems.length > 0 || !isEnterpriseUser) && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
             <div className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" /><h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Auditoria Consultiva Proova</h2></div>
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
@@ -532,12 +537,12 @@ export default function DashPage() {
                   </CardContent>
                 </Card>
               ))}
-              {!isPremiumUser && (
+              {!isEnterpriseUser && (
                 <Card className="border-none shadow-sm overflow-hidden rounded-2xl bg-muted/10 border-2 border-dashed flex flex-col items-center justify-center p-6 text-center space-y-3 opacity-70">
                    <Lock className="w-6 h-6 text-muted-foreground" />
                    <div className="space-y-1">
                      <p className="text-[10px] font-black uppercase">Scanner de Saúde Digital</p>
-                     <p className="text-[9px] text-muted-foreground">Upgrade para Gold para auditoria de SEO no Google Maps.</p>
+                     <p className="text-[9px] text-muted-foreground">Upgrade para o plano Enterprise para auditoria de SEO no Google Maps.</p>
                    </div>
                    <Button variant="outline" size="sm" className="h-7 text-[9px] font-bold uppercase rounded-lg" onClick={() => router.push('/pricing')}>Ver Planos</Button>
                 </Card>
