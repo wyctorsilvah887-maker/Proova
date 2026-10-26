@@ -510,9 +510,14 @@ export default function DashPage() {
           </section>
         )}
 
-        {isSetupComplete && (auditItems.length > 0 || !isEnterpriseUser) && (
+        {isSetupComplete && auditItems.length > 0 && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
-            <div className="flex items-center gap-2"><ShieldCheck className="w-4 h-4 text-primary" /><h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Auditoria Consultiva Proova</h2></div>
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-primary" />
+              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+                {isEnterpriseUser ? "Auditoria Consultiva Proova" : "Ações de Reputação"}
+              </h2>
+            </div>
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {auditItems.map((item) => (
                 <Card key={item.id} className={cn("border-none shadow-sm overflow-hidden rounded-2xl relative", item.status === 'critical' ? "bg-destructive/5" : "bg-orange-500/5")}>
@@ -526,16 +531,6 @@ export default function DashPage() {
                   </CardContent>
                 </Card>
               ))}
-              {!isEnterpriseUser && (
-                <Card className="border-none shadow-sm overflow-hidden rounded-2xl bg-muted/10 border-2 border-dashed flex flex-col items-center justify-center p-6 text-center space-y-3 opacity-70">
-                   <Lock className="w-6 h-6 text-muted-foreground" />
-                   <div className="space-y-1">
-                     <p className="text-[10px] font-black uppercase">Scanner de Saúde Digital</p>
-                     <p className="text-[9px] text-muted-foreground">Upgrade para o plano Enterprise para auditoria de SEO no Google Maps.</p>
-                   </div>
-                   <Button variant="outline" size="sm" className="h-7 text-[9px] font-bold uppercase rounded-lg" onClick={() => router.push('/pricing')}>Ver Planos</Button>
-                </Card>
-              )}
             </div>
           </section>
         )}
