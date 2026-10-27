@@ -80,6 +80,7 @@ export async function submitTestimonialAction(data: {
   userEmail: string;
   rating: number;
   text: string;
+  videoUrl?: string;
 }) {
   try {
     await checkRateLimit('submit_testimonial');
@@ -91,6 +92,7 @@ export async function submitTestimonialAction(data: {
       userEmail: data.userEmail.trim().toLowerCase(),
       rating: data.rating,
       text: data.text.trim(),
+      videoUrl: data.videoUrl || null,
       status: initialStatus,
       createdAt: serverTimestamp(),
     };
