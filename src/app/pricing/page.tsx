@@ -25,7 +25,8 @@ import {
   Moon,
   Loader2,
   Box,
-  Handshake
+  Handshake,
+  Video
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useUser, useAuth, useFirestore, useDoc } from '@/firebase';
@@ -127,6 +128,7 @@ export default function PricingPage() {
         description: "O plano completo para empresas que buscam domínio total do mercado.",
         features: [
           "Depoimentos ilimitados",
+          "Depoimentos em Vídeo 4K",
           "Todos os widgets liberados",
           "Consultor Proova (Auditoria Digital)",
           "Auto-curadoria inteligente",
@@ -338,6 +340,12 @@ export default function PricingPage() {
                 <AccordionTrigger className="text-left font-bold py-5 hover:text-primary transition-colors text-sm sm:text-base">Como funciona o redirecionamento para o Google Maps?</AccordionTrigger>
                 <AccordionContent className="text-muted-foreground pb-6 font-medium text-xs sm:text-sm">
                   Ao receber uma avaliação de 4 ou 5 estrelas, o Proova exibe um botão especial incentivando o cliente a replicar esse elogio no seu perfil do Google Business, aumentando seu SEO local. Disponível nos planos Gold e Enterprise.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="item-3" className="border-b border-primary/10">
+                <AccordionTrigger className="text-left font-bold py-5 hover:text-primary transition-colors text-sm sm:text-base">Como funcionam os depoimentos em vídeo?</AccordionTrigger>
+                <AccordionContent className="text-muted-foreground pb-6 font-medium text-xs sm:text-sm">
+                  O Proova Enterprise libera uma ferramenta cinematográfica de captura direta no navegador. Seus clientes podem gravar depoimentos de até 30 segundos em 4K UHD, que são hospedados automaticamente e podem ser exibidos em seus widgets para converter muito mais.
                 </AccordionContent>
               </AccordionItem>
             </Accordion>

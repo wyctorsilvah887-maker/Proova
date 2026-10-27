@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, use, useEffect, useMemo, useRef } from 'react';
@@ -5,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, Shield, ArrowLeft, Globe, Copy, X, Camera, Square, RefreshCcw, SwitchCamera, FlipHorizontal } from 'lucide-react';
+import { Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, Shield, ArrowLeft, Globe, Copy, X, Camera, Square, RefreshCcw, SwitchCamera, FlipHorizontal, Gem } from 'lucide-react';
 import { useFirestore, useStorage } from '@/firebase';
 import { collection, query, where, getDocs, limit, doc, updateDoc, increment } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -98,14 +99,13 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     const currentMode = mode || facingMode;
     stopCamera();
     
-    // Pequeno delay para evitar conflitos de inicialização de hardware durante transições de UI
     await new Promise(resolve => setTimeout(resolve, 150));
 
     try {
       const constraints = {
         video: {
           facingMode: currentMode,
-          width: { ideal: 3840, min: 1280 }, // Tenta 4K mas aceita HD se falhar
+          width: { ideal: 3840, min: 1280 }, 
           height: { ideal: 2160, min: 720 },
           frameRate: { ideal: 30 }
         },
@@ -120,7 +120,6 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     } catch (err: any) {
       console.warn("Falha ao iniciar câmera com 4K, tentando modo básico:", err.name);
       
-      // Fallback para configurações básicas se o 4K falhar ou der timeout
       try {
         const simpleConstraints = { 
           video: { facingMode: currentMode }, 
@@ -341,6 +340,8 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     );
   }
 
+  const isEnterprise = membershipStatus === 'enterprise';
+
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col items-center justify-center p-4 font-body text-foreground">
       <div className="fixed top-8 right-8"><ThemeToggle /></div>
@@ -406,19 +407,21 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
 
                 <Textarea placeholder="Conte-nos o que achou da nossa empresa..." className="min-h-[120px] resize-none" value={text} onChange={(e) => setText(e.target.value)} required />
 
-                <div 
-                  onClick={() => { setIsVideoDialogOpen(true); startCamera(); }}
-                  className={cn(
-                    "p-4 rounded-xl border-2 border-dashed transition-all cursor-pointer text-center space-y-2 group",
-                    videoBlob ? "border-green-500 bg-green-50" : "border-primary/20 bg-primary/5 hover:bg-primary/10"
-                  )}
-                >
-                  <Video className={cn("w-6 h-6 mx-auto", videoBlob ? "text-green-600" : "text-primary")} />
-                  <p className={cn("text-xs font-semibold", videoBlob ? "text-green-700" : "text-primary")}>
-                    {videoBlob ? "Vídeo Gravado com Sucesso!" : "Gravar Depoimento em Vídeo 4K"}
-                  </p>
-                  <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black">Máxima qualidade para nossa vitrine</p>
-                </div>
+                {isEnterprise && (
+                  <div 
+                    onClick={() => { setIsVideoDialogOpen(true); startCamera(); }}
+                    className={cn(
+                      "p-4 rounded-xl border-2 border-dashed transition-all cursor-pointer text-center space-y-2 group",
+                      videoBlob ? "border-green-500 bg-green-50" : "border-primary/20 bg-primary/5 hover:bg-primary/10"
+                    )}
+                  >
+                    <Video className={cn("w-6 h-6 mx-auto", videoBlob ? "text-green-600" : "text-primary")} />
+                    <p className={cn("text-xs font-semibold", videoBlob ? "text-green-700" : "text-primary")}>
+                      {videoBlob ? "Vídeo Gravado com Sucesso!" : "Gravar Depoimento em Vídeo 4K"}
+                    </p>
+                    <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black">Recurso Exclusivo Enterprise</p>
+                  </div>
+                )}
 
                 <Button type="submit" className="w-full h-14 text-lg font-bold shadow-xl">
                   <><Send className="mr-2 w-5 h-5" /> Revisar e Enviar</>
@@ -488,7 +491,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
                            <h3 className="text-white font-black uppercase tracking-widest text-sm">Pronto para Gravar</h3>
                            <p className="text-white/60 text-[10px] font-bold">Posicione a câmera e comece seu depoimento.</p>
                         </div>
-                        <Button size="lg" className="h-20 w-20 rounded-full bg-white hover:bg-white/90 shadow-2xl p-1 transition-all active:scale-90" onClick={handleStartRecording}>
+                        <Button size="lg" className="h-20 w-20 rounded-full bg-white hover:bg-white/90 shadow-2xl p-1 transition-all active:scale-95" onClick={handleStartRecording}>
                           <div className="h-full w-full rounded-full border-4 border-black/10 flex items-center justify-center">
                             <div className="h-6 w-6 bg-red-600 rounded-full" />
                           </div>
