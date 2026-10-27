@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, Shield, ArrowLeft, Globe, Copy, X, Camera, Square, RefreshCcw } from 'lucide-react';
+import { Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, Shield, ArrowLeft, Globe, Copy, X, Camera, Square, RefreshCcw, FlipHorizontal } from 'lucide-react';
 import { useFirestore, useStorage } from '@/firebase';
 import { collection, query, where, getDocs, limit, doc, updateDoc, increment } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -40,8 +40,8 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
   const [isRecording, setIsRecording] = useState(false);
   const [recordedVideoUrl, setRecordedVideoUrl] = useState<string | null>(null);
   const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user');
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const videoPreviewRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -84,10 +84,21 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
   }, [db, rawSlug]);
 
   // Video Logic
-  const startCamera = async () => {
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+  };
+
+  const startCamera = async (mode?: 'user' | 'environment') => {
+    const currentMode = mode || facingMode;
+    stopCamera();
+    
     try {
       const constraints = {
         video: {
+          facingMode: currentMode,
           width: { ideal: 3840 },
           height: { ideal: 2160 },
           frameRate: { ideal: 30 }
@@ -105,10 +116,11 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     }
   };
 
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
+  const toggleCamera = () => {
+    const newMode = facingMode === 'user' ? 'environment' : 'user';
+    setFacingMode(newMode);
+    if (!recordedVideoUrl) {
+      startCamera(newMode);
     }
   };
 
@@ -134,11 +146,22 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     mediaRecorder.start();
     setIsRecording(true);
     setRecordingSeconds(0);
-    timerRef.current = setInterval(() => setRecordingSeconds(s => s + 1), 1000);
+    
+    timerRef.current = setInterval(() => {
+      setRecordingSeconds(s => {
+        if (s >= 29) { // Limite de 30 segundos
+          if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+            handleStopRecording();
+          }
+          return 30;
+        }
+        return s + 1;
+      });
+    }, 1000);
   };
 
   const handleStopRecording = () => {
-    if (mediaRecorderRef.current) {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
       if (timerRef.current) clearInterval(timerRef.current);
@@ -176,6 +199,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     setFinalDest(null);
     setVideoBlob(null);
     setRecordedVideoUrl(null);
+    setRecordingSeconds(0);
   };
 
   const handleSubmitInitial = (e: React.FormEvent) => {
@@ -313,7 +337,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
               <div className="space-y-8 animate-in fade-in zoom-in duration-500 py-4">
                 <div className="text-center space-y-2">
                   <h3 className="text-xl font-black font-headline">Como deseja prosseguir?</h3>
-                  <p className="text-sm text-muted-foreground font-medium">Escolha como quer compartilhar sua experiência.</p>
+                  <p className="text-sm text-muted-foreground font-medium">Escolha como quer compartilhar sua experiênica.</p>
                 </div>
                 
                 <div className="grid gap-4">
@@ -387,26 +411,48 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
             {recordedVideoUrl ? (
               <video src={recordedVideoUrl} controls className="w-full h-full object-cover" />
             ) : (
-              <video ref={videoPreviewRef} autoPlay muted playsInline className="w-full h-full object-cover scale-x-[-1]" />
+              <video 
+                ref={videoPreviewRef} 
+                autoPlay 
+                muted 
+                playsInline 
+                className={cn(
+                  "w-full h-full object-cover",
+                  facingMode === 'user' && "scale-x-[-1]"
+                )} 
+              />
             )}
             
             {isRecording && (
               <div className="absolute top-4 left-4 flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full animate-pulse text-xs font-bold">
-                <div className="w-2 h-2 rounded-full bg-white" /> GRAVANDO {new Date(recordingSeconds * 1000).toISOString().substr(14, 5)}
+                <div className="w-2 h-2 rounded-full bg-white" /> GRAVANDO {new Date(recordingSeconds * 1000).toISOString().substr(14, 5)} / 00:30
               </div>
             )}
 
-            <div className="absolute top-4 right-4">
-              <Button variant="ghost" size="icon" className="text-white hover:bg-white/20 rounded-full" onClick={() => { stopCamera(); setIsVideoDialogOpen(false); }}>
-                <X className="w-6 h-6" />
-              </Button>
-            </div>
+            {!recordedVideoUrl && (
+              <div className="absolute top-4 right-4 flex gap-2">
+                <Button variant="ghost" size="icon" className="text-white bg-black/40 hover:bg-black/60 rounded-full" onClick={toggleCamera}>
+                  <FlipHorizontal className="w-6 h-6" />
+                </Button>
+                <Button variant="ghost" size="icon" className="text-white bg-black/40 hover:bg-black/60 rounded-full" onClick={() => { stopCamera(); setIsVideoDialogOpen(false); }}>
+                  <X className="w-6 h-6" />
+                </Button>
+              </div>
+            )}
+
+            {recordedVideoUrl && (
+               <div className="absolute top-4 right-4">
+                 <Button variant="ghost" size="icon" className="text-white bg-black/40 hover:bg-black/60 rounded-full" onClick={() => { stopCamera(); setIsVideoDialogOpen(false); }}>
+                   <X className="w-6 h-6" />
+                 </Button>
+               </div>
+            )}
           </div>
 
           <div className="p-6 bg-background flex flex-col items-center gap-6">
             <div className="text-center space-y-1">
-              <h3 className="font-bold">Captura em Ultra HD 4K</h3>
-              <p className="text-xs text-muted-foreground">Mostre seu rosto e conte como foi sua experiência.</p>
+              <h3 className="font-bold">Depoimento em Ultra HD</h3>
+              <p className="text-xs text-muted-foreground">Mostre seu rosto e conte como foi sua experiência (Máx. 30s).</p>
             </div>
 
             <div className="flex items-center gap-4">
