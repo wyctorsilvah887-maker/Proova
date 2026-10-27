@@ -406,7 +406,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
 
       {/* Video Recording Dialog - FULL SCREEN */}
       <Dialog open={isVideoDialogOpen} onOpenChange={(open) => { if (!open) { stopCamera(); setIsVideoDialogOpen(false); } }}>
-        <DialogContent className="fixed inset-0 m-0 h-screen w-screen max-w-none rounded-none bg-black border-none p-0 flex flex-col z-[101] translate-x-0 translate-y-0 left-0 top-0 overflow-hidden">
+        <DialogContent className="fixed inset-0 m-0 h-screen w-screen max-w-none rounded-none bg-black border-none p-0 flex flex-col z-[101] translate-x-0 translate-y-0 left-0 top-0 overflow-hidden [&>button]:hidden">
           <DialogHeader className="sr-only">
             <DialogTitle>Gravação de Depoimento em Vídeo</DialogTitle>
             <DialogDescription>Grave seu depoimento em vídeo de até 30 segundos com qualidade Ultra HD.</DialogDescription>
