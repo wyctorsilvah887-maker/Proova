@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, Shield, ArrowLeft, Globe, Copy, X, Camera, Square, RefreshCcw, FlipHorizontal } from 'lucide-react';
+import { Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, Shield, ArrowLeft, Globe, Copy, X, Camera, Square, RefreshCcw, SwitchCamera, FlipHorizontal } from 'lucide-react';
 import { useFirestore, useStorage } from '@/firebase';
 import { collection, query, where, getDocs, limit, doc, updateDoc, increment } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -404,16 +404,17 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
         </Card>
       </div>
 
-      {/* Video Recording Dialog */}
+      {/* Video Recording Dialog - FULL SCREEN */}
       <Dialog open={isVideoDialogOpen} onOpenChange={(open) => { if (!open) { stopCamera(); setIsVideoDialogOpen(false); } }}>
-        <DialogContent className="sm:max-w-2xl bg-black border-none rounded-[2rem] overflow-hidden p-0">
+        <DialogContent className="fixed inset-0 m-0 h-screen w-screen max-w-none rounded-none bg-black border-none p-0 flex flex-col z-[101] translate-x-0 translate-y-0 left-0 top-0 overflow-hidden">
           <DialogHeader className="sr-only">
             <DialogTitle>Gravação de Depoimento em Vídeo</DialogTitle>
             <DialogDescription>Grave seu depoimento em vídeo de até 30 segundos com qualidade Ultra HD.</DialogDescription>
           </DialogHeader>
-          <div className="relative aspect-video bg-muted flex items-center justify-center">
+          
+          <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden">
             {recordedVideoUrl ? (
-              <video src={recordedVideoUrl} controls className="w-full h-full object-cover" />
+              <video src={recordedVideoUrl} controls className="w-full h-full object-contain md:object-cover" />
             ) : (
               <video 
                 ref={videoPreviewRef} 
@@ -427,59 +428,72 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
               />
             )}
             
-            {isRecording && (
-              <div className="absolute top-4 left-4 flex items-center gap-2 bg-red-600 text-white px-3 py-1 rounded-full animate-pulse text-xs font-bold">
-                <div className="w-2 h-2 rounded-full bg-white" /> GRAVANDO {new Date(recordingSeconds * 1000).toISOString().substr(14, 5)} / 00:30
-              </div>
-            )}
-
-            {!recordedVideoUrl && (
-              <div className="absolute top-4 right-4 flex gap-2">
-                <Button variant="ghost" size="icon" className="text-white bg-black/40 hover:bg-black/60 rounded-full" onClick={toggleCamera}>
-                  <FlipHorizontal className="w-6 h-6" />
-                </Button>
-                <Button variant="ghost" size="icon" className="text-white bg-black/40 hover:bg-black/60 rounded-full" onClick={() => { stopCamera(); setIsVideoDialogOpen(false); }}>
-                  <X className="w-6 h-6" />
-                </Button>
-              </div>
-            )}
-
-            {recordedVideoUrl && (
-               <div className="absolute top-4 right-4">
-                 <Button variant="ghost" size="icon" className="text-white bg-black/40 hover:bg-black/60 rounded-full" onClick={() => { stopCamera(); setIsVideoDialogOpen(false); }}>
-                   <X className="w-6 h-6" />
-                 </Button>
-               </div>
-            )}
-          </div>
-
-          <div className="p-6 bg-background flex flex-col items-center gap-6">
-            <div className="text-center space-y-1">
-              <h3 className="font-bold">Depoimento em Ultra HD</h3>
-              <p className="text-xs text-muted-foreground">Mostre seu rosto e conte como foi sua experiência (Máx. 30s).</p>
-            </div>
-
-            <div className="flex items-center gap-4">
-              {!recordedVideoUrl ? (
-                !isRecording ? (
-                  <Button size="lg" className="h-16 w-16 rounded-full bg-red-600 hover:bg-red-700 shadow-xl" onClick={handleStartRecording}>
-                    <div className="h-6 w-6 bg-white rounded-full" />
-                  </Button>
+            {/* OVERLAY CONTROLS */}
+            <div className="absolute inset-0 pointer-events-none p-6 flex flex-col justify-between">
+              <div className="flex items-center justify-between pointer-events-auto">
+                {isRecording ? (
+                  <div className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-full animate-pulse text-xs font-black shadow-lg">
+                    <div className="w-2 h-2 rounded-full bg-white" /> {new Date(recordingSeconds * 1000).toISOString().substr(14, 5)} / 00:30
+                  </div>
                 ) : (
-                  <Button size="lg" className="h-16 w-16 rounded-full bg-white hover:bg-muted text-black border-4 border-red-600" onClick={handleStopRecording}>
-                    <Square className="h-6 w-6 fill-current" />
-                  </Button>
-                )
-              ) : (
-                <div className="flex gap-3">
-                  <Button variant="outline" className="h-12 rounded-xl font-bold gap-2" onClick={handleResetRecording}>
-                    <RefreshCcw className="w-4 h-4" /> Gravar Novamente
-                  </Button>
-                  <Button className="h-12 rounded-xl font-bold gap-2 px-8" onClick={() => setIsVideoDialogOpen(false)}>
-                    <CheckCircle2 className="w-4 h-4" /> Usar Este Vídeo
+                  <div className="bg-black/40 backdrop-blur-md text-white/80 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest border border-white/10">
+                    Qualidade 4K UHD
+                  </div>
+                )}
+
+                <div className="flex gap-2 pointer-events-auto">
+                  {!recordedVideoUrl && !isRecording && (
+                    <Button variant="ghost" size="icon" className="text-white bg-black/40 hover:bg-black/60 rounded-full h-12 w-12 backdrop-blur-md" onClick={toggleCamera}>
+                      <SwitchCamera className="w-6 h-6" />
+                    </Button>
+                  )}
+                  <Button variant="ghost" size="icon" className="text-white bg-black/40 hover:bg-black/60 rounded-full h-12 w-12 backdrop-blur-md" onClick={() => { stopCamera(); setIsVideoDialogOpen(false); }}>
+                    <X className="w-6 h-6" />
                   </Button>
                 </div>
-              )}
+              </div>
+
+              {/* BOTTOM ACTION AREA */}
+              <div className="flex flex-col items-center gap-8 pointer-events-auto pb-8">
+                {!recordedVideoUrl ? (
+                  <div className="flex flex-col items-center gap-4">
+                    {!isRecording ? (
+                      <>
+                        <div className="text-center space-y-1 drop-shadow-lg mb-2">
+                           <h3 className="text-white font-black uppercase tracking-widest text-sm">Pronto para Gravar</h3>
+                           <p className="text-white/60 text-[10px] font-bold">Posicione a câmera e comece seu depoimento.</p>
+                        </div>
+                        <Button size="lg" className="h-20 w-20 rounded-full bg-white hover:bg-white/90 shadow-2xl p-1 transition-all active:scale-90" onClick={handleStartRecording}>
+                          <div className="h-full w-full rounded-full border-4 border-black/10 flex items-center justify-center">
+                            <div className="h-6 w-6 bg-red-600 rounded-full" />
+                          </div>
+                        </Button>
+                      </>
+                    ) : (
+                      <Button size="lg" className="h-20 w-20 rounded-full bg-white hover:bg-white/90 shadow-2xl p-1 transition-all" onClick={handleStopRecording}>
+                         <div className="h-full w-full rounded-full border-4 border-black/10 flex items-center justify-center">
+                            <Square className="h-6 w-6 fill-red-600 text-red-600" />
+                         </div>
+                      </Button>
+                    )}
+                  </div>
+                ) : (
+                  <div className="w-full max-w-sm space-y-4">
+                    <div className="text-center space-y-1 drop-shadow-lg mb-4">
+                       <h3 className="text-white font-black uppercase tracking-widest text-sm">Vídeo Capturado!</h3>
+                       <p className="text-white/60 text-[10px] font-bold">Revise acima ou grave novamente se preferir.</p>
+                    </div>
+                    <div className="flex gap-3">
+                      <Button variant="outline" className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] bg-white/10 text-white border-white/20 backdrop-blur-xl hover:bg-white/20" onClick={handleResetRecording}>
+                        <RefreshCcw className="w-4 h-4 mr-2" /> Refazer
+                      </Button>
+                      <Button className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] bg-white text-black hover:bg-white/90 shadow-xl" onClick={() => setIsVideoDialogOpen(false)}>
+                        <CheckCircle2 className="w-4 h-4 mr-2" /> Usar Vídeo
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </DialogContent>
