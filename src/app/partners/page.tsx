@@ -322,15 +322,16 @@ export default function PartnersPage() {
           </p>
         </div>
 
-        <section className="bg-primary/5 rounded-[2.5rem] p-8 md:p-12 border border-primary/10 relative overflow-hidden">
+        <section className="bg-primary/5 rounded-[2.5rem] p-6 sm:p-8 md:p-12 border border-primary/10 relative overflow-hidden">
           <div className="relative z-10 grid md:grid-cols-[1fr_0.5fr] gap-8 items-center">
             <div className="space-y-4">
               <h2 className="text-2xl md:text-3xl font-black font-headline">Deseja ser um Parceiro Indicado?</h2>
               <p className="text-muted-foreground text-sm md:text-lg font-medium">
                 Sua agência ou software atende negócios locais e possui alto nível de entrega? Junte-se ao nosso ecossistema de confiança.
               </p>
-              <Button className="h-12 px-8 rounded-xl font-bold gap-2">
-                Falar com nosso time de parcerias <ArrowRight className="w-4 h-4" />
+              <Button className="w-full sm:w-auto h-auto min-h-12 py-4 px-8 rounded-xl font-bold gap-2 text-center">
+                <span className="whitespace-normal">Falar com nosso time de parcerias</span> 
+                <ArrowRight className="w-4 h-4 shrink-0" />
               </Button>
             </div>
             <div className="hidden md:flex justify-center">
