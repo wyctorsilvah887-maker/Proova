@@ -49,6 +49,7 @@ import { signOut } from 'firebase/auth';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function PartnersPage() {
   const { user, loading: authLoading } = useUser();
@@ -71,10 +72,6 @@ export default function PartnersPage() {
     if (status === 'expired') return 'Plano Expirado';
     return 'Plano Base';
   }, [status]);
-
-  useEffect(() => {
-    if (!authLoading && !user) router.replace('/login');
-  }, [user, authLoading, router]);
 
   const partners = [
     {
@@ -155,7 +152,7 @@ export default function PartnersPage() {
     }
   ];
 
-  if (authLoading || userDataLoading) {
+  if (authLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-muted/30">
         <Loader2 className="animate-spin h-10 w-10 text-primary mx-auto" />
@@ -167,12 +164,12 @@ export default function PartnersPage() {
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-3">
-          <Link href="/dash">
+          <Link href={user ? "/dash" : "/"}>
             <Button variant="ghost" size="icon" className="rounded-full h-10 w-10">
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
-          <Link href="/dash" className="flex items-center group -ml-2">
+          <Link href="/" className="flex items-center group -ml-2">
             <div className="relative w-[180px] h-[60px] md:w-[280px] md:h-[90px] transition-transform group-hover:scale-105">
               <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
               <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" priority />
@@ -181,56 +178,66 @@ export default function PartnersPage() {
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
-                <div className="hidden sm:flex flex-col items-end">
-                  <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
-                    {userData?.companyName || 'Minha Empresa'}
-                  </span>
-                  <span className={cn(
-                    "text-[8px] uppercase tracking-widest font-black leading-tight",
-                    isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground"
-                  )}>
-                    {membershipLabel}
-                  </span>
-                </div>
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
-                  <User className="w-4 h-4" />
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
-              <DropdownMenuLabel className="px-3 py-2">
-                <p className="text-xs font-headline font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</p>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <TrendingUp className="mr-2 h-4 w-4 text-primary" />
-                <span>Dash</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Layout className="mr-2 h-4 w-4 text-primary" />
-                <span>Meus Widgets</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Inbox className="mr-2 h-4 w-4 text-primary" />
-                <span>Inbox Privado</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Gem className="mr-2 h-4 w-4 text-primary" />
-                <span>Upgrade</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
-                <Handshake className="mr-2 h-4 w-4 text-primary" />
-                <span>Serviços de Parceiros</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ThemeToggle />
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
+                  <div className="hidden sm:flex flex-col items-end">
+                    <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
+                      {userData?.companyName || 'Minha Empresa'}
+                    </span>
+                    <span className={cn(
+                      "text-[8px] uppercase tracking-widest font-black leading-tight",
+                      isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground"
+                    )}>
+                      {membershipLabel}
+                    </span>
+                  </div>
+                  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
+                    <User className="w-4 h-4" />
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
+                <DropdownMenuLabel className="px-3 py-2">
+                  <p className="text-xs font-headline font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</p>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="mx-1" />
+                <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                  <TrendingUp className="mr-2 h-4 w-4 text-primary" />
+                  <span>Dash</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                  <Layout className="mr-2 h-4 w-4 text-primary" />
+                  <span>Meus Widgets</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                  <Inbox className="mr-2 h-4 w-4 text-primary" />
+                  <span>Inbox Privado</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                  <Gem className="mr-2 h-4 w-4 text-primary" />
+                  <span>Upgrade</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
+                  <Handshake className="mr-2 h-4 w-4 text-primary" />
+                  <span>Serviços de Parceiros</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="mx-1" />
+                <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link href="/login">
+                <Button variant="ghost" size="sm" className="font-bold text-[10px] uppercase tracking-widest hidden sm:flex">Entrar</Button>
+              </Link>
+              <Link href="/signup">
+                <Button size="sm" className="font-bold text-[10px] uppercase tracking-widest shadow-lg px-4 h-9">Cadastro Grátis</Button>
+              </Link>
+            </div>
+          )}
         </div>
       </header>
 
