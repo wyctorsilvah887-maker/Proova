@@ -407,6 +407,10 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
       {/* Video Recording Dialog */}
       <Dialog open={isVideoDialogOpen} onOpenChange={(open) => { if (!open) { stopCamera(); setIsVideoDialogOpen(false); } }}>
         <DialogContent className="sm:max-w-2xl bg-black border-none rounded-[2rem] overflow-hidden p-0">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Gravação de Depoimento em Vídeo</DialogTitle>
+            <DialogDescription>Grave seu depoimento em vídeo de até 30 segundos com qualidade Ultra HD.</DialogDescription>
+          </DialogHeader>
           <div className="relative aspect-video bg-muted flex items-center justify-center">
             {recordedVideoUrl ? (
               <video src={recordedVideoUrl} controls className="w-full h-full object-cover" />
