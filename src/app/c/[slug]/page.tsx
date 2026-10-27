@@ -89,30 +89,56 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
     }
+    if (videoPreviewRef.current) {
+      videoPreviewRef.current.srcObject = null;
+    }
   };
 
   const startCamera = async (mode?: 'user' | 'environment') => {
     const currentMode = mode || facingMode;
     stopCamera();
     
+    // Pequeno delay para evitar conflitos de inicialização de hardware durante transições de UI
+    await new Promise(resolve => setTimeout(resolve, 150));
+
     try {
       const constraints = {
         video: {
           facingMode: currentMode,
-          width: { ideal: 3840 },
-          height: { ideal: 2160 },
+          width: { ideal: 3840, min: 1280 }, // Tenta 4K mas aceita HD se falhar
+          height: { ideal: 2160, min: 720 },
           frameRate: { ideal: 30 }
         },
         audio: true
       };
+      
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
       if (videoPreviewRef.current) {
         videoPreviewRef.current.srcObject = stream;
       }
-    } catch (err) {
-      console.error("Erro ao acessar câmera:", err);
-      toast({ variant: "destructive", title: "Câmera Não Detectada", description: "Certifique-se de dar permissão ao navegador." });
+    } catch (err: any) {
+      console.warn("Falha ao iniciar câmera com 4K, tentando modo básico:", err.name);
+      
+      // Fallback para configurações básicas se o 4K falhar ou der timeout
+      try {
+        const simpleConstraints = { 
+          video: { facingMode: currentMode }, 
+          audio: true 
+        };
+        const stream = await navigator.mediaDevices.getUserMedia(simpleConstraints);
+        streamRef.current = stream;
+        if (videoPreviewRef.current) {
+          videoPreviewRef.current.srcObject = stream;
+        }
+      } catch (secondErr) {
+        console.error("Erro crítico ao acessar câmera:", secondErr);
+        toast({ 
+          variant: "destructive", 
+          title: "Câmera Não Detectada", 
+          description: "Certifique-se de dar permissão ao navegador ou tente outro dispositivo." 
+        });
+      }
     }
   };
 
@@ -149,7 +175,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     
     timerRef.current = setInterval(() => {
       setRecordingSeconds(s => {
-        if (s >= 29) { // Limite de 30 segundos
+        if (s >= 29) { 
           if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
             handleStopRecording();
           }
@@ -224,7 +250,6 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
 
     let finalVideoUrl = '';
 
-    // Upload do Vídeo se existir
     if (videoBlob) {
       try {
         const videoRef = ref(storage, `users/${targetUserId}/testimonials_videos/video_${Date.now()}.webm`);
