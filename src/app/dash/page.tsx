@@ -68,7 +68,8 @@ import {
   Globe,
   Rocket,
   MapPinned,
-  Handshake
+  Handshake,
+  Play
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -687,10 +688,36 @@ export default function DashPage() {
             {testimonialsLoading ? <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary/50" /></div> : filteredMetrics.displayList.length > 0 ? filteredMetrics.displayList.map((t: any) => (
               <Card key={t.id} className="border-none shadow-sm overflow-hidden rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md">
                 <div className="flex items-start gap-4">
-                  <div className="bg-primary/10 p-2 rounded-xl hidden sm:block"><User className="w-4 h-4 text-primary" /></div>
-                  <div className="space-y-1 min-w-0"><div className="flex flex-col space-y-0.5"><span className="font-bold text-xs truncate">{t.userName}</span><div className="flex gap-0.5">{Array.from({ length: t.rating || 5 }).map((_, i) => <Star key={i} className="w-2.5 h-2.5 fill-primary text-primary" />)}</div></div><p className="text-[10px] md:text-xs text-foreground italic line-clamp-2">"{t.text}"</p></div>
+                  {t.videoUrl ? (
+                    <div className="relative w-16 h-12 md:w-24 md:h-16 rounded-lg overflow-hidden bg-black shrink-0 border border-primary/10 group-hover:border-primary/30 transition-colors hidden sm:block">
+                      <video 
+                        src={t.videoUrl} 
+                        className="w-full h-full object-cover opacity-60"
+                        muted
+                        playsInline
+                        preload="metadata"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Play className="w-5 h-5 text-white fill-white drop-shadow-lg" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="bg-primary/10 p-2 rounded-xl hidden sm:block"><User className="w-4 h-4 text-primary" /></div>
+                  )}
+                  <div className="space-y-1 min-w-0 flex-1">
+                    <div className="flex flex-col space-y-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-xs truncate">{t.userName}</span>
+                        {t.videoUrl && <Badge variant="secondary" className="h-4 px-1 text-[7px] font-black uppercase bg-primary/10 text-primary border-none">Vídeo</Badge>}
+                      </div>
+                      <div className="flex gap-0.5">{Array.from({ length: t.rating || 5 }).map((_, i) => <Star key={i} className="w-2.5 h-2.5 fill-primary text-primary" />)}</div>
+                    </div>
+                    <p className="text-[10px] md:text-xs text-foreground italic line-clamp-2">"{t.text}"</p>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between md:justify-end gap-4 shrink-0 border-t md:border-t-0 pt-2 md:pt-0"><div className="flex items-center gap-1 text-[8px] md:text-[10px] text-muted-foreground font-medium"><Clock className="w-3 h-3" />{t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Hoje'}</div></div>
+                <div className="flex items-center justify-between md:justify-end gap-4 shrink-0 border-t md:border-t-0 pt-2 md:pt-0">
+                  <div className="flex items-center gap-1 text-[8px] md:text-[10px] text-muted-foreground font-medium"><Clock className="w-3 h-3" />{t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Hoje'}</div>
+                </div>
               </Card>
             )) : <div className="text-center py-16 border-2 border-dashed rounded-2xl bg-muted/10 opacity-40"><MessageSquare className="w-10 h-10 mx-auto mb-3" /><p className="text-sm">Nenhum depoimento publicado ainda.</p></div>}
           </div>
