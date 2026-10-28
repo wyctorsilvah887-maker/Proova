@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -102,6 +103,7 @@ import { toast } from '@/hooks/use-toast';
 import { QRCodeSVG } from 'qrcode.react';
 import { useTheme } from 'next-themes';
 import { jsPDF } from 'jspdf';
+import { toPng } from 'html-to-image';
 import { cn } from '@/lib/utils';
 import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-actions';
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
@@ -135,6 +137,12 @@ export default function DashPage() {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [isSendingReport, setIsSendingReport] = useState(false);
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+
+  // Estados para Social Cards
+  const [selectedTestimonialForShare, setSelectedTestimonialForShare] = useState<any>(null);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const [isExportingCard, setIsExportingCard] = useState(false);
+  const shareCardRef = useRef<HTMLDivElement>(null);
 
   // Estados para Busca de Local
   const [city, setCity] = useState('');
@@ -403,11 +411,40 @@ export default function DashPage() {
     } catch (e: any) { toast({ variant: "destructive", title: "Erro", description: e.message }); } finally { setIsSendingReport(false); }
   };
 
+  const handleDownloadPNG = async () => {
+    if (!shareCardRef.current || !selectedTestimonialForShare) return;
+    setIsExportingCard(true);
+    try {
+      const dataUrl = await toPng(shareCardRef.current, { quality: 1.0, pixelRatio: 2 });
+      const link = document.createElement('a');
+      link.download = `proova-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
+      link.href = dataUrl;
+      link.click();
+      toast({ title: "Imagem Gerada!", description: "Seu card está pronto para o Instagram." });
+    } catch (err) {
+      console.error(err);
+      toast({ variant: "destructive", title: "Erro ao gerar imagem" });
+    } finally {
+      setIsExportingCard(false);
+    }
+  };
+
+  const openShareDialog = (testimonial: any) => {
+    setSelectedTestimonialForShare(testimonial);
+    setIsShareDialogOpen(true);
+  };
+
   if (authLoading || userDataLoading || (user && !userData)) {
     return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-10 w-10 text-primary mx-auto" /></div>;
   }
 
   const collectionLink = `${baseUrl}/c/${userData?.companySlug}`;
+
+  const setupProgressLocker = (id: string) => {
+    const step = setupSteps.find(s => s.id === id);
+    if (!step?.completed) return "opacity-50 grayscale cursor-not-allowed";
+    return "rounded-xl cursor-pointer font-bold py-2.5";
+  };
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
@@ -458,10 +495,7 @@ export default function DashPage() {
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => isCollectDone && router.push('/widgets')} 
-                className={cn(
-                  "rounded-xl cursor-pointer font-bold py-2.5",
-                  !isCollectDone && "opacity-50 grayscale cursor-not-allowed"
-                )}
+                className={cn(setupProgressLocker('collect'))}
               >
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Widgets</span>
@@ -469,10 +503,7 @@ export default function DashPage() {
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => isSetupComplete && router.push('/private')} 
-                className={cn(
-                  "rounded-xl cursor-pointer font-bold py-2.5",
-                  !isSetupComplete && "opacity-50 grayscale cursor-not-allowed"
-                )}
+                className={cn(setupProgressLocker('widget'))}
               >
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>
@@ -688,7 +719,7 @@ export default function DashPage() {
           <div className="grid gap-3 md:gap-4">
             {testimonialsLoading ? <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary/50" /></div> : filteredMetrics.displayList.length > 0 ? filteredMetrics.displayList.map((t: any) => (
               <Card key={t.id} className="border-none shadow-sm overflow-hidden rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md">
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-4 min-w-0 flex-1">
                   {t.videoUrl ? (
                     <div 
                       className={cn(
@@ -740,10 +771,20 @@ export default function DashPage() {
                       <div className="flex gap-0.5">{Array.from({ length: t.rating || 5 }).map((_, i) => <Star key={i} className="w-2.5 h-2.5 fill-primary text-primary" />)}</div>
                     </div>
                     <p className="text-[10px] md:text-xs text-foreground italic line-clamp-2">"{t.text}"</p>
+                    <div className="flex items-center gap-4 text-[8px] md:text-[10px] text-muted-foreground font-medium pt-1">
+                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Hoje'}</span>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between md:justify-end gap-4 shrink-0 border-t md:border-t-0 pt-2 md:pt-0">
-                  <div className="flex items-center gap-1 text-[8px] md:text-[10px] text-muted-foreground font-medium"><Clock className="w-3 h-3" />{t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Hoje'}</div>
+                <div className="flex items-center justify-between md:justify-end gap-3 shrink-0 border-t md:border-t-0 pt-2 md:pt-0">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="rounded-full gap-1.5 text-[9px] font-black uppercase tracking-widest h-8 border-primary/20 text-primary hover:bg-primary/5"
+                    onClick={() => openShareDialog(t)}
+                  >
+                    <Share className="w-3 h-3" /> Gerar Card
+                  </Button>
                 </div>
               </Card>
             )) : <div className="text-center py-16 border-2 border-dashed rounded-2xl bg-muted/10 opacity-40"><MessageSquare className="w-10 h-10 mx-auto mb-3" /><p className="text-sm">Nenhum depoimento publicado ainda.</p></div>}
@@ -758,6 +799,77 @@ export default function DashPage() {
         </div>
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
+
+      {/* SHARE DIALOG (SOCIAL CARDS) */}
+      <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
+        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background">
+          <DialogHeader className="p-8 pb-4 text-center">
+            <DialogTitle className="text-xl font-black font-headline uppercase tracking-tight">Social Card Instagram</DialogTitle>
+            <DialogDescription>Gere um card pronto para seus stories ou feed.</DialogDescription>
+          </DialogHeader>
+
+          <div className="p-6 flex flex-col items-center gap-8">
+            {/* O CARD VISUAL (INSTAGRAM SQUARE) */}
+            <div 
+              ref={shareCardRef}
+              className="w-[320px] h-[320px] bg-primary relative overflow-hidden rounded-[2rem] shadow-2xl flex flex-col items-center justify-center p-8 text-center"
+              style={{ background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' }}
+            >
+               {/* Background Elements */}
+               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
+               <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full -ml-16 -mb-16 blur-2xl" />
+               
+               <Quote className="absolute top-6 left-6 w-12 h-12 text-white/10 rotate-180" />
+               
+               <div className="relative z-10 space-y-6">
+                 <div className="flex justify-center gap-1.5">
+                    {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
+                      <Star key={i} className="w-5 h-5 fill-white text-white drop-shadow-sm" />
+                    ))}
+                 </div>
+                 
+                 <p className="text-white text-lg font-bold leading-tight line-clamp-6 italic drop-shadow-md">
+                    "{selectedTestimonialForShare?.text}"
+                 </p>
+
+                 <div className="space-y-1">
+                    <p className="text-white font-black text-sm uppercase tracking-widest">
+                      {selectedTestimonialForShare?.userName}
+                    </p>
+                    <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 inline-block">
+                       <p className="text-[8px] text-white font-black uppercase tracking-[0.2em]">
+                         Avaliado via Proova
+                       </p>
+                    </div>
+                 </div>
+               </div>
+
+               {/* Footer Brand */}
+               <div className="absolute bottom-6 w-full px-8 flex justify-between items-center opacity-60">
+                  <span className="text-[7px] text-white font-black uppercase tracking-widest">{userData?.companyName}</span>
+                  <div className="h-3 w-12 relative">
+                    <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Proova" fill className="object-contain" />
+                  </div>
+               </div>
+            </div>
+
+            <Button 
+              className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-xl gap-2 transition-all active:scale-95"
+              onClick={handleDownloadPNG}
+              disabled={isExportingCard}
+            >
+              {isExportingCard ? <Loader2 className="animate-spin" /> : <Download className="w-5 h-5" />}
+              Baixar PNG em Alta
+            </Button>
+          </div>
+          
+          <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center">
+            <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">
+              Dica: Poste nos Stories e marque @proova
+            </p>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isTutorialOpen} onOpenChange={setIsTutorialOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
@@ -778,6 +890,13 @@ export default function DashPage() {
                 </div>
               </div>
               <div className="flex gap-4 group">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Share2 className="w-5 h-5" /></div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-bold">Gerador de Social Cards</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">Transforme qualquer elogio em uma imagem profissional para Instagram com um clique. A prova social agora é conteúdo viral.</p>
+                </div>
+              </div>
+              <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><ShieldCheck className="w-5 h-5" /></div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">Consultor Proova</p>
@@ -792,24 +911,10 @@ export default function DashPage() {
                 </div>
               </div>
               <div className="flex gap-4 group">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><MousePointer2 className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Cliques e G-Boost</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Monitore quantos clientes o Proova enviou diretamente para o seu perfil no Google Maps para te avaliar 5 estrelas.</p>
-                </div>
-              </div>
-              <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Zap className="w-5 h-5" /></div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">Ações Rápidas</p>
                   <p className="text-xs text-muted-foreground leading-relaxed">Acessos rápidos para copiar seu link, baixar o cartaz de balcão ou gerenciar seus murais embutidos.</p>
-                </div>
-              </div>
-              <div className="flex gap-4 group">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Mail className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Relatórios por E-mail</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Receba uma auditoria de performance semanal no seu e-mail clicando em "Enviar Relatório" no card de Resumo.</p>
                 </div>
               </div>
             </div>
@@ -925,7 +1030,7 @@ export default function DashPage() {
                   
                   {searchResults.length === 0 && !isSearchingPlaces && searchQuery && (
                     <div className="py-6 text-center border-2 border-dashed rounded-2xl bg-muted/5">
-                      <p className="text-[10px] text-muted-foreground font-medium">Empresa não listada? Refine o nome.</p>
+                      <p className="text-[10px] font-medium text-muted-foreground font-medium">Empresa não listada? Refine o nome.</p>
                     </div>
                   )}
                 </div>
