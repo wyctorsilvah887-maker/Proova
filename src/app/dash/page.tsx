@@ -752,80 +752,82 @@ export default function DashPage() {
               )}
             </section>
 
-            {/* ETAPA 2: BUSCA NO GOOGLE (Apenas se tiver local) */}
-            <section className={cn("space-y-4 pt-4 border-t", (!userData?.city && !city) && "opacity-30 grayscale pointer-events-none")}>
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-black flex items-center justify-center">2</div>
-                <h3 className="text-xs font-black uppercase tracking-widest">Vincular Google Business</h3>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="relative group">
-                  <Search className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
-                  <Input 
-                    placeholder="Nome da sua empresa no Google" 
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleSearchPlaces()}
-                    className="h-11 pl-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs"
-                  />
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    onClick={handleSearchPlaces}
-                    disabled={isSearchingPlaces || !searchQuery}
-                    className="absolute right-1 top-1 h-9 rounded-lg hover:bg-primary/10 text-primary"
-                  >
-                    {isSearchingPlaces ? <Loader2 className="animate-spin w-4 h-4" /> : <Navigation className="w-4 h-4" />}
-                  </Button>
+            {/* ETAPA 2: BUSCA NO GOOGLE (Apenas se tiver local salvo) */}
+            {userData?.city && userData?.state && (
+              <section className={cn("space-y-4 pt-4 border-t animate-in fade-in slide-in-from-top-4 duration-500")}>
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-black flex items-center justify-center">2</div>
+                  <h3 className="text-xs font-black uppercase tracking-widest">Vincular Google Business</h3>
                 </div>
-              </div>
+                
+                <div className="space-y-2">
+                  <div className="relative group">
+                    <Search className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
+                    <Input 
+                      placeholder="Nome da sua empresa no Google" 
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleSearchPlaces()}
+                      className="h-11 pl-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs"
+                    />
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      onClick={handleSearchPlaces}
+                      disabled={isSearchingPlaces || !searchQuery}
+                      className="absolute right-1 top-1 h-9 rounded-lg hover:bg-primary/10 text-primary"
+                    >
+                      {isSearchingPlaces ? <Loader2 className="animate-spin w-4 h-4" /> : <Navigation className="w-4 h-4" />}
+                    </Button>
+                  </div>
+                </div>
 
-              {/* RESULTADOS DA BUSCA */}
-              <div className="space-y-2">
-                {searchResults.map((place) => (
-                  <Card 
-                    key={place.place_id}
-                    className="border-2 border-transparent hover:border-primary/20 cursor-pointer transition-all bg-muted/10 group"
-                    onClick={() => handleSelectPlace(place)}
-                  >
-                    <div className="p-3 flex items-center gap-3">
-                      <div className="p-2 rounded-xl bg-background group-hover:bg-primary/10 transition-colors">
-                        <MapPin className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
+                {/* RESULTADOS DA BUSCA */}
+                <div className="space-y-2">
+                  {searchResults.map((place) => (
+                    <Card 
+                      key={place.place_id}
+                      className="border-2 border-transparent hover:border-primary/20 cursor-pointer transition-all bg-muted/10 group"
+                      onClick={() => handleSelectPlace(place)}
+                    >
+                      <div className="p-3 flex items-center gap-3">
+                        <div className="p-2 rounded-xl bg-background group-hover:bg-primary/10 transition-colors">
+                          <MapPin className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-xs font-black truncate">{place.name}</p>
+                          <p className="text-[10px] text-muted-foreground truncate opacity-70">{place.address}</p>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground opacity-30 group-hover:translate-x-1 transition-all" />
                       </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-xs font-black truncate">{place.name}</p>
-                        <p className="text-[10px] text-muted-foreground truncate opacity-70">{place.address}</p>
-                      </div>
-                      <ChevronRight className="w-4 h-4 text-muted-foreground opacity-30 group-hover:translate-x-1 transition-all" />
+                    </Card>
+                  ))}
+                  
+                  {isSearchingPlaces && (
+                    <div className="py-8 text-center">
+                      <Loader2 className="animate-spin w-6 h-6 text-primary mx-auto mb-2" />
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase">Consultando Satélite...</p>
                     </div>
-                  </Card>
-                ))}
-                
-                {isSearchingPlaces && (
-                   <div className="py-8 text-center">
-                     <Loader2 className="animate-spin w-6 h-6 text-primary mx-auto mb-2" />
-                     <p className="text-[10px] font-bold text-muted-foreground uppercase">Consultando Satélite...</p>
-                   </div>
-                )}
-                
-                {searchResults.length === 0 && !isSearchingPlaces && searchQuery && (
-                   <div className="py-6 text-center border-2 border-dashed rounded-2xl bg-muted/5">
-                     <p className="text-[10px] text-muted-foreground font-medium">Empresa não listada? Refine o nome.</p>
-                   </div>
-                )}
-              </div>
-            </section>
+                  )}
+                  
+                  {searchResults.length === 0 && !isSearchingPlaces && searchQuery && (
+                    <div className="py-6 text-center border-2 border-dashed rounded-2xl bg-muted/5">
+                      <p className="text-[10px] text-muted-foreground font-medium">Empresa não listada? Refine o nome.</p>
+                    </div>
+                  )}
+                </div>
 
-            <section className="space-y-3 pt-4 border-t opacity-60">
-               <div className="flex items-center gap-2">
-                 <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-                 <h4 className="text-[10px] font-black uppercase tracking-widest">Como funciona o G-Boost?</h4>
-               </div>
-               <p className="text-[10px] text-muted-foreground leading-relaxed">
-                 O Proova detecta elogios 5 estrelas e redireciona o cliente para este local no Google. Isso sobe sua posição nas buscas e atrai novos clientes organicamente.
-               </p>
-            </section>
+                <section className="space-y-3 pt-4 border-t opacity-60">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className="w-3.5 h-3.5 text-primary" />
+                    <h4 className="text-[10px] font-black uppercase tracking-widest">Como funciona o G-Boost?</h4>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground leading-relaxed">
+                    O Proova detecta elogios 5 estrelas e redireciona o cliente para este local no Google. Isso sobe sua posição nas buscas e atrai novos clientes organicamente.
+                  </p>
+                </section>
+              </section>
+            )}
           </div>
 
           <div className="p-6 bg-background border-t shrink-0">
