@@ -359,7 +359,7 @@ export default function DashPage() {
     try {
       await updateDoc(doc(db, 'users', user.uid), { city, state });
       toast({ title: "Localização Salva" });
-      setIsGoogleMapsDialogOpen(false); // Fecha o diálogo ao salvar localização
+      setIsGoogleMapsDialogOpen(false); 
       setSearchQuery('');
     } catch (err) {
       toast({ variant: "destructive", title: "Erro ao salvar local" });
@@ -636,7 +636,26 @@ export default function DashPage() {
         </section>
 
         <section className="space-y-4">
-          <div className="flex items-center justify-between"><div className="flex items-center gap-2"><MessageSquare className="w-5 h-5 text-primary" /><h2 className="text-lg md:text-xl font-bold font-headline tracking-tight">Últimos Depoimentos Publicados</h2></div><Link href="/private"><Button variant="outline" size="sm" className="rounded-full gap-2 text-[10px] h-7 border border-primary/20 text-primary hover:bg-primary/5"><Inbox className="w-3 h-3" /> Ver Inbox Unificado</Button></Link></div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-primary" />
+              <h2 className="text-lg md:text-xl font-bold font-headline tracking-tight">Últimos Depoimentos Publicados</h2>
+            </div>
+            <Link href={isSetupComplete ? "/private" : "#"} onClick={(e) => !isSetupComplete && e.preventDefault()}>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                disabled={!isSetupComplete}
+                className={cn(
+                  "rounded-full gap-2 text-[10px] h-7 border border-primary/20 text-primary hover:bg-primary/5",
+                  !isSetupComplete && "opacity-50 grayscale cursor-not-allowed"
+                )}
+              >
+                {isSetupComplete ? <Inbox className="w-3 h-3" /> : <Lock className="w-3 h-3" />} 
+                Ver Inbox Unificado
+              </Button>
+            </Link>
+          </div>
           <div className="grid gap-3 md:gap-4">
             {testimonialsLoading ? <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary/50" /></div> : filteredMetrics.displayList.length > 0 ? filteredMetrics.displayList.map((t: any) => (
               <Card key={t.id} className="border-none shadow-sm overflow-hidden rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md">
