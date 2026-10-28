@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, use, useEffect, useMemo, useRef } from 'react';
@@ -87,7 +86,10 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
   // Video Logic
   const stopCamera = () => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach(track => {
+        track.stop();
+        console.log(`Track ${track.kind} parado.`);
+      });
       streamRef.current = null;
     }
     if (videoPreviewRef.current) {
@@ -161,11 +163,18 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     mediaRecorderRef.current = mediaRecorder;
     
     const chunks: BlobPart[] = [];
-    mediaRecorder.ondataavailable = (e) => chunks.push(e.data);
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) {
+        chunks.push(e.data);
+      }
+    };
+
     mediaRecorder.onstop = () => {
       const blob = new Blob(chunks, { type: 'video/webm' });
+      const url = URL.createObjectURL(blob);
       setVideoBlob(blob);
-      setRecordedVideoUrl(URL.createObjectURL(blob));
+      setRecordedVideoUrl(url);
+      console.log("Gravação finalizada e blob gerado.");
     };
 
     mediaRecorder.start();
@@ -175,9 +184,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     timerRef.current = setInterval(() => {
       setRecordingSeconds(s => {
         if (s >= 29) { 
-          if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-            handleStopRecording();
-          }
+          handleStopRecording();
           return 30;
         }
         return s + 1;
@@ -189,7 +196,12 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      // Fecha a câmera imediatamente para liberar o hardware e permitir que o vídeo gravado seja renderizado sozinho
+      stopCamera();
     }
   };
 
