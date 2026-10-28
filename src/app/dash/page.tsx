@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -417,32 +418,16 @@ export default function DashPage() {
     setIsExportingCard(true);
     try {
       if (selectedTestimonialForShare.videoUrl) {
-        // DOWNLOAD VÍDEO MP4 - Estratégia de Fallback para CORS
-        try {
-          const response = await fetch(selectedTestimonialForShare.videoUrl);
-          if (!response.ok) throw new Error('Falha na resposta do servidor');
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = `proova-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          window.URL.revokeObjectURL(url);
-          toast({ title: "Vídeo Baixado!", description: "O depoimento em MP4 está pronto." });
-        } catch (fetchErr) {
-          console.warn("Fetch bloqueado por CORS, tentando link direto:", fetchErr);
-          // Fallback: Abre o vídeo em nova aba com sugestão de download se o fetch falhar
-          const link = document.createElement('a');
-          link.href = selectedTestimonialForShare.videoUrl;
-          link.target = "_blank";
-          link.download = `proova-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          toast({ title: "Iniciando Download", description: "O vídeo abrirá em uma nova aba para salvar." });
-        }
+        // DOWNLOAD VÍDEO MP4 VIA PROXY API
+        // Isso inicia o download automaticamente no navegador sem abrir abas novas
+        const fileName = `proova-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
+        const downloadUrl = `/api/download/video?url=${encodeURIComponent(selectedTestimonialForShare.videoUrl)}&name=${encodeURIComponent(fileName)}`;
+        
+        // Redireciona a janela atual para o endpoint de download. 
+        // Como o endpoint retorna Content-Disposition: attachment, o navegador inicia o download e permanece na página atual.
+        window.location.href = downloadUrl;
+        
+        toast({ title: "Iniciando Download", description: "O vídeo MP4 será salvo em instantes." });
       } else {
         // DOWNLOAD IMAGEM PNG
         if (!shareCardRef.current) return;
@@ -688,7 +673,7 @@ export default function DashPage() {
                onClick={() => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }} 
                className="absolute top-2 right-4 px-2 py-0.5 z-40 bg-primary text-white text-[7px] font-black uppercase rounded-full shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all flex items-center gap-1 border-none"
              >
-               <Edit3 className="w-2 h-2" /> Editar
+               <Edit3 className="w-2 i-2" /> Editar
              </div>
              <Card className="border-none shadow-sm h-full rounded-2xl p-4 md:p-6 space-y-4 relative flex flex-col justify-center overflow-visible">
               <div className="flex items-center justify-between">
