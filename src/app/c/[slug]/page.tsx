@@ -242,15 +242,28 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
   const handleSubmitInitial = (e: React.FormEvent) => {
     e.preventDefault();
     if (honeypot) return;
+    
     if (Date.now() - loadTime < 3000) {
       toast({ variant: "destructive", title: "Calma aí!", description: "Você está enviando rápido demais." });
       return;
     }
+    
     if (rating === 0) {
       toast({ variant: "destructive", title: "Nota Obrigatória", description: "Selecione uma nota de 1 a 5 estrelas." });
       return;
     }
-    if (!userName.trim() || !text.trim()) return;
+    
+    if (!userName.trim()) {
+      toast({ variant: "destructive", title: "Identificação", description: "Por favor, informe seu nome para continuar." });
+      return;
+    }
+
+    // Texto é obrigatório apenas se NÃO houver vídeo
+    if (!videoBlob && !text.trim()) {
+      toast({ variant: "destructive", title: "Mensagem Necessária", description: "Por favor, escreva seu depoimento ou grave um vídeo." });
+      return;
+    }
+
     setSelectionPending(true);
   };
 
@@ -274,8 +287,9 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     if (destination === 'public') {
       if (googleMapsUrl) handleGoogleRedirect(googleMapsUrl);
       try {
-        await navigator.clipboard.writeText(text.trim());
-        toast({ title: "Elogio Copiado!", description: "Pronto para colar no Google." });
+        const textToCopy = text.trim() || `Avaliação de ${rating} estrelas gravada em vídeo por ${userName}.`;
+        await navigator.clipboard.writeText(textToCopy);
+        toast({ title: "Feedback Copiado!", description: "Pronto para colar no Google." });
       } catch (err) {}
     }
 
@@ -285,7 +299,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
       userName,
       userEmail,
       rating,
-      text,
+      text: text.trim() || "(Depoimento em Vídeo)",
       videoUrl: finalVideoUrl
     });
 
@@ -417,7 +431,12 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
                   <Input type="email" placeholder="E-mail (opcional)" value={userEmail} onChange={(e) => setUserEmail(e.target.value)} className="h-11" />
                 </div>
 
-                <Textarea placeholder="Conte-nos o que achou da nossa empresa..." className="min-h-[120px] resize-none" value={text} onChange={(e) => setText(e.target.value)} required />
+                <Textarea 
+                  placeholder={videoBlob ? "Escreva algo (opcional)" : "Conte-nos o que achou da nossa empresa..."}
+                  className="min-h-[120px] resize-none" 
+                  value={text} 
+                  onChange={(e) => setText(e.target.value)} 
+                />
 
                 {isEnterprise && (
                   <div 
