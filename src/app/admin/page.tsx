@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -12,7 +11,7 @@ import {
   BadgeCheck, Loader2, Building2, Eye, EyeOff, Sun, Moon, 
   TrendingUp, CreditCard, AlertCircle, Copy, Hash, Calendar,
   BarChart3, MousePointer2, ExternalLink, Gem, ArrowLeft,
-  Settings, Handshake
+  Settings, Handshake, Save
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -32,7 +31,7 @@ import {
 import { Label } from '@/components/ui/label';
 import { useAuth, useFirestore, useUser, useCollection, useDoc } from '@/firebase';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { collection, query, doc, setDoc, serverTimestamp, where, orderBy, limit } from 'firebase/firestore';
+import { collection, query, doc, setDoc, serverTimestamp, where, orderBy, limit, updateDoc } from 'firebase/firestore';
 import { toast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { useTheme } from 'next-themes';
@@ -41,6 +40,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export default function AdminPage() {
   const auth = useAuth();
@@ -55,6 +55,8 @@ export default function AdminPage() {
   const [isAdminVerified, setIsAdminVerified] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [isDetailOpen, setIsUserDetailOpen] = useState(false);
+  const [newPlanStatus, setNewPlanStatus] = useState<string>('');
+  const [isUpdatingPlan, setIsUpdatingPlan] = useState(false);
 
   useEffect(() => {
     if (userData?.isAdmin === true) {
@@ -166,6 +168,7 @@ export default function AdminPage() {
     const matchedUser = leadsList?.find((u: any) => u.id === uid);
     if (matchedUser) {
       setSelectedUser(matchedUser);
+      setNewPlanStatus(matchedUser.membershipStatus || 'base');
       setIsUserDetailOpen(true);
     } else {
       toast({ 
@@ -173,6 +176,32 @@ export default function AdminPage() {
         title: "Usuário não encontrado", 
         description: "Os dados deste usuário ainda não foram carregados ou o UID é inválido." 
       });
+    }
+  };
+
+  const handleUpdatePlan = async () => {
+    if (!db || !selectedUser || !newPlanStatus || isUpdatingPlan) return;
+    
+    setIsUpdatingPlan(true);
+    try {
+      const userRef = doc(db, 'users', selectedUser.id);
+      await updateDoc(userRef, {
+        membershipStatus: newPlanStatus
+      });
+      toast({
+        title: "Plano Atualizado",
+        description: `O status do usuário foi alterado para ${newPlanStatus.toUpperCase()}.`
+      });
+      // Update local state to reflect change without re-fetching everything
+      setSelectedUser({ ...selectedUser, membershipStatus: newPlanStatus });
+    } catch (err: any) {
+      toast({
+        variant: "destructive",
+        title: "Erro ao Atualizar",
+        description: err.message
+      });
+    } finally {
+      setIsUpdatingPlan(false);
     }
   };
 
@@ -460,10 +489,7 @@ export default function AdminPage() {
                         <TableRow 
                           key={usr.id} 
                           className="hover:bg-muted/20 cursor-pointer transition-colors"
-                          onClick={() => {
-                            setSelectedUser(usr);
-                            setIsUserDetailOpen(true);
-                          }}
+                          onClick={() => handleOpenUserDetail(usr.id)}
                         >
                           <TableCell className="font-bold">
                             <div className="flex flex-col min-w-[120px]">
@@ -482,7 +508,7 @@ export default function AdminPage() {
                               variant={usr.membershipStatus === 'enterprise' ? 'default' : (usr.membershipStatus === 'gold' ? 'secondary' : 'outline')} 
                               className="uppercase text-[8px] font-black h-5"
                             >
-                              {usr.membershipStatus === 'enterprise' ? 'Enterprise' : (usr.membershipStatus === 'gold' ? 'Gold' : (usr.membershipStatus === 'trial' ? 'Trial' : 'Plano Base'))}
+                              {usr.membershipStatus === 'enterprise' ? 'Enterprise' : (usr.membershipStatus === 'gold' ? 'Gold' : (usr.membershipStatus === 'trial' ? 'Trial' : (usr.membershipStatus === 'expired' ? 'Expirado' : 'Plano Base')))}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-muted-foreground text-[10px] whitespace-nowrap">
@@ -605,13 +631,49 @@ export default function AdminPage() {
                 variant={selectedUser?.membershipStatus === 'enterprise' ? 'default' : (selectedUser?.membershipStatus === 'gold' ? 'secondary' : 'outline')} 
                 className="uppercase text-[8px] font-black h-5"
               >
-                {selectedUser?.membershipStatus === 'enterprise' ? 'Enterprise' : (selectedUser?.membershipStatus === 'gold' ? 'Gold' : (selectedUser?.membershipStatus === 'trial' ? 'Trial' : 'Plano Base'))}
+                {selectedUser?.membershipStatus === 'enterprise' ? 'Enterprise' : (selectedUser?.membershipStatus === 'gold' ? 'Gold' : (selectedUser?.membershipStatus === 'trial' ? 'Trial' : (selectedUser?.membershipStatus === 'expired' ? 'Expirado' : 'Plano Base')))}
               </Badge>
               {selectedUser?.isAdmin && <Badge variant="secondary" className="uppercase text-[8px] font-black h-5">Administrador</Badge>}
             </div>
           </SheetHeader>
 
           <div className="space-y-8">
+            {/* Membeship Management Section */}
+            <section className="space-y-4 bg-primary/5 p-4 rounded-2xl border border-primary/10">
+              <div className="flex items-center gap-2 mb-2">
+                <Gem className="w-4 h-4 text-primary" />
+                <h3 className="text-xs font-black uppercase tracking-widest text-primary">Gestão de Plano</h3>
+              </div>
+              
+              <div className="space-y-3">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Status da Assinatura</Label>
+                <div className="flex gap-2">
+                  <Select value={newPlanStatus} onValueChange={setNewPlanStatus}>
+                    <SelectTrigger className="h-11 bg-background">
+                      <SelectValue placeholder="Selecione o plano" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="base">Plano Base (Grátis)</SelectItem>
+                      <SelectItem value="gold">Membro Gold</SelectItem>
+                      <SelectItem value="enterprise">Membro Enterprise</SelectItem>
+                      <SelectItem value="trial">Período Trial (14d)</SelectItem>
+                      <SelectItem value="expired">Assinatura Expirada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button 
+                    className="h-11 px-4 gap-2 font-bold shadow-md" 
+                    onClick={handleUpdatePlan}
+                    disabled={isUpdatingPlan || newPlanStatus === (selectedUser?.membershipStatus || 'base')}
+                  >
+                    {isUpdatingPlan ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    Salvar
+                  </Button>
+                </div>
+              </div>
+            </section>
+
+            <Separator />
+
             <section className="space-y-4">
               <div className="space-y-3">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">E-mail do Usuário</Label>
