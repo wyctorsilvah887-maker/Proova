@@ -1,6 +1,6 @@
 rules_version = '2';
 
-// Regras de Segurança do Firebase Storage - Versão 2.3
+// Regras de Segurança do Firebase Storage - Versão 2.4
 // Permite uploads de depoimentos em vídeo pelo público e uploads administrativos de widgets.
 
 service firebase.storage {
@@ -9,8 +9,9 @@ service firebase.storage {
     // Caminho para vídeos de depoimento enviados por consumidores (Público)
     match /users/{userId}/testimonials_videos/{fileName} {
       allow read: if true;
-      // Permite o upload de arquivos de até 100MB para evitar abusos
-      allow create: if request.resource.size < 100 * 1024 * 1024;
+      // Permite 'write' (create e update) para cobrir todas as fases do upload via SDK
+      // Restrição de 100MB para segurança
+      allow write: if request.resource.size < 100 * 1024 * 1024;
     }
 
     // Caminho: users/{userId}/widgets/{widgetId}/{fileName}

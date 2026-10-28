@@ -88,7 +88,6 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => {
         track.stop();
-        console.log(`Track ${track.kind} parado.`);
       });
       streamRef.current = null;
     }
@@ -174,7 +173,6 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
       const url = URL.createObjectURL(blob);
       setVideoBlob(blob);
       setRecordedVideoUrl(url);
-      console.log("Gravação finalizada e blob gerado.");
     };
 
     mediaRecorder.start();
@@ -263,7 +261,6 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     }
 
     if (videoBlob) {
-      // Vídeo é sempre enviado como público (curadoria) automaticamente para reduzir fricção
       handleFinalSubmit('public');
     } else {
       setSelectionPending(true);
@@ -280,14 +277,17 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     if (videoBlob) {
       try {
         const videoRef = ref(storage, `users/${targetUserId}/testimonials_videos/video_${Date.now()}.webm`);
-        await uploadBytes(videoRef, videoBlob);
+        const metadata = { contentType: 'video/webm' };
+        await uploadBytes(videoRef, videoBlob, metadata);
         finalVideoUrl = await getDownloadURL(videoRef);
-      } catch (err) {
+      } catch (err: any) {
         console.error("Falha no upload do vídeo:", err);
+        toast({ variant: "destructive", title: "Erro no vídeo", description: "Não conseguimos salvar sua gravação. Tente novamente." });
+        setIsSubmitting(false);
+        return;
       }
     }
 
-    // Se for texto público, tentamos copiar agora. Para vídeo, o convite do Maps aparece na tela de sucesso.
     if (destination === 'public' && !videoBlob) {
       if (googleMapsUrl) handleGoogleRedirect(googleMapsUrl);
       try {
@@ -360,7 +360,6 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
               {videoBlob && <p className="text-[10px] text-primary font-black uppercase tracking-widest mt-3">Depoimento em Vídeo Recebido</p>}
             </div>
 
-            {/* Convite para o Google Maps caso a nota seja alta e a empresa tenha o link configurado */}
             {googleMapsUrl && finalDest === 'public' && rating >= 4 && (
               <div className="pt-6 border-t space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <p className="text-xs font-bold text-muted-foreground">Que tal nos ajudar ainda mais?</p>
