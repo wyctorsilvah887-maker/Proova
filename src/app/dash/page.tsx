@@ -70,7 +70,8 @@ import {
   Rocket,
   MapPinned,
   Handshake,
-  Play
+  Play,
+  Video
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -420,7 +421,7 @@ export default function DashPage() {
       link.download = `proova-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
       link.href = dataUrl;
       link.click();
-      toast({ title: "Imagem Gerada!", description: "Seu card está pronto para o Instagram." });
+      toast({ title: "Imagem Gerada!", description: "Seu card está pronto para as redes sociais." });
     } catch (err) {
       console.error(err);
       toast({ variant: "destructive", title: "Erro ao gerar imagem" });
@@ -723,8 +724,8 @@ export default function DashPage() {
                   {t.videoUrl ? (
                     <div 
                       className={cn(
-                        "relative rounded-lg overflow-hidden bg-black shrink-0 border border-primary/10 transition-all hidden sm:block",
-                        playingVideoId === t.id ? "w-48 h-32 md:w-64 md:h-40" : "w-16 h-12 md:w-24 md:h-16 cursor-pointer hover:border-primary/30"
+                        "relative rounded-lg overflow-hidden bg-black shrink-0 border border-primary/10 transition-all cursor-pointer",
+                        playingVideoId === t.id ? "w-full sm:w-64 h-48 sm:h-40" : "w-20 h-16 sm:w-24 sm:h-16 hover:border-primary/30"
                       )}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -738,8 +739,8 @@ export default function DashPage() {
                           autoPlay
                           controls
                           playsInline
-                          controlsList="nodownload noplaybackrate noremoteplayback"
                           disablePictureInPicture
+                          controlsList="nodownload noplaybackrate noremoteplayback"
                           disableRemotePlayback
                         />
                       ) : (
@@ -804,52 +805,91 @@ export default function DashPage() {
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background">
           <DialogHeader className="p-8 pb-4 text-center">
-            <DialogTitle className="text-xl font-black font-headline uppercase tracking-tight">Social Card Instagram</DialogTitle>
-            <DialogDescription>Gere um card pronto para seus stories ou feed.</DialogDescription>
+            <DialogTitle className="text-xl font-black font-headline uppercase tracking-tight">Social Card Premium</DialogTitle>
+            <DialogDescription>Gere um post profissional para suas redes sociais.</DialogDescription>
           </DialogHeader>
 
           <div className="p-6 flex flex-col items-center gap-8">
             {/* O CARD VISUAL (INSTAGRAM SQUARE) */}
             <div 
               ref={shareCardRef}
-              className="w-[320px] h-[320px] bg-primary relative overflow-hidden rounded-[2rem] shadow-2xl flex flex-col items-center justify-center p-8 text-center"
+              className="w-[360px] h-[360px] bg-primary relative overflow-hidden rounded-[2.5rem] shadow-2xl flex flex-col items-center p-8 text-center"
               style={{ background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' }}
             >
                {/* Background Elements */}
-               <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
-               <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full -ml-16 -mb-16 blur-2xl" />
+               <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl" />
+               <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/10 rounded-full -ml-20 -mb-20 blur-3xl" />
                
                <Quote className="absolute top-6 left-6 w-12 h-12 text-white/10 rotate-180" />
                
-               <div className="relative z-10 space-y-6">
-                 <div className="flex justify-center gap-1.5">
-                    {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-white text-white drop-shadow-sm" />
-                    ))}
-                 </div>
+               <div className="relative z-10 w-full flex flex-col h-full justify-between items-center">
                  
-                 <p className="text-white text-lg font-bold leading-tight line-clamp-6 italic drop-shadow-md">
-                    "{selectedTestimonialForShare?.text}"
-                 </p>
+                 {selectedTestimonialForShare?.videoUrl ? (
+                   <div className="w-full flex flex-col items-center gap-4 mt-2">
+                      <div className="w-full aspect-video rounded-2xl overflow-hidden bg-black/20 relative border border-white/20 shadow-lg">
+                        <video 
+                          src={selectedTestimonialForShare.videoUrl} 
+                          className="w-full h-full object-cover opacity-90"
+                          muted
+                          playsInline
+                          crossOrigin="anonymous"
+                        />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                           <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center">
+                              <Play className="w-6 h-6 text-white fill-white" />
+                           </div>
+                        </div>
+                        <div className="absolute top-3 left-3 bg-white/10 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/10">
+                          <p className="text-[7px] text-white font-black uppercase tracking-widest flex items-center gap-1">
+                            <Video className="w-2.5 h-2.5" /> Depoimento em Vídeo
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-center gap-1">
+                          {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
+                            <Star key={i} className="w-4 h-4 fill-white text-white drop-shadow-sm" />
+                          ))}
+                        </div>
+                        <p className="text-white text-sm font-bold leading-tight italic line-clamp-3 px-2">
+                           "{selectedTestimonialForShare?.text !== '(Depoimento em Vídeo)' ? selectedTestimonialForShare?.text : 'Feedback incrível deste cliente!'}"
+                        </p>
+                      </div>
+                   </div>
+                 ) : (
+                   <div className="flex-1 flex flex-col justify-center items-center space-y-6">
+                     <div className="flex justify-center gap-1.5">
+                        {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
+                          <Star key={i} className="w-5 h-5 fill-white text-white drop-shadow-sm" />
+                        ))}
+                     </div>
+                     
+                     <p className="text-white text-lg font-bold leading-tight line-clamp-6 italic drop-shadow-md">
+                        "{selectedTestimonialForShare?.text}"
+                     </p>
+                   </div>
+                 )}
 
-                 <div className="space-y-1">
-                    <p className="text-white font-black text-sm uppercase tracking-widest">
-                      {selectedTestimonialForShare?.userName}
-                    </p>
-                    <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 inline-block">
-                       <p className="text-[8px] text-white font-black uppercase tracking-[0.2em]">
-                         Avaliado via Proova
-                       </p>
+                 <div className="w-full pt-4">
+                    <div className="space-y-1 mb-4">
+                      <p className="text-white font-black text-sm uppercase tracking-widest">
+                        {selectedTestimonialForShare?.userName}
+                      </p>
+                      <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 inline-block">
+                         <p className="text-[8px] text-white font-black uppercase tracking-[0.2em]">
+                           Avaliado via Proova
+                         </p>
+                      </div>
+                    </div>
+
+                    <div className="w-full flex justify-between items-center opacity-60">
+                        <span className="text-[7px] text-white font-black uppercase tracking-widest">{userData?.companyName}</span>
+                        <div className="h-3 w-12 relative">
+                          <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Proova" fill className="object-contain" />
+                        </div>
                     </div>
                  </div>
-               </div>
-
-               {/* Footer Brand */}
-               <div className="absolute bottom-6 w-full px-8 flex justify-between items-center opacity-60">
-                  <span className="text-[7px] text-white font-black uppercase tracking-widest">{userData?.companyName}</span>
-                  <div className="h-3 w-12 relative">
-                    <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Proova" fill className="object-contain" />
-                  </div>
                </div>
             </div>
 
@@ -859,13 +899,13 @@ export default function DashPage() {
               disabled={isExportingCard}
             >
               {isExportingCard ? <Loader2 className="animate-spin" /> : <Download className="w-5 h-5" />}
-              Baixar PNG em Alta
+              {selectedTestimonialForShare?.videoUrl ? 'Baixar Video-Card PNG' : 'Baixar PNG em Alta'}
             </Button>
           </div>
           
           <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center">
             <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">
-              Dica: Poste nos Stories e marque @proova
+              Dica: Use nos Stories para provar autoridade 24h por dia
             </p>
           </DialogFooter>
         </DialogContent>
