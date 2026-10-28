@@ -695,7 +695,10 @@ export default function DashPage() {
                         "relative rounded-lg overflow-hidden bg-black shrink-0 border border-primary/10 transition-all hidden sm:block",
                         playingVideoId === t.id ? "w-48 h-32 md:w-64 md:h-40" : "w-16 h-12 md:w-24 md:h-16 cursor-pointer hover:border-primary/30"
                       )}
-                      onClick={() => playingVideoId !== t.id && setPlayingVideoId(t.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPlayingVideoId(playingVideoId === t.id ? null : t.id);
+                      }}
                     >
                       {playingVideoId === t.id ? (
                         <video 
@@ -704,7 +707,9 @@ export default function DashPage() {
                           autoPlay
                           controls
                           playsInline
-                          controlsList="nodownload"
+                          controlsList="nodownload noplaybackrate noremoteplayback"
+                          disablePictureInPicture
+                          disableRemotePlayback
                         />
                       ) : (
                         <>
