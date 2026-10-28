@@ -83,7 +83,6 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     findCompany();
   }, [db, rawSlug]);
 
-  // Video Logic
   const stopCamera = () => {
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => {
@@ -276,13 +275,25 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
 
     if (videoBlob) {
       try {
+        // Garantindo metadados explícitos para evitar erro de autorização durante negociação de stream
         const videoRef = ref(storage, `users/${targetUserId}/testimonials_videos/video_${Date.now()}.webm`);
-        const metadata = { contentType: 'video/webm' };
+        const metadata = { 
+          contentType: 'video/webm',
+          customMetadata: {
+            'userName': userName,
+            'source': 'proova_web'
+          }
+        };
+        
         await uploadBytes(videoRef, videoBlob, metadata);
         finalVideoUrl = await getDownloadURL(videoRef);
       } catch (err: any) {
         console.error("Falha no upload do vídeo:", err);
-        toast({ variant: "destructive", title: "Erro no vídeo", description: "Não conseguimos salvar sua gravação. Tente novamente." });
+        toast({ 
+          variant: "destructive", 
+          title: "Erro de Permissão", 
+          description: "Não conseguimos autorizar o envio do seu vídeo. Tente enviar apenas texto." 
+        });
         setIsSubmitting(false);
         return;
       }
@@ -314,8 +325,8 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
       setIsSubmitting(false);
       setSelectionPending(false);
       toast({
-        title: destination === 'public' ? "Enviado com Sucesso!" : "Feedback Enviado Privado",
-        description: destination === 'public' ? "Sua avaliação aguarda aprovação interna." : "A gerência recebeu seu feedback sigiloso.",
+        title: (destination === 'public' || videoBlob) ? "Enviado com Sucesso!" : "Feedback Enviado Privado",
+        description: (destination === 'public' || videoBlob) ? "Sua avaliação aguarda aprovação interna." : "A gerência recebeu seu feedback sigiloso.",
       });
     } else {
       toast({ variant: "destructive", title: "Falha no Envio", description: result.error || "Erro ao processar depoimento." });
@@ -360,7 +371,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
               {videoBlob && <p className="text-[10px] text-primary font-black uppercase tracking-widest mt-3">Depoimento em Vídeo Recebido</p>}
             </div>
 
-            {googleMapsUrl && finalDest === 'public' && rating >= 4 && (
+            {googleMapsUrl && (finalDest === 'public' || videoBlob) && rating >= 4 && (
               <div className="pt-6 border-t space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <p className="text-xs font-bold text-muted-foreground">Que tal nos ajudar ainda mais?</p>
                 <Button onClick={() => handleGoogleRedirect(googleMapsUrl)} className="w-full h-14 rounded-xl gap-3 text-sm font-bold bg-[#4285F4] hover:bg-[#357ae8]">
