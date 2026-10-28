@@ -24,7 +24,8 @@ import {
   EyeOff,
   Sparkles,
   MessageSquare,
-  Handshake
+  Handshake,
+  Lock
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -79,6 +80,13 @@ export default function PrivateInboxPage() {
   }, [db, user]);
   const { data: testimonialsList, loading: testimonialsLoading } = useCollection(testimonialsQuery);
 
+  // Busca de Widgets para lógica de setup
+  const widgetsQuery = useMemo(() => {
+    if (!db || !user) return null;
+    return collection(db, 'users', user.uid, 'widgets');
+  }, [db, user]);
+  const { data: widgetsList } = useCollection(widgetsQuery);
+
   const pendingTestimonials = useMemo(() => {
     return (testimonialsList || [])
       .filter((t: any) => t.status === 'pending')
@@ -97,6 +105,17 @@ export default function PrivateInboxPage() {
         return db.getTime() - da.getTime();
       });
   }, [privateFeedbacksList]);
+
+  // Lógica de Onboarding simplificada para bloqueio de menu
+  const setupProgress = useMemo(() => {
+    if (!userData) return { isCollectDone: false, isSetupComplete: false };
+    const isLocationDone = !!userData.city && !!userData.state;
+    const isGoogleDone = !!userData.googleMapsUrl;
+    const isCollectDone = (userData.testimonialsCount || 0) > 0;
+    const isWidgetDone = !!(widgetsList && widgetsList.length > 0);
+    const isSetupComplete = isLocationDone && isGoogleDone && isCollectDone && isWidgetDone;
+    return { isCollectDone, isSetupComplete };
+  }, [userData, widgetsList]);
 
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
@@ -205,13 +224,27 @@ export default function PrivateInboxPage() {
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
+              <DropdownMenuItem 
+                onClick={() => setupProgress.isCollectDone && router.push('/widgets')} 
+                className={cn(
+                  "rounded-xl cursor-pointer font-bold py-2.5",
+                  !setupProgress.isCollectDone && "opacity-50 grayscale cursor-not-allowed"
+                )}
+              >
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Widgets</span>
+                {!setupProgress.isCollectDone && <Lock className="ml-auto w-3 h-3 opacity-60" />}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
+              <DropdownMenuItem 
+                onClick={() => setupProgress.isSetupComplete && router.push('/private')} 
+                className={cn(
+                  "rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary",
+                  !setupProgress.isSetupComplete && "opacity-50 grayscale cursor-not-allowed"
+                )}
+              >
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>
+                {!setupProgress.isSetupComplete && <Lock className="ml-auto w-3 h-3 opacity-60" />}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />

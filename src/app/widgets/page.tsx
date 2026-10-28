@@ -27,7 +27,8 @@ import {
   Moon,
   Gem,
   Info,
-  Handshake
+  Handshake,
+  Lock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -100,6 +101,17 @@ export default function WidgetsPage() {
       w.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [widgetsList, searchTerm]);
+
+  // Lógica de Onboarding simplificada para bloqueio de menu
+  const setupProgress = useMemo(() => {
+    if (!userData) return { isCollectDone: false, isSetupComplete: false };
+    const isLocationDone = !!userData.city && !!userData.state;
+    const isGoogleDone = !!userData.googleMapsUrl;
+    const isCollectDone = (userData.testimonialsCount || 0) > 0;
+    const isWidgetDone = !!(widgetsList && widgetsList.length > 0);
+    const isSetupComplete = isLocationDone && isGoogleDone && isCollectDone && isWidgetDone;
+    return { isCollectDone, isSetupComplete };
+  }, [userData, widgetsList]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -186,10 +198,6 @@ export default function WidgetsPage() {
     });
   };
 
-  const getWidgetCode = (widgetId: string) => {
-    return `<script src="${baseUrl}/widget.js?id=${widgetId}&user=${user?.uid}" defer></script>`;
-  };
-
   if (authLoading || userDataLoading || (user && !userData)) {
     return (
       <div className="flex h-screen items-center justify-center bg-muted/30">
@@ -238,13 +246,27 @@ export default function WidgetsPage() {
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
+              <DropdownMenuItem 
+                onClick={() => setupProgress.isCollectDone && router.push('/widgets')} 
+                className={cn(
+                  "rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary",
+                  !setupProgress.isCollectDone && "opacity-50 grayscale cursor-not-allowed"
+                )}
+              >
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Widgets</span>
+                {!setupProgress.isCollectDone && <Lock className="ml-auto w-3 h-3 opacity-60" />}
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
+              <DropdownMenuItem 
+                onClick={() => setupProgress.isSetupComplete && router.push('/private')} 
+                className={cn(
+                  "rounded-xl cursor-pointer font-bold py-2.5",
+                  !setupProgress.isSetupComplete && "opacity-50 grayscale cursor-not-allowed"
+                )}
+              >
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>
+                {!setupProgress.isSetupComplete && <Lock className="ml-auto w-3 h-3 opacity-60" />}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
@@ -394,6 +416,36 @@ export default function WidgetsPage() {
         </div>
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="rounded-3xl">
+          <DialogHeader>
+            <DialogTitle>Código de Instalação</DialogTitle>
+            <DialogDescription>Copie e cole este script no seu site.</DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+             <div className="relative bg-muted/50 rounded-xl p-4 border group">
+                <pre className="text-[10px] font-mono whitespace-pre-wrap break-all">{selectedWidget ? `<script src="${baseUrl}/widget.js?id=${selectedWidget.id}&user=${user?.uid}" defer></script>` : ''}</pre>
+                <Button size="icon" variant="secondary" className="absolute top-2 right-2 h-8 w-8" onClick={() => copyToClipboard(selectedWidget ? `<script src="${baseUrl}/widget.js?id=${selectedWidget.id}&user=${user?.uid}" defer></script>` : '')}>
+                   <Copy className="h-4 w-4" />
+                </Button>
+             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+        <DialogContent className="rounded-3xl">
+          <DialogHeader>
+            <DialogTitle>Novo Mural de Depoimentos</DialogTitle>
+            <DialogDescription>Dê um nome para organizar sua prova social.</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleCreateWidget} className="space-y-4">
+            <Input placeholder="Ex: Mural Site Principal" value={newWidgetName} onChange={(e) => setNewWidgetName(e.target.value)} required />
+            <Button className="w-full h-12 font-bold" disabled={isCreating}>{isCreating ? <Loader2 className="animate-spin" /> : "Criar e Customizar"}</Button>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
