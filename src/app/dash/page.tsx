@@ -368,7 +368,7 @@ export default function DashPage() {
     if (!db || !user || !city || !state) return;
     setIsUpdatingUrl(true);
     try {
-      await updateDoc(doc(db, 'users', user.uid), { city, state });
+      await updateDoc(db, 'users', user.uid, { city, state });
       toast({ title: "Localização Salva" });
       setIsGoogleMapsDialogOpen(false); 
       setSearchQuery('');
@@ -828,13 +828,17 @@ export default function DashPage() {
                    <div className="w-full flex flex-col items-center gap-4 mt-2">
                       <div className="w-full aspect-video rounded-2xl overflow-hidden bg-black/20 relative border border-white/20 shadow-lg">
                         <video 
+                          key={selectedTestimonialForShare?.id}
                           src={selectedTestimonialForShare.videoUrl} 
-                          className="w-full h-full object-cover opacity-90"
+                          className="w-full h-full object-cover opacity-95"
                           muted
+                          autoPlay
+                          loop
                           playsInline
                           crossOrigin="anonymous"
+                          preload="auto"
                         />
-                        <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                            <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center">
                               <Play className="w-6 h-6 text-white fill-white" />
                            </div>
