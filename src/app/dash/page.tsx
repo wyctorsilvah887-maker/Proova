@@ -645,7 +645,15 @@ export default function DashPage() {
             <Button variant="outline" disabled={!isGoogleDone} onClick={() => copyToClipboard(collectionLink, "Link de coleta")} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all"><Link2 className="w-5 h-5 text-primary" /><span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Copiar Link</span></Button>
             <Button variant="outline" disabled={!isGoogleDone} onClick={() => setIsQrDialogOpenManual(true)} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all"><QrCode className="w-5 h-5 text-primary" /><span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Ver Cartaz</span></Button>
             <Button variant="outline" disabled={!isCollectDone} onClick={() => router.push('/widgets')} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all"><Layout className="w-5 h-5 text-primary" /><span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Meus Murais</span></Button>
-            <Button variant="outline" disabled={!isSetupComplete} onClick={() => router.push('/private')} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all"><Inbox className="w-5 h-5 text-primary" /><span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Ver Inbox</span></Button>
+            <Button variant="outline" disabled={!isSetupComplete} onClick={() => router.push('/private')} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all relative">
+              <Inbox className="w-5 h-5 text-primary" />
+              {pendingTestimonialsCount > 0 && (
+                <span className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white shadow-lg animate-in zoom-in duration-300">
+                  {pendingTestimonialsCount}
+                </span>
+              )}
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Ver Inbox</span>
+            </Button>
           </div>
         </section>
 
@@ -661,12 +669,17 @@ export default function DashPage() {
                 size="sm" 
                 disabled={!isSetupComplete}
                 className={cn(
-                  "rounded-full gap-2 text-[10px] h-7 border border-primary/20 text-primary hover:bg-primary/5",
+                  "rounded-full gap-2 text-[10px] h-7 border border-primary/20 text-primary hover:bg-primary/5 relative",
                   !isSetupComplete && "opacity-50 grayscale cursor-not-allowed"
                 )}
               >
                 {isSetupComplete ? <Inbox className="w-3 h-3" /> : <Lock className="w-3 h-3" />} 
                 Ver Inbox Unificado
+                {isSetupComplete && pendingTestimonialsCount > 0 && (
+                  <Badge variant="destructive" className="ml-1 h-4 px-1.5 text-[8px] font-black animate-pulse">
+                    {pendingTestimonialsCount} NOVOS
+                  </Badge>
+                )}
               </Button>
             </Link>
           </div>
