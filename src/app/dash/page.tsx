@@ -127,6 +127,7 @@ export default function DashPage() {
   const [isQrDialogOpenManual, setIsQrDialogOpenManual] = useState(false);
   const [isGoogleMapsDialogOpen, setIsGoogleMapsDialogOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [configMode, setConfigMode] = useState<'location' | 'maps'>('location');
   
   const [newGoogleMapsUrl, setNewGoogleMapsUrl] = useState('');
   const [isUpdatingUrl, setIsUpdatingUrl] = useState(false);
@@ -216,8 +217,26 @@ export default function DashPage() {
   }, [user, authLoading, router]);
 
   const setupSteps = useMemo(() => {
-    const s0 = { id: 'location', label: 'Localização', completed: !!userData?.city, unlocked: true, action: () => setIsGoogleMapsDialogOpen(true) };
-    const s1 = { id: 'google', label: 'Google Maps', completed: !!userData?.googleMapsUrl, unlocked: s0.completed, action: () => setIsGoogleMapsDialogOpen(true) };
+    const s0 = { 
+      id: 'location', 
+      label: 'Localização', 
+      completed: !!userData?.city, 
+      unlocked: true, 
+      action: () => {
+        setConfigMode('location');
+        setIsGoogleMapsDialogOpen(true);
+      } 
+    };
+    const s1 = { 
+      id: 'google', 
+      label: 'Google Maps', 
+      completed: !!userData?.googleMapsUrl, 
+      unlocked: s0.completed, 
+      action: () => {
+        setConfigMode('maps');
+        setIsGoogleMapsDialogOpen(true);
+      } 
+    };
     const s2 = { id: 'collect', label: 'Coleta Ativa', completed: (userData?.testimonialsCount || 0) > 0, unlocked: s1.completed, action: () => copyToClipboard(`${baseUrl}/c/${userData?.companySlug}`, "Link de coleta") };
     const s3 = { id: 'widget', label: 'Primeiro Mural', completed: !!(widgetsList && widgetsList.length > 0), unlocked: s2.completed, action: () => router.push('/widgets') };
     return [s0, s1, s2, s3];
@@ -254,9 +273,9 @@ export default function DashPage() {
       const isReviewLink = mapsUrl.includes('writereview') || mapsUrl.includes('local/writereview');
       
       if (!mapsUrl) {
-        results.push({ id: 'maps-unlinked', label: 'Google Maps Desconectado', status: 'critical', description: 'Sua empresa não está recebendo redirecionamentos.', actionLabel: 'Vincular Agora', action: () => setIsGoogleMapsDialogOpen(true), icon: MapPin });
+        results.push({ id: 'maps-unlinked', label: 'Google Maps Desconectado', status: 'critical', description: 'Sua empresa não está recebendo redirecionamentos.', actionLabel: 'Vincular Agora', action: () => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }, icon: MapPin });
       } else if (!isReviewLink) {
-        results.push({ id: 'maps-invalid', label: 'Link de Avaliação Indireto', status: 'attention', description: 'Seu link atual não abre direto na caixa de texto do Google.', actionLabel: 'Corrigir Link', action: () => setIsGoogleMapsDialogOpen(true), icon: ShieldAlert });
+        results.push({ id: 'maps-invalid', label: 'Link de Avaliação Indireto', status: 'attention', description: 'Seu link atual não abre direto na caixa de texto do Google.', actionLabel: 'Corrigir Link', action: () => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }, icon: ShieldAlert });
       }
 
       // Auditoria Avançada (Consultor Proova - Apenas Enterprise)
@@ -340,6 +359,7 @@ export default function DashPage() {
     try {
       await updateDoc(doc(db, 'users', user.uid), { city, state });
       toast({ title: "Localização Salva" });
+      setIsGoogleMapsDialogOpen(false); // Fecha o diálogo ao salvar localização
       setSearchQuery('');
     } catch (err) {
       toast({ variant: "destructive", title: "Erro ao salvar local" });
@@ -586,7 +606,7 @@ export default function DashPage() {
           
           <div className="relative h-full group">
              <div 
-               onClick={() => setIsGoogleMapsDialogOpen(true)} 
+               onClick={() => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }} 
                className="absolute top-2 right-4 px-2 py-0.5 z-40 bg-primary text-white text-[7px] font-black uppercase rounded-full shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all flex items-center gap-1 border-none"
              >
                <Edit3 className="w-2 h-2" /> Editar
@@ -706,60 +726,53 @@ export default function DashPage() {
         <DialogContent className="rounded-[2rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-6 pb-2 pt-10 shrink-0 bg-background">
             <DialogTitle className="text-2xl font-black font-headline flex items-center gap-2">
-              <MapPinned className="w-6 h-6 text-primary" /> Perfil Comercial
+              <MapPinned className="w-6 h-6 text-primary" /> {configMode === 'location' ? 'Localização' : 'Perfil Comercial'}
             </DialogTitle>
-            <DialogDescription>Conecte sua empresa ao motor de prova social Proova.</DialogDescription>
+            <DialogDescription>
+              {configMode === 'location' ? 'Defina a cidade onde seu negócio opera.' : 'Conecte sua empresa ao Google Business.'}
+            </DialogDescription>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6 scrollbar-hide">
             
-            {/* ETAPA 1: LOCALIZAÇÃO (Cidade/Estado) */}
-            <section className="space-y-4 pt-2">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-black flex items-center justify-center">1</div>
-                <h3 className="text-xs font-black uppercase tracking-widest">Localização do Negócio</h3>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <Label className="text-[9px] font-black uppercase opacity-60 ml-1">Cidade</Label>
-                  <Input 
-                    placeholder="Ex: São Paulo" 
-                    value={city} 
-                    onChange={(e) => setCity(e.target.value)} 
-                    className="h-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs"
-                  />
+            {/* TELA 1: LOCALIZAÇÃO */}
+            {configMode === 'location' && (
+              <section className="space-y-4 pt-2 animate-in fade-in zoom-in duration-300">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] font-black uppercase opacity-60 ml-1">Cidade</Label>
+                    <Input 
+                      placeholder="Ex: São Paulo" 
+                      value={city} 
+                      onChange={(e) => setCity(e.target.value)} 
+                      className="h-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] font-black uppercase opacity-60 ml-1">Estado (UF)</Label>
+                    <Input 
+                      placeholder="Ex: SP" 
+                      value={state} 
+                      maxLength={2}
+                      onChange={(e) => setState(e.target.value.toUpperCase())} 
+                      className="h-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs uppercase"
+                    />
+                  </div>
                 </div>
-                <div className="space-y-1.5">
-                  <Label className="text-[9px] font-black uppercase opacity-60 ml-1">Estado (UF)</Label>
-                  <Input 
-                    placeholder="Ex: SP" 
-                    value={state} 
-                    maxLength={2}
-                    onChange={(e) => setState(e.target.value.toUpperCase())} 
-                    className="h-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs uppercase"
-                  />
-                </div>
-              </div>
-              {(!userData?.city || !userData?.state) && (
                 <Button 
                   onClick={handleUpdateLocation} 
                   disabled={!city || !state || isUpdatingUrl}
-                  className="w-full h-10 rounded-xl font-bold text-[10px] uppercase tracking-widest gap-2"
+                  className="w-full h-12 rounded-xl font-bold text-sm shadow-md gap-2"
                 >
-                  {isUpdatingUrl ? <Loader2 className="animate-spin w-3 h-3" /> : <Save className="w-3 h-3" />}
-                  Salvar Localização
+                  {isUpdatingUrl ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="w-4 h-4" />}
+                  Confirmar e Salvar
                 </Button>
-              )}
-            </section>
+              </section>
+            )}
 
-            {/* ETAPA 2: BUSCA NO GOOGLE (Apenas se tiver local salvo) */}
-            {userData?.city && userData?.state && (
-              <section className={cn("space-y-4 pt-4 border-t animate-in fade-in slide-in-from-top-4 duration-500")}>
-                <div className="flex items-center gap-2">
-                  <div className="w-6 h-6 rounded-full bg-primary/10 text-primary text-[10px] font-black flex items-center justify-center">2</div>
-                  <h3 className="text-xs font-black uppercase tracking-widest">Vincular Google Business</h3>
-                </div>
-                
+            {/* TELA 2: BUSCA NO GOOGLE */}
+            {configMode === 'maps' && (
+              <section className="space-y-4 pt-2 animate-in fade-in zoom-in duration-300">
                 <div className="space-y-2">
                   <div className="relative group">
                     <Search className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
