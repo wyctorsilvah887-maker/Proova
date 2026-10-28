@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState } from 'react';
@@ -222,6 +221,14 @@ export default function PrivateInboxPage() {
                 <Handshake className="mr-2 h-4 w-4 text-primary" />
                 <span>Serviços de Parceiros</span>
               </DropdownMenuItem>
+              
+              {userData?.isAdmin && (
+                <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                  <Shield className="mr-2 h-4 w-4 text-primary" />
+                  <span>Administração</span>
+                </DropdownMenuItem>
+              )}
+
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />

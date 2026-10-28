@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, use, useRef } from 'react';
@@ -450,7 +449,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const membershipLabel = isEnterprise ? 'Membro Enterprise' : (isGold ? 'Membro Gold' : (isTrial ? 'Período Trial' : 'Plano Base'));
 
   return (
-    <div className="h-screen flex flex-col font-body w-full overflow-hidden bg-background">
+    <div className="h-screen flex flex-col font-body w-full overflow-hidden bg-background shrink-0">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95 shrink-0">
         <div className="flex items-center gap-3 flex-1">
           <Button 
@@ -515,6 +514,14 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
                 <Handshake className="mr-2 h-4 w-4 text-primary" />
                 <span>Serviços de Parceiros</span>
               </DropdownMenuItem>
+              
+              {userData?.isAdmin && (
+                <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                  <Shield className="mr-2 h-4 w-4 text-primary" />
+                  <span>Administração</span>
+                </DropdownMenuItem>
+              )}
+
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />

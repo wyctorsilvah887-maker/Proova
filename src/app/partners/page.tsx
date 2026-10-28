@@ -30,7 +30,8 @@ import {
   Search,
   MousePointer2,
   Megaphone,
-  Info
+  Info,
+  Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -224,6 +225,14 @@ export default function PartnersPage() {
                   <Handshake className="mr-2 h-4 w-4 text-primary" />
                   <span>Serviços de Parceiros</span>
                 </DropdownMenuItem>
+                
+                {userData?.isAdmin && (
+                  <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                    <Shield className="mr-2 h-4 w-4 text-primary" />
+                    <span>Administração</span>
+                  </DropdownMenuItem>
+                )}
+
                 <DropdownMenuSeparator className="mx-1" />
                 <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
               </DropdownMenuContent>
