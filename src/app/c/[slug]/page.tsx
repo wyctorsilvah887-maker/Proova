@@ -200,7 +200,6 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
         clearInterval(timerRef.current);
         timerRef.current = null;
       }
-      // Fecha a câmera imediatamente para liberar o hardware e permitir que o vídeo gravado seja renderizado sozinho
       stopCamera();
     }
   };
@@ -258,13 +257,17 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
       return;
     }
 
-    // Texto é obrigatório apenas se NÃO houver vídeo
     if (!videoBlob && !text.trim()) {
       toast({ variant: "destructive", title: "Mensagem Necessária", description: "Por favor, escreva seu depoimento ou grave um vídeo." });
       return;
     }
 
-    setSelectionPending(true);
+    if (videoBlob) {
+      // Vídeo é sempre enviado como público (curadoria) automaticamente para reduzir fricção
+      handleFinalSubmit('public');
+    } else {
+      setSelectionPending(true);
+    }
   };
 
   const handleFinalSubmit = async (destination: 'public' | 'private') => {
@@ -284,12 +287,15 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
       }
     }
 
-    if (destination === 'public') {
+    // Se for texto público, tentamos copiar agora. Para vídeo, o convite do Maps aparece na tela de sucesso.
+    if (destination === 'public' && !videoBlob) {
       if (googleMapsUrl) handleGoogleRedirect(googleMapsUrl);
       try {
-        const textToCopy = text.trim() || `Avaliação de ${rating} estrelas gravada em vídeo por ${userName}.`;
-        await navigator.clipboard.writeText(textToCopy);
-        toast({ title: "Feedback Copiado!", description: "Pronto para colar no Google." });
+        const textToCopy = text.trim();
+        if (textToCopy) {
+          await navigator.clipboard.writeText(textToCopy);
+          toast({ title: "Feedback Copiado!", description: "Pronto para colar no Google." });
+        }
       } catch (err) {}
     }
 
@@ -308,8 +314,8 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
       setIsSubmitting(false);
       setSelectionPending(false);
       toast({
-        title: destination === 'public' ? "Publicado com Sucesso!" : "Feedback Enviado Privado",
-        description: destination === 'public' ? "Seu elogio agora brilha no nosso site." : "A gerência recebeu seu feedback sigiloso.",
+        title: destination === 'public' ? "Enviado com Sucesso!" : "Feedback Enviado Privado",
+        description: destination === 'public' ? "Sua avaliação aguarda aprovação interna." : "A gerência recebeu seu feedback sigiloso.",
       });
     } else {
       toast({ variant: "destructive", title: "Falha no Envio", description: result.error || "Erro ao processar depoimento." });
@@ -351,14 +357,20 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
             <div className="space-y-2">
               <h2 className="text-3xl font-bold font-headline">Obrigado!</h2>
               <p className="text-muted-foreground">Sua avaliação foi enviada para {companyNameDisplay}.</p>
+              {videoBlob && <p className="text-[10px] text-primary font-black uppercase tracking-widest mt-3">Depoimento em Vídeo Recebido</p>}
             </div>
-            {googleMapsUrl && finalDest === 'public' && (
-              <div className="pt-6 border-t space-y-4">
+
+            {/* Convite para o Google Maps caso a nota seja alta e a empresa tenha o link configurado */}
+            {googleMapsUrl && finalDest === 'public' && rating >= 4 && (
+              <div className="pt-6 border-t space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <p className="text-xs font-bold text-muted-foreground">Que tal nos ajudar ainda mais?</p>
                 <Button onClick={() => handleGoogleRedirect(googleMapsUrl)} className="w-full h-14 rounded-xl gap-3 text-sm font-bold bg-[#4285F4] hover:bg-[#357ae8]">
-                  <MapPin className="w-5 h-5" /> Abrir Google Maps (Colar)
+                  <MapPin className="w-5 h-5" /> Avaliar também no Google
                 </Button>
+                <p className="text-[9px] opacity-60">Sua nota ajuda nossa empresa a brilhar nas buscas!</p>
               </div>
             )}
+
             <Button variant="ghost" onClick={handleResetForm} className="text-xs">Enviar outro depoimento</Button>
           </CardContent>
         </Card>
@@ -454,8 +466,12 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
                   </div>
                 )}
 
-                <Button type="submit" className="w-full h-14 text-lg font-bold shadow-xl">
-                  <><Send className="mr-2 w-5 h-5" /> Revisar e Enviar</>
+                <Button type="submit" disabled={isSubmitting} className="w-full h-14 text-lg font-bold shadow-xl">
+                  {isSubmitting ? (
+                    <><Loader2 className="animate-spin mr-2 h-5 w-5" /> Enviando...</>
+                  ) : (
+                    <><Send className="mr-2 w-5 h-5" /> Revisar e Enviar</>
+                  )}
                 </Button>
               </form>
             )}
