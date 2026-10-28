@@ -134,6 +134,7 @@ export default function DashPage() {
   const [isUpdatingUrl, setIsUpdatingUrl] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [isSendingReport, setIsSendingReport] = useState(false);
+  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
 
   // Estados para Busca de Local
   const [city, setCity] = useState('');
@@ -689,17 +690,35 @@ export default function DashPage() {
               <Card key={t.id} className="border-none shadow-sm overflow-hidden rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md">
                 <div className="flex items-start gap-4">
                   {t.videoUrl ? (
-                    <div className="relative w-16 h-12 md:w-24 md:h-16 rounded-lg overflow-hidden bg-black shrink-0 border border-primary/10 group-hover:border-primary/30 transition-colors hidden sm:block">
-                      <video 
-                        src={t.videoUrl} 
-                        className="w-full h-full object-cover opacity-60"
-                        muted
-                        playsInline
-                        preload="metadata"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <Play className="w-5 h-5 text-white fill-white drop-shadow-lg" />
-                      </div>
+                    <div 
+                      className={cn(
+                        "relative rounded-lg overflow-hidden bg-black shrink-0 border border-primary/10 transition-all hidden sm:block",
+                        playingVideoId === t.id ? "w-48 h-32 md:w-64 md:h-40" : "w-16 h-12 md:w-24 md:h-16 cursor-pointer hover:border-primary/30"
+                      )}
+                      onClick={() => playingVideoId !== t.id && setPlayingVideoId(t.id)}
+                    >
+                      {playingVideoId === t.id ? (
+                        <video 
+                          src={t.videoUrl} 
+                          className="w-full h-full object-contain"
+                          autoPlay
+                          controls
+                          playsInline
+                        />
+                      ) : (
+                        <>
+                          <video 
+                            src={t.videoUrl} 
+                            className="w-full h-full object-cover opacity-60"
+                            muted
+                            playsInline
+                            preload="metadata"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Play className="w-5 h-5 text-white fill-white drop-shadow-lg" />
+                          </div>
+                        </>
+                      )}
                     </div>
                   ) : (
                     <div className="bg-primary/10 p-2 rounded-xl hidden sm:block"><User className="w-4 h-4 text-primary" /></div>
@@ -796,7 +815,7 @@ export default function DashPage() {
       
       {/* DIALOGO DE CONFIGURAÇÃO DE BUSINESS (Maps + Location) */}
       <Dialog open={isGoogleMapsDialogOpen} onOpenChange={setIsGoogleMapsDialogOpen}>
-        <DialogContent className="rounded-[2rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
+        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-6 pb-2 pt-10 shrink-0 bg-background">
             <DialogTitle className="text-2xl font-black font-headline flex items-center gap-2">
               <MapPinned className="w-6 h-6 text-primary" /> {configMode === 'location' ? 'Localização' : 'Perfil Comercial'}
