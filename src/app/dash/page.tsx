@@ -412,19 +412,37 @@ export default function DashPage() {
     } catch (e: any) { toast({ variant: "destructive", title: "Erro", description: e.message }); } finally { setIsSendingReport(false); }
   };
 
-  const handleDownloadPNG = async () => {
-    if (!shareCardRef.current || !selectedTestimonialForShare) return;
+  const handleDownloadContent = async () => {
+    if (!selectedTestimonialForShare) return;
+
     setIsExportingCard(true);
     try {
-      const dataUrl = await toPng(shareCardRef.current, { quality: 1.0, pixelRatio: 2 });
-      const link = document.createElement('a');
-      link.download = `proova-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
-      link.href = dataUrl;
-      link.click();
-      toast({ title: "Imagem Gerada!", description: "Seu card está pronto para as redes sociais." });
+      if (selectedTestimonialForShare.videoUrl) {
+        // DOWNLOAD VÍDEO MP4
+        const response = await fetch(selectedTestimonialForShare.videoUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `proova-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        toast({ title: "Vídeo Baixado!", description: "O depoimento em MP4 está pronto." });
+      } else {
+        // DOWNLOAD IMAGEM PNG
+        if (!shareCardRef.current) return;
+        const dataUrl = await toPng(shareCardRef.current, { quality: 1.0, pixelRatio: 2 });
+        const link = document.createElement('a');
+        link.download = `proova-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
+        link.href = dataUrl;
+        link.click();
+        toast({ title: "Imagem Gerada!", description: "Seu card está pronto para as redes sociais." });
+      }
     } catch (err) {
       console.error(err);
-      toast({ variant: "destructive", title: "Erro ao gerar imagem" });
+      toast({ variant: "destructive", title: "Erro ao exportar conteúdo" });
     } finally {
       setIsExportingCard(false);
     }
@@ -499,7 +517,7 @@ export default function DashPage() {
                 className={cn(setupProgressLocker('collect'))}
               >
                 <Layout className="mr-2 h-4 w-4 text-primary" />
-                <span>Meus Widgets</span>
+                <span>Meus Murais</span>
                 {!isCollectDone && <Lock className="ml-auto w-3 h-3 opacity-60" />}
               </DropdownMenuItem>
               <DropdownMenuItem 
@@ -899,17 +917,17 @@ export default function DashPage() {
 
             <Button 
               className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-xl gap-2 transition-all active:scale-95"
-              onClick={handleDownloadPNG}
+              onClick={handleDownloadContent}
               disabled={isExportingCard}
             >
               {isExportingCard ? <Loader2 className="animate-spin" /> : <Download className="w-5 h-5" />}
-              {selectedTestimonialForShare?.videoUrl ? 'Baixar Video-Card PNG' : 'Baixar PNG em Alta'}
+              {selectedTestimonialForShare?.videoUrl ? 'Baixar Vídeo MP4' : 'Baixar PNG em Alta'}
             </Button>
           </div>
           
           <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center">
             <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">
-              Dica: Use nos Stories para provar autoridade 24h por dia
+              Dica: Use nas redes sociais para provar autoridade 24h por dia
             </p>
           </DialogFooter>
         </DialogContent>
