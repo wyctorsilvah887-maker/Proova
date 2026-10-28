@@ -704,6 +704,7 @@ export default function DashPage() {
                           autoPlay
                           controls
                           playsInline
+                          controlsList="nodownload"
                         />
                       ) : (
                         <>
@@ -711,6 +712,8 @@ export default function DashPage() {
                             src={t.videoUrl} 
                             className="w-full h-full object-cover opacity-60"
                             muted
+                            autoPlay
+                            loop
                             playsInline
                             preload="metadata"
                           />
