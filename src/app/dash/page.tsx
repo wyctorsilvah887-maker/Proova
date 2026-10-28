@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -418,18 +417,32 @@ export default function DashPage() {
     setIsExportingCard(true);
     try {
       if (selectedTestimonialForShare.videoUrl) {
-        // DOWNLOAD VÍDEO MP4
-        const response = await fetch(selectedTestimonialForShare.videoUrl);
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `proova-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-        toast({ title: "Vídeo Baixado!", description: "O depoimento em MP4 está pronto." });
+        // DOWNLOAD VÍDEO MP4 - Estratégia de Fallback para CORS
+        try {
+          const response = await fetch(selectedTestimonialForShare.videoUrl);
+          if (!response.ok) throw new Error('Falha na resposta do servidor');
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `proova-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          window.URL.revokeObjectURL(url);
+          toast({ title: "Vídeo Baixado!", description: "O depoimento em MP4 está pronto." });
+        } catch (fetchErr) {
+          console.warn("Fetch bloqueado por CORS, tentando link direto:", fetchErr);
+          // Fallback: Abre o vídeo em nova aba com sugestão de download se o fetch falhar
+          const link = document.createElement('a');
+          link.href = selectedTestimonialForShare.videoUrl;
+          link.target = "_blank";
+          link.download = `proova-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          toast({ title: "Iniciando Download", description: "O vídeo abrirá em uma nova aba para salvar." });
+        }
       } else {
         // DOWNLOAD IMAGEM PNG
         if (!shareCardRef.current) return;
@@ -441,8 +454,8 @@ export default function DashPage() {
         toast({ title: "Imagem Gerada!", description: "Seu card está pronto para as redes sociais." });
       }
     } catch (err) {
-      console.error(err);
-      toast({ variant: "destructive", title: "Erro ao exportar conteúdo" });
+      console.error("Erro fatal ao exportar:", err);
+      toast({ variant: "destructive", title: "Erro ao exportar conteúdo", description: "Não conseguimos processar o arquivo agora." });
     } finally {
       setIsExportingCard(false);
     }
