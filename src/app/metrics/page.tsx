@@ -149,6 +149,18 @@ export default function MetricsPage() {
       label: "Depoimentos",
       color: "hsl(var(--primary))",
     },
+    stars5: {
+      label: "5 Estrelas",
+      color: "hsl(var(--primary))",
+    },
+    stars4: {
+      label: "4 Estrelas",
+      color: "rgba(249, 115, 22, 0.6)",
+    },
+    starsRest: {
+      label: "Outros",
+      color: "rgba(249, 115, 22, 0.2)",
+    }
   };
 
   const membershipLabel = useMemo(() => {
@@ -364,23 +376,25 @@ export default function MetricsPage() {
               {stats.pieData.length > 0 ? (
                 <>
                   <div className="relative w-[200px] h-[200px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={stats.pieData}
-                          innerRadius={60}
-                          outerRadius={80}
-                          paddingAngle={5}
-                          dataKey="value"
-                        >
-                          {stats.pieData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <ChartContainer config={chartConfig} className="h-full w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={stats.pieData}
+                            innerRadius={60}
+                            outerRadius={80}
+                            paddingAngle={5}
+                            dataKey="value"
+                          >
+                            {stats.pieData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <ChartTooltip content={<ChartTooltipContent />} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </ChartContainer>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                        <span className="text-3xl font-black">{stats.avgRating}</span>
                        <span className="text-[9px] uppercase font-black text-muted-foreground">SCORE</span>
                     </div>
