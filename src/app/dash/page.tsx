@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -739,7 +738,22 @@ export default function DashPage() {
 
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
           <div className="space-y-1">
-            <div className="flex items-center gap-3"><h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Painel de Controle</h1><Button variant="ghost" size="sm" onClick={() => setIsTutorialOpen(true)} className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5"><Info className="w-3.5 h-3.5" /> Tutorial</Button></div>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Painel de Controle</h1>
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" onClick={() => setIsTutorialOpen(true)} className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5">
+                  <Info className="w-3.5 h-3.5" /> Tutorial
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }} 
+                  className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5"
+                >
+                  <Edit3 className="w-3.5 h-3.5" /> Google Maps
+                </Button>
+              </div>
+            </div>
             <p className="text-xs md:text-base text-muted-foreground">Gestão de prova social dinâmica</p>
           </div>
           <div className="w-full sm:w-48">
@@ -750,7 +764,7 @@ export default function DashPage() {
           </div>
         </header>
 
-        <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2">
+        <div className="grid gap-4 md:gap-6 grid-cols-1">
           <Card 
             className="border-none shadow-sm overflow-hidden rounded-2xl p-4 md:p-6 space-y-4 cursor-pointer hover:shadow-md transition-all active:scale-[0.98]"
             onClick={() => router.push('/metrics')}
@@ -760,7 +774,7 @@ export default function DashPage() {
                 <CardTitle className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Resumo {period !== 'all' ? `(${period}d)` : ''}</CardTitle>
                 <button 
                   onClick={(e) => {
-                    e.stopPropagation(); // Evita navegar para métricas ao clicar no botão de relatório
+                    e.stopPropagation(); 
                     handleSendWeeklyReport();
                   }} 
                   disabled={isSendingReport} 
@@ -774,30 +788,13 @@ export default function DashPage() {
                   Enviar Relatório
                 </button>
               </div>
-              <BarChart3 className="h-4 w-4 text-primary" />
+              <div className="flex items-center gap-3">
+                <p className="text-[10px] font-black uppercase text-primary/60 tracking-widest hidden sm:block">Ver Métricas Detalhadas</p>
+                <BarChart3 className="h-4 w-4 text-primary" />
+              </div>
             </div>
             <div className="space-y-1"><div className="text-xl md:text-3xl font-bold">{filteredMetrics.count} <span className="text-sm md:text-lg font-medium text-muted-foreground">avaliações</span></div><Badge variant="secondary" className="border-none text-[8px] md:text-[10px] h-4 md:h-5 px-1.5 font-black bg-primary/10 text-primary">{filteredMetrics.trendLabel}</Badge></div>
           </Card>
-          
-          <div className="relative h-full group">
-             <div 
-               onClick={() => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }} 
-               className="absolute top-2 right-4 px-2 py-0.5 z-40 bg-primary text-white text-[7px] font-black uppercase rounded-full shadow-lg cursor-pointer hover:scale-110 active:scale-95 transition-all flex items-center gap-1 border-none"
-             >
-               <Edit3 className="w-2 i-2" /> Editar
-             </div>
-             <Card className="border-none shadow-sm h-full rounded-2xl p-4 md:p-6 space-y-4 relative flex flex-col justify-center overflow-visible">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Cliques Google</CardTitle>
-                <MousePointer2 className="h-4 w-4 text-primary" />
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="text-xl md:text-2xl font-bold">{userData?.googleRedirectCount || 0}</div>
-                {userData?.googleMapsUrl ? <Badge variant="secondary" className="text-[8px] md:text-[10px] h-4 md:h-5 bg-primary/10 text-primary border-none">G-Boost Ativo</Badge> : <Badge variant="outline" className="text-[8px] h-4 md:h-5 opacity-50 uppercase font-black">Pendente</Badge>}
-              </div>
-              <p className="text-[10px] md:text-xs text-muted-foreground">Visitantes redirecionados ao Maps.</p>
-            </Card>
-          </div>
         </div>
 
         <section className="space-y-3">
@@ -1055,38 +1052,23 @@ export default function DashPage() {
             <div className="space-y-8">
               <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Inbox className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Inbox de Moderação Unificado</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Centralizamos tudo o que entra: elógios para aprovar e feedbacks privados. É sua torre de comando de reputação.</p>
-                </div>
+                <div className="min-w-0 flex-1"><p className="text-sm font-bold">Inbox de Moderação Unificado</p><p className="text-xs text-muted-foreground leading-relaxed">Centralizamos tudo o que entra: elógios para aprovar e feedbacks privados. É sua torre de comando de reputação.</p></div>
               </div>
               <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Share2 className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Gerador de Social Cards</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Transforme qualquer elogio em uma imagem profissional para Instagram com um clique. A prova social agora é conteúdo viral.</p>
-                </div>
+                <div className="min-w-0 flex-1"><p className="text-sm font-bold">Gerador de Social Cards</p><p className="text-xs text-muted-foreground leading-relaxed">Transforme qualquer elogio em uma imagem profissional para Instagram com um clique. A prova social agora é conteúdo viral.</p></div>
               </div>
               <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><ShieldCheck className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Consultor Proova</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Seu auditor de SEO Local. Ele avisa sobre falhas no link do Google, elogios pendentes de aprovação ou horários desatualizados.</p>
-                </div>
+                <div className="min-w-0 flex-1"><p className="text-sm font-bold">Consultor Proova</p><p className="text-xs text-muted-foreground leading-relaxed">Seu auditor de SEO Local. Ele avisa sobre falhas no link do Google, elogios pendentes de aprovação ou horários desatualizados.</p></div>
               </div>
               <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><BarChart3 className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Resumos e Filtros</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Filtre seus resultados por períodos (7d, 30d ou Total) para entender o ritmo de crescimento da sua prova social.</p>
-                </div>
+                <div className="min-w-0 flex-1"><p className="text-sm font-bold">Resumos e Filtros</p><p className="text-xs text-muted-foreground leading-relaxed">Filtre seus resultados por períodos (7d, 30d ou Total) para entender o ritmo de crescimento da sua prova social.</p></div>
               </div>
               <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Zap className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold">Ações Rápidas</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">Acessos rápidos para copiar seu link, baixar o cartaz de balcão ou gerenciar seus murais embutidos.</p>
-                </div>
+                <div className="min-w-0 flex-1"><p className="text-sm font-bold">Ações Rápidas</p><p className="text-xs text-muted-foreground leading-relaxed">Acessos rápidos para copiar seu link, baixar o cartaz de balcão ou gerenciar seus murais embutidos.</p></div>
               </div>
             </div>
           </div>
