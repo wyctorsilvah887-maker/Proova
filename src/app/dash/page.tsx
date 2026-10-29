@@ -71,7 +71,9 @@ import {
   Handshake,
   Play,
   Video,
-  VideoIcon
+  VideoIcon,
+  Eye,
+  Settings
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -131,6 +133,7 @@ export default function DashPage() {
   const [isQrDialogOpenManual, setIsQrDialogOpenManual] = useState(false);
   const [isGoogleMapsDialogOpen, setIsGoogleMapsDialogOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
+  const [isPublicPageChoiceOpen, setIsPublicPageChoiceOpen] = useState(false);
   const [configMode, setConfigMode] = useState<'location' | 'maps'>('location');
   
   const [newGoogleMapsUrl, setNewGoogleMapsUrl] = useState('');
@@ -802,16 +805,11 @@ export default function DashPage() {
               <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Copiar Link</span>
             </Button>
 
-            {/* 2: Ver Página Pública */}
+            {/* 2: Ver Página Pública (COM DIÁLOGO DE ESCOLHA) */}
             <Button 
               variant="outline" 
               disabled={!widgetsList || widgetsList.length === 0} 
-              onClick={() => {
-                const firstWidget = widgetsList?.[0];
-                if (firstWidget) {
-                  window.open(`${baseUrl}/pp/${userData?.companySlug}/${firstWidget.id}`, '_blank');
-                }
-              }} 
+              onClick={() => setIsPublicPageChoiceOpen(true)} 
               className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm"
             >
               <Globe className="w-5 h-5 text-primary" />
@@ -963,6 +961,57 @@ export default function DashPage() {
         </div>
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
+
+      {/* PUBLIC PAGE CHOICE DIALOG */}
+      <Dialog open={isPublicPageChoiceOpen} onOpenChange={setIsPublicPageChoiceOpen}>
+        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background">
+          <DialogHeader className="p-8 pb-4 text-center shrink-0">
+            <DialogTitle className="text-2xl font-black font-headline tracking-tight uppercase">Página de Autoridade</DialogTitle>
+            <DialogDescription className="text-sm">Escolha como deseja prosseguir com seu link da bio.</DialogDescription>
+          </DialogHeader>
+
+          <div className="px-8 pb-8 space-y-4">
+            <Button 
+              className="w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 bg-primary hover:bg-primary/90 shadow-xl transition-all active:scale-95 group"
+              onClick={() => {
+                const firstWidget = widgetsList?.[0];
+                if (firstWidget) {
+                  window.open(`${baseUrl}/pp/${userData?.companySlug}/${firstWidget.id}`, '_blank');
+                  setIsPublicPageChoiceOpen(false);
+                }
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <Eye className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <span className="text-lg font-black uppercase tracking-tight">Visualizar Agora</span>
+              </div>
+              <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Ver como seu cliente enxerga</span>
+            </Button>
+
+            <Button 
+              variant="outline"
+              className="w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 border-primary/20 text-primary hover:bg-primary/5 transition-all active:scale-95 group"
+              onClick={() => {
+                const firstWidget = widgetsList?.[0];
+                if (firstWidget) {
+                  router.push(`/widgets/${firstWidget.id}`);
+                  setIsPublicPageChoiceOpen(false);
+                }
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
+                <span className="text-lg font-black uppercase tracking-tight">Editar / Configurar</span>
+              </div>
+              <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Personalizar textos, cores e seções</span>
+            </Button>
+          </div>
+
+          <DialogFooter className="p-4 bg-muted/30 border-t text-center flex justify-center">
+            <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-60">Dica: Use seu link da bio no Instagram para converter mais.</p>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* SHARE DIALOG (SOCIAL CARDS) */}
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
@@ -1217,7 +1266,7 @@ export default function DashPage() {
                   
                   {searchResults.length === 0 && !isSearchingPlaces && searchQuery && (
                     <div className="py-6 text-center border-2 border-dashed rounded-2xl bg-muted/5">
-                      <p className="text-[10px] font-medium text-muted-foreground font-medium">Empresa não listada? Refine o nome.</p>
+                      <p className="text-[10px] font-medium text-muted-foreground">Empresa não listada? Refine o nome.</p>
                     </div>
                   )}
                 </div>
