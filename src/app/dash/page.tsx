@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -447,7 +446,7 @@ export default function DashPage() {
       const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9,opus' });
       const chunks: Blob[] = [];
       
-      recorder.ondataavailable = (e) => chunks.push(e.data);
+      recorder.onanyavailable = (e: any) => chunks.push(e.data);
       recorder.onstop = () => {
         const blob = new Blob(chunks, { type: 'video/webm' });
         const url = URL.createObjectURL(blob);
@@ -464,11 +463,11 @@ export default function DashPage() {
       videoEl.muted = false; // Precisamos do som na gravação
       
       // Capturar imagem do card (sem o vídeo) para usar como fundo/moldura
-      // Temporariamente ocultamos o vídeo no card para capturar apenas a moldura
-      const videoContainer = cardEl.querySelector('.aspect-video') as HTMLElement;
-      if (videoContainer) videoContainer.style.opacity = '0';
-      const cardImage = await toPng(cardEl, { pixelRatio: 2 });
-      if (videoContainer) videoContainer.style.opacity = '1';
+      // Usamos um filtro para que o html-to-image não tente processar o vídeo, evitando Tainted Canvas
+      const cardImage = await toPng(cardEl, { 
+        pixelRatio: 2,
+        filter: (node) => (node as HTMLElement).tagName !== 'VIDEO' && (node as HTMLElement).id !== 'video-overlay-badge'
+      });
       
       const frameImg = new (window as any).Image();
       frameImg.src = cardImage;
@@ -958,13 +957,14 @@ export default function DashPage() {
                             loop
                             playsInline
                             preload="auto"
+                            crossOrigin="anonymous"
                           />
                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center">
                                 <Play className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white" />
                              </div>
                           </div>
-                          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white/10 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/10">
+                          <div id="video-overlay-badge" className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white/10 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/10">
                             <p className="text-[6px] sm:text-[7px] text-white font-black uppercase tracking-widest flex items-center gap-1">
                               <Video className="w-2 sm:w-2.5 h-2 sm:h-2.5" /> Depoimento em Vídeo
                             </p>
@@ -973,7 +973,7 @@ export default function DashPage() {
                         
                         <div className="space-y-1.5 sm:space-y-2">
                           <div className="flex justify-center gap-0.5 sm:gap-1">
-                            {Array.from({ length: selectedTestimonialForShare?.rating || Star }).map((_, i) => (
+                            {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
                               <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 fill-white text-white drop-shadow-sm" />
                             ))}
                           </div>
