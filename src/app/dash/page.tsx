@@ -833,14 +833,9 @@ export default function DashPage() {
               <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">4: Gerar Social Cards</span>
             </Button>
 
-            <Button variant="outline" disabled={!isCollectDone} onClick={() => router.push('/widgets')} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
-              <Layout className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">5: Meus Murais</span>
-            </Button>
-
             <Button variant="outline" disabled={!isGoogleDone} onClick={() => setIsQrDialogOpenManual(true)} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
               <QrCode className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">6: QR de Balcão</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">5: QR de Balcão</span>
             </Button>
           </div>
         </section>
@@ -1295,4 +1290,3 @@ export default function DashPage() {
     </div>
   );
 }
-
