@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -227,7 +228,6 @@ export default function DashPage() {
     if (!authLoading && !user) router.replace('/login');
   }, [user, authLoading, router]);
 
-  // Efeito para garantir que o vídeo carregue no diálogo de Social Card
   useEffect(() => {
     if (isShareDialogOpen && selectedTestimonialForShare?.videoUrl && dialogVideoRef.current) {
       dialogVideoRef.current.load();
@@ -296,7 +296,6 @@ export default function DashPage() {
         results.push({ id: 'maps-invalid', label: 'Link de Avaliação Indireto', status: 'attention', description: 'Seu link atual não abre direto na caixa de texto do Google.', actionLabel: 'Corrigir Link', action: () => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }, icon: ShieldAlert });
       }
 
-      // Auditoria Avançada (Consultor Proova - Apenas Enterprise)
       if (userData.googlePlaceId && isEnterpriseUser) {
         const details = await getGooglePlaceDetails(userData.googlePlaceId);
         if (details) {
@@ -327,14 +326,6 @@ export default function DashPage() {
     toast({ title: "Copiado!", description: `${description} copiado.` });
   };
 
-  const handleUpdateGoogleMapsUrl = async () => {
-    if (!db || !user || isUpdatingUrl) return;
-    setIsUpdatingUrl(true);
-    updateDoc(doc(db, 'users', user.uid), { googleMapsUrl: newGoogleMapsUrl.trim() })
-      .then(() => { toast({ title: "Link Atualizado" }); setIsGoogleMapsDialogOpen(false); })
-      .finally(() => setIsUpdatingUrl(false));
-  };
-
   const handleSearchPlaces = async () => {
     if (!searchQuery.trim()) return;
     setIsSearchingPlaces(true);
@@ -351,9 +342,7 @@ export default function DashPage() {
   const handleSelectPlace = async (place: any) => {
     if (!db || !user || isUpdatingUrl) return;
     setIsUpdatingUrl(true);
-    
     const reviewLink = `https://search.google.com/local/writereview?placeid=${place.place_id}`;
-    
     try {
       await updateDoc(doc(db, 'users', user.uid), {
         googlePlaceId: place.place_id,
@@ -419,32 +408,148 @@ export default function DashPage() {
     } catch (e: any) { toast({ variant: "destructive", title: "Erro", description: e.message }); } finally { setIsSendingReport(false); }
   };
 
+  /**
+   * FUNÇÃO AVANÇADA: Renderiza o Card de Social com o Vídeo dentro e exporta como MP4.
+   * Utiliza Canvas API para compor a moldura e capturar o stream de vídeo.
+   */
+  const handleDownloadComposedVideo = async () => {
+    if (!selectedTestimonialForShare || !dialogVideoRef.current || !shareCardRef.current) return;
+
+    setIsExportingCard(true);
+    toast({ title: "Processando Vídeo VIP", description: "Gravando moldura digital... aguarde." });
+
+    try {
+      const videoEl = dialogVideoRef.current;
+      const cardEl = shareCardRef.current;
+      
+      // Criar canvas para renderização da composição
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error("Falha ao iniciar motor gráfico");
+
+      // Definir tamanho do vídeo (Quadrado 720p para redes sociais)
+      const size = 720;
+      canvas.width = size;
+      canvas.height = size;
+
+      // Iniciar MediaRecorder para capturar o Canvas
+      const stream = canvas.captureStream(30); // 30 FPS
+      
+      // Adicionar trilha de áudio do vídeo original
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const source = audioCtx.createMediaElementSource(videoEl);
+      const destination = audioCtx.createMediaStreamDestination();
+      source.connect(destination);
+      source.connect(audioCtx.destination); // Manter áudio para o usuário ouvir enquanto processa
+      
+      destination.stream.getAudioTracks().forEach(track => stream.addTrack(track));
+
+      const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9,opus' });
+      const chunks: Blob[] = [];
+      
+      recorder.ondataavailable = (e) => chunks.push(e.data);
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'video/webm' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `proova-social-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
+        link.click();
+        setIsExportingCard(false);
+        toast({ title: "Vídeo Gerado!", description: "Seu depoimento com moldura está pronto." });
+      };
+
+      // Resetar vídeo e iniciar gravação
+      videoEl.currentTime = 0;
+      videoEl.muted = false; // Precisamos do som na gravação
+      
+      // Capturar imagem do card (sem o vídeo) para usar como fundo/moldura
+      // Temporariamente ocultamos o vídeo no card para capturar apenas a moldura
+      const videoContainer = cardEl.querySelector('.aspect-video') as HTMLElement;
+      if (videoContainer) videoContainer.style.opacity = '0';
+      const cardImage = await toPng(cardEl, { pixelRatio: 2 });
+      if (videoContainer) videoContainer.style.opacity = '1';
+      
+      const frameImg = new (window as any).Image();
+      frameImg.src = cardImage;
+      await new Promise(r => frameImg.onload = r);
+
+      recorder.start();
+
+      // Loop de renderização frame a frame
+      const renderLoop = () => {
+        if (videoEl.paused || videoEl.ended) {
+          recorder.stop();
+          return;
+        }
+
+        // 1. Desenhar a moldura estática (fundo, textos, estrelas)
+        ctx.drawImage(frameImg, 0, 0, size, size);
+
+        // 2. Desenhar o frame atual do vídeo na posição correta da moldura
+        // Calculamos a posição baseada no layout do card
+        const vWidth = size * 0.85; // Aproximadamente o tamanho da moldura no card
+        const vHeight = vWidth * (9/16);
+        const vX = (size - vWidth) / 2;
+        const vY = size * 0.18; // Posição vertical aproximada
+
+        ctx.save();
+        // Arredondar cantos do vídeo na gravação
+        ctx.beginPath();
+        const radius = 24;
+        ctx.moveTo(vX + radius, vY);
+        ctx.arcTo(vX + vWidth, vY, vX + vWidth, vY + vHeight, radius);
+        ctx.arcTo(vX + vWidth, vY + vHeight, vX, vY + vHeight, radius);
+        ctx.arcTo(vX, vY + vHeight, vX, vY, radius);
+        ctx.arcTo(vX, vY, vX + vWidth, vY, radius);
+        ctx.closePath();
+        ctx.clip();
+        
+        ctx.drawImage(videoEl, vX, vY, vWidth, vHeight);
+        ctx.restore();
+
+        requestAnimationFrame(renderLoop);
+      };
+
+      videoEl.play();
+      renderLoop();
+
+      // Parar após 15 segundos ou se o vídeo acabar
+      setTimeout(() => {
+        if (recorder.state === 'recording') recorder.stop();
+      }, 15000);
+
+    } catch (err) {
+      console.error("Erro na gravação composta:", err);
+      setIsExportingCard(false);
+      toast({ variant: "destructive", title: "Erro na composição", description: "Tente o download simples." });
+    }
+  };
+
   const handleDownloadContent = async () => {
     if (!selectedTestimonialForShare) return;
 
+    if (selectedTestimonialForShare.videoUrl) {
+      await handleDownloadComposedVideo();
+      return;
+    }
+
     setIsExportingCard(true);
     try {
-      if (selectedTestimonialForShare.videoUrl) {
-        const fileName = `proova-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
-        const downloadUrl = `/api/download/video?url=${encodeURIComponent(selectedTestimonialForShare.videoUrl)}&name=${encodeURIComponent(fileName)}`;
-        window.location.href = downloadUrl;
-        toast({ title: "Iniciando Download", description: "O vídeo MP4 será salvo em instantes." });
-      } else {
-        if (!shareCardRef.current) return;
-        const dataUrl = await toPng(shareCardRef.current, { 
-          quality: 1.0, 
-          pixelRatio: 3, 
-          backgroundColor: '#f97316'
-        });
-        const link = document.createElement('a');
-        link.download = `proova-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
-        link.href = dataUrl;
-        link.click();
-        toast({ title: "Imagem Gerada!", description: "Seu card está pronto para as redes sociais." });
-      }
+      if (!shareCardRef.current) return;
+      const dataUrl = await toPng(shareCardRef.current, { 
+        quality: 1.0, 
+        pixelRatio: 3, 
+        backgroundColor: '#f97316'
+      });
+      const link = document.createElement('a');
+      link.download = `proova-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
+      link.href = dataUrl;
+      link.click();
+      toast({ title: "Imagem Gerada!", description: "Seu card está pronto para as redes sociais." });
     } catch (err) {
       console.error("Erro fatal ao exportar:", err);
-      toast({ variant: "destructive", title: "Erro ao exportar conteúdo", description: "Não conseguimos processar o arquivo agora." });
+      toast({ variant: "destructive", title: "Erro ao exportar conteúdo" });
     } finally {
       setIsExportingCard(false);
     }
@@ -538,14 +643,12 @@ export default function DashPage() {
                 <Handshake className="mr-2 h-4 w-4 text-primary" />
                 <span>Serviços de Parceiros</span>
               </DropdownMenuItem>
-
               {userData?.isAdmin && (
                 <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
                   <Shield className="mr-2 h-4 w-4 text-primary" />
                   <span>Administração</span>
                 </DropdownMenuItem>
               )}
-
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
@@ -870,7 +973,7 @@ export default function DashPage() {
                         
                         <div className="space-y-1.5 sm:space-y-2">
                           <div className="flex justify-center gap-0.5 sm:gap-1">
-                            {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
+                            {Array.from({ length: selectedTestimonialForShare?.rating || Star }).map((_, i) => (
                               <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 fill-white text-white drop-shadow-sm" />
                             ))}
                           </div>
@@ -922,13 +1025,13 @@ export default function DashPage() {
               disabled={isExportingCard}
             >
               {isExportingCard ? <Loader2 className="animate-spin" /> : <Download className="w-4 h-4 sm:w-5 sm:h-5" />}
-              {selectedTestimonialForShare?.videoUrl ? 'Baixar Vídeo MP4' : 'Baixar PNG em Alta'}
+              {selectedTestimonialForShare?.videoUrl ? 'Gerar Vídeo com Moldura' : 'Baixar PNG em Alta'}
             </Button>
           </div>
           
           <DialogFooter className="p-4 sm:p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
             <p className="text-[8px] sm:text-[9px] font-black uppercase text-muted-foreground tracking-widest">
-              Dica: Use nos redes sociais para provar autoridade 24h por dia
+              {selectedTestimonialForShare?.videoUrl ? 'O sistema gravará seu vídeo com a moldura. Isso pode levar alguns segundos.' : 'Dica: Use nos redes sociais para provar autoridade 24h por dia'}
             </p>
           </DialogFooter>
         </DialogContent>
