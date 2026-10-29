@@ -238,11 +238,12 @@ export default function MetricsPage() {
       <main className="flex-1 p-4 md:p-8 space-y-8 max-w-7xl mx-auto w-full">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex flex-col gap-4">
-            <Link href="/dash" className="inline-block group">
-              <Button variant="ghost" size="sm" className="gap-2 px-0 text-muted-foreground hover:text-primary transition-colors h-8">
-                <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                <span className="text-[10px] font-black uppercase tracking-widest">Voltar ao Painel</span>
-              </Button>
+            <Link 
+              href="/dash" 
+              className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group w-fit"
+            >
+              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Voltar ao Painel</span>
             </Link>
             <div className="space-y-1">
               <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight flex items-center gap-3">
@@ -257,7 +258,7 @@ export default function MetricsPage() {
 
           <div className="w-full sm:w-48">
             <Select value={period} onValueChange={(val: any) => setPeriod(val)}>
-              <SelectTrigger className="h-11 rounded-xl bg-background border-primary/20 text-[11px] font-bold uppercase tracking-wider">
+              <SelectTrigger className="h-11 rounded-xl bg-background border-primary/20 text-[11px] font-bold uppercase tracking-wider focus:ring-primary/20">
                 <SelectValue placeholder="Período" />
               </SelectTrigger>
               <SelectContent align="end" className="rounded-xl">
@@ -430,7 +431,7 @@ export default function MetricsPage() {
       </main>
 
       <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
-        <div className="flex items-center gap-2 relative w-[200px] h-[65px] md:w-[320px] md:h-[105px]">
+        <div className="flex items-center gap-2 relative w-[220px] h-[75px] md:w-[340px] md:h-[105px]">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain dark:hidden" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain hidden dark:block" priority />
         </div>
