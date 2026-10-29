@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -418,20 +417,17 @@ export default function DashPage() {
     setIsExportingCard(true);
     try {
       if (selectedTestimonialForShare.videoUrl) {
-        // DOWNLOAD VÍDEO MP4 VIA PROXY API
-        // Isso inicia o download automaticamente no navegador sem abrir abas novas
         const fileName = `proova-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
         const downloadUrl = `/api/download/video?url=${encodeURIComponent(selectedTestimonialForShare.videoUrl)}&name=${encodeURIComponent(fileName)}`;
-        
-        // Redireciona a janela atual para o endpoint de download. 
-        // Como o endpoint retorna Content-Disposition: attachment, o navegador inicia o download e permanece na página atual.
         window.location.href = downloadUrl;
-        
         toast({ title: "Iniciando Download", description: "O vídeo MP4 será salvo em instantes." });
       } else {
-        // DOWNLOAD IMAGEM PNG
         if (!shareCardRef.current) return;
-        const dataUrl = await toPng(shareCardRef.current, { quality: 1.0, pixelRatio: 2 });
+        const dataUrl = await toPng(shareCardRef.current, { 
+          quality: 1.0, 
+          pixelRatio: 3, // Qualidade 4K
+          backgroundColor: '#f97316'
+        });
         const link = document.createElement('a');
         link.download = `proova-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
         link.href = dataUrl;
@@ -817,115 +813,117 @@ export default function DashPage() {
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
 
-      {/* SHARE DIALOG (SOCIAL CARDS) */}
+      {/* SHARE DIALOG (SOCIAL CARDS) - OPTIMIZED FOR MOBILE */}
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
-        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background">
-          <DialogHeader className="p-8 pb-4 text-center">
-            <DialogTitle className="text-xl font-black font-headline uppercase tracking-tight">Social Card Premium</DialogTitle>
-            <DialogDescription>Gere um post profissional para suas redes sociais.</DialogDescription>
+        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[96vh] flex flex-col">
+          <DialogHeader className="p-6 sm:p-8 pb-2 text-center shrink-0">
+            <DialogTitle className="text-lg sm:text-xl font-black font-headline uppercase tracking-tight">Social Card Premium</DialogTitle>
+            <DialogDescription className="text-xs">Gere um post profissional para suas redes sociais.</DialogDescription>
           </DialogHeader>
 
-          <div className="p-6 flex flex-col items-center gap-8">
-            {/* O CARD VISUAL (INSTAGRAM SQUARE) */}
-            <div 
-              ref={shareCardRef}
-              className="w-[360px] h-[360px] bg-primary relative overflow-hidden rounded-[2.5rem] shadow-2xl flex flex-col items-center p-8 text-center"
-              style={{ background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' }}
-            >
-               {/* Background Elements */}
-               <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl" />
-               <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/10 rounded-full -ml-20 -mb-20 blur-3xl" />
-               
-               <Quote className="absolute top-6 left-6 w-12 h-12 text-white/10 rotate-180" />
-               
-               <div className="relative z-10 w-full flex flex-col h-full justify-between items-center">
+          <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6 flex flex-col items-center gap-6 scrollbar-hide">
+            {/* O CARD VISUAL (INSTAGRAM SQUARE) - DYNAMIC SCALING */}
+            <div className="w-full flex justify-center py-2 shrink-0">
+              <div 
+                ref={shareCardRef}
+                className="w-[min(85vw,400px)] aspect-square bg-primary relative overflow-hidden rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl flex flex-col items-center p-6 sm:p-10 text-center"
+                style={{ background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' }}
+              >
+                 {/* Background Elements */}
+                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
+                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full -ml-16 -mb-16 blur-2xl" />
                  
-                 {selectedTestimonialForShare?.videoUrl ? (
-                   <div className="w-full flex flex-col items-center gap-4 mt-2">
-                      <div className="w-full aspect-video rounded-2xl overflow-hidden bg-black/20 relative border border-white/20 shadow-lg">
-                        <video 
-                          key={selectedTestimonialForShare?.id}
-                          src={selectedTestimonialForShare.videoUrl} 
-                          className="w-full h-full object-cover opacity-95"
-                          muted
-                          autoPlay
-                          loop
-                          playsInline
-                          crossOrigin="anonymous"
-                          preload="auto"
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                           <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center">
-                              <Play className="w-6 h-6 text-white fill-white" />
-                           </div>
+                 <Quote className="absolute top-4 left-4 sm:top-6 sm:left-6 w-8 h-8 sm:w-12 sm:h-12 text-white/10 rotate-180" />
+                 
+                 <div className="relative z-10 w-full flex flex-col h-full justify-between items-center">
+                   
+                   {selectedTestimonialForShare?.videoUrl ? (
+                     <div className="w-full flex flex-col items-center gap-3 sm:gap-4 mt-1 sm:mt-2">
+                        <div className="w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black/20 relative border border-white/20 shadow-lg">
+                          <video 
+                            key={selectedTestimonialForShare?.id}
+                            src={selectedTestimonialForShare.videoUrl} 
+                            className="w-full h-full object-cover opacity-95"
+                            muted
+                            autoPlay
+                            loop
+                            playsInline
+                            crossOrigin="anonymous"
+                            preload="auto"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center">
+                                <Play className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white" />
+                             </div>
+                          </div>
+                          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white/10 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/10">
+                            <p className="text-[6px] sm:text-[7px] text-white font-black uppercase tracking-widest flex items-center gap-1">
+                              <Video className="w-2 sm:w-2.5 h-2 sm:h-2.5" /> Depoimento em Vídeo
+                            </p>
+                          </div>
                         </div>
-                        <div className="absolute top-3 left-3 bg-white/10 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/10">
-                          <p className="text-[7px] text-white font-black uppercase tracking-widest flex items-center gap-1">
-                            <Video className="w-2.5 h-2.5" /> Depoimento em Vídeo
+                        
+                        <div className="space-y-1.5 sm:space-y-2">
+                          <div className="flex justify-center gap-0.5 sm:gap-1">
+                            {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
+                              <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 fill-white text-white drop-shadow-sm" />
+                            ))}
+                          </div>
+                          <p className="text-white text-[11px] sm:text-sm font-bold leading-tight italic line-clamp-3 px-1">
+                             "{selectedTestimonialForShare?.text !== '(Depoimento em Vídeo)' ? selectedTestimonialForShare?.text : 'Feedback incrível deste cliente!'}"
                           </p>
                         </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex justify-center gap-1">
-                          {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                            <Star key={i} className="w-4 h-4 fill-white text-white drop-shadow-sm" />
-                          ))}
-                        </div>
-                        <p className="text-white text-sm font-bold leading-tight italic line-clamp-3 px-2">
-                           "{selectedTestimonialForShare?.text !== '(Depoimento em Vídeo)' ? selectedTestimonialForShare?.text : 'Feedback incrível deste cliente!'}"
-                        </p>
-                      </div>
-                   </div>
-                 ) : (
-                   <div className="flex-1 flex flex-col justify-center items-center space-y-6">
-                     <div className="flex justify-center gap-1.5">
-                        {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                          <Star key={i} className="w-5 h-5 fill-white text-white drop-shadow-sm" />
-                        ))}
                      </div>
-                     
-                     <p className="text-white text-lg font-bold leading-tight line-clamp-6 italic drop-shadow-md">
-                        "{selectedTestimonialForShare?.text}"
-                     </p>
-                   </div>
-                 )}
+                   ) : (
+                     <div className="flex-1 flex flex-col justify-center items-center space-y-4 sm:space-y-6">
+                       <div className="flex justify-center gap-1 sm:gap-1.5">
+                          {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
+                            <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 fill-white text-white drop-shadow-sm" />
+                          ))}
+                       </div>
+                       
+                       <p className="text-white text-sm sm:text-lg font-bold leading-snug sm:leading-tight line-clamp-6 italic drop-shadow-md px-2">
+                          "{selectedTestimonialForShare?.text}"
+                       </p>
+                     </div>
+                   )}
 
-                 <div className="w-full pt-4">
-                    <div className="space-y-1 mb-4">
-                      <p className="text-white font-black text-sm uppercase tracking-widest">
-                        {selectedTestimonialForShare?.userName}
-                      </p>
-                      <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 inline-block">
-                         <p className="text-[8px] text-white font-black uppercase tracking-[0.2em]">
-                           Avaliado via Proova
-                         </p>
-                      </div>
-                    </div>
-
-                    <div className="w-full flex justify-between items-center opacity-60">
-                        <span className="text-[7px] text-white font-black uppercase tracking-widest">{userData?.companyName}</span>
-                        <div className="h-3 w-12 relative">
-                          <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Proova" fill className="object-contain" />
+                   <div className="w-full pt-3 sm:pt-4">
+                      <div className="space-y-1 mb-3 sm:mb-4">
+                        <p className="text-white font-black text-[11px] sm:text-sm uppercase tracking-widest truncate max-w-full">
+                          {selectedTestimonialForShare?.userName}
+                        </p>
+                        <div className="bg-white/10 backdrop-blur-md px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border border-white/20 inline-block">
+                           <p className="text-[7px] sm:text-[8px] text-white font-black uppercase tracking-[0.2em]">
+                             Avaliado via Proova
+                           </p>
                         </div>
-                    </div>
+                      </div>
+
+                      <div className="w-full flex justify-between items-center opacity-60">
+                          <span className="text-[6px] sm:text-[7px] text-white font-black uppercase tracking-widest truncate max-w-[120px]">{userData?.companyName}</span>
+                          <div className="h-2.5 sm:h-3 w-10 sm:w-12 relative">
+                            <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Proova" fill className="object-contain" />
+                          </div>
+                      </div>
+                   </div>
                  </div>
-               </div>
+              </div>
             </div>
 
             <Button 
-              className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-xl gap-2 transition-all active:scale-95"
+              className="w-full h-12 sm:h-14 rounded-2xl font-black uppercase tracking-widest shadow-xl gap-2 transition-all active:scale-95 text-xs shrink-0"
               onClick={handleDownloadContent}
               disabled={isExportingCard}
             >
-              {isExportingCard ? <Loader2 className="animate-spin" /> : <Download className="w-5 h-5" />}
+              {isExportingCard ? <Loader2 className="animate-spin" /> : <Download className="w-4 h-4 sm:w-5 sm:h-5" />}
               {selectedTestimonialForShare?.videoUrl ? 'Baixar Vídeo MP4' : 'Baixar PNG em Alta'}
             </Button>
           </div>
           
-          <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center">
-            <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest">
-              Dica: Use nas redes sociais para provar autoridade 24h por dia
+          <DialogFooter className="p-4 sm:p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
+            <p className="text-[8px] sm:text-[9px] font-black uppercase text-muted-foreground tracking-widest">
+              Dica: Use nos redes sociais para provar autoridade 24h por dia
             </p>
           </DialogFooter>
         </DialogContent>
