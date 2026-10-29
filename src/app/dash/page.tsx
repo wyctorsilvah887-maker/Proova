@@ -134,7 +134,8 @@ export default function DashPage() {
   const [isGoogleMapsDialogOpen, setIsGoogleMapsDialogOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [isPublicPageChoiceOpen, setIsPublicPageChoiceOpen] = useState(false);
-  const [configMode, setConfigMode] = useState<'location' | 'maps'>('location');
+  const [isCollectLinkChoiceOpen, setIsCollectLinkChoiceOpen] = useState(false);
+  const [configMode, setConfigMode] = useState<'location' | 'maps' | 'business'>('location');
   
   const [newGoogleMapsUrl, setNewGoogleMapsUrl] = useState('');
   const [isUpdatingUrl, setIsUpdatingUrl] = useState(false);
@@ -149,12 +150,14 @@ export default function DashPage() {
   const shareCardRef = useRef<HTMLDivElement>(null);
   const dialogVideoRef = useRef<HTMLVideoElement>(null);
 
-  // Estados para Busca de Local
+  // Estados para Busca de Local e Identidade
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearchingPlaces, setIsSearchingPlaces] = useState(false);
+  const [companyNameEdit, setCompanyNameEdit] = useState('');
+  const [companySlugEdit, setCompanySlugEdit] = useState('');
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
@@ -169,11 +172,11 @@ export default function DashPage() {
     return status === 'enterprise';
   }, [userData]);
 
-  const widgetsQuery = useMemo(() => {
+  const widgetsListQuery = useMemo(() => {
     if (!db || !user) return null;
     return collection(db, 'users', user.uid, 'widgets');
   }, [db, user]);
-  const { data: widgetsList } = useCollection(widgetsQuery);
+  const { data: widgetsList } = useCollection(widgetsListQuery);
 
   const announcementsQuery = useMemo(() => {
     if (!db) return null;
@@ -258,10 +261,10 @@ export default function DashPage() {
         setIsGoogleMapsDialogOpen(true);
       } 
     };
-    const s2 = { id: 'collect', label: 'Coleta Ativa', completed: (userData?.testimonialsCount || 0) > 0, unlocked: s1.completed, action: () => copyToClipboard(`${baseUrl}/c/${userData?.companySlug}`, "Link de coleta") };
+    const s2 = { id: 'collect', label: 'Coleta Ativa', completed: (userData?.testimonialsCount || 0) > 0, unlocked: s1.completed, action: () => setIsCollectLinkChoiceOpen(true) };
     const s3 = { id: 'widget', label: 'Primeiro Mural', completed: !!(widgetsList && widgetsList.length > 0), unlocked: s2.completed, action: () => router.push('/widgets') };
     return [s0, s1, s2, s3];
-  }, [userData, widgetsList, baseUrl, router]);
+  }, [userData, widgetsList, router]);
 
   const completedStepsCount = setupSteps.filter(s => s.completed).length;
   const progressPercentage = (completedStepsCount / setupSteps.length) * 100;
@@ -378,12 +381,31 @@ export default function DashPage() {
     }
   };
 
+  const handleUpdateBusinessInfo = async () => {
+    if (!db || !user || !companyNameEdit || !companySlugEdit) return;
+    setIsUpdatingUrl(true);
+    try {
+      await updateDoc(doc(db, 'users', user.uid), { 
+        companyName: companyNameEdit.trim(), 
+        companySlug: companySlugEdit.trim().toLowerCase().replace(/\s+/g, '-') 
+      });
+      toast({ title: "Identidade Atualizada", description: "Seu link de coleta foi modificado." });
+      setIsGoogleMapsDialogOpen(false);
+    } catch (err) {
+      toast({ variant: "destructive", title: "Erro ao salvar identidade" });
+    } finally {
+      setIsUpdatingUrl(false);
+    }
+  };
+
   useEffect(() => {
     if (isGoogleMapsDialogOpen && userData) {
       setCity(userData.city || '');
       setState(userData.state || '');
       setSearchQuery('');
       setSearchResults([]);
+      setCompanyNameEdit(userData.companyName || '');
+      setCompanySlugEdit(userData.companySlug || '');
     }
   }, [isGoogleMapsDialogOpen, userData]);
 
@@ -555,12 +577,6 @@ export default function DashPage() {
 
   const collectionLink = `${baseUrl}/c/${userData?.companySlug}`;
 
-  const setupProgressLocker = (id: string) => {
-    const step = setupSteps.find(s => s.id === id);
-    if (!step?.completed) return "opacity-50 grayscale cursor-not-allowed";
-    return "rounded-xl cursor-pointer font-bold py-2.5";
-  };
-
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
       {currentAnnouncement && !isAnnouncementDismissed && (
@@ -610,7 +626,7 @@ export default function DashPage() {
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => isCollectDone && router.push('/widgets')} 
-                className={cn(setupProgressLocker('collect'))}
+                className={cn("rounded-xl cursor-pointer font-bold py-2.5", !isCollectDone && "opacity-50 grayscale cursor-not-allowed")}
               >
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Murais</span>
@@ -618,7 +634,7 @@ export default function DashPage() {
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => isSetupComplete && router.push('/private')} 
-                className={cn(setupProgressLocker('widget'))}
+                className={cn("rounded-xl cursor-pointer font-bold py-2.5", !isSetupComplete && "opacity-50 grayscale cursor-not-allowed")}
               >
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>
@@ -799,7 +815,7 @@ export default function DashPage() {
         <section className="space-y-3">
           <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Ações Rápidas</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <Button variant="outline" disabled={!isGoogleDone} onClick={() => copyToClipboard(collectionLink, "Link de coleta")} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
+            <Button variant="outline" onClick={() => setIsCollectLinkChoiceOpen(true)} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
               <Link2 className="w-5 h-5 text-primary" />
               <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">1: Copiar Link</span>
             </Button>
@@ -949,6 +965,52 @@ export default function DashPage() {
         </div>
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
+
+      {/* COLLECT LINK CHOICE DIALOG */}
+      <Dialog open={isCollectLinkChoiceOpen} onOpenChange={setIsCollectLinkChoiceOpen}>
+        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background">
+          <DialogHeader className="p-8 pb-4 text-center shrink-0">
+            <DialogTitle className="text-2xl font-black font-headline tracking-tight uppercase">Link de Coleta</DialogTitle>
+            <DialogDescription className="text-sm">Gerencie como você captura novos elogios.</DialogDescription>
+          </DialogHeader>
+
+          <div className="px-8 pb-8 space-y-4">
+            <Button 
+              className="w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 bg-primary hover:bg-primary/90 shadow-xl transition-all active:scale-95 group"
+              onClick={() => {
+                copyToClipboard(collectionLink, "Link de coleta");
+                setIsCollectLinkChoiceOpen(false);
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <Copy className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                <span className="text-lg font-black uppercase tracking-tight">Copiar Link Agora</span>
+              </div>
+              <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Pronto para enviar aos clientes</span>
+            </Button>
+
+            <Button 
+              variant="outline"
+              className="w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 border-primary/20 text-primary hover:bg-primary/5 transition-all active:scale-95 group"
+              onClick={() => {
+                setConfigMode('business');
+                setIsGoogleMapsDialogOpen(true);
+                setIsCollectLinkChoiceOpen(false);
+              }}
+            >
+              <div className="flex items-center gap-2">
+                <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
+                <span className="text-lg font-black uppercase tracking-tight">Personalizar Identidade</span>
+              </div>
+              <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Ajustar Nome e Slug da URL</span>
+            </Button>
+          </div>
+
+          <DialogFooter className="p-4 bg-muted/30 border-t text-center flex justify-center">
+            <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-60">Dica: Um link curto e amigável converte 40% mais.</p>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* PUBLIC PAGE CHOICE DIALOG */}
       <Dialog open={isPublicPageChoiceOpen} onOpenChange={setIsPublicPageChoiceOpen}>
@@ -1159,10 +1221,11 @@ export default function DashPage() {
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-6 pb-2 pt-10 shrink-0 bg-background">
             <DialogTitle className="text-2xl font-black font-headline flex items-center gap-2">
-              <MapPinned className="w-6 h-6 text-primary" /> {configMode === 'location' ? 'Localização' : 'Perfil Comercial'}
+              {configMode === 'business' ? <Fingerprint className="w-6 h-6 text-primary" /> : <MapPinned className="w-6 h-6 text-primary" />} 
+              {configMode === 'location' ? 'Localização' : (configMode === 'business' ? 'Identidade de Marca' : 'Perfil Comercial')}
             </DialogTitle>
             <DialogDescription>
-              {configMode === 'location' ? 'Defina a cidade onde seu negócio opera.' : 'Conecte sua empresa ao Google Business.'}
+              {configMode === 'location' ? 'Defina a cidade onde seu negócio opera.' : (configMode === 'business' ? 'Personalize o nome e o link da sua página.' : 'Conecte sua empresa ao Google Business.')}
             </DialogDescription>
           </DialogHeader>
 
@@ -1197,6 +1260,42 @@ export default function DashPage() {
                 >
                   {isUpdatingUrl ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="w-4 h-4" />}
                   Confirmar e Salvar
+                </Button>
+              </section>
+            )}
+
+            {configMode === 'business' && (
+              <section className="space-y-4 pt-2 animate-in fade-in zoom-in duration-300">
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] font-black uppercase opacity-60 ml-1">Nome da Empresa</Label>
+                    <Input 
+                      placeholder="Ex: Minha Empresa" 
+                      value={companyNameEdit} 
+                      onChange={(e) => setCompanyNameEdit(e.target.value)} 
+                      className="h-11 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs font-bold"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-[9px] font-black uppercase opacity-60 ml-1">Slug do Link (URL Personalizada)</Label>
+                    <div className="flex items-center gap-1 bg-muted/20 rounded-xl px-3 border border-transparent focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                      <span className="text-[10px] font-bold opacity-40">/c/</span>
+                      <input 
+                        placeholder="nome-da-sua-empresa"
+                        value={companySlugEdit} 
+                        onChange={(e) => setCompanySlugEdit(e.target.value.toLowerCase().replace(/\s+/g, '-'))} 
+                        className="h-11 flex-1 bg-transparent border-none focus:ring-0 text-xs font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <Button 
+                  onClick={handleUpdateBusinessInfo} 
+                  disabled={!companyNameEdit || !companySlugEdit || isUpdatingUrl}
+                  className="w-full h-12 rounded-xl font-bold text-sm shadow-md gap-2"
+                >
+                  {isUpdatingUrl ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="w-4 h-4" />}
+                  Salvar Nova Identidade
                 </Button>
               </section>
             )}
