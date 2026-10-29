@@ -823,7 +823,12 @@ export default function DashPage() {
         <section className="space-y-3">
           <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Ações Rápidas</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <Button variant="outline" onClick={() => setIsCollectLinkChoiceOpen(true)} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
+            <Button 
+              variant="outline" 
+              disabled={!isGoogleDone}
+              onClick={() => setIsCollectLinkChoiceOpen(true)} 
+              className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm"
+            >
               <Link2 className="w-5 h-5 text-primary" />
               <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Link de Coleta</span>
             </Button>
