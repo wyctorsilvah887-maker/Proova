@@ -572,7 +572,11 @@ export default function DashPage() {
   };
 
   if (authLoading || userDataLoading || (user && !userData)) {
-    return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-10 w-10 text-primary mx-auto" /></div>;
+    return (
+      <div className="flex h-screen items-center justify-center bg-muted/30">
+        <Loader2 className="animate-spin h-10 w-10 text-primary mx-auto" />
+      </div>
+    );
   }
 
   const collectionLink = `${baseUrl}/c/${userData?.companySlug}`;
@@ -936,7 +940,9 @@ export default function DashPage() {
                       </div>
                       <div className="flex gap-0.5">{Array.from({ length: t.rating || 5 }).map((_, i) => <Star key={i} className="w-2.5 h-2.5 fill-primary text-primary" />)}</div>
                     </div>
-                    <p className="text-[10px] md:text-xs text-foreground italic line-clamp-2">"{t.text}"</p>
+                    {t.text && t.text !== '(Depoimento em Vídeo)' && (
+                      <p className="text-[10px] md:text-xs text-foreground italic line-clamp-2">"{t.text}"</p>
+                    )}
                     <div className="flex items-center gap-4 text-[8px] md:text-[10px] text-muted-foreground font-medium pt-1">
                        <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Hoje'}</span>
                     </div>
@@ -1118,7 +1124,9 @@ export default function DashPage() {
                             ))}
                           </div>
                           <p className="text-white text-[11px] sm:text-sm font-bold leading-tight italic line-clamp-3 px-1">
-                             "{selectedTestimonialForShare?.text !== '(Depoimento em Vídeo)' ? selectedTestimonialForShare?.text : 'Feedback incrível deste cliente!'}"
+                             {selectedTestimonialForShare?.text && selectedTestimonialForShare?.text !== '(Depoimento em Vídeo)' 
+                               ? `"${selectedTestimonialForShare.text}"` 
+                               : '"Feedback incrível deste cliente!"'}
                           </p>
                         </div>
                      </div>

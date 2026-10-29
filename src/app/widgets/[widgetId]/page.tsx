@@ -137,7 +137,9 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
             <Star key={i} className="fill-primary text-primary w-3 h-3" style={{ color: themeColor, fill: themeColor }} />
           ))}
         </div>
-        <p className="text-foreground/80 italic leading-relaxed text-xs line-clamp-4">"{t.text}"</p>
+        {t.text && t.text !== '(Depoimento em Vídeo)' && (
+          <p className="text-foreground/80 italic leading-relaxed text-xs line-clamp-4">"{t.text}"</p>
+        )}
       </div>
     </Card>
   );
@@ -889,8 +891,6 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
                     size="icon" 
                     className="h-8 w-8 rounded-lg"
                     onClick={() => copyToClipboard(publicPageLink, "Link da Página Pública")}
-                  >
-                    <Copy className="h-4 w-4" />
                   </Button>
                   <Button 
                     variant="outline" 
@@ -1050,7 +1050,9 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
                               </div>
                               <div className="flex-1 min-w-0">
                                 <span className="font-bold text-[11px] block truncate">{t.userName}</span>
-                                <p className="text-[10px] text-muted-foreground italic line-clamp-2 mt-1">"{t.text}"</p>
+                                {t.text && t.text !== '(Depoimento em Vídeo)' && (
+                                  <p className="text-[10px] text-muted-foreground italic line-clamp-2 mt-1">"{t.text}"</p>
+                                )}
                               </div>
                             </div>
                             {isDisabled && (

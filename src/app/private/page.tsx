@@ -321,7 +321,9 @@ export default function PrivateInboxPage() {
                           </div>
                           <div className="flex gap-0.5">{Array.from({ length: 5 }).map((_, i) => (<Star key={i} className={cn("w-3.5 h-3.5", i < (t.rating || 5) ? "fill-primary text-primary" : "text-muted-foreground/20")} />))}</div>
                         </div>
-                        <div className="bg-muted/30 p-4 rounded-2xl border-l-4 border-primary italic text-sm leading-relaxed">"{t.text}"</div>
+                        {t.text && t.text !== '(Depoimento em Vídeo)' && (
+                          <div className="bg-muted/30 p-4 rounded-2xl border-l-4 border-primary italic text-sm leading-relaxed">"{t.text}"</div>
+                        )}
                         <div className="flex items-center gap-4 text-[10px] text-muted-foreground font-bold uppercase tracking-widest"><span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleString('pt-BR') : 'Hoje'}</span></div>
                       </div>
                       <div className="flex md:flex-col items-center justify-end gap-2 shrink-0">
@@ -374,7 +376,9 @@ export default function PrivateInboxPage() {
                         </div>
                         <div className="flex gap-0.5">{Array.from({ length: 5 }).map((_, i) => (<Star key={i} className={cn("w-3.5 h-3.5", i < f.rating ? "fill-orange-400 text-orange-400" : "text-muted-foreground/20")} />))}</div>
                       </div>
-                      <div className="bg-muted/30 p-4 rounded-2xl border-l-4 border-orange-400/30 italic text-sm leading-relaxed">"{f.text}"</div>
+                      {f.text && f.text !== '(Depoimento em Vídeo)' && (
+                        <div className="bg-muted/30 p-4 rounded-2xl border-l-4 border-orange-400/30 italic text-sm leading-relaxed">"{f.text}"</div>
+                      )}
                       <div className="flex items-center gap-4 text-[10px] text-muted-foreground font-bold uppercase tracking-widest"><span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {f.createdAt?.toDate ? f.createdAt.toDate().toLocaleString('pt-BR') : 'Agora'}</span></div>
                     </div>
                     <div className="flex md:flex-col items-center justify-end gap-2 shrink-0">

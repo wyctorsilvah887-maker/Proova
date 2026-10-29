@@ -316,7 +316,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
       userName,
       userEmail,
       rating,
-      text: text.trim() || "(Depoimento em Vídeo)",
+      text: text.trim(),
       videoUrl: finalVideoUrl
     });
 

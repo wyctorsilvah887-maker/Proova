@@ -253,7 +253,9 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
               <Star key={i} className="w-3 h-3 fill-current" style={{ color: themeColor }} />
             ))}
           </div>
-          <p className="text-foreground/80 italic text-sm leading-relaxed">"{t.text}"</p>
+          {t.text && t.text !== '(Depoimento em Vídeo)' && (
+            <p className="text-foreground/80 italic text-sm leading-relaxed">"{t.text}"</p>
+          )}
         </div>
       </Card>
     );

@@ -111,7 +111,9 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
             <Star key={i} className="fill-primary text-primary w-2.5 h-2.5" style={{ color: themeColor, fill: themeColor }} />
           ))}
         </div>
-        <p className="italic text-[10px] line-clamp-3 text-foreground/80">"{t.text}"</p>
+        {t.text && t.text !== '(Depoimento em Vídeo)' && (
+          <p className="italic text-[10px] line-clamp-3 text-foreground/80">"{t.text}"</p>
+        )}
       </div>
     </Card>
   );
@@ -627,7 +629,9 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
                               </div>
                               <div className="flex-1 min-w-0">
                                 <span className="font-bold text-[11px] block truncate">{t.userName}</span>
-                                <p className="text-[10px] text-muted-foreground italic line-clamp-1 mt-1">"{t.text}"</p>
+                                {t.text && t.text !== '(Depoimento em Vídeo)' && (
+                                  <p className="text-[10px] text-muted-foreground italic line-clamp-1 mt-1">"{t.text}"</p>
+                                )}
                               </div>
                             </div>
                             {isDisabled && (
