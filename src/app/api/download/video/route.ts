@@ -2,13 +2,12 @@
 import { NextResponse } from 'next/server';
 
 /**
- * Route Handler para processar downloads de vídeo contornando CORS.
- * Recebe a URL e o nome do arquivo via query params e retorna um stream de download.
+ * Route Handler para processar downloads e visualização de vídeo contornando CORS.
+ * Atua como um proxy para permitir que o Canvas grave o vídeo sem erros de segurança.
  */
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const videoUrl = searchParams.get('url');
-  const fileName = searchParams.get('name') || 'proova-video.mp4';
 
   if (!videoUrl) {
     return new NextResponse('URL do vídeo é obrigatória', { status: 400 });
@@ -26,11 +25,11 @@ export async function GET(request: Request) {
     return new NextResponse(videoBuffer, {
       headers: {
         'Content-Type': 'video/mp4',
-        'Content-Disposition': `attachment; filename="${fileName}"`,
+        'Cache-Control': 'public, max-age=3600',
       },
     });
   } catch (error: any) {
-    console.error('Erro no proxy de download:', error);
-    return new NextResponse('Erro ao processar download', { status: 500 });
+    console.error('Erro no proxy de vídeo:', error);
+    return new NextResponse('Erro ao processar vídeo', { status: 500 });
   }
 }

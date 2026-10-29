@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -70,7 +71,8 @@ import {
   MapPinned,
   Handshake,
   Play,
-  Video
+  Video,
+  VideoIcon
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -409,7 +411,7 @@ export default function DashPage() {
 
   /**
    * FUNÇÃO AVANÇADA: Renderiza o Card de Social com o Vídeo dentro e exporta como MP4.
-   * Utiliza Canvas API para compor a moldura e capturar o stream de vídeo.
+   * Utiliza o Proxy Interno para evitar Tainted Canvas.
    */
   const handleDownloadComposedVideo = async () => {
     if (!selectedTestimonialForShare || !dialogVideoRef.current || !shareCardRef.current) return;
@@ -421,32 +423,28 @@ export default function DashPage() {
       const videoEl = dialogVideoRef.current;
       const cardEl = shareCardRef.current;
       
-      // Criar canvas para renderização da composição
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error("Falha ao iniciar motor gráfico");
 
-      // Definir tamanho do vídeo (Quadrado 720p para redes sociais)
       const size = 720;
       canvas.width = size;
       canvas.height = size;
 
-      // Iniciar MediaRecorder para capturar o Canvas
-      const stream = canvas.captureStream(30); // 30 FPS
+      const stream = canvas.captureStream(30);
       
-      // Adicionar trilha de áudio do vídeo original
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const source = audioCtx.createMediaElementSource(videoEl);
       const destination = audioCtx.createMediaStreamDestination();
       source.connect(destination);
-      source.connect(audioCtx.destination); // Manter áudio para o usuário ouvir enquanto processa
+      source.connect(audioCtx.destination);
       
       destination.stream.getAudioTracks().forEach(track => stream.addTrack(track));
 
       const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9,opus' });
       const chunks: Blob[] = [];
       
-      recorder.onanyavailable = (e: any) => chunks.push(e.data);
+      recorder.ondataavailable = (e: any) => chunks.push(e.data);
       recorder.onstop = () => {
         const blob = new Blob(chunks, { type: 'video/webm' });
         const url = URL.createObjectURL(blob);
@@ -458,15 +456,15 @@ export default function DashPage() {
         toast({ title: "Vídeo Gerado!", description: "Seu depoimento com moldura está pronto." });
       };
 
-      // Resetar vídeo e iniciar gravação
       videoEl.currentTime = 0;
-      videoEl.muted = false; // Precisamos do som na gravação
+      videoEl.muted = false;
       
-      // Capturar imagem do card (sem o vídeo) para usar como fundo/moldura
-      // Usamos um filtro para que o html-to-image não tente processar o vídeo, evitando Tainted Canvas
       const cardImage = await toPng(cardEl, { 
         pixelRatio: 2,
-        filter: (node) => (node as HTMLElement).tagName !== 'VIDEO' && (node as HTMLElement).id !== 'video-overlay-badge'
+        filter: (node) => {
+          const el = node as HTMLElement;
+          return el.tagName !== 'VIDEO' && el.id !== 'video-overlay-badge';
+        }
       });
       
       const frameImg = new (window as any).Image();
@@ -475,25 +473,20 @@ export default function DashPage() {
 
       recorder.start();
 
-      // Loop de renderização frame a frame
       const renderLoop = () => {
         if (videoEl.paused || videoEl.ended) {
-          recorder.stop();
+          if (recorder.state === 'recording') recorder.stop();
           return;
         }
 
-        // 1. Desenhar a moldura estática (fundo, textos, estrelas)
         ctx.drawImage(frameImg, 0, 0, size, size);
 
-        // 2. Desenhar o frame atual do vídeo na posição correta da moldura
-        // Calculamos a posição baseada no layout do card
-        const vWidth = size * 0.85; // Aproximadamente o tamanho da moldura no card
+        const vWidth = size * 0.85;
         const vHeight = vWidth * (9/16);
         const vX = (size - vWidth) / 2;
-        const vY = size * 0.18; // Posição vertical aproximada
+        const vY = size * 0.18;
 
         ctx.save();
-        // Arredondar cantos do vídeo na gravação
         ctx.beginPath();
         const radius = 24;
         ctx.moveTo(vX + radius, vY);
@@ -513,10 +506,9 @@ export default function DashPage() {
       videoEl.play();
       renderLoop();
 
-      // Parar após 15 segundos ou se o vídeo acabar
       setTimeout(() => {
         if (recorder.state === 'recording') recorder.stop();
-      }, 15000);
+      }, 16000);
 
     } catch (err) {
       console.error("Erro na gravação composta:", err);
@@ -949,7 +941,7 @@ export default function DashPage() {
                         <div className="w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black/40 relative border border-white/20 shadow-lg">
                           <video 
                             ref={dialogVideoRef}
-                            src={selectedTestimonialForShare.videoUrl} 
+                            src={`/api/download/video?url=${encodeURIComponent(selectedTestimonialForShare.videoUrl)}`} 
                             className="w-full h-full object-cover"
                             style={{ width: '100%', height: '100%' }}
                             muted
@@ -957,7 +949,6 @@ export default function DashPage() {
                             loop
                             playsInline
                             preload="auto"
-                            crossOrigin="anonymous"
                           />
                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center">
