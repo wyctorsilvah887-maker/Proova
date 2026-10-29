@@ -81,7 +81,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/accordion";
+} from "@/components/ui/accordion";
 import { Slider } from '@/components/ui/slider';
 import Cropper from 'react-easy-crop';
 import { 
@@ -984,7 +984,7 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
                       ))
                     )
                   ) : (
-                    <div className="col-span-full py-20 text-center opacity-30 italic text-sm">Selecione depoimentos para o preview.</div>
+                    <div className="col-span-full py-20 text-center opacity-30 italic text-sm">Selecione depoimentos para the preview.</div>
                   )}
                 </div>
 
