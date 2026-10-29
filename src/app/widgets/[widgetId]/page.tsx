@@ -209,10 +209,10 @@ const PublicPageSettings = ({
   return (
     <div className="flex flex-col w-full h-full overflow-hidden bg-background">
       <div className="p-4 border-b bg-muted/10 shrink-0 space-y-4">
-        <Link href="/widgets" className="w-full">
+        <Link href="/dash" className="w-full">
           <Button variant="ghost" className="w-full justify-start gap-3 h-10 px-2 group">
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-xs font-black uppercase tracking-[0.2em]">Voltar</span>
+            <span className="text-xs font-black uppercase tracking-[0.2em]">Voltar ao Dash</span>
           </Button>
         </Link>
         <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 font-bold gap-2 text-sm">
@@ -499,7 +499,7 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </Tabs>
+      </div>
     </div>
   );
 };
@@ -867,10 +867,10 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
           <div className="max-w-none mx-auto space-y-8 pb-20">
             
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <Link href="/widgets" className="inline-block group">
+              <Link href="/dash" className="inline-block group">
                 <Button variant="ghost" className="gap-2 px-0 hover:bg-transparent text-muted-foreground hover:text-primary transition-colors">
                   <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Voltar para a Lista</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest">Voltar ao Dash</span>
                 </Button>
               </Link>
               
