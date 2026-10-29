@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo } from 'react';
@@ -26,7 +25,8 @@ import {
   Loader2,
   Box,
   Handshake,
-  Video
+  Video,
+  Lock
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useUser, useAuth, useFirestore, useDoc } from '@/firebase';
@@ -208,9 +208,13 @@ export default function PricingPage() {
                   <Gem className="mr-2 h-4 w-4" />
                   <span>Planos de Upgrade</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <DropdownMenuItem 
+                  onClick={() => router.push('/pricing')} 
+                  className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
+                >
                   <Handshake className="mr-2 h-4 w-4 text-primary" />
                   <span>Serviços de Parceiros</span>
+                  <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
                 </DropdownMenuItem>
                 
                 <DropdownMenuSeparator className="mx-1" />
