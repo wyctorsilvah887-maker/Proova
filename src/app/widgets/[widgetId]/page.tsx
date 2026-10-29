@@ -467,11 +467,6 @@ const PublicPageSettings = ({
                     );
                   })}
                 </div>
-                {!isGoldPlan && (
-                  <p className="text-[10px] text-primary font-bold text-center bg-primary/5 p-2 rounded-lg border border-primary/10">
-                    🚀 Layouts premium liberados no Período Trial e Gold
-                  </p>
-                )}
               </div>
             </TabsContent>
 
@@ -489,19 +484,10 @@ const PublicPageSettings = ({
                 <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">URL do Site Oficial</Label>
                 <Input value={externalSiteUrl} onChange={(e) => setExternalSiteUrl(e.target.value)} placeholder="https://seusite.com.br" />
               </div>
-              <div className="space-y-3 pt-4 border-t opacity-60">
-                <div className="flex items-center gap-2 mb-2">
-                  <MapPin className="w-3 h-3 text-primary" />
-                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Google Maps</Label>
-                </div>
-                <div className="bg-muted/30 p-3 rounded-lg border border-dashed text-[10px] text-muted-foreground">
-                  O link do Google Maps é global e deve ser configurado diretamente no <strong>Dashboard Principal</strong> para refletir em todas as suas páginas.
-                </div>
-              </div>
             </TabsContent>
           </div>
         </ScrollArea>
-      </div>
+      </Tabs>
     </div>
   );
 };
@@ -750,8 +736,6 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
     onFileSelect, isUploading, handleSave, isSaving, isEnterprise, isGoldPlan
   };
 
-  const membershipLabel = isEnterprise ? 'Membro Enterprise' : (isGold ? 'Membro Gold' : (isTrial ? 'Período Trial' : 'Plano Base'));
-
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body w-full overflow-hidden text-foreground">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
@@ -797,7 +781,7 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
                     "text-[8px] uppercase tracking-widest font-black leading-tight",
                     isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground"
                   )}>
-                    {membershipLabel}
+                    {membershipStatus === 'enterprise' ? 'Membro Enterprise' : (membershipStatus === 'gold' ? 'Membro Gold' : (membershipStatus === 'trial' ? 'Período Trial' : 'Plano Base'))}
                   </span>
                 </div>
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
@@ -853,16 +837,12 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
                 onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
                 className="rounded-xl cursor-pointer font-bold py-2.5"
               >
-                {theme === 'light' ? (
-                  <Moon className="mr-2 h-4 w-4 text-primary" />
-                ) : (
-                  <Sun className="mr-2 h-4 w-4 text-primary" />
-                )}
+                {theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}
                 <span>Alternar Tema</span>
               </DropdownMenuItem>
 
               <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-bold py-2.5">
+              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5">
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Sair</span>
               </DropdownMenuItem>
