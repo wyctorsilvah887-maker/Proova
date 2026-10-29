@@ -738,7 +738,7 @@ export default function DashPage() {
               <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Painel de Controle</h1>
               <div className="flex items-center gap-2">
                 <Button variant="ghost" size="sm" onClick={() => setIsTutorialOpen(true)} className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5">
-                  <Info className="w-3.5 h-3.5" /> Tutorial
+                  <span className="flex items-center gap-1.5"><Info className="w-3.5 h-3.5" /> Tutorial</span>
                 </Button>
                 <Button 
                   variant="ghost" 
@@ -780,7 +780,7 @@ export default function DashPage() {
                   )}
                 >
                   {isSendingReport ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <Mail className="w-2.5 h-2.5" />} 
-                  {!isPremiumUser && <Lock className="w-2 e-2" />} 
+                  {!isPremiumUser && <Lock className="w-2.5 h-2.5" />} 
                   Enviar Relatório
                 </button>
               </div>
@@ -795,11 +795,31 @@ export default function DashPage() {
 
         <section className="space-y-3">
           <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Ações Rápidas</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Button variant="outline" disabled={!isGoogleDone} onClick={() => copyToClipboard(collectionLink, "Link de coleta")} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all"><Link2 className="w-5 h-5 text-primary" /><span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Copiar Link</span></Button>
-            <Button variant="outline" disabled={!isGoogleDone} onClick={() => setIsQrDialogOpenManual(true)} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all"><QrCode className="w-5 h-5 text-primary" /><span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Ver Cartaz</span></Button>
-            <Button variant="outline" disabled={!isCollectDone} onClick={() => router.push('/widgets')} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all"><Layout className="w-5 h-5 text-primary" /><span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Meus Murais</span></Button>
-            <Button variant="outline" disabled={!isSetupComplete} onClick={() => router.push('/private')} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all relative">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {/* 1: Copiar Link */}
+            <Button variant="outline" disabled={!isGoogleDone} onClick={() => copyToClipboard(collectionLink, "Link de coleta")} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
+              <Link2 className="w-5 h-5 text-primary" />
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Copiar Link</span>
+            </Button>
+
+            {/* 2: Ver Página Pública */}
+            <Button 
+              variant="outline" 
+              disabled={!widgetsList || widgetsList.length === 0} 
+              onClick={() => {
+                const firstWidget = widgetsList?.[0];
+                if (firstWidget) {
+                  window.open(`${baseUrl}/pp/${userData?.companySlug}/${firstWidget.id}`, '_blank');
+                }
+              }} 
+              className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm"
+            >
+              <Globe className="w-5 h-5 text-primary" />
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Ver Página Pública</span>
+            </Button>
+
+            {/* 3: Ver Inbox */}
+            <Button variant="outline" disabled={!isSetupComplete} onClick={() => router.push('/private')} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all relative shadow-sm">
               <Inbox className="w-5 h-5 text-primary" />
               {pendingTestimonialsCount > 0 && (
                 <span className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white shadow-lg animate-in zoom-in duration-300">
@@ -808,10 +828,33 @@ export default function DashPage() {
               )}
               <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Ver Inbox</span>
             </Button>
+
+            {/* 4: Gerar Cards */}
+            <Button 
+              variant="outline" 
+              disabled={approvedTestimonials.length === 0}
+              onClick={() => document.getElementById('testimonials-section')?.scrollIntoView({ behavior: 'smooth' })} 
+              className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm"
+            >
+              <Share2 className="w-5 h-5 text-primary" />
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Social Cards</span>
+            </Button>
+
+            {/* 5: Meus murais */}
+            <Button variant="outline" disabled={!isCollectDone} onClick={() => router.push('/widgets')} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
+              <Layout className="w-5 h-5 text-primary" />
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Meus Murais</span>
+            </Button>
+
+            {/* 6: Ver QR Code */}
+            <Button variant="outline" disabled={!isGoogleDone} onClick={() => setIsQrDialogOpenManual(true)} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
+              <QrCode className="w-5 h-5 text-primary" />
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">QR de Balcão</span>
+            </Button>
           </div>
         </section>
 
-        <section className="space-y-4">
+        <section id="testimonials-section" className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-primary" />
@@ -1182,7 +1225,7 @@ export default function DashPage() {
                 <section className="space-y-3 pt-4 border-t opacity-60">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-                    <h4 className="text-[10px] font-black uppercase tracking-widest">Como funciona o G-Boost?</h4>
+                    h4 className="text-[10px] font-black uppercase tracking-widest">Como funciona o G-Boost?</h4>
                   </div>
                   <p className="text-[10px] text-muted-foreground leading-relaxed">
                     O Proova detecta elogios 5 estrelas e redireciona o cliente para este local no Google. Isso sobe sua posição nas buscas e atrai novos clientes organicamente.
