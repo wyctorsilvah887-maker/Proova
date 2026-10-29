@@ -102,7 +102,6 @@ export default function WidgetsPage() {
     );
   }, [widgetsList, searchTerm]);
 
-  // Lógica de Onboarding simplificada para bloqueio de menu
   const setupProgress = useMemo(() => {
     if (!userData) return { isCollectDone: false, isSetupComplete: false };
     const isLocationDone = !!userData.city && !!userData.state;
@@ -167,9 +166,9 @@ export default function WidgetsPage() {
       setIsCreateDialogOpen(false);
       toast({
         title: "Mural Criado!",
-        description: "Configurando sua página pública...",
+        description: "Configurando seu novo mural embutido...",
       });
-      router.push(`/widgets/${slug}`);
+      router.push(`/widgetconfig/${slug}`);
       
     } catch (error: any) {
       console.error("Erro ao criar widget:", error);
@@ -186,7 +185,7 @@ export default function WidgetsPage() {
     if (!db || !user) return;
     const widgetRef = doc(db, 'users', user.uid, 'widgets', widgetId);
     deleteDoc(widgetRef).then(() => {
-      toast({ title: "Widget Removido", description: "O widget foi excluído com sucesso." });
+      toast({ title: "Mural Removido", description: "O mural foi excluído com sucesso." });
     });
   };
 
@@ -254,7 +253,7 @@ export default function WidgetsPage() {
                 )}
               >
                 <Layout className="mr-2 h-4 w-4 text-primary" />
-                <span>Meus Widgets</span>
+                <span>Meus Murais</span>
                 {!setupProgress.isCollectDone && <Lock className="ml-auto w-3 h-3 opacity-60" />}
               </DropdownMenuItem>
               <DropdownMenuItem 
@@ -308,7 +307,7 @@ export default function WidgetsPage() {
                   <Info className="w-3 h-3" /> Tutorial
                 </Button>
               </div>
-              <p className="text-sm text-muted-foreground">Gerencie e publique suas provas sociais</p>
+              <p className="text-sm text-muted-foreground">Gerencie e publique murais de depoimentos no seu site</p>
             </div>
           </div>
           <Button onClick={() => setIsCreateDialogOpen(true)} className="w-full sm:w-auto h-12 rounded-xl shadow-lg font-bold gap-2 text-sm" size="lg">
@@ -367,24 +366,17 @@ export default function WidgetsPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    <Button 
-                      className="h-14 sm:h-12 rounded-xl text-xs font-black uppercase tracking-widest gap-2 bg-background border border-primary/20 text-primary hover:bg-primary/5 shadow-sm justify-between px-4"
-                      onClick={() => router.push(`/widgets/${w.id}`)}
-                    >
-                      <span className="flex items-center gap-2"><Monitor className="w-4 h-4" /> Página Pública</span>
-                      <ChevronRight className="w-3.5 h-3.5 opacity-30" />
-                    </Button>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Button 
                       className="h-14 sm:h-12 rounded-xl text-xs font-black uppercase tracking-widest gap-2 bg-background border border-primary/20 text-primary hover:bg-primary/5 shadow-sm justify-between px-4"
                       onClick={() => router.push(`/widgetconfig/${w.id}`)}
                     >
-                      <span className="flex items-center gap-2"><Settings2 className="w-4 h-4" /> Mural Embutido</span>
+                      <span className="flex items-center gap-2"><Settings2 className="w-4 h-4" /> Configurar Mural</span>
                       <ChevronRight className="w-3.5 h-3.5 opacity-30" />
                     </Button>
                     <Button 
                       variant="secondary"
-                      className="h-14 sm:h-12 rounded-xl text-xs font-black uppercase tracking-widest gap-2 bg-muted/50 hover:bg-muted shadow-sm justify-between px-4 sm:col-span-2 lg:col-span-1"
+                      className="h-14 sm:h-12 rounded-xl text-xs font-black uppercase tracking-widest gap-2 bg-muted/50 hover:bg-muted shadow-sm justify-between px-4"
                       onClick={() => { setSelectedWidget(w); setIsDialogOpen(true); }}
                     >
                       <span className="flex items-center gap-2"><Code className="w-4 h-4" /> Obter Código</span>
@@ -399,7 +391,7 @@ export default function WidgetsPage() {
               <Layout className="w-12 h-12 text-muted-foreground/20 mx-auto" />
               <div className="space-y-1">
                 <p className="font-bold text-lg">Nenhum mural criado</p>
-                <p className="text-sm text-muted-foreground">Comece criando seu primeiro mural de depoimentos.</p>
+                <p className="text-sm text-muted-foreground">Comece criando seu primeiro mural de depoimentos para o seu site.</p>
               </div>
               <Button onClick={() => setIsCreateDialogOpen(true)} variant="outline" className="rounded-xl font-bold mt-4 h-12 px-8">
                 Criar Agora
@@ -421,7 +413,7 @@ export default function WidgetsPage() {
         <DialogContent className="rounded-3xl">
           <DialogHeader>
             <DialogTitle>Código de Instalação</DialogTitle>
-            <DialogDescription>Copie e cole este script no seu site.</DialogDescription>
+            <DialogDescription>Copie e cole este script no seu site para exibir o mural.</DialogDescription>
           </DialogHeader>
           <div className="py-4">
              <div className="relative bg-muted/50 rounded-xl p-4 border group">
@@ -438,11 +430,11 @@ export default function WidgetsPage() {
         <DialogContent className="rounded-3xl">
           <DialogHeader>
             <DialogTitle>Novo Mural de Depoimentos</DialogTitle>
-            <DialogDescription>Dê um nome para organizar sua prova social.</DialogDescription>
+            <DialogDescription>Dê um nome para organizar sua prova social no site.</DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreateWidget} className="space-y-4">
-            <Input placeholder="Ex: Mural Site Principal" value={newWidgetName} onChange={(e) => setNewWidgetName(e.target.value)} required />
-            <Button className="w-full h-12 font-bold" disabled={isCreating}>{isCreating ? <Loader2 className="animate-spin" /> : "Criar e Customizar"}</Button>
+            <Input placeholder="Ex: Mural Home Page" value={newWidgetName} onChange={(e) => setNewWidgetName(e.target.value)} required />
+            <Button className="w-full h-12 font-bold" disabled={isCreating}>{isCreating ? <Loader2 className="animate-spin" /> : "Criar e Configurar"}</Button>
           </form>
         </DialogContent>
       </Dialog>
