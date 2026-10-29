@@ -408,10 +408,6 @@ export default function DashPage() {
     } catch (e: any) { toast({ variant: "destructive", title: "Erro", description: e.message }); } finally { setIsSendingReport(false); }
   };
 
-  /**
-   * FUNÇÃO AVANÇADA: Renderiza o Card de Social com o Vídeo dentro e exporta como MP4.
-   * Utiliza o Proxy Interno para evitar Tainted Canvas.
-   */
   const handleDownloadComposedVideo = async () => {
     if (!selectedTestimonialForShare || !dialogVideoRef.current || !shareCardRef.current) return;
 
@@ -784,7 +780,7 @@ export default function DashPage() {
                   )}
                 >
                   {isSendingReport ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <Mail className="w-2.5 h-2.5" />} 
-                  {!isPremiumUser && <Lock className="w-2 h-2" />} 
+                  {!isPremiumUser && <Lock className="w-2 e-2" />} 
                   Enviar Relatório
                 </button>
               </div>
@@ -1064,7 +1060,7 @@ export default function DashPage() {
               </div>
               <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><BarChart3 className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1"><p className="text-sm font-bold">Resumos e Filtros</p><p className="text-xs text-muted-foreground leading-relaxed">Filtre seus resultados por períodos (7d, 30d ou Total) para entender o ritmo de crescimento da sua prova social.</p></div>
+                <div className="min-w-0 flex-1"><p className="text-sm font-bold">Analytics Avançado</p><p className="text-xs text-muted-foreground leading-relaxed">Clique no card de Resumo para abrir o painel detalhado. Analise o fluxo de coleta e o índice de satisfação em tempo real.</p></div>
               </div>
               <div className="flex gap-4 group">
                 <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Zap className="w-5 h-5" /></div>
