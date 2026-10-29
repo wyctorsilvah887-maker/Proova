@@ -20,7 +20,9 @@ import {
   MousePointer2,
   Calendar,
   MessageSquare,
-  ChevronDown
+  ChevronDown,
+  Mail,
+  Lock
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -58,6 +60,8 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from '@/hooks/use-toast';
+import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
 
 export default function MetricsPage() {
   const { user, loading: authLoading } = useUser();
@@ -67,9 +71,15 @@ export default function MetricsPage() {
   const { theme, setTheme } = useTheme();
   
   const [period, setPeriod] = useState<'7' | '30' | 'all'>('7');
+  const [isSendingReport, setIsSendingReport] = useState(false);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
+
+  const isPremiumUser = useMemo(() => {
+    const status = userData?.membershipStatus;
+    return status === 'gold' || status === 'enterprise' || status === 'trial';
+  }, [userData]);
 
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
@@ -85,6 +95,30 @@ export default function MetricsPage() {
   useEffect(() => {
     if (!authLoading && !user) router.replace('/login');
   }, [user, authLoading, router]);
+
+  const handleSendWeeklyReport = async () => {
+    if (!user) return;
+    if (!isPremiumUser) {
+      router.push('/pricing');
+      return;
+    }
+    setIsSendingReport(true);
+    try {
+      const result = await sendWeeklyPerformanceReport(user.uid);
+      if (result.success) {
+        toast({ 
+          title: "Relatório Enviado!", 
+          description: "Os dados de performance foram enviados para o seu e-mail." 
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (e: any) { 
+      toast({ variant: "destructive", title: "Erro", description: e.message }); 
+    } finally { 
+      setIsSendingReport(false); 
+    }
+  };
 
   const stats = useMemo(() => {
     if (!testimonials) return { 
@@ -268,17 +302,31 @@ export default function MetricsPage() {
             </div>
           </div>
 
-          <div className="w-full sm:w-48">
-            <Select value={period} onValueChange={(val: any) => setPeriod(val)}>
-              <SelectTrigger className="h-11 rounded-xl bg-background border-primary/20 text-[11px] font-bold uppercase tracking-wider focus:ring-primary/20">
-                <SelectValue placeholder="Período" />
-              </SelectTrigger>
-              <SelectContent align="end" className="rounded-xl">
-                <SelectItem value="7" className="text-xs font-medium">Últimos 7 dias</SelectItem>
-                <SelectItem value="30" className="text-xs font-medium">Últimos 30 dias</SelectItem>
-                <SelectItem value="all" className="text-xs font-medium">Todo o período</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="flex flex-col items-end gap-3 w-full sm:w-auto">
+            <div className="w-full sm:w-48">
+              <Select value={period} onValueChange={(val: any) => setPeriod(val)}>
+                <SelectTrigger className="h-11 rounded-xl bg-background border-primary/20 text-[11px] font-bold uppercase tracking-wider focus:ring-primary/20">
+                  <SelectValue placeholder="Período" />
+                </SelectTrigger>
+                <SelectContent align="end" className="rounded-xl">
+                  <SelectItem value="7" className="text-xs font-medium">Últimos 7 dias</SelectItem>
+                  <SelectItem value="30" className="text-xs font-medium">Últimos 30 dias</SelectItem>
+                  <SelectItem value="all" className="text-xs font-medium">Todo o período</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <button 
+              onClick={handleSendWeeklyReport} 
+              disabled={isSendingReport} 
+              className={cn(
+                "text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:underline disabled:opacity-50 transition-all",
+                isPremiumUser ? "text-primary" : "text-muted-foreground opacity-50"
+              )}
+            >
+              {isSendingReport ? <Loader2 className="w-3 h-3 animate-spin" /> : <Mail className="w-3 h-3" />} 
+              {!isPremiumUser && <Lock className="w-2.5 h-2.5" />} 
+              Disparar Relatório Completo por E-mail
+            </button>
           </div>
         </header>
 
