@@ -751,12 +751,18 @@ export default function DashPage() {
         </header>
 
         <div className="grid gap-4 md:gap-6 grid-cols-1 md:grid-cols-2">
-          <Card className="border-none shadow-sm overflow-hidden rounded-2xl p-4 md:p-6 space-y-4">
+          <Card 
+            className="border-none shadow-sm overflow-hidden rounded-2xl p-4 md:p-6 space-y-4 cursor-pointer hover:shadow-md transition-all active:scale-[0.98]"
+            onClick={() => router.push('/metrics')}
+          >
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <CardTitle className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Resumo {period !== 'all' ? `(${period}d)` : ''}</CardTitle>
                 <button 
-                  onClick={handleSendWeeklyReport} 
+                  onClick={(e) => {
+                    e.stopPropagation(); // Evita navegar para métricas ao clicar no botão de relatório
+                    handleSendWeeklyReport();
+                  }} 
                   disabled={isSendingReport} 
                   className={cn(
                     "text-[9px] font-black uppercase tracking-widest flex items-center gap-1 hover:underline disabled:opacity-50",
