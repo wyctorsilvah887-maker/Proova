@@ -997,18 +997,31 @@ export default function DashPage() {
 
             <Button 
               variant="outline"
-              className="w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 border-primary/20 text-primary hover:bg-primary/5 transition-all active:scale-95 group"
+              className={cn(
+                "w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 border-primary/20 text-primary hover:bg-primary/5 transition-all active:scale-95 group relative",
+                !isPremiumUser && "opacity-80"
+              )}
               onClick={() => {
+                if (!isPremiumUser) {
+                  router.push('/pricing');
+                  return;
+                }
                 setConfigMode('business');
                 setIsGoogleMapsDialogOpen(true);
                 setIsCollectLinkChoiceOpen(false);
               }}
             >
               <div className="flex items-center gap-2">
-                <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
+                {isPremiumUser ? (
+                  <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
+                ) : (
+                  <Lock className="w-5 h-5 text-muted-foreground" />
+                )}
                 <span className="text-lg font-black uppercase tracking-tight">Personalizar Identidade</span>
               </div>
-              <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Ajustar Nome e Slug da URL</span>
+              <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">
+                {isPremiumUser ? 'Ajustar Nome e Slug da URL' : 'Recurso Exclusivo Gold/Enterprise'}
+              </span>
             </Button>
           </div>
 
