@@ -808,8 +808,13 @@ export default function DashPage() {
             {/* 2: Ver Página Pública (COM DIÁLOGO DE ESCOLHA) */}
             <Button 
               variant="outline" 
-              disabled={!widgetsList || widgetsList.length === 0} 
-              onClick={() => setIsPublicPageChoiceOpen(true)} 
+              onClick={() => {
+                if (!widgetsList || widgetsList.length === 0) {
+                  toast({ title: "Mural Necessário", description: "Crie seu primeiro mural para ver a página pública." });
+                  return;
+                }
+                setIsPublicPageChoiceOpen(true);
+              }} 
               className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm"
             >
               <Globe className="w-5 h-5 text-primary" />
@@ -976,7 +981,8 @@ export default function DashPage() {
               onClick={() => {
                 const firstWidget = widgetsList?.[0];
                 if (firstWidget) {
-                  window.open(`${baseUrl}/pp/${userData?.companySlug}/${firstWidget.id}`, '_blank');
+                  const slug = userData?.companySlug || userData?.companyName?.toLowerCase().replace(/\s+/g, '-') || '';
+                  window.open(`${baseUrl}/pp/${slug}/${firstWidget.id}`, '_blank');
                   setIsPublicPageChoiceOpen(false);
                 }
               }}
