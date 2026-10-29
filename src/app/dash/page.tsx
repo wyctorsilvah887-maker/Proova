@@ -426,7 +426,7 @@ export default function DashPage() {
       canvas.width = size;
       canvas.height = size;
 
-      const stream = canvas.captureStream(30);
+      const stream = (canvas as any).captureStream(30);
       
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const source = audioCtx.createMediaElementSource(videoEl);
@@ -1225,7 +1225,7 @@ export default function DashPage() {
                 <section className="space-y-3 pt-4 border-t opacity-60">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-                    h4 className="text-[10px] font-black uppercase tracking-widest">Como funciona o G-Boost?</h4>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest">Como funciona o G-Boost?</h4>
                   </div>
                   <p className="text-[10px] text-muted-foreground leading-relaxed">
                     O Proova detecta elogios 5 estrelas e redireciona o cliente para este local no Google. Isso sobe sua posição nas buscas e atrai novos clientes organicamente.
