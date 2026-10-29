@@ -455,14 +455,17 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
     <div className="h-screen flex flex-col font-body w-full overflow-hidden bg-background shrink-0">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95 shrink-0">
         <div className="flex items-center gap-3 flex-1">
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className={cn("text-primary hover:bg-primary/5 transition-all h-12 w-12 flex items-center justify-center rounded-xl", isSidebarOpen && "bg-primary/10")}
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 group transition-all text-primary hover:text-primary/80"
+            )}
           >
-            <Monitor className="h-8 w-8" />
-          </Button>
+            <div className={cn("h-10 w-10 flex items-center justify-center rounded-xl transition-all", isSidebarOpen ? "bg-primary/10" : "bg-transparent group-hover:bg-primary/5")}>
+              <Monitor className="h-6 w-6" />
+            </div>
+            <span className="text-[8px] font-black uppercase tracking-widest leading-none">EDITAR</span>
+          </button>
 
           <div className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
@@ -473,6 +476,15 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
+          <Button 
+            onClick={handleSave} 
+            disabled={isSaving} 
+            className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground transition-all active:scale-95"
+          >
+            {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
+            Salvar Alterações
+          </Button>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">

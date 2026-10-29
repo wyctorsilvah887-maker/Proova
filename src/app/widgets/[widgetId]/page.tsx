@@ -217,7 +217,7 @@ const PublicPageSettings = ({
             <span className="text-xs font-black uppercase tracking-[0.2em]">Voltar ao Dash</span>
           </Button>
         </Link>
-        <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 font-bold gap-2 text-sm">
+        <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground">
           {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
           Salvar Alterações
         </Button>
@@ -487,8 +487,7 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </Tabs>
-    </div>
+      </div>
   );
 };
 
@@ -770,6 +769,15 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
+          <Button 
+            onClick={handleSave} 
+            disabled={isSaving || isUploading} 
+            className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground transition-all active:scale-95"
+          >
+            {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
+            Salvar Alterações
+          </Button>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
