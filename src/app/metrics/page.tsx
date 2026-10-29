@@ -48,8 +48,7 @@ import {
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell,
-  Label as RechartsLabel
+  Cell
 } from 'recharts';
 import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebase';
 import { doc, collection, query, where, orderBy } from 'firebase/firestore';
@@ -105,11 +104,9 @@ export default function MetricsPage() {
       return period === 'all' || date >= cutoff;
     });
 
-    // Média de Estrelas
     const sum = filtered.reduce((acc, t: any) => acc + (t.rating || 0), 0);
     const avg = filtered.length > 0 ? (sum / filtered.length).toFixed(1) : "0.0";
 
-    // Dados para Gráfico de Barras (Volume por Dia)
     const lastNDays = Array.from({ length: days }, (_, i) => {
       const d = new Date();
       d.setDate(d.getDate() - (days - 1 - i));
@@ -125,9 +122,8 @@ export default function MetricsPage() {
     const chartData = lastNDays.map(date => ({
       date,
       count: dayCounts[date] || 0
-    })).slice(-(period === '7' ? 7 : 14)); // Mostra os últimos 7 ou 14 no gráfico para não poluir
+    })).slice(-(period === '7' ? 7 : 14));
 
-    // Dados para Gráfico de Pizza (Distribuição de Notas)
     const ratings = filtered.reduce((acc: any, t: any) => {
       const r = t.rating || 5;
       acc[r] = (acc[r] || 0) + 1;
@@ -224,10 +220,6 @@ export default function MetricsPage() {
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Upgrade</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Handshake className="mr-2 h-4 w-4 text-primary" />
-                <span>Parceiros</span>
-              </DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 {theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}
@@ -244,16 +236,20 @@ export default function MetricsPage() {
       </header>
 
       <main className="flex-1 p-4 md:p-8 space-y-8 max-w-7xl mx-auto w-full">
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <Link href="/dash">
-              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 text-muted-foreground hover:text-primary transition-colors">
-                <ArrowLeft className="w-5 h-5" />
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex flex-col gap-4">
+            <Link href="/dash" className="inline-block group">
+              <Button variant="ghost" size="sm" className="gap-2 px-0 text-muted-foreground hover:text-primary transition-colors h-8">
+                <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+                <span className="text-[10px] font-black uppercase tracking-widest">Voltar ao Painel</span>
               </Button>
             </Link>
             <div className="space-y-1">
-              <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight flex items-center gap-2">
-                <BarChart3 className="w-8 h-8 text-primary" /> Proova Analytics
+              <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                  <BarChart3 className="w-6 h-6" />
+                </div>
+                Proova Analytics
               </h1>
               <p className="text-xs md:text-sm text-muted-foreground font-medium">O ROI da sua confiança em números reais.</p>
             </div>
@@ -322,7 +318,6 @@ export default function MetricsPage() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-          {/* Gráfico de Volume de Depoimentos */}
           <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden bg-background p-6 md:p-8">
             <CardHeader className="p-0 mb-8">
               <div className="flex items-center gap-3 mb-2">
@@ -356,7 +351,6 @@ export default function MetricsPage() {
             </CardContent>
           </Card>
 
-          {/* Gráfico de Distribuição de Notas */}
           <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden bg-background p-6 md:p-8">
             <CardHeader className="p-0 mb-8">
               <div className="flex items-center gap-3 mb-2">
