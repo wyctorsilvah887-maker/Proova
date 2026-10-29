@@ -755,9 +755,16 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
         <div className="flex items-center gap-3 flex-1">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/5 transition-all h-12 w-12 flex items-center justify-center">
-                <Monitor className="h-8 w-8" />
-              </Button>
+              <button 
+                className={cn(
+                  "flex flex-col items-center justify-center gap-1 group transition-all text-primary hover:text-primary/80"
+                )}
+              >
+                <div className="h-10 w-10 flex items-center justify-center rounded-xl transition-all bg-transparent group-hover:bg-primary/5">
+                  <Monitor className="h-6 w-6" />
+                </div>
+                <span className="text-[8px] font-black uppercase tracking-widest leading-none">Editar</span>
+              </button>
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-80 border-none">
               <SheetHeader className="sr-only">
