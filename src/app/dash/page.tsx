@@ -143,6 +143,7 @@ export default function DashPage() {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isExportingCard, setIsExportingCard] = useState(false);
   const shareCardRef = useRef<HTMLDivElement>(null);
+  const dialogVideoRef = useRef<HTMLVideoElement>(null);
 
   // Estados para Busca de Local
   const [city, setCity] = useState('');
@@ -225,6 +226,13 @@ export default function DashPage() {
   useEffect(() => {
     if (!authLoading && !user) router.replace('/login');
   }, [user, authLoading, router]);
+
+  // Efeito para garantir que o vídeo carregue no diálogo de Social Card
+  useEffect(() => {
+    if (isShareDialogOpen && selectedTestimonialForShare?.videoUrl && dialogVideoRef.current) {
+      dialogVideoRef.current.load();
+    }
+  }, [isShareDialogOpen, selectedTestimonialForShare]);
 
   const setupSteps = useMemo(() => {
     const s0 = { 
@@ -425,7 +433,7 @@ export default function DashPage() {
         if (!shareCardRef.current) return;
         const dataUrl = await toPng(shareCardRef.current, { 
           quality: 1.0, 
-          pixelRatio: 3, // Qualidade 4K
+          pixelRatio: 3, 
           backgroundColor: '#f97316'
         });
         const link = document.createElement('a');
@@ -548,7 +556,6 @@ export default function DashPage() {
       </header>
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden">
-        {/* CHECKLIST DE MISSÕES (ONBOARDING) */}
         {!isSetupComplete && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="flex items-center justify-between">
@@ -813,7 +820,7 @@ export default function DashPage() {
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
 
-      {/* SHARE DIALOG (SOCIAL CARDS) - OPTIMIZED FOR MOBILE */}
+      {/* SHARE DIALOG (SOCIAL CARDS) */}
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[96vh] flex flex-col">
           <DialogHeader className="p-6 sm:p-8 pb-2 text-center shrink-0">
@@ -822,14 +829,12 @@ export default function DashPage() {
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6 flex flex-col items-center gap-6 scrollbar-hide">
-            {/* O CARD VISUAL (INSTAGRAM SQUARE) - DYNAMIC SCALING */}
             <div className="w-full flex justify-center py-2 shrink-0">
               <div 
                 ref={shareCardRef}
                 className="w-[min(85vw,400px)] aspect-square bg-primary relative overflow-hidden rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl flex flex-col items-center p-6 sm:p-10 text-center"
                 style={{ background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' }}
               >
-                 {/* Background Elements */}
                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full -ml-16 -mb-16 blur-2xl" />
                  
@@ -839,16 +844,16 @@ export default function DashPage() {
                    
                    {selectedTestimonialForShare?.videoUrl ? (
                      <div className="w-full flex flex-col items-center gap-3 sm:gap-4 mt-1 sm:mt-2">
-                        <div className="w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black/20 relative border border-white/20 shadow-lg">
+                        <div className="w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black/40 relative border border-white/20 shadow-lg">
                           <video 
-                            key={selectedTestimonialForShare?.id}
+                            ref={dialogVideoRef}
                             src={selectedTestimonialForShare.videoUrl} 
-                            className="w-full h-full object-cover opacity-95"
+                            className="w-full h-full object-cover"
+                            style={{ width: '100%', height: '100%' }}
                             muted
                             autoPlay
                             loop
                             playsInline
-                            crossOrigin="anonymous"
                             preload="auto"
                           />
                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -984,7 +989,6 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
       
-      {/* DIALOGO DE CONFIGURAÇÃO DE BUSINESS (Maps + Location) */}
       <Dialog open={isGoogleMapsDialogOpen} onOpenChange={setIsGoogleMapsDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-6 pb-2 pt-10 shrink-0 bg-background">
@@ -997,8 +1001,6 @@ export default function DashPage() {
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6 scrollbar-hide">
-            
-            {/* TELA 1: LOCALIZAÇÃO */}
             {configMode === 'location' && (
               <section className="space-y-4 pt-2 animate-in fade-in zoom-in duration-300">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1033,7 +1035,6 @@ export default function DashPage() {
               </section>
             )}
 
-            {/* TELA 2: BUSCA NO GOOGLE */}
             {configMode === 'maps' && (
               <section className="space-y-4 pt-2 animate-in fade-in zoom-in duration-300">
                 <div className="space-y-2">
@@ -1058,7 +1059,6 @@ export default function DashPage() {
                   </div>
                 </div>
 
-                {/* RESULTADOS DA BUSCA */}
                 <div className="space-y-2">
                   {searchResults.map((place) => (
                     <Card 
