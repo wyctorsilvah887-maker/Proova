@@ -610,7 +610,7 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
     return `${baseUrl}/pp/${slug}/${widgetId}`;
   }, [baseUrl, userData, widgetId]);
 
-  const copyToClipboard = (text: string, description: string) => {
+  const copyToClipboard = (text: string, description: string = "Link da Página Pública") => {
     navigator.clipboard.writeText(text);
     toast({
       title: "Copiado!",
@@ -891,6 +891,8 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
                     size="icon" 
                     className="h-8 w-8 rounded-lg"
                     onClick={() => copyToClipboard(publicPageLink, "Link da Página Pública")}
+                  >
+                    <Copy className="h-4 w-4" />
                   </Button>
                   <Button 
                     variant="outline" 
