@@ -324,6 +324,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   
   const SELECTION_LIMIT = isEnterprise ? Infinity : ((isGold || isTrial) ? 50 : 10);
   const isGoldPlan = isGold || isTrial || isEnterprise;
+  const isPremiumUser = isGoldPlan;
 
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
@@ -512,9 +513,19 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Planos de Upgrade</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
+              <DropdownMenuItem 
+                onClick={() => {
+                  if (!isPremiumUser) {
+                    router.push('/pricing');
+                    return;
+                  }
+                  router.push('/partners');
+                }} 
+                className={cn("rounded-xl cursor-pointer font-bold py-2.5", !isPremiumUser && "opacity-70")}
+              >
                 <Handshake className="mr-2 h-4 w-4 text-primary" />
                 <span>Serviços de Parceiros</span>
+                {!isPremiumUser && <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />}
               </DropdownMenuItem>
               
               {userData?.isAdmin && (
