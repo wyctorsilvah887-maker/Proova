@@ -799,29 +799,20 @@ export default function DashPage() {
         <section className="space-y-3">
           <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Ações Rápidas</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {/* 1: Copiar Link */}
             <Button variant="outline" disabled={!isGoogleDone} onClick={() => copyToClipboard(collectionLink, "Link de coleta")} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
               <Link2 className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Copiar Link</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">1: Copiar Link</span>
             </Button>
 
-            {/* 2: Ver Página Pública (COM DIÁLOGO DE ESCOLHA) */}
             <Button 
               variant="outline" 
-              onClick={() => {
-                if (!widgetsList || widgetsList.length === 0) {
-                  toast({ title: "Mural Necessário", description: "Crie seu primeiro mural para ver a página pública." });
-                  return;
-                }
-                setIsPublicPageChoiceOpen(true);
-              }} 
+              onClick={() => setIsPublicPageChoiceOpen(true)} 
               className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm"
             >
               <Globe className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Ver Página Pública</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">2: Ver Página Pública</span>
             </Button>
 
-            {/* 3: Ver Inbox */}
             <Button variant="outline" disabled={!isSetupComplete} onClick={() => router.push('/private')} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all relative shadow-sm">
               <Inbox className="w-5 h-5 text-primary" />
               {pendingTestimonialsCount > 0 && (
@@ -829,10 +820,9 @@ export default function DashPage() {
                   {pendingTestimonialsCount}
                 </span>
               )}
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Ver Inbox</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">3: Ver Inbox</span>
             </Button>
 
-            {/* 4: Gerar Cards */}
             <Button 
               variant="outline" 
               disabled={approvedTestimonials.length === 0}
@@ -840,19 +830,17 @@ export default function DashPage() {
               className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm"
             >
               <Share2 className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Social Cards</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">4: Gerar Social Cards</span>
             </Button>
 
-            {/* 5: Meus murais */}
             <Button variant="outline" disabled={!isCollectDone} onClick={() => router.push('/widgets')} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
               <Layout className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Meus Murais</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">5: Meus Murais</span>
             </Button>
 
-            {/* 6: Ver QR Code */}
             <Button variant="outline" disabled={!isGoogleDone} onClick={() => setIsQrDialogOpenManual(true)} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
               <QrCode className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">QR de Balcão</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">6: QR de Balcão</span>
             </Button>
           </div>
         </section>
@@ -984,6 +972,8 @@ export default function DashPage() {
                   const slug = userData?.companySlug || userData?.companyName?.toLowerCase().replace(/\s+/g, '-') || '';
                   window.open(`${baseUrl}/pp/${slug}/${firstWidget.id}`, '_blank');
                   setIsPublicPageChoiceOpen(false);
+                } else {
+                  toast({ title: "Mural Necessário", description: "Crie seu primeiro mural para visualizar." });
                 }
               }}
             >
@@ -998,11 +988,8 @@ export default function DashPage() {
               variant="outline"
               className="w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 border-primary/20 text-primary hover:bg-primary/5 transition-all active:scale-95 group"
               onClick={() => {
-                const firstWidget = widgetsList?.[0];
-                if (firstWidget) {
-                  router.push(`/widgets/${firstWidget.id}`);
-                  setIsPublicPageChoiceOpen(false);
-                }
+                router.push('/ppeditor');
+                setIsPublicPageChoiceOpen(false);
               }}
             >
               <div className="flex items-center gap-2">
@@ -1308,3 +1295,4 @@ export default function DashPage() {
     </div>
   );
 }
+
