@@ -209,7 +209,7 @@ export default function ManualPage() {
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
                   <div className="bg-blue-500/10 p-3 rounded-2xl text-blue-600"><Layout className="w-8 h-8" /></div>
-                  <h2 className="text-2xl md:text-4xl font-black font-headline tracking-tight">Elite Widgets</h2>
+                  <h2 className="text-2xl md:text-4xl font-black font-headline tracking-tight">Página de Conversão</h2>
                 </div>
                 <p className="text-muted-foreground text-base md:text-xl leading-relaxed font-medium">
                   Sua Landing Page não vende apenas pelo texto, mas pela <span className="text-foreground font-bold">pressão social</span> dos murais.
