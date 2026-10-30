@@ -161,6 +161,8 @@ export default function SignupPage() {
                     <SelectItem value="restaurante">Restaurante/ Lanchonete</SelectItem>
                     <SelectItem value="oficina">Oficina/ Serviços automotivos</SelectItem>
                     <SelectItem value="petshop">Pet shop</SelectItem>
+                    <SelectItem value="agencia">Agência (Marketing/ Publicidade)</SelectItem>
+                    <SelectItem value="servicos_digitais">Prestador de Serviços Digitais/ Freelancer</SelectItem>
                     <SelectItem value="outros">Outros</SelectItem>
                   </SelectContent>
                 </Select>
