@@ -78,7 +78,7 @@ export default function ManualPage() {
               <Target className="w-4 h-4" /> Pilares Principais
             </TabsTrigger>
             <TabsTrigger value="geral" className="rounded-xl gap-2 font-black text-xs uppercase tracking-widest transition-all data-[state=active]:shadow-lg">
-              <BookOpen className="w-4 h-4" /> Manual Detalhado
+              <BookOpen className="w-4 h-4" /> Manual do Usuário
             </TabsTrigger>
           </TabsList>
 
@@ -116,7 +116,7 @@ export default function ManualPage() {
               <div className="relative group">
                 <div className="absolute -inset-2 bg-primary/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
                 <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
-                  {manualImages.gboost?.imageUrl ? (
+                  {manualImages.gboost?.imageUrl && (
                     <Image 
                       src={manualImages.gboost.imageUrl} 
                       alt="Guia G-Boost" 
@@ -124,8 +124,6 @@ export default function ManualPage() {
                       className="object-cover" 
                       data-ai-hint="google maps boost tutorial interface"
                     />
-                  ) : (
-                    <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground italic text-xs">Aguardando Imagem...</div>
                   )}
                   {/* SIMULATED RED CIRCLE OVERLAY */}
                   <div className="absolute top-[60%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-20 h-20 border-4 border-red-600 rounded-full animate-pulse flex items-center justify-center">
@@ -168,7 +166,7 @@ export default function ManualPage() {
               <div className="lg:order-1 relative group">
                 <div className="absolute -inset-2 bg-orange-500/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
                 <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
-                  {manualImages.shield?.imageUrl ? (
+                  {manualImages.shield?.imageUrl && (
                     <Image 
                       src={manualImages.shield.imageUrl} 
                       alt="Guia Shield" 
@@ -176,8 +174,6 @@ export default function ManualPage() {
                       className="object-cover" 
                       data-ai-hint="private inbox customer feedback interface"
                     />
-                  ) : (
-                    <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground italic text-xs">Aguardando Imagem...</div>
                   )}
                   <div className="absolute top-[30%] left-[20%] w-24 h-24 border-4 border-red-600 rounded-full animate-pulse" />
                 </div>
@@ -217,7 +213,7 @@ export default function ManualPage() {
               <div className="relative group">
                 <div className="absolute -inset-2 bg-blue-500/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
                 <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
-                  {manualImages.widgets?.imageUrl ? (
+                  {manualImages.widgets?.imageUrl && (
                     <Image 
                       src={manualImages.widgets.imageUrl} 
                       alt="Guia Widgets" 
@@ -225,8 +221,6 @@ export default function ManualPage() {
                       className="object-cover" 
                       data-ai-hint="website widget testimonials layout interface"
                     />
-                  ) : (
-                    <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground italic text-xs">Aguardando Imagem...</div>
                   )}
                   <div className="absolute bottom-[20%] right-[30%] w-28 h-12 border-4 border-red-600 rounded-2xl animate-pulse" />
                 </div>
@@ -266,7 +260,7 @@ export default function ManualPage() {
               <div className="lg:order-1 relative group">
                 <div className="absolute -inset-2 bg-purple-500/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
                 <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
-                  {manualImages.social?.imageUrl ? (
+                  {manualImages.social?.imageUrl && (
                     <Image 
                       src={manualImages.social.imageUrl} 
                       alt="Guia Social" 
@@ -274,8 +268,6 @@ export default function ManualPage() {
                       className="object-cover" 
                       data-ai-hint="instagram story card generator interface"
                     />
-                  ) : (
-                    <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground italic text-xs">Aguardando Imagem...</div>
                   )}
                   <div className="absolute top-[45%] left-[65%] w-16 h-16 border-4 border-red-600 rounded-full animate-pulse" />
                 </div>
