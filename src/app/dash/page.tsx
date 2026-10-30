@@ -171,6 +171,10 @@ export default function DashPage() {
     return status === 'enterprise';
   }, [userData]);
 
+  const isDigitalBusiness = useMemo(() => {
+    return userData?.businessType === 'agencia' || userData?.businessType === 'servicos_digitais';
+  }, [userData]);
+
   const widgetsListQuery = useMemo(() => {
     if (!db || !user) return null;
     return collection(db, 'users', user.uid, 'widgets');
@@ -250,6 +254,7 @@ export default function DashPage() {
         setIsGoogleMapsDialogOpen(true);
       } 
     };
+
     const s1 = { 
       id: 'google', 
       label: 'Google Maps', 
@@ -260,16 +265,38 @@ export default function DashPage() {
         setIsGoogleMapsDialogOpen(true);
       } 
     };
-    const s2 = { id: 'collect', label: 'Coleta Ativa', completed: (userData?.testimonialsCount || 0) > 0, unlocked: s1.completed, action: () => setIsCollectLinkChoiceOpen(true) };
-    const s3 = { id: 'widget', label: 'Primeiro Mural', completed: !!(widgetsList && widgetsList.length > 0), unlocked: s2.completed, action: () => router.push('/widgets') };
-    return [s0, s1, s2, s3];
-  }, [userData, widgetsList, router]);
+
+    const s2 = { 
+      id: 'collect', 
+      label: 'Coleta Ativa', 
+      completed: (userData?.testimonialsCount || 0) > 0, 
+      unlocked: isDigitalBusiness ? s0.completed : s1.completed, 
+      action: () => setIsCollectLinkChoiceOpen(true) 
+    };
+
+    const s3 = { 
+      id: 'widget', 
+      label: 'Primeiro Mural', 
+      completed: !!(widgetsList && widgetsList.length > 0), 
+      unlocked: s2.completed, 
+      action: () => router.push('/widgets') 
+    };
+
+    const allSteps = [s0, s1, s2, s3];
+    
+    // Se for negócio digital, removemos a tarefa do Google Maps
+    if (isDigitalBusiness) {
+      return allSteps.filter(s => s.id !== 'google');
+    }
+
+    return allSteps;
+  }, [userData, widgetsList, router, isDigitalBusiness]);
 
   const completedStepsCount = setupSteps.filter(s => s.completed).length;
   const progressPercentage = (completedStepsCount / setupSteps.length) * 100;
   const isSetupComplete = completedStepsCount === setupSteps.length;
   const isCollectDone = setupSteps.find(s => s.id === 'collect')?.completed;
-  const isGoogleDone = setupSteps.find(s => s.id === 'google')?.completed;
+  const isGoogleDone = isDigitalBusiness ? true : !!userData?.googleMapsUrl;
 
   const [auditItems, setAuditItems] = useState<AuditItem[]>([]);
   const [isAuditing, setIsAuditing] = useState(false);
@@ -292,20 +319,23 @@ export default function DashPage() {
         });
       }
 
-      const mapsUrl = userData.googleMapsUrl || '';
-      const isReviewLink = mapsUrl.includes('writereview') || mapsUrl.includes('local/writereview');
-      
-      if (!mapsUrl) {
-        results.push({ id: 'maps-unlinked', label: 'Google Maps Desconectado', status: 'critical', description: 'Sua empresa não está recebendo redirecionamentos.', actionLabel: 'Vincular Agora', action: () => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }, icon: MapPin });
-      } else if (!isReviewLink) {
-        results.push({ id: 'maps-invalid', label: 'Link de Avaliação Indireto', status: 'attention', description: 'Seu link atual não abre direto na caixa de texto do Google.', actionLabel: 'Corrigir Link', action: () => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }, icon: ShieldAlert });
-      }
+      // Auditoria de Maps apenas se não for negócio digital
+      if (!isDigitalBusiness) {
+        const mapsUrl = userData.googleMapsUrl || '';
+        const isReviewLink = mapsUrl.includes('writereview') || mapsUrl.includes('local/writereview');
+        
+        if (!mapsUrl) {
+          results.push({ id: 'maps-unlinked', label: 'Google Maps Desconectado', status: 'critical', description: 'Sua empresa não está recebendo redirecionamentos.', actionLabel: 'Vincular Agora', action: () => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }, icon: MapPin });
+        } else if (!isReviewLink) {
+          results.push({ id: 'maps-invalid', label: 'Link de Avaliação Indireto', status: 'attention', description: 'Seu link atual não abre direto na caixa de texto do Google.', actionLabel: 'Corrigir Link', action: () => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }, icon: ShieldAlert });
+        }
 
-      if (userData.googlePlaceId && isEnterpriseUser) {
-        const details = await getGooglePlaceDetails(userData.googlePlaceId);
-        if (details) {
-          if (!details.hasPhotos) results.push({ id: 'profile-photos', label: 'Perfil Sem Fotos', status: 'attention', description: 'Empresas com fotos recebem 42% mais cliques no Maps.', actionLabel: 'Adicionar Fotos', action: () => window.open(`https://www.google.com/maps/place/?q=place_id:${userData.googlePlaceId}`, '_blank'), icon: Camera });
-          if (!details.hasHours) results.push({ id: 'profile-hours', label: 'Horário Pendente', status: 'attention', description: 'Clientes evitam empresas sem horário de funcionamento.', actionLabel: 'Configurar no Google', action: () => window.open(`https://business.google.com/`, '_blank'), icon: Timer });
+        if (userData.googlePlaceId && isEnterpriseUser) {
+          const details = await getGooglePlaceDetails(userData.googlePlaceId);
+          if (details) {
+            if (!details.hasPhotos) results.push({ id: 'profile-photos', label: 'Perfil Sem Fotos', status: 'attention', description: 'Empresas com fotos recebem 42% mais cliques no Maps.', actionLabel: 'Adicionar Fotos', action: () => window.open(`https://www.google.com/maps/place/?q=place_id:${userData.googlePlaceId}`, '_blank'), icon: Camera });
+            if (!details.hasHours) results.push({ id: 'profile-hours', label: 'Horário Pendente', status: 'attention', description: 'Clientes evitam empresas sem horário de funcionamento.', actionLabel: 'Configurar no Google', action: () => window.open(`https://business.google.com/`, '_blank'), icon: Timer });
+          }
         }
       }
 
@@ -313,7 +343,7 @@ export default function DashPage() {
       setIsAuditing(false);
     }
     runAudit();
-  }, [isSetupComplete, userData, widgetsList, pendingTestimonialsCount, router, isEnterpriseUser]);
+  }, [isSetupComplete, userData, widgetsList, pendingTestimonialsCount, router, isEnterpriseUser, isDigitalBusiness]);
 
   const filteredMetrics = useMemo(() => {
     const testimonials = approvedTestimonials;
@@ -774,14 +804,16 @@ export default function DashPage() {
                   <Info className="w-3.5 h-3.5" /> Manual do Usuário
                 </Button>
               </Link>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                onClick={() => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }} 
-                className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5"
-              >
-                <Edit3 className="w-3.5 h-3.5" /> Google Maps
-              </Button>
+              {!isDigitalBusiness && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }} 
+                  className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5"
+                >
+                  <Edit3 className="w-3.5 h-3.5" /> Google Maps
+                </Button>
+              )}
               <Link href={isSetupComplete ? "/private" : "#"} onClick={(e) => !isSetupComplete && e.preventDefault()}>
                 <Button 
                   variant="ghost" 
