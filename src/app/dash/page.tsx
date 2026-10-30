@@ -570,13 +570,6 @@ export default function DashPage() {
     setIsShareDialogOpen(true);
   };
 
-  const handleOpenManualAlert = () => {
-    toast({
-      title: "Em Breve",
-      description: "O Manual do Usuário está sendo preparado e estará disponível em breve.",
-    });
-  };
-
   if (authLoading || userDataLoading || (user && !userData)) {
     return (
       <div className="flex h-screen items-center justify-center bg-muted/30">
@@ -770,9 +763,11 @@ export default function DashPage() {
             <div className="flex items-center gap-3">
               <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Painel de Controle</h1>
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={handleOpenManualAlert} className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5">
-                  <span className="flex items-center gap-1.5"><Info className="w-3.5 h-3.5" /> Manual do Usuário</span>
-                </Button>
+                <Link href="/manual">
+                  <Button variant="ghost" size="sm" className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5">
+                    <span className="flex items-center gap-1.5"><Info className="w-3.5 h-3.5" /> Manual do Usuário</span>
+                  </Button>
+                </Link>
                 <Button 
                   variant="ghost" 
                   size="sm" 
@@ -1254,7 +1249,7 @@ export default function DashPage() {
                   disabled={!city || !state || isUpdatingUrl}
                   className="w-full h-12 rounded-xl font-bold text-sm shadow-md gap-2"
                 >
-                  {isUpdatingUrl ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="w-4 h-4" />}
+                  {isUpdatingUrl ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="h-4 w-4" />}
                   Confirmar e Salvar
                 </Button>
               </section>
@@ -1290,7 +1285,7 @@ export default function DashPage() {
                   disabled={!companyNameEdit || !companySlugEdit || isUpdatingUrl}
                   className="w-full h-12 rounded-xl font-bold text-sm shadow-md gap-2"
                 >
-                  {isUpdatingUrl ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="w-4 h-4" />}
+                  {isUpdatingUrl ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="h-4 w-4" />}
                   Salvar Nova Identidade
                 </Button>
               </section>
