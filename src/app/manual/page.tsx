@@ -91,7 +91,7 @@ export default function ManualPage() {
                   <h2 className="text-2xl md:text-4xl font-black font-headline tracking-tight">Ativar G-Boost: Autoridade Local</h2>
                 </div>
                 <p className="text-muted-foreground text-base md:text-xl leading-relaxed font-medium">
-                  Aumentar suas chances de estar entre os 3 primeiros no Google Maps não é sorte, é <span className="text-foreground font-bold">frequência de avaliações</span>.
+                  O G-Boost é o seu acelerador no Google. Ele foca em aumentar drasticamente suas <span className="text-foreground font-bold">chances de estar entre os 3 primeiros</span> no Google Maps através de avaliações reais.
                 </p>
                 <div className="space-y-4">
                   <div className="flex gap-4 p-4 rounded-2xl bg-background border border-primary/10 shadow-sm transition-all hover:shadow-md">
@@ -103,7 +103,7 @@ export default function ManualPage() {
                   <div className="flex gap-4 p-4 rounded-2xl bg-background border border-primary/10 shadow-sm transition-all hover:shadow-md">
                     <div className="h-6 w-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-black shrink-0">2</div>
                     <p className="text-sm font-medium leading-relaxed">
-                      <strong className="text-foreground">A Ação:</strong> Para notas altas, exibimos um botão especial convidando o cliente a replicar a nota no seu perfil do Google Business.
+                      <strong className="text-foreground">A Ação:</strong> Exibimos um botão especial convidando o cliente a replicar a nota no seu perfil do Google Business.
                     </p>
                   </div>
                 </div>
@@ -116,15 +116,12 @@ export default function ManualPage() {
               <div className="relative group">
                 <div className="absolute -inset-2 bg-primary/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
                 <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
-                  {manualImages.gboost?.imageUrl && (
-                    <Image 
-                      src={manualImages.gboost.imageUrl} 
-                      alt="Guia G-Boost" 
-                      fill 
-                      className="object-cover" 
-                      data-ai-hint="google maps ranking guide interface"
-                    />
-                  )}
+                  <Image 
+                    src="/gboost.png" 
+                    alt="Guia G-Boost" 
+                    fill 
+                    className="object-cover" 
+                  />
                   <div className="absolute top-[60%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-20 h-20 border-4 border-red-600 rounded-full animate-pulse flex items-center justify-center">
                     <div className="bg-red-600/20 w-full h-full rounded-full" />
                   </div>
@@ -140,19 +137,19 @@ export default function ManualPage() {
                   <h2 className="text-2xl md:text-4xl font-black font-headline tracking-tight">Reputation Shield</h2>
                 </div>
                 <p className="text-muted-foreground text-base md:text-xl leading-relaxed font-medium">
-                  Evite que uma falha momentânea vire uma mancha eterna na sua reputação pública.
+                  Evite que uma falha momentânea vire uma mancha eterna na sua reputação pública através do roteamento inteligente.
                 </p>
                 <div className="space-y-4">
                   <div className="flex gap-4 p-4 rounded-2xl bg-background border border-orange-500/10 shadow-sm transition-all hover:shadow-md">
                     <div className="h-6 w-6 rounded-full bg-orange-500/10 text-orange-600 flex items-center justify-center text-xs font-black shrink-0">1</div>
                     <p className="text-sm font-medium leading-relaxed">
-                      <strong className="text-foreground">Compliance Total:</strong> Mantemos o botão de envio público para todos para seguir as diretrizes de transparência do Google Maps.
+                      <strong className="text-foreground">Compliance Total:</strong> Exibimos o botão de envio público para todos os usuários para seguir estritamente as diretrizes de transparência do Google.
                     </p>
                   </div>
                   <div className="flex gap-4 p-4 rounded-2xl bg-background border border-orange-500/10 shadow-sm transition-all hover:shadow-md">
                     <div className="h-6 w-6 rounded-full bg-orange-500/10 text-orange-600 flex items-center justify-center text-xs font-black shrink-0">2</div>
                     <p className="text-sm font-medium leading-relaxed">
-                      <strong className="text-foreground">O Direcionamento:</strong> Depoimentos de 1 a 3 estrelas são incentivados ao seu <strong className="text-foreground">Inbox Privado</strong> para resolução interna imediata.
+                      <strong className="text-foreground">O Direcionamento:</strong> Depoimentos de 1 a 3 estrelas são fortemente incentivados ao seu <strong className="text-foreground">Inbox Privado</strong> para resolução interna imediata.
                     </p>
                   </div>
                 </div>
