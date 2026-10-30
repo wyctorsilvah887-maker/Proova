@@ -88,7 +88,7 @@ export default function ManualPage() {
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
                   <div className="bg-primary/10 p-3 rounded-2xl text-primary"><MapPin className="w-8 h-8" /></div>
-                  <h2 className="text-2xl md:text-4xl font-black font-headline tracking-tight">G-Boost: Autoridade Local</h2>
+                  <h2 className="text-2xl md:text-4xl font-black font-headline tracking-tight">Ativar G-Boost: Autoridade Local</h2>
                 </div>
                 <p className="text-muted-foreground text-base md:text-xl leading-relaxed font-medium">
                   Aumentar suas chances de estar entre os 3 primeiros no Google Maps não é sorte, é <span className="text-foreground font-bold">frequência de avaliações</span>.
@@ -97,7 +97,7 @@ export default function ManualPage() {
                   <div className="flex gap-4 p-4 rounded-2xl bg-background border border-primary/10 shadow-sm transition-all hover:shadow-md">
                     <div className="h-6 w-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-black shrink-0">1</div>
                     <p className="text-sm font-medium leading-relaxed">
-                      <strong className="text-foreground">O Gatilho:</strong> O sistema detecta automaticamente elogios de 4 e 5 estrelas.
+                      <strong className="text-foreground">O Gatilho:</strong> O sistema detecta automaticamente experiências de 4 e 5 estrelas.
                     </p>
                   </div>
                   <div className="flex gap-4 p-4 rounded-2xl bg-background border border-primary/10 shadow-sm transition-all hover:shadow-md">
@@ -122,7 +122,7 @@ export default function ManualPage() {
                       alt="Guia G-Boost" 
                       fill 
                       className="object-cover" 
-                      data-ai-hint="google maps boost tutorial interface"
+                      data-ai-hint="google maps ranking guide interface"
                     />
                   )}
                   <div className="absolute top-[60%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-20 h-20 border-4 border-red-600 rounded-full animate-pulse flex items-center justify-center">
@@ -218,7 +218,7 @@ export default function ManualPage() {
                       alt="Guia Widgets" 
                       fill 
                       className="object-cover" 
-                      data-ai-hint="website widget testimonials layout interface"
+                      data-ai-hint="website widget layout guide interface"
                     />
                   )}
                   <div className="absolute bottom-[20%] right-[30%] w-28 h-12 border-4 border-red-600 rounded-2xl animate-pulse" />
@@ -265,7 +265,7 @@ export default function ManualPage() {
                       alt="Guia Social" 
                       fill 
                       className="object-cover" 
-                      data-ai-hint="instagram story card generator interface"
+                      data-ai-hint="instagram card generator guide interface"
                     />
                   )}
                   <div className="absolute top-[45%] left-[65%] w-16 h-16 border-4 border-red-600 rounded-full animate-pulse" />
