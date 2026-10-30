@@ -117,7 +117,7 @@ export default function ManualPage() {
                 <div className="absolute -inset-2 bg-primary/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
                 <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
                   <Image 
-                    src="/gboost.png" 
+                    src="/gboost.png?v=1" 
                     alt="Guia G-Boost" 
                     fill 
                     className="object-cover" 
