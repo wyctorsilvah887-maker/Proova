@@ -91,7 +91,7 @@ export default function ManualPage() {
                   <h2 className="text-2xl md:text-4xl font-black font-headline tracking-tight">G-Boost: Autoridade Local</h2>
                 </div>
                 <p className="text-muted-foreground text-base md:text-xl leading-relaxed font-medium">
-                  Aparecer em primeiro no Google Maps não é sorte, é <span className="text-foreground font-bold">frequência de avaliações</span>.
+                  Estar entre os 3 primeiros no Google Maps não é sorte, é <span className="text-foreground font-bold">frequência de avaliações</span>.
                 </p>
                 <div className="space-y-4">
                   <div className="flex gap-4 p-4 rounded-2xl bg-background border border-primary/10 shadow-sm transition-all hover:shadow-md">
