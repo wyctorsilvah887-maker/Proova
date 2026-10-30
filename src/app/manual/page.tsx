@@ -177,15 +177,12 @@ export default function ManualPage() {
               <div className="lg:order-1 relative group">
                 <div className="absolute -inset-2 bg-orange-500/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
                 <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
-                  {manualImages.shield?.imageUrl && (
-                    <Image 
-                      src={manualImages.shield.imageUrl} 
-                      alt="Guia Shield" 
-                      fill 
-                      className="object-cover" 
-                      data-ai-hint="private inbox customer feedback interface"
-                    />
-                  )}
+                  <Image 
+                    src="/inboxp.png?v=1" 
+                    alt="Guia Shield" 
+                    fill 
+                    className="object-cover" 
+                  />
                 </div>
               </div>
             </section>
