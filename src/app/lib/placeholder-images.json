@@ -1,0 +1,71 @@
+
+{
+  "placeholderImages": [
+    {
+      "id": "hero-saas",
+      "description": "Dashboard de depoimentos e feedback de clientes",
+      "imageUrl": "https://picsum.photos/seed/saas1/800/600",
+      "imageHint": "saas dashboard testimonials"
+    },
+    {
+      "id": "hero-bg-photo",
+      "description": "Imagem de fundo profissional para a seção principal",
+      "imageUrl": "https://picsum.photos/seed/herobg99/1920/1080",
+      "imageHint": "modern office space"
+    },
+    {
+      "id": "cta-bg-photo",
+      "description": "Imagem de fundo para a seção de fechamento",
+      "imageUrl": "https://picsum.photos/seed/ctabg88/1920/1080",
+      "imageHint": "tech abstract pattern"
+    },
+    {
+      "id": "brand-design",
+      "description": "Exemplo de customização de marca e design",
+      "imageUrl": "https://picsum.photos/seed/design1/800/600",
+      "imageHint": "brand design customization"
+    },
+    {
+      "id": "avatar-1",
+      "description": "Avatar do usuário Alice",
+      "imageUrl": "https://picsum.photos/seed/av1/64/64",
+      "imageHint": "person face"
+    },
+    {
+      "id": "avatar-2",
+      "description": "Avatar do usuário Bruno",
+      "imageUrl": "https://picsum.photos/seed/av2/64/64",
+      "imageHint": "person face"
+    },
+    {
+      "id": "avatar-3",
+      "description": "Avatar do usuário Carla",
+      "imageUrl": "https://picsum.photos/seed/av3/64/64",
+      "imageHint": "person face"
+    },
+    {
+      "id": "manual-gboost",
+      "description": "Guia visual do sistema G-Boost",
+      "imageUrl": "https://picsum.photos/seed/m1/800/500",
+      "imageHint": "google maps ranking"
+    },
+    {
+      "id": "manual-shield",
+      "description": "Guia visual do Reputation Shield",
+      "imageUrl": "https://picsum.photos/seed/m2/800/500",
+      "imageHint": "security private inbox"
+    },
+    {
+      "id": "manual-widgets",
+      "description": "Guia visual dos Widgets e Murais",
+      "imageUrl": "https://picsum.photos/seed/m3/800/500",
+      "imageHint": "website masonry layout"
+    },
+    {
+      "id": "manual-social",
+      "description": "Guia visual dos Social Cards",
+      "imageUrl": "https://picsum.photos/seed/m4/800/500",
+      "imageHint": "instagram content post"
+    }
+  ]
+}
