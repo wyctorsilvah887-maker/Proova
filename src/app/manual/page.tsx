@@ -91,7 +91,7 @@ export default function ManualPage() {
                   <h2 className="text-2xl md:text-4xl font-black font-headline tracking-tight">Ativar G-Boost: Autoridade Local</h2>
                 </div>
                 <p className="text-muted-foreground text-base md:text-xl leading-relaxed font-medium">
-                  O G-Boost é o seu acelerador no Google. Ele foca em aumentar drasticamente suas <span className="text-foreground font-bold">chances de estar entre os primeiros</span> no Google Maps através de avaliações reais.
+                  O G-Boost é o seu acelerador no Google. Ele foca em aumentar drasticamente suas <span className="text-foreground font-bold">chances de visibilidade</span> no Google Maps através de uma maior frequência de avaliações reais.
                 </p>
                 <div className="space-y-4">
                   <div className="flex gap-4 p-4 rounded-2xl bg-background border border-primary/10 shadow-sm transition-all hover:shadow-md">
@@ -109,7 +109,7 @@ export default function ManualPage() {
                 </div>
                 <div className="pt-4">
                    <Badge variant="outline" className="h-8 px-4 rounded-full border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
-                     Estratégia: Ganhar relevância no ranking orgânico sem gastar com anúncios.
+                     Estratégia: Ganhar relevância orgânica impulsionando o volume de avaliações nota máxima.
                    </Badge>
                 </div>
               </div>
@@ -132,7 +132,7 @@ export default function ManualPage() {
                   <div className="p-4 rounded-2xl bg-muted/50 border space-y-1">
                     <p className="text-[10px] font-black uppercase text-primary tracking-widest">Para que serve?</p>
                     <p className="text-xs font-medium text-muted-foreground leading-relaxed">
-                      Serve para impulsionar a presença da sua empresa no Google Maps, transformando elogios recebidos no Proova em estrelas reais no seu perfil comercial.
+                      Serve para impulsionar a presença da sua empresa no Google Maps, transformando elogios recebidos no Proova em chances reais de melhor posicionamento.
                     </p>
                   </div>
                   <div className="p-4 rounded-2xl bg-muted/50 border space-y-1">
@@ -153,7 +153,7 @@ export default function ManualPage() {
                   <h2 className="text-2xl md:text-4xl font-black font-headline tracking-tight">Reputation Shield</h2>
                 </div>
                 <p className="text-muted-foreground text-base md:text-xl leading-relaxed font-medium">
-                  Evite que uma falha momentânea vire uma mancha eterna na sua reputação pública através do roteamento inteligente.
+                  Proteja sua imagem incentivando a resolução interna de conflitos, mantendo sempre a transparência e a liberdade de escolha do consumidor.
                 </p>
                 <div className="space-y-4">
                   <div className="flex gap-4 p-4 rounded-2xl bg-background border border-orange-500/10 shadow-sm transition-all hover:shadow-md">
@@ -165,13 +165,13 @@ export default function ManualPage() {
                   <div className="flex gap-4 p-4 rounded-2xl bg-background border border-orange-500/10 shadow-sm transition-all hover:shadow-md">
                     <div className="h-6 w-6 rounded-full bg-orange-500/10 text-orange-600 flex items-center justify-center text-xs font-black shrink-0">2</div>
                     <p className="text-sm font-medium leading-relaxed">
-                      <strong className="text-foreground">O Direcionamento:</strong> Depoimentos de 1 a 3 estrelas são fortemente incentivados ao seu <strong className="text-foreground">Inbox Privado</strong> para resolução interna imediata.
+                      <strong className="text-foreground">O Incentivo ao Diálogo:</strong> Feedbacks de 1 a 3 estrelas são fortemente incentivados ao seu <strong className="text-foreground">Inbox Privado</strong> para resolução interna imediata, permitindo que você melhore seu serviço antes de uma crítica pública.
                     </p>
                   </div>
                 </div>
                 <div className="pt-4">
                    <Badge variant="outline" className="h-8 px-4 rounded-full border-orange-500/20 text-orange-600 text-[10px] font-black uppercase tracking-widest">
-                     Estratégia: Blindagem contra crises e melhoria contínua de processos.
+                     Estratégia: Transformar clientes insatisfeitos em parceiros de melhoria via canal privado.
                    </Badge>
                 </div>
               </div>
