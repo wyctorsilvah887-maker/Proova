@@ -122,9 +122,6 @@ export default function ManualPage() {
                     fill 
                     className="object-cover" 
                   />
-                  <div className="absolute top-[60%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-20 h-20 border-4 border-red-600 rounded-full animate-pulse flex items-center justify-center">
-                    <div className="bg-red-600/20 w-full h-full rounded-full" />
-                  </div>
                 </div>
               </div>
             </section>
@@ -171,7 +168,6 @@ export default function ManualPage() {
                       data-ai-hint="private inbox customer feedback interface"
                     />
                   )}
-                  <div className="absolute top-[30%] left-[20%] w-24 h-24 border-4 border-red-600 rounded-full animate-pulse" />
                 </div>
               </div>
             </section>
@@ -218,7 +214,6 @@ export default function ManualPage() {
                       data-ai-hint="website widget layout guide interface"
                     />
                   )}
-                  <div className="absolute bottom-[20%] right-[30%] w-28 h-12 border-4 border-red-600 rounded-2xl animate-pulse" />
                 </div>
               </div>
             </section>
@@ -265,7 +260,6 @@ export default function ManualPage() {
                       data-ai-hint="instagram card generator guide interface"
                     />
                   )}
-                  <div className="absolute top-[45%] left-[65%] w-16 h-16 border-4 border-red-600 rounded-full animate-pulse" />
                 </div>
               </div>
             </section>
