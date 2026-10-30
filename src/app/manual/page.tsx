@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo } from 'react';
@@ -117,13 +116,17 @@ export default function ManualPage() {
               <div className="relative group">
                 <div className="absolute -inset-2 bg-primary/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
                 <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
-                  <Image 
-                    src={manualImages.gboost?.imageUrl || ''} 
-                    alt="Guia G-Boost" 
-                    fill 
-                    className="object-cover" 
-                    data-ai-hint="google maps boost tutorial interface"
-                  />
+                  {manualImages.gboost?.imageUrl ? (
+                    <Image 
+                      src={manualImages.gboost.imageUrl} 
+                      alt="Guia G-Boost" 
+                      fill 
+                      className="object-cover" 
+                      data-ai-hint="google maps boost tutorial interface"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground italic text-xs">Aguardando Imagem...</div>
+                  )}
                   {/* SIMULATED RED CIRCLE OVERLAY */}
                   <div className="absolute top-[60%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-20 h-20 border-4 border-red-600 rounded-full animate-pulse flex items-center justify-center">
                     <div className="bg-red-600/20 w-full h-full rounded-full" />
@@ -165,13 +168,17 @@ export default function ManualPage() {
               <div className="lg:order-1 relative group">
                 <div className="absolute -inset-2 bg-orange-500/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
                 <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
-                  <Image 
-                    src={manualImages.shield?.imageUrl || ''} 
-                    alt="Guia Shield" 
-                    fill 
-                    className="object-cover" 
-                    data-ai-hint="private inbox customer feedback interface"
-                  />
+                  {manualImages.shield?.imageUrl ? (
+                    <Image 
+                      src={manualImages.shield.imageUrl} 
+                      alt="Guia Shield" 
+                      fill 
+                      className="object-cover" 
+                      data-ai-hint="private inbox customer feedback interface"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground italic text-xs">Aguardando Imagem...</div>
+                  )}
                   <div className="absolute top-[30%] left-[20%] w-24 h-24 border-4 border-red-600 rounded-full animate-pulse" />
                 </div>
               </div>
@@ -210,13 +217,17 @@ export default function ManualPage() {
               <div className="relative group">
                 <div className="absolute -inset-2 bg-blue-500/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
                 <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
-                  <Image 
-                    src={manualImages.widgets?.imageUrl || ''} 
-                    alt="Guia Widgets" 
-                    fill 
-                    className="object-cover" 
-                    data-ai-hint="website widget testimonials layout interface"
-                  />
+                  {manualImages.widgets?.imageUrl ? (
+                    <Image 
+                      src={manualImages.widgets.imageUrl} 
+                      alt="Guia Widgets" 
+                      fill 
+                      className="object-cover" 
+                      data-ai-hint="website widget testimonials layout interface"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground italic text-xs">Aguardando Imagem...</div>
+                  )}
                   <div className="absolute bottom-[20%] right-[30%] w-28 h-12 border-4 border-red-600 rounded-2xl animate-pulse" />
                 </div>
               </div>
@@ -255,13 +266,17 @@ export default function ManualPage() {
               <div className="lg:order-1 relative group">
                 <div className="absolute -inset-2 bg-purple-500/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
                 <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
-                  <Image 
-                    src={manualImages.social?.imageUrl || ''} 
-                    alt="Guia Social" 
-                    fill 
-                    className="object-cover" 
-                    data-ai-hint="instagram story card generator interface"
-                  />
+                  {manualImages.social?.imageUrl ? (
+                    <Image 
+                      src={manualImages.social.imageUrl} 
+                      alt="Guia Social" 
+                      fill 
+                      className="object-cover" 
+                      data-ai-hint="instagram story card generator interface"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-muted flex items-center justify-center text-muted-foreground italic text-xs">Aguardando Imagem...</div>
+                  )}
                   <div className="absolute top-[45%] left-[65%] w-16 h-16 border-4 border-red-600 rounded-full animate-pulse" />
                 </div>
               </div>
@@ -282,13 +297,13 @@ export default function ManualPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
                     <div className="flex items-start gap-3">
-                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                      <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
                       <p className="text-xs font-medium leading-relaxed">
                         <strong className="text-foreground">Resumo Analytics:</strong> Acompanhe o volume de depoimentos em 7, 30 ou todo o período.
                       </p>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                      <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
                       <p className="text-xs font-medium leading-relaxed">
                         <strong className="text-foreground">Consultor Proova:</strong> Auditoria automática que avisa sobre falhas no SEO Local.
                       </p>
@@ -309,13 +324,13 @@ export default function ManualPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
                     <div className="flex items-start gap-3">
-                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                      <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
                       <p className="text-xs font-medium leading-relaxed">
                         <strong className="text-foreground">Link de Coleta:</strong> Envie via WhatsApp após cada atendimento concluído.
                       </p>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                      <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
                       <p className="text-xs font-medium leading-relaxed">
                         <strong className="text-foreground">QR de Balcão:</strong> Baixe o PDF e coloque no caixa ou mesa para coleta física.
                       </p>
@@ -336,13 +351,13 @@ export default function ManualPage() {
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
                     <div className="flex items-start gap-3">
-                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                      <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
                       <p className="text-xs font-medium leading-relaxed">
                         <strong className="text-foreground">Curadoria:</strong> Aprove depoimentos qualificados para injetar nos seus murais.
                       </p>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="mt-1 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                      <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
                       <p className="text-xs font-medium leading-relaxed">
                         <strong className="text-foreground">Auto-Publish:</strong> Automatize a publicação baseada em regras de nota mínima e caracteres.
                       </p>
