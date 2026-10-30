@@ -759,26 +759,26 @@ export default function DashPage() {
         )}
 
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pt-2">
-          <div className="space-y-1">
-            <div className="flex items-center gap-3">
+          <div className="space-y-3">
+            <div className="space-y-1">
               <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Painel de Controle</h1>
-              <div className="flex items-center gap-2">
-                <Link href="/manual">
-                  <Button variant="ghost" size="sm" className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5">
-                    <span className="flex items-center gap-1.5"><Info className="w-3.5 h-3.5" /> Manual do Usuário</span>
-                  </Button>
-                </Link>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }} 
-                  className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5"
-                >
-                  <Edit3 className="w-3.5 h-3.5" /> Google Maps
-                </Button>
-              </div>
+              <p className="text-xs md:text-base text-muted-foreground">Gestão de prova social dinâmica</p>
             </div>
-            <p className="text-xs md:text-base text-muted-foreground">Gestão de prova social dinâmica</p>
+            <div className="flex items-center gap-2">
+              <Link href="/manual">
+                <Button variant="ghost" size="sm" className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5">
+                  <Info className="w-3.5 h-3.5" /> Manual do Usuário
+                </Button>
+              </Link>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }} 
+                className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5"
+              >
+                <Edit3 className="w-3.5 h-3.5" /> Google Maps
+              </Button>
+            </div>
           </div>
           <div className="w-full sm:w-48">
             <Select value={period} onValueChange={(val: any) => setPeriod(val)}>
