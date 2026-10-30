@@ -113,15 +113,34 @@ export default function ManualPage() {
                    </Badge>
                 </div>
               </div>
-              <div className="relative group">
-                <div className="absolute -inset-2 bg-primary/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
-                <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
-                  <Image 
-                    src="/gboost.png?v=1" 
-                    alt="Guia G-Boost" 
-                    fill 
-                    className="object-cover" 
-                  />
+              
+              <div className="space-y-4">
+                <div className="relative group">
+                  <div className="absolute -inset-2 bg-primary/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
+                  <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
+                    <Image 
+                      src="/gboost.png?v=1" 
+                      alt="Guia G-Boost" 
+                      fill 
+                      className="object-cover" 
+                    />
+                  </div>
+                </div>
+
+                {/* Tutorial Rápido G-Boost */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <div className="p-4 rounded-2xl bg-muted/50 border space-y-1">
+                    <p className="text-[10px] font-black uppercase text-primary tracking-widest">Para que serve?</p>
+                    <p className="text-xs font-medium text-muted-foreground leading-relaxed">
+                      Serve para colocar sua empresa no topo das buscas do Google Maps. Ele transforma elogios recebidos no Proova em estrelas reais no seu perfil comercial.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-muted/50 border space-y-1">
+                    <p className="text-[10px] font-black uppercase text-primary tracking-widest">Como utilizar?</p>
+                    <p className="text-xs font-medium text-muted-foreground leading-relaxed">
+                      Vincule sua empresa no Painel (botão "Google Maps"). O Proova fará o convite automático sempre que um cliente avaliar sua empresa com nota máxima.
+                    </p>
+                  </div>
                 </div>
               </div>
             </section>
