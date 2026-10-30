@@ -766,7 +766,11 @@ export default function DashPage() {
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <Link href="/manual">
-                <Button variant="ghost" size="sm" className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5"
+                >
                   <Info className="w-3.5 h-3.5" /> Manual do Usuário
                 </Button>
               </Link>
@@ -879,7 +883,7 @@ export default function DashPage() {
               className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm"
             >
               <Share2 className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Social Card (Conteúdo)</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Social Card</span>
             </Button>
 
             <Button variant="outline" disabled={!isGoogleDone} onClick={() => setIsQrDialogOpenManual(true)} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
