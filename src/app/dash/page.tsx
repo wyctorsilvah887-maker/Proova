@@ -132,7 +132,6 @@ export default function DashPage() {
   const [period, setPeriod] = useState<'7' | '30' | 'all'>('7');
   const [isQrDialogOpenManual, setIsQrDialogOpenManual] = useState(false);
   const [isGoogleMapsDialogOpen, setIsGoogleMapsDialogOpen] = useState(false);
-  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [isPublicPageChoiceOpen, setIsPublicPageChoiceOpen] = useState(false);
   const [isCollectLinkChoiceOpen, setIsCollectLinkChoiceOpen] = useState(false);
   const [configMode, setConfigMode] = useState<'location' | 'maps' | 'business'>('location');
@@ -571,6 +570,13 @@ export default function DashPage() {
     setIsShareDialogOpen(true);
   };
 
+  const handleOpenManualAlert = () => {
+    toast({
+      title: "Em Breve",
+      description: "O Manual do Usuário está sendo preparado e estará disponível em breve.",
+    });
+  };
+
   if (authLoading || userDataLoading || (user && !userData)) {
     return (
       <div className="flex h-screen items-center justify-center bg-muted/30">
@@ -764,8 +770,8 @@ export default function DashPage() {
             <div className="flex items-center gap-3">
               <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Painel de Controle</h1>
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={() => setIsTutorialOpen(true)} className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5">
-                  <span className="flex items-center gap-1.5"><Info className="w-3.5 h-3.5" /> Tutorial</span>
+                <Button variant="ghost" size="sm" onClick={handleOpenManualAlert} className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5">
+                  <span className="flex items-center gap-1.5"><Info className="w-3.5 h-3.5" /> Manual do Usuário</span>
                 </Button>
                 <Button 
                   variant="ghost" 
@@ -1204,46 +1210,6 @@ export default function DashPage() {
               {selectedTestimonialForShare?.videoUrl ? 'O sistema gravará seu vídeo com a moldura. Isso pode levar alguns segundos.' : 'Dica: Use nos redes sociais para provar autoridade 24h por dia'}
             </p>
           </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isTutorialOpen} onOpenChange={setIsTutorialOpen}>
-        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
-          <DialogHeader className="p-8 pt-16 pb-4 shrink-0 bg-background">
-            <DialogTitle className="text-2xl font-black font-headline flex items-center gap-2">
-              <Sparkles className="w-6 h-6 text-primary" /> Guia Estratégico Proova
-            </DialogTitle>
-            <DialogDescription>Domine as ferramentas que aceleram sua autoridade.</DialogDescription>
-          </DialogHeader>
-          
-          <div className="flex-1 overflow-y-auto px-8 pb-8 scrollbar-hide">
-            <div className="space-y-8">
-              <div className="flex gap-4 group">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Inbox className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1"><p className="text-sm font-bold">Inbox de Moderação Unificado</p><p className="text-xs text-muted-foreground leading-relaxed">Centralizamos tudo o que entra: elógios para aprovar e feedbacks privados. É sua torre de comando de reputação.</p></div>
-              </div>
-              <div className="flex gap-4 group">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Share2 className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1"><p className="text-sm font-bold">Gerador de Social Cards</p><p className="text-xs text-muted-foreground leading-relaxed">Transforme qualquer elogio em uma imagem profissional para Instagram com um clique. A prova social agora é conteúdo viral.</p></div>
-              </div>
-              <div className="flex gap-4 group">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><ShieldCheck className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1"><p className="text-sm font-bold">Consultor Proova</p><p className="text-xs text-muted-foreground leading-relaxed">Seu auditor de SEO Local. Ele avisa sobre falhas no link do Google, elogios pendentes de aprovação ou horários desatualizados.</p></div>
-              </div>
-              <div className="flex gap-4 group">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><BarChart3 className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1"><p className="text-sm font-bold">Analytics Avançado</p><p className="text-xs text-muted-foreground leading-relaxed">Clique no card de Resumo para abrir o painel detalhado. Analise o fluxo de coleta e o índice de satisfação em tempo real.</p></div>
-              </div>
-              <div className="flex gap-4 group">
-                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0 group-hover:bg-primary group-hover:text-white transition-colors"><Zap className="w-5 h-5" /></div>
-                <div className="min-w-0 flex-1"><p className="text-sm font-bold">Ações Rápidas</p><p className="text-xs text-muted-foreground leading-relaxed">Acessos rápidos para copiar seu link, baixar o cartaz de balcão ou gerenciar seus murais embutidos.</p></div>
-              </div>
-            </div>
-          </div>
-
-          <div className="p-8 pt-4 pb-8 bg-background border-t shrink-0">
-            <Button className="w-full font-black h-12 rounded-2xl shadow-xl" onClick={() => setIsTutorialOpen(false)}>Dominar Meu Painel</Button>
-          </div>
         </DialogContent>
       </Dialog>
       
