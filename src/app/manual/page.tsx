@@ -31,13 +31,6 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 
 export default function ManualPage() {
-  const manualImages = {
-    gboost: PlaceHolderImages.find(img => img.id === 'manual-gboost'),
-    shield: PlaceHolderImages.find(img => img.id === 'manual-shield'),
-    widgets: PlaceHolderImages.find(img => img.id === 'manual-widgets'),
-    social: PlaceHolderImages.find(img => img.id === 'manual-social'),
-  };
-
   return (
     <div className="min-h-screen bg-muted/30 font-body text-foreground flex flex-col overflow-x-hidden">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-4 md:px-8 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
@@ -294,18 +287,32 @@ export default function ManualPage() {
                    </div>
                 </div>
               </div>
-              <div className="lg:order-1 relative group">
-                <div className="absolute -inset-2 bg-purple-500/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
-                <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
-                  {manualImages.social?.imageUrl && (
+              <div className="lg:order-1 space-y-4">
+                <div className="relative group">
+                  <div className="absolute -inset-2 bg-purple-500/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
+                  <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
                     <Image 
-                      src={manualImages.social.imageUrl} 
-                      alt="Guia Social" 
+                      src="/conteudocard.png?v=1" 
+                      alt="Guia Conteúdo Social" 
                       fill 
                       className="object-cover" 
-                      data-ai-hint="instagram card generator guide interface"
                     />
-                  )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <div className="p-4 rounded-2xl bg-muted/50 border space-y-1">
+                    <p className="text-[10px] font-black uppercase text-purple-600 tracking-widest">Para que serve?</p>
+                    <p className="text-xs font-medium text-muted-foreground leading-relaxed">
+                      Serve para transformar seus depoimentos em publicações profissionais e atraentes para as redes sociais com apenas um clique.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-muted/50 border space-y-1">
+                    <p className="text-[10px] font-black uppercase text-purple-600 tracking-widest">Como utilizar?</p>
+                    <p className="text-xs font-medium text-muted-foreground leading-relaxed">
+                      No seu Painel, clique no botão "Gerar Card" em qualquer depoimento aprovado. O Proova criará uma imagem pronta para você postar.
+                    </p>
+                  </div>
                 </div>
               </div>
             </section>
