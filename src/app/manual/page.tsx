@@ -91,7 +91,7 @@ export default function ManualPage() {
                   <h2 className="text-2xl md:text-4xl font-black font-headline tracking-tight">Ativar G-Boost: Autoridade Local</h2>
                 </div>
                 <p className="text-muted-foreground text-base md:text-xl leading-relaxed font-medium">
-                  O G-Boost é o seu acelerador no Google. Ele foca em aumentar drasticamente suas <span className="text-foreground font-bold">chances de estar entre os 3 primeiros</span> no Google Maps através de avaliações reais.
+                  O G-Boost é o seu acelerador no Google. Ele foca em aumentar drasticamente suas <span className="text-foreground font-bold">chances de estar entre os primeiros</span> no Google Maps através de avaliações reais.
                 </p>
                 <div className="space-y-4">
                   <div className="flex gap-4 p-4 rounded-2xl bg-background border border-primary/10 shadow-sm transition-all hover:shadow-md">
@@ -132,7 +132,7 @@ export default function ManualPage() {
                   <div className="p-4 rounded-2xl bg-muted/50 border space-y-1">
                     <p className="text-[10px] font-black uppercase text-primary tracking-widest">Para que serve?</p>
                     <p className="text-xs font-medium text-muted-foreground leading-relaxed">
-                      Serve para colocar sua empresa no topo das buscas do Google Maps. Ele transforma elogios recebidos no Proova em estrelas reais no seu perfil comercial.
+                      Serve para impulsionar a presença da sua empresa no Google Maps, transformando elogios recebidos no Proova em estrelas reais no seu perfil comercial.
                     </p>
                   </div>
                   <div className="p-4 rounded-2xl bg-muted/50 border space-y-1">
