@@ -108,9 +108,9 @@ export default function ManualPage() {
                   </div>
                 </div>
                 <div className="pt-4">
-                   <Badge variant="outline" className="h-8 px-4 rounded-full border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest">
+                   <div className="inline-flex h-auto py-2 px-4 rounded-2xl border border-primary/20 text-primary text-[10px] font-black uppercase tracking-widest leading-relaxed">
                      Estratégia: Ganhar relevância orgânica impulsionando o volume de avaliações nota máxima.
-                   </Badge>
+                   </div>
                 </div>
               </div>
               
@@ -127,7 +127,6 @@ export default function ManualPage() {
                   </div>
                 </div>
 
-                {/* Tutorial Rápido G-Boost */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                   <div className="p-4 rounded-2xl bg-muted/50 border space-y-1">
                     <p className="text-[10px] font-black uppercase text-primary tracking-widest">Para que serve?</p>
@@ -170,9 +169,9 @@ export default function ManualPage() {
                   </div>
                 </div>
                 <div className="pt-4">
-                   <Badge variant="outline" className="h-8 px-4 rounded-full border-orange-500/20 text-orange-600 text-[10px] font-black uppercase tracking-widest">
+                   <div className="inline-flex h-auto py-2 px-4 rounded-2xl border border-orange-500/20 text-orange-600 text-[10px] font-black uppercase tracking-widest leading-relaxed">
                      Estratégia: Transformar clientes insatisfeitos em parceiros de melhoria via canal privado.
-                   </Badge>
+                   </div>
                 </div>
               </div>
               <div className="lg:order-1 relative group">
@@ -216,9 +215,9 @@ export default function ManualPage() {
                   </div>
                 </div>
                 <div className="pt-4">
-                   <Badge variant="outline" className="h-8 px-4 rounded-full border-blue-500/20 text-blue-600 text-[10px] font-black uppercase tracking-widest">
+                   <div className="inline-flex h-auto py-2 px-4 rounded-2xl border border-blue-500/20 text-blue-600 text-[10px] font-black uppercase tracking-widest leading-relaxed">
                      Estratégia: Reduzir o tempo de decisão do cliente no seu site.
-                   </Badge>
+                   </div>
                 </div>
               </div>
               <div className="relative group">
@@ -262,9 +261,9 @@ export default function ManualPage() {
                   </div>
                 </div>
                 <div className="pt-4">
-                   <Badge variant="outline" className="h-8 px-4 rounded-full border-purple-500/20 text-purple-600 text-[10px] font-black uppercase tracking-widest">
+                   <div className="inline-flex h-auto py-2 px-4 rounded-2xl border border-purple-500/20 text-purple-600 text-[10px] font-black uppercase tracking-widest leading-relaxed">
                      Estratégia: Marketing viral e onipresença digital através de depoimentos reais.
-                   </Badge>
+                   </div>
                 </div>
               </div>
               <div className="lg:order-1 relative group">
