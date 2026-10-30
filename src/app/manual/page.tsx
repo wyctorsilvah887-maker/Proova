@@ -103,7 +103,7 @@ export default function ManualPage() {
                   <div className="flex gap-4 p-4 rounded-2xl bg-background border border-primary/10 shadow-sm transition-all hover:shadow-md">
                     <div className="h-6 w-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-black shrink-0">2</div>
                     <p className="text-sm font-medium leading-relaxed">
-                      <strong className="text-foreground">A Ação:</strong> Exibimos um botão especial convidando o cliente a replicar a nota no seu perfil do Google Business.
+                      <strong className="text-foreground">A Ação:</strong> Para notas altas, exibimos um botão especial convidando o cliente a replicar a nota no seu perfil do Google Business.
                     </p>
                   </div>
                 </div>
@@ -125,7 +125,6 @@ export default function ManualPage() {
                       data-ai-hint="google maps boost tutorial interface"
                     />
                   )}
-                  {/* SIMULATED RED CIRCLE OVERLAY */}
                   <div className="absolute top-[60%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-20 h-20 border-4 border-red-600 rounded-full animate-pulse flex items-center justify-center">
                     <div className="bg-red-600/20 w-full h-full rounded-full" />
                   </div>
@@ -147,13 +146,13 @@ export default function ManualPage() {
                   <div className="flex gap-4 p-4 rounded-2xl bg-background border border-orange-500/10 shadow-sm transition-all hover:shadow-md">
                     <div className="h-6 w-6 rounded-full bg-orange-500/10 text-orange-600 flex items-center justify-center text-xs font-black shrink-0">1</div>
                     <p className="text-sm font-medium leading-relaxed">
-                      <strong className="text-foreground">O Desvio:</strong> Notas baixas (1-3) são roteadas para o seu <strong className="text-foreground">Inbox Privado</strong>.
+                      <strong className="text-foreground">Compliance Total:</strong> Mantemos o botão de envio público para todos para seguir as diretrizes de transparência do Google Maps.
                     </p>
                   </div>
                   <div className="flex gap-4 p-4 rounded-2xl bg-background border border-orange-500/10 shadow-sm transition-all hover:shadow-md">
                     <div className="h-6 w-6 rounded-full bg-orange-500/10 text-orange-600 flex items-center justify-center text-xs font-black shrink-0">2</div>
                     <p className="text-sm font-medium leading-relaxed">
-                      <strong className="text-foreground">A Conciliação:</strong> Você resolve o problema do cliente internamente antes que ele recorra ao Reclame Aqui ou Google.
+                      <strong className="text-foreground">O Direcionamento:</strong> Depoimentos de 1 a 3 estrelas são incentivados ao seu <strong className="text-foreground">Inbox Privado</strong> para resolução interna imediata.
                     </p>
                   </div>
                 </div>
