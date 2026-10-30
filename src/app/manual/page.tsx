@@ -204,7 +204,7 @@ export default function ManualPage() {
               </div>
             </section>
 
-            {/* PILLAR 3: WIDGETS */}
+            {/* PILLAR 3: Página de Conversão */}
             <section className="grid gap-12 lg:grid-cols-2 items-center">
               <div className="space-y-6">
                 <div className="flex items-center gap-3">
@@ -234,18 +234,32 @@ export default function ManualPage() {
                    </div>
                 </div>
               </div>
-              <div className="relative group">
-                <div className="absolute -inset-2 bg-blue-500/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
-                <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
-                  {manualImages.widgets?.imageUrl && (
+              <div className="space-y-4">
+                <div className="relative group">
+                  <div className="absolute -inset-2 bg-blue-500/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
+                  <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
                     <Image 
-                      src={manualImages.widgets.imageUrl} 
-                      alt="Guia Widgets" 
+                      src="/paginapp.png?v=1" 
+                      alt="Guia Página de Conversão" 
                       fill 
                       className="object-cover" 
-                      data-ai-hint="website widget layout guide interface"
                     />
-                  )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <div className="p-4 rounded-2xl bg-muted/50 border space-y-1">
+                    <p className="text-[10px] font-black uppercase text-blue-600 tracking-widest">Para que serve?</p>
+                    <p className="text-xs font-medium text-muted-foreground leading-relaxed">
+                      Serve para você ter uma página profissional que mostra seus melhores elogios. É o link ideal para usar na sua bio do Instagram.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-muted/50 border space-y-1">
+                    <p className="text-[10px] font-black uppercase text-blue-600 tracking-widest">Como utilizar?</p>
+                    <p className="text-xs font-medium text-muted-foreground leading-relaxed">
+                      Clique no botão "Página Pública" no Painel. Lá você escolhe as cores, fotos e quais elogios quer mostrar para seus clientes.
+                    </p>
+                  </div>
                 </div>
               </div>
             </section>
