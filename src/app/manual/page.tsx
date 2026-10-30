@@ -174,15 +174,32 @@ export default function ManualPage() {
                    </div>
                 </div>
               </div>
-              <div className="lg:order-1 relative group">
-                <div className="absolute -inset-2 bg-orange-500/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
-                <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
-                  <Image 
-                    src="/inboxp.png?v=1" 
-                    alt="Guia Shield" 
-                    fill 
-                    className="object-cover" 
-                  />
+              <div className="lg:order-1 space-y-4">
+                <div className="relative group">
+                  <div className="absolute -inset-2 bg-orange-500/10 rounded-[2rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-1000"></div>
+                  <div className="relative aspect-[16/10] bg-background border-4 border-white dark:border-muted rounded-[2rem] shadow-2xl overflow-hidden">
+                    <Image 
+                      src="/inboxp.png?v=1" 
+                      alt="Guia Shield" 
+                      fill 
+                      className="object-cover" 
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <div className="p-4 rounded-2xl bg-muted/50 border space-y-1">
+                    <p className="text-[10px] font-black uppercase text-orange-600 tracking-widest">Para que serve?</p>
+                    <p className="text-xs font-medium text-muted-foreground leading-relaxed">
+                      Serve para evitar que críticas virem reclamações públicas no Google. O sistema incentiva o cliente a falar direto com você em um canal privado.
+                    </p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-muted/50 border space-y-1">
+                    <p className="text-[10px] font-black uppercase text-orange-600 tracking-widest">Como utilizar?</p>
+                    <p className="text-xs font-medium text-muted-foreground leading-relaxed">
+                      Acesse o botão "Inbox Privado" no seu Painel. Lá você resolve o problema do cliente internamente antes que ele decida postar na internet.
+                    </p>
+                  </div>
                 </div>
               </div>
             </section>
