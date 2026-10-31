@@ -73,7 +73,8 @@ import {
   Video,
   VideoIcon,
   Eye,
-  Settings
+  Settings,
+  BookOpen
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -801,7 +802,7 @@ export default function DashPage() {
                   size="sm" 
                   className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5"
                 >
-                  <item.icon className="w-3.5 h-3.5" /> Manual do Usuário
+                  <BookOpen className="w-3.5 h-3.5" /> Manual do Usuário
                 </Button>
               </Link>
               {!isDigitalBusiness && (
