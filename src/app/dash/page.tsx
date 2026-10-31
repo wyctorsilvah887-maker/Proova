@@ -1257,7 +1257,12 @@ export default function DashPage() {
                         <div className="w-full flex justify-between items-center pt-2 sm:pt-4 opacity-40">
                           <span className="text-[7px] sm:text-[8px] text-white font-black uppercase tracking-[0.2em] truncate max-w-[120px] sm:max-w-[150px]">{userData?.companyName}</span>
                           <div className="h-3 sm:h-4 w-12 sm:w-16 relative">
-                            <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Proova" fill className="object-contain" />
+                            <Image 
+                              src={cardVariant === 'dark' ? "/Logotipo%20PROOVA%20dark%20mode%201.png" : "/Logotipo%20PROOVA%20white%20mode%201.png"} 
+                              alt="Proova" 
+                              fill 
+                              className="object-contain" 
+                            />
                           </div>
                         </div>
                       </div>
