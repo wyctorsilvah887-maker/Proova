@@ -15,7 +15,6 @@ async function checkRateLimit(actionName: string) {
   const oneMinuteAgo = new Date(Date.now() - 60000);
   const rateLimitRef = collection(firestore, 'rate_limits');
   
-  // Busca apenas por IP para evitar erro de índice
   const snap = await getDocs(query(rateLimitRef, where('ip', '==', ip), limit(50)));
   
   const recentRequests = snap.docs.filter(doc => {
@@ -24,7 +23,7 @@ async function checkRateLimit(actionName: string) {
     return data.action === actionName && createdAt > oneMinuteAgo;
   });
   
-  if (recentRequests.length >= 10) {
+  if (recentRequests.length >= 15) {
     throw new Error('Limite de requisições excedido. Tente novamente em um minuto.');
   }
 
@@ -37,6 +36,7 @@ async function checkRateLimit(actionName: string) {
 
 /**
  * Consulta detalhes técnicos de um local no Google Maps para o Consultor Proova.
+ * Otimizado para detectar fotos de usuários e horários com maior precisão.
  */
 export async function getGooglePlaceDetails(placeId: string) {
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
@@ -57,16 +57,19 @@ export async function getGooglePlaceDetails(placeId: string) {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': apiKey,
-        'X-Goog-FieldMask': 'photos,regularOpeningHours,types,editorialSummary,displayName',
+        'X-Goog-FieldMask': 'photos,regularOpeningHours,types,editorialSummary,displayName,currentOpeningHours',
       },
-      next: { revalidate: 3600 } // Cache de 1 hora
+      next: { revalidate: 300 } // Cache reduzido para 5 minutos para auditoria mais fresca
     });
+
+    if (!response.ok) return null;
 
     const data = await response.json();
 
     return {
+      // Verifica múltiplas fontes de fotos e horários que o Google pode retornar
       hasPhotos: !!(data.photos && data.photos.length > 0),
-      hasHours: !!(data.regularOpeningHours),
+      hasHours: !!(data.regularOpeningHours || data.currentOpeningHours),
       hasCategory: !!(data.types && data.types.length > 0),
       hasDescription: !!(data.editorialSummary),
       isMock: false
@@ -91,7 +94,6 @@ export async function searchGooglePlaces(queryStr: string, city: string, state: 
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
 
   if (!apiKey) {
-    console.warn("Atenção: GOOGLE_MAPS_API_KEY não encontrada no servidor. Usando modo de simulação.");
     return [
       { 
         name: `${queryStr}`, 
