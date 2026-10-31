@@ -15,6 +15,12 @@ service cloud.firestore {
       allow create, list: if true;
     }
 
+    // Regras para Estatísticas de Conversão (Rastreamento de LP)
+    match /platform_stats/{statsId} {
+      allow read: if true;
+      allow write: if true; // Permite incremento de visitas pela Landing Page
+    }
+
     // Regras para a coleção de usuários e subcoleções
     match /users/{userId} {
       allow create: if true;

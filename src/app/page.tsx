@@ -8,12 +8,34 @@ import Image from "next/image";
 import Link from "next/link";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { Star, CheckCircle2, Link2, ShieldCheck, Zap, Loader2, ArrowRight, MapPin, Inbox, Layout, Scale, Lock } from "lucide-react";
-import { useUser } from "@/firebase";
+import { useUser, useFirestore } from "@/firebase";
+import { doc, setDoc, increment } from "firebase/firestore";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function Home() {
   const { user, loading } = useUser();
+  const db = useFirestore();
   const router = useRouter();
+
+  // Rastreamento de Conversão: Contador de Visitantes Únicos (por sessão)
+  useEffect(() => {
+    if (!db) return;
+    
+    const trackVisit = async () => {
+      try {
+        const hasVisited = sessionStorage.getItem('proova_visited');
+        if (!hasVisited) {
+          const statsRef = doc(db, 'platform_stats', 'landing_page');
+          await setDoc(statsRef, { visitorCount: increment(1) }, { merge: true });
+          sessionStorage.setItem('proova_visited', 'true');
+        }
+      } catch (err) {
+        console.warn("Falha silenciosa ao rastrear visita (possível bloqueador ou permissão):", err);
+      }
+    };
+
+    trackVisit();
+  }, [db]);
 
   useEffect(() => {
     if (!loading && user) {

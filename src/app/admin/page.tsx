@@ -11,7 +11,8 @@ import {
   BadgeCheck, Loader2, Building2, Eye, EyeOff, Sun, Moon, 
   TrendingUp, CreditCard, AlertCircle, Copy, Hash, Calendar,
   BarChart3, MousePointer2, ExternalLink, Gem, ArrowLeft,
-  Settings, Handshake, Save, CheckCircle2, CircleDashed, Rocket
+  Settings, Handshake, Save, CheckCircle2, CircleDashed, Rocket,
+  MousePointer
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -104,6 +105,11 @@ export default function AdminPage() {
 
   const { data: paymentEvents, loading: eventsLoading } = useCollection(paymentEventsQuery);
 
+  // Busca estatísticas globais da Landing Page
+  const statsRef = useMemo(() => (db && isAdminVerified ? doc(db, 'platform_stats', 'landing_page') : null), [db, isAdminVerified]);
+  const { data: statsData } = useDoc(statsRef);
+  const visitorCount = (statsData as any)?.visitorCount || 0;
+
   // Métrica de Onboarding/Setup
   const setupMetrics = useMemo(() => {
     if (!leadsList) return { completed: 0, percentage: 0 };
@@ -121,6 +127,12 @@ export default function AdminPage() {
     
     return { completed: completedCount, percentage };
   }, [leadsList]);
+
+  // Cálculo da Taxa de Conversão da Landing Page
+  const lpConversionRate = useMemo(() => {
+    if (!visitorCount || !leadsList || leadsList.length === 0) return 0;
+    return Math.round((leadsList.length / visitorCount) * 100);
+  }, [leadsList, visitorCount]);
 
   const sortedLeads = useMemo(() => {
     if (!leadsList) return [];
@@ -270,8 +282,8 @@ export default function AdminPage() {
 
   if (!user) {
     return (
-      <div className="flex h-screen items-center justify-center bg-muted/30 px-4">
-        <Card className="w-full max-w-md shadow-xl">
+      <div className="flex h-screen items-center justify-center bg-muted/30 px-4 max-w-md mx-auto">
+        <Card className="w-full shadow-xl">
           <CardHeader className="text-center">
             <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-4">
               <Shield className="w-6 h-6 text-primary" />
@@ -484,6 +496,19 @@ export default function AdminPage() {
             <CardContent className="px-4 md:px-6">
               <div className="text-2xl font-bold text-primary">{setupMetrics.percentage}%</div>
               <p className="text-[10px] text-primary/60 font-bold uppercase">Configuração completa</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-sm overflow-hidden bg-orange-500/5">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
+              <CardTitle className="text-xs font-bold uppercase tracking-widest text-orange-600">LP Conversion</CardTitle>
+              <MousePointer className="w-4 h-4 text-orange-600" />
+            </CardHeader>
+            <CardContent className="px-4 md:px-6">
+              <div className="text-2xl font-bold text-orange-600">{lpConversionRate}%</div>
+              <div className="flex items-center gap-1">
+                <span className="text-[9px] text-orange-600/60 font-bold uppercase">{visitorCount} visitas</span>
+              </div>
             </CardContent>
           </Card>
 
