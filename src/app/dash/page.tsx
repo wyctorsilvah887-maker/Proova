@@ -147,6 +147,7 @@ export default function DashPage() {
   const [selectedTestimonialForShare, setSelectedTestimonialForShare] = useState<any>(null);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isExportingCard, setIsExportingCard] = useState(false);
+  const [cardVariant, setCardVariant] = useState<'dark' | 'orange'>('dark');
   const shareCardRef = useRef<HTMLDivElement>(null);
   const dialogVideoRef = useRef<HTMLVideoElement>(null);
 
@@ -581,7 +582,7 @@ export default function DashPage() {
       const dataUrl = await toPng(shareCardRef.current, { 
         quality: 1.0, 
         pixelRatio: 3, 
-        backgroundColor: '#000000'
+        backgroundColor: cardVariant === 'dark' ? '#000000' : '#f97316'
       });
       const link = document.createElement('a');
       link.download = `proova-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
@@ -598,6 +599,7 @@ export default function DashPage() {
 
   const openShareDialog = (testimonial: any) => {
     setSelectedTestimonialForShare(testimonial);
+    setCardVariant(Math.random() > 0.5 ? 'dark' : 'orange');
     setIsShareDialogOpen(true);
   };
 
@@ -1141,32 +1143,40 @@ export default function DashPage() {
             <div className="w-full flex justify-center py-2 shrink-0">
               <div 
                 ref={shareCardRef}
-                className="w-[min(85vw,400px)] aspect-square relative overflow-hidden rounded-[2.5rem] shadow-2xl flex flex-col items-center p-8 sm:p-12 text-center"
+                className="w-[min(88vw,400px)] aspect-square relative overflow-hidden rounded-[2.5rem] shadow-2xl flex flex-col items-center p-6 sm:p-10 text-center transition-all duration-500"
                 style={{ 
-                  background: 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)',
-                  backgroundColor: '#000000'
+                  background: cardVariant === 'dark' 
+                    ? 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)'
+                    : 'linear-gradient(160deg, #f97316 0%, #ea580c 60%, #ffffff 180%)',
+                  backgroundColor: cardVariant === 'dark' ? '#000000' : '#f97316'
                 }}
               >
                  {/* Decorative Mesh background elements */}
-                 <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/20 rounded-full blur-[80px] opacity-40" />
+                 <div className={cn(
+                   "absolute -top-20 -right-20 w-64 h-64 rounded-full blur-[80px] opacity-40",
+                   cardVariant === 'dark' ? "bg-primary/20" : "bg-white/20"
+                 )} />
                  <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-black/40 rounded-full blur-[80px]" />
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-5 pointer-events-none" 
                    style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }} 
                  />
                  
-                 <Quote className="absolute top-6 left-6 w-12 h-12 text-white/5 -rotate-12" />
+                 <Quote className={cn("absolute top-6 left-6 w-10 h-10 -rotate-12", cardVariant === 'dark' ? "text-white/5" : "text-black/5")} />
                  
                  <div className="relative z-10 w-full flex flex-col h-full justify-between items-center">
                    
                    {/* Persuasive Header */}
                    <div id="card-header-cta" className="mb-2">
-                     <p className="text-[10px] sm:text-xs font-black text-primary uppercase tracking-[0.3em] drop-shadow-md">
+                     <p className={cn(
+                       "text-[9px] sm:text-[11px] font-black uppercase tracking-[0.3em] drop-shadow-md",
+                       cardVariant === 'dark' ? "text-primary" : "text-white"
+                     )}>
                        Veja o que falam sobre nós
                      </p>
                    </div>
 
                    {selectedTestimonialForShare?.videoUrl ? (
-                     <div className="w-full flex flex-col items-center gap-4 mt-2">
+                     <div className="w-full flex flex-col items-center gap-4 mt-1 sm:mt-2">
                         <div className="w-full aspect-video rounded-[1.5rem] overflow-hidden bg-black/40 relative border-4 border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] group">
                           <video 
                             ref={dialogVideoRef}
@@ -1180,24 +1190,30 @@ export default function DashPage() {
                             preload="auto"
                           />
                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                             <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-2xl">
-                                <Play className="w-6 h-6 text-white fill-white" />
+                             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-2xl">
+                                <Play className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white" />
                              </div>
                           </div>
                           <div id="video-overlay-badge" className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                            <p className="text-[8px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
-                              <Video className="w-3 h-3 text-primary" /> Video Review
+                            <p className="text-[7px] sm:text-[8px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
+                              <Video className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-primary" /> Video Review
                             </p>
                           </div>
                         </div>
                         
-                        <div className="space-y-3">
+                        <div className="space-y-2 sm:space-y-3">
                           <div className="flex justify-center gap-1">
                             {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                              <Star key={i} className="w-4 h-4 fill-primary text-primary drop-shadow-[0_2px_4px_rgba(249,115,22,0.4)]" />
+                              <Star key={i} className={cn(
+                                "w-3.5 h-3.5 sm:w-4 h-4 fill-current",
+                                cardVariant === 'dark' ? "text-primary drop-shadow-[0_2px_4px_rgba(249,115,22,0.4)]" : "text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]"
+                              )} />
                             ))}
                           </div>
-                          <p className="text-white text-sm sm:text-base font-bold leading-tight italic line-clamp-3 px-4 drop-shadow-md">
+                          <p className={cn(
+                            "text-xs sm:text-base font-bold leading-tight italic line-clamp-3 px-4 drop-shadow-md",
+                            cardVariant === 'dark' ? "text-white" : "text-white"
+                          )}>
                              {selectedTestimonialForShare?.text && selectedTestimonialForShare?.text !== '(Depoimento em Vídeo)' 
                                ? `"${selectedTestimonialForShare.text}"` 
                                : '"Incrível experiência!"'}
@@ -1205,36 +1221,42 @@ export default function DashPage() {
                         </div>
                      </div>
                    ) : (
-                     <div className="flex-1 flex flex-col justify-center items-center space-y-6 sm:space-y-8 py-4">
+                     <div className="flex-1 flex flex-col justify-center items-center space-y-4 sm:space-y-8 py-2 sm:py-4">
                        <div className="flex justify-center gap-1.5">
                           {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                            <Star key={i} className="w-5 h-5 sm:w-6 sm:h-6 fill-primary text-primary drop-shadow-[0_4px_10px_rgba(249,115,22,0.5)]" />
+                            <Star key={i} className={cn(
+                              "w-5 h-5 sm:w-6 sm:h-6 fill-current",
+                              cardVariant === 'dark' ? "text-primary drop-shadow-[0_4px_10px_rgba(249,115,22,0.5)]" : "text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.1)]"
+                            )} />
                           ))}
                        </div>
                        
-                       <p className="text-white text-lg sm:text-2xl font-black leading-snug sm:leading-tight line-clamp-6 italic drop-shadow-xl px-2 tracking-tight">
+                       <p className={cn(
+                         "text-base sm:text-2xl font-black leading-snug sm:leading-tight line-clamp-6 italic drop-shadow-xl px-2 tracking-tight",
+                         cardVariant === 'dark' ? "text-white" : "text-white"
+                       )}>
                           "{selectedTestimonialForShare?.text}"
                        </p>
                      </div>
                    )}
 
-                   <div className="w-full pt-6 border-t border-white/5 mt-4">
-                      <div className="flex flex-col items-center gap-3">
-                        <div className="space-y-1">
-                          <p className="text-white font-black text-xs sm:text-sm uppercase tracking-[0.2em] drop-shadow-sm">
+                   <div className="w-full pt-4 sm:pt-6 border-t border-white/5 mt-2 sm:mt-4">
+                      <div className="flex flex-col items-center gap-2 sm:gap-3">
+                        <div className="space-y-0.5 sm:space-y-1">
+                          <p className="text-white font-black text-[10px] sm:text-sm uppercase tracking-[0.2em] drop-shadow-sm">
                             {selectedTestimonialForShare?.userName}
                           </p>
-                          <div className="bg-white/5 backdrop-blur-xl px-4 py-1.5 rounded-full border border-white/10 inline-flex items-center gap-2 shadow-sm">
-                             <CheckCircle2 className="w-3 h-3 text-primary" />
-                             <p className="text-[8px] sm:text-[9px] text-white/80 font-bold uppercase tracking-widest">
+                          <div className="bg-white/5 backdrop-blur-xl px-3 sm:px-4 py-1 sm:py-1.5 rounded-full border border-white/10 inline-flex items-center gap-2 shadow-sm">
+                             <CheckCircle2 className={cn("w-2.5 h-2.5 sm:w-3 sm:h-3", cardVariant === 'dark' ? "text-primary" : "text-white")} />
+                             <p className="text-[7px] sm:text-[9px] text-white/80 font-bold uppercase tracking-widest">
                                Avaliado via Proova
                              </p>
                           </div>
                         </div>
 
-                        <div className="w-full flex justify-between items-center pt-4 opacity-40">
-                          <span className="text-[8px] text-white font-black uppercase tracking-[0.2em] truncate max-w-[150px]">{userData?.companyName}</span>
-                          <div className="h-4 w-16 relative">
+                        <div className="w-full flex justify-between items-center pt-2 sm:pt-4 opacity-40">
+                          <span className="text-[7px] sm:text-[8px] text-white font-black uppercase tracking-[0.2em] truncate max-w-[120px] sm:max-w-[150px]">{userData?.companyName}</span>
+                          <div className="h-3 sm:h-4 w-12 sm:w-16 relative">
                             <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Proova" fill className="object-contain" />
                           </div>
                         </div>
@@ -1254,7 +1276,7 @@ export default function DashPage() {
             </Button>
           </div>
           
-          <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center">
+          <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
             <p className="text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
               <Zap className="w-3 h-3 text-primary" /> Dica: Posts com prova social aumentam o CTR em até 400%
             </p>
