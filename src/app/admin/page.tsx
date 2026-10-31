@@ -11,7 +11,7 @@ import {
   BadgeCheck, Loader2, Building2, Eye, EyeOff, Sun, Moon, 
   TrendingUp, CreditCard, AlertCircle, Copy, Hash, Calendar,
   BarChart3, MousePointer2, ExternalLink, Gem, ArrowLeft,
-  Settings, Handshake, Save
+  Settings, Handshake, Save, CheckCircle2, CircleDashed, Rocket
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -103,6 +103,24 @@ export default function AdminPage() {
   }, [db, user, isAdminVerified]);
 
   const { data: paymentEvents, loading: eventsLoading } = useCollection(paymentEventsQuery);
+
+  // Métrica de Onboarding/Setup
+  const setupMetrics = useMemo(() => {
+    if (!leadsList) return { completed: 0, percentage: 0 };
+    
+    const completedCount = leadsList.filter((usr: any) => {
+      const isLocationDone = !!usr.city;
+      const isTestimonialDone = (usr.testimonialsCount || 0) > 0;
+      const isDigital = usr.businessType === 'agencia' || usr.businessType === 'servicos_digitais';
+      const isGoogleDone = isDigital ? true : !!usr.googleMapsUrl;
+      
+      return isLocationDone && isTestimonialDone && isGoogleDone;
+    }).length;
+
+    const percentage = leadsList.length > 0 ? Math.round((completedCount / leadsList.length) * 100) : 0;
+    
+    return { completed: completedCount, percentage };
+  }, [leadsList]);
 
   const sortedLeads = useMemo(() => {
     if (!leadsList) return [];
@@ -457,6 +475,18 @@ export default function AdminPage() {
               <p className="text-[10px] text-muted-foreground">Inscrições totais</p>
             </CardContent>
           </Card>
+          
+          <Card className="border-none shadow-sm overflow-hidden bg-primary/5">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
+              <CardTitle className="text-xs font-bold uppercase tracking-widest text-primary">Setup Rate</CardTitle>
+              <Rocket className="w-4 h-4 text-primary" />
+            </CardHeader>
+            <CardContent className="px-4 md:px-6">
+              <div className="text-2xl font-bold text-primary">{setupMetrics.percentage}%</div>
+              <p className="text-[10px] text-primary/60 font-bold uppercase">Configuração completa</p>
+            </CardContent>
+          </Card>
+
           <Card className="border-none shadow-sm overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
               <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Alertas</CardTitle>
@@ -495,42 +525,63 @@ export default function AdminPage() {
                       <TableRow className="bg-muted/30">
                         <TableHead className="text-[10px] uppercase font-black">Empresa / Nome</TableHead>
                         <TableHead className="text-[10px] uppercase font-black">Email / UID</TableHead>
+                        <TableHead className="text-[10px] uppercase font-black">Setup</TableHead>
                         <TableHead className="text-[10px] uppercase font-black">Plano Atual</TableHead>
                         <TableHead className="text-[10px] uppercase font-black">Registro</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {sortedLeads.map((usr: any) => (
-                        <TableRow 
-                          key={usr.id} 
-                          className="hover:bg-muted/20 cursor-pointer transition-colors"
-                          onClick={() => handleOpenUserDetail(usr.id)}
-                        >
-                          <TableCell className="font-bold">
-                            <div className="flex flex-col min-w-[120px]">
-                              <span className="text-xs">{usr.companyName}</span>
-                              <span className="text-[10px] text-muted-foreground font-normal uppercase tracking-widest">{usr.name}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-col text-[11px] min-w-[150px]">
-                              <span className="font-medium text-primary">{usr.email}</span>
-                              <span className="text-[9px] text-muted-foreground font-mono opacity-60">UID: {usr.id}</span>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge 
-                              variant={usr.membershipStatus === 'enterprise' ? 'default' : (usr.membershipStatus === 'gold' ? 'secondary' : 'outline')} 
-                              className="uppercase text-[8px] font-black h-5"
-                            >
-                              {usr.membershipStatus === 'enterprise' ? 'Enterprise' : (usr.membershipStatus === 'gold' ? 'Gold' : (usr.membershipStatus === 'trial' ? 'Trial' : (usr.membershipStatus === 'expired' ? 'Expirado' : 'Plano Base')))}
-                            </Badge>
-                          </TableCell>
-                          <TableCell className="text-muted-foreground text-[10px] whitespace-nowrap">
-                            {usr.createdAt?.toDate ? usr.createdAt.toDate().toLocaleDateString('pt-BR') : 'Hoje'}
-                          </TableCell>
-                        </TableRow>
-                      ))}
+                      {sortedLeads.map((usr: any) => {
+                        const isLocationDone = !!usr.city;
+                        const isTestimonialDone = (usr.testimonialsCount || 0) > 0;
+                        const isDigital = usr.businessType === 'agencia' || usr.businessType === 'servicos_digitais';
+                        const isGoogleDone = isDigital ? true : !!usr.googleMapsUrl;
+                        const isSetupComplete = isLocationDone && isTestimonialDone && isGoogleDone;
+
+                        return (
+                          <TableRow 
+                            key={usr.id} 
+                            className="hover:bg-muted/20 cursor-pointer transition-colors"
+                            onClick={() => handleOpenUserDetail(usr.id)}
+                          >
+                            <TableCell className="font-bold">
+                              <div className="flex flex-col min-w-[120px]">
+                                <span className="text-xs">{usr.companyName}</span>
+                                <span className="text-[10px] text-muted-foreground font-normal uppercase tracking-widest">{usr.name}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex flex-col text-[11px] min-w-[150px]">
+                                <span className="font-medium text-primary">{usr.email}</span>
+                                <span className="text-[9px] text-muted-foreground font-mono opacity-60">UID: {usr.id}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-1.5" title={isSetupComplete ? "Configuração completa" : "Setup pendente"}>
+                                {isSetupComplete ? (
+                                  <CheckCircle2 className="w-4 h-4 text-green-500" />
+                                ) : (
+                                  <CircleDashed className="w-4 h-4 text-muted-foreground/40" />
+                                )}
+                                <span className={cn("text-[9px] font-black uppercase tracking-widest", isSetupComplete ? "text-green-600" : "text-muted-foreground opacity-50")}>
+                                  {isSetupComplete ? 'Ativo' : 'Pendente'}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge 
+                                variant={usr.membershipStatus === 'enterprise' ? 'default' : (usr.membershipStatus === 'gold' ? 'secondary' : 'outline')} 
+                                className="uppercase text-[8px] font-black h-5"
+                              >
+                                {usr.membershipStatus === 'enterprise' ? 'Enterprise' : (usr.membershipStatus === 'gold' ? 'Gold' : (usr.membershipStatus === 'trial' ? 'Trial' : (usr.membershipStatus === 'expired' ? 'Expirado' : 'Plano Base')))}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-muted-foreground text-[10px] whitespace-nowrap">
+                              {usr.createdAt?.toDate ? usr.createdAt.toDate().toLocaleDateString('pt-BR') : 'Hoje'}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 ) : (
