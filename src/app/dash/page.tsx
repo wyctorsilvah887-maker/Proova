@@ -1128,7 +1128,7 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
 
-      {/* SHARE DIALOG (SOCIAL CARDS) */}
+      {/* SHARE DIALOG (SOCIAL CARDS) - REDESENHADO PREMIUM */}
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[96vh] flex flex-col">
           <DialogHeader className="p-6 sm:p-8 pb-2 text-center shrink-0">
@@ -1140,19 +1140,25 @@ export default function DashPage() {
             <div className="w-full flex justify-center py-2 shrink-0">
               <div 
                 ref={shareCardRef}
-                className="w-[min(85vw,400px)] aspect-square bg-primary relative overflow-hidden rounded-[1.5rem] sm:rounded-[2.5rem] shadow-2xl flex flex-col items-center p-6 sm:p-10 text-center"
-                style={{ background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)' }}
+                className="w-[min(85vw,400px)] aspect-square relative overflow-hidden rounded-[2.5rem] shadow-2xl flex flex-col items-center p-8 sm:p-12 text-center"
+                style={{ 
+                  background: `linear-gradient(145deg, ${userData?.themeColor || '#f97316'} 0%, #ea580c 100%)`,
+                }}
               >
-                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
-                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-black/10 rounded-full -ml-16 -mb-16 blur-2xl" />
+                 {/* Decorative Mesh background elements */}
+                 <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/20 rounded-full blur-[80px]" />
+                 <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-black/20 rounded-full blur-[80px]" />
+                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-primary/10 opacity-30 pointer-events-none" 
+                   style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }} 
+                 />
                  
-                 <Quote className="absolute top-4 left-4 sm:top-6 sm:left-6 w-8 h-8 sm:w-12 sm:h-12 text-white/10 rotate-180" />
+                 <Quote className="absolute top-6 left-6 w-10 h-10 text-white/10 -rotate-12" />
                  
                  <div className="relative z-10 w-full flex flex-col h-full justify-between items-center">
                    
                    {selectedTestimonialForShare?.videoUrl ? (
-                     <div className="w-full flex flex-col items-center gap-3 sm:gap-4 mt-1 sm:mt-2">
-                        <div className="w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black/40 relative border border-white/20 shadow-lg">
+                     <div className="w-full flex flex-col items-center gap-4 mt-2">
+                        <div className="w-full aspect-video rounded-[1.5rem] overflow-hidden bg-black/40 relative border-4 border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.3)] group">
                           <video 
                             ref={dialogVideoRef}
                             src={`/api/download/video?url=${encodeURIComponent(selectedTestimonialForShare.videoUrl)}`} 
@@ -1165,61 +1171,64 @@ export default function DashPage() {
                             preload="auto"
                           />
                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center">
-                                <Play className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white" />
+                             <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-xl border border-white/40 flex items-center justify-center shadow-2xl">
+                                <Play className="w-6 h-6 text-white fill-white" />
                              </div>
                           </div>
-                          <div id="video-overlay-badge" className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white/10 backdrop-blur-md px-2 py-0.5 rounded-full border border-white/10">
-                            <p className="text-[6px] sm:text-[7px] text-white font-black uppercase tracking-widest flex items-center gap-1">
-                              <Video className="w-2 sm:w-2.5 h-2 sm:h-2.5" /> Depoimento em Vídeo
+                          <div id="video-overlay-badge" className="absolute top-3 left-3 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                            <p className="text-[8px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
+                              <Video className="w-3 h-3" /> Video Review
                             </p>
                           </div>
                         </div>
                         
-                        <div className="space-y-1.5 sm:space-y-2">
-                          <div className="flex justify-center gap-0.5 sm:gap-1">
+                        <div className="space-y-3">
+                          <div className="flex justify-center gap-1">
                             {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                              <Star key={i} className="w-3 h-3 sm:w-4 sm:h-4 fill-white text-white drop-shadow-sm" />
+                              <Star key={i} className="w-4 h-4 fill-white text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]" />
                             ))}
                           </div>
-                          <p className="text-white text-[11px] sm:text-sm font-bold leading-tight italic line-clamp-3 px-1">
+                          <p className="text-white text-sm sm:text-base font-bold leading-tight italic line-clamp-3 px-4 drop-shadow-md">
                              {selectedTestimonialForShare?.text && selectedTestimonialForShare?.text !== '(Depoimento em Vídeo)' 
                                ? `"${selectedTestimonialForShare.text}"` 
-                               : '"Feedback incrível deste cliente!"'}
+                               : '"Incrível experiência!"'}
                           </p>
                         </div>
                      </div>
                    ) : (
-                     <div className="flex-1 flex flex-col justify-center items-center space-y-4 sm:space-y-6">
-                       <div className="flex justify-center gap-1 sm:gap-1.5">
+                     <div className="flex-1 flex flex-col justify-center items-center space-y-6 sm:space-y-8">
+                       <div className="flex justify-center gap-1.5">
                           {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                            <Star key={i} className="w-4 h-4 sm:w-5 sm:h-5 fill-white text-white drop-shadow-sm" />
+                            <Star key={i} className="w-5 h-5 sm:w-6 sm:h-6 fill-white text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.2)]" />
                           ))}
                        </div>
                        
-                       <p className="text-white text-sm sm:text-lg font-bold leading-snug sm:leading-tight line-clamp-6 italic drop-shadow-md px-2">
+                       <p className="text-white text-lg sm:text-2xl font-black leading-snug sm:leading-tight line-clamp-6 italic drop-shadow-xl px-2 tracking-tight">
                           "{selectedTestimonialForShare?.text}"
                        </p>
                      </div>
                    )}
 
-                   <div className="w-full pt-3 sm:pt-4">
-                      <div className="space-y-1 mb-3 sm:mb-4">
-                        <p className="text-white font-black text-[11px] sm:text-sm uppercase tracking-widest truncate max-w-full">
-                          {selectedTestimonialForShare?.userName}
-                        </p>
-                        <div className="bg-white/10 backdrop-blur-md px-2 sm:px-3 py-0.5 sm:py-1 rounded-full border border-white/20 inline-block">
-                           <p className="text-[7px] sm:text-[8px] text-white font-black uppercase tracking-[0.2em]">
-                             Avaliado via Proova
-                           </p>
+                   <div className="w-full pt-6 border-t border-white/10 mt-4">
+                      <div className="flex flex-col items-center gap-3">
+                        <div className="space-y-1">
+                          <p className="text-white font-black text-xs sm:text-sm uppercase tracking-[0.2em] drop-shadow-sm">
+                            {selectedTestimonialForShare?.userName}
+                          </p>
+                          <div className="bg-white/10 backdrop-blur-xl px-4 py-1.5 rounded-full border border-white/20 inline-flex items-center gap-2 shadow-sm">
+                             <CheckCircle2 className="w-3 h-3 text-white" />
+                             <p className="text-[8px] sm:text-[9px] text-white font-bold uppercase tracking-widest">
+                               Avaliado via Proova
+                             </p>
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="w-full flex justify-between items-center opacity-60">
-                          <span className="text-[6px] sm:text-[7px] text-white font-black uppercase tracking-widest truncate max-w-[120px]">{userData?.companyName}</span>
-                          <div className="h-2.5 sm:h-3 w-10 sm:w-12 relative">
+                        <div className="w-full flex justify-between items-center pt-4 opacity-50">
+                          <span className="text-[8px] text-white font-black uppercase tracking-[0.2em] truncate max-w-[150px]">{userData?.companyName}</span>
+                          <div className="h-4 w-16 relative">
                             <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Proova" fill className="object-contain" />
                           </div>
+                        </div>
                       </div>
                    </div>
                  </div>
@@ -1227,18 +1236,18 @@ export default function DashPage() {
             </div>
 
             <Button 
-              className="w-full h-12 sm:h-14 rounded-2xl font-black uppercase tracking-widest shadow-xl gap-2 transition-all active:scale-95 text-xs shrink-0"
+              className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-xs bg-primary hover:bg-primary/90 text-white"
               onClick={handleDownloadContent}
               disabled={isExportingCard}
             >
-              {isExportingCard ? <Loader2 className="animate-spin" /> : <Download className="w-4 h-4 sm:w-5 sm:h-5" />}
-              {selectedTestimonialForShare?.videoUrl ? 'Gerar Vídeo com Moldura' : 'Baixar PNG em Alta'}
+              {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-5 h-5" />}
+              {selectedTestimonialForShare?.videoUrl ? 'Renderizar Vídeo Premium' : 'Baixar Card de Alta'}
             </Button>
           </div>
           
-          <DialogFooter className="p-4 sm:p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
-            <p className="text-[8px] sm:text-[9px] font-black uppercase text-muted-foreground tracking-widest">
-              {selectedTestimonialForShare?.videoUrl ? 'O sistema gravará seu vídeo com a moldura. Isso pode levar alguns segundos.' : 'Dica: Use nos redes sociais para provar autoridade 24h por dia'}
+          <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center">
+            <p className="text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
+              <Zap className="w-3 h-3 text-primary" /> Dica: Posts com prova social aumentam o CTR em até 400%
             </p>
           </DialogFooter>
         </DialogContent>
