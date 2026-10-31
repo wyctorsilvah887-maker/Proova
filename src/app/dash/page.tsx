@@ -512,7 +512,7 @@ export default function DashPage() {
         pixelRatio: 2,
         filter: (node) => {
           const el = node as HTMLElement;
-          return el.tagName !== 'VIDEO' && el.id !== 'video-overlay-badge';
+          return el.tagName !== 'VIDEO' && el.id !== 'video-overlay-badge' && el.id !== 'card-header-cta';
         }
       });
       
@@ -533,7 +533,7 @@ export default function DashPage() {
         const vWidth = size * 0.85;
         const vHeight = vWidth * (9/16);
         const vX = (size - vWidth) / 2;
-        const vY = size * 0.18;
+        const vY = size * 0.22; // Adjusted for the header text
 
         ctx.save();
         ctx.beginPath();
@@ -580,7 +580,7 @@ export default function DashPage() {
       const dataUrl = await toPng(shareCardRef.current, { 
         quality: 1.0, 
         pixelRatio: 3, 
-        backgroundColor: '#f97316'
+        backgroundColor: '#000000'
       });
       const link = document.createElement('a');
       link.download = `proova-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
@@ -801,7 +801,7 @@ export default function DashPage() {
                   size="sm" 
                   className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5"
                 >
-                  <Info className="w-3.5 h-3.5" /> Manual do Usuário
+                  <item.icon className="w-3.5 h-3.5" /> Manual do Usuário
                 </Button>
               </Link>
               {!isDigitalBusiness && (
@@ -1128,7 +1128,7 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
 
-      {/* SHARE DIALOG (SOCIAL CARDS) - REDESENHADO PREMIUM */}
+      {/* SHARE DIALOG (SOCIAL CARDS) - REDESENHADO PREMIUM DARK & ORANGE */}
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[96vh] flex flex-col">
           <DialogHeader className="p-6 sm:p-8 pb-2 text-center shrink-0">
@@ -1142,23 +1142,31 @@ export default function DashPage() {
                 ref={shareCardRef}
                 className="w-[min(85vw,400px)] aspect-square relative overflow-hidden rounded-[2.5rem] shadow-2xl flex flex-col items-center p-8 sm:p-12 text-center"
                 style={{ 
-                  background: `linear-gradient(145deg, ${userData?.themeColor || '#f97316'} 0%, #ea580c 100%)`,
+                  background: 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)',
+                  backgroundColor: '#000000'
                 }}
               >
                  {/* Decorative Mesh background elements */}
-                 <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/20 rounded-full blur-[80px]" />
-                 <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-black/20 rounded-full blur-[80px]" />
-                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-primary/10 opacity-30 pointer-events-none" 
+                 <div className="absolute -top-20 -right-20 w-64 h-64 bg-primary/20 rounded-full blur-[80px] opacity-40" />
+                 <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-black/40 rounded-full blur-[80px]" />
+                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-5 pointer-events-none" 
                    style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }} 
                  />
                  
-                 <Quote className="absolute top-6 left-6 w-10 h-10 text-white/10 -rotate-12" />
+                 <Quote className="absolute top-6 left-6 w-12 h-12 text-white/5 -rotate-12" />
                  
                  <div className="relative z-10 w-full flex flex-col h-full justify-between items-center">
                    
+                   {/* Persuasive Header */}
+                   <div id="card-header-cta" className="mb-2">
+                     <p className="text-[10px] sm:text-xs font-black text-primary uppercase tracking-[0.3em] drop-shadow-md">
+                       Veja o que falam sobre nós
+                     </p>
+                   </div>
+
                    {selectedTestimonialForShare?.videoUrl ? (
                      <div className="w-full flex flex-col items-center gap-4 mt-2">
-                        <div className="w-full aspect-video rounded-[1.5rem] overflow-hidden bg-black/40 relative border-4 border-white/20 shadow-[0_20px_50px_rgba(0,0,0,0.3)] group">
+                        <div className="w-full aspect-video rounded-[1.5rem] overflow-hidden bg-black/40 relative border-4 border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] group">
                           <video 
                             ref={dialogVideoRef}
                             src={`/api/download/video?url=${encodeURIComponent(selectedTestimonialForShare.videoUrl)}`} 
@@ -1171,13 +1179,13 @@ export default function DashPage() {
                             preload="auto"
                           />
                           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                             <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-xl border border-white/40 flex items-center justify-center shadow-2xl">
+                             <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-2xl">
                                 <Play className="w-6 h-6 text-white fill-white" />
                              </div>
                           </div>
-                          <div id="video-overlay-badge" className="absolute top-3 left-3 bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                          <div id="video-overlay-badge" className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
                             <p className="text-[8px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
-                              <Video className="w-3 h-3" /> Video Review
+                              <Video className="w-3 h-3 text-primary" /> Video Review
                             </p>
                           </div>
                         </div>
@@ -1185,7 +1193,7 @@ export default function DashPage() {
                         <div className="space-y-3">
                           <div className="flex justify-center gap-1">
                             {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                              <Star key={i} className="w-4 h-4 fill-white text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]" />
+                              <Star key={i} className="w-4 h-4 fill-primary text-primary drop-shadow-[0_2px_4px_rgba(249,115,22,0.4)]" />
                             ))}
                           </div>
                           <p className="text-white text-sm sm:text-base font-bold leading-tight italic line-clamp-3 px-4 drop-shadow-md">
@@ -1196,10 +1204,10 @@ export default function DashPage() {
                         </div>
                      </div>
                    ) : (
-                     <div className="flex-1 flex flex-col justify-center items-center space-y-6 sm:space-y-8">
+                     <div className="flex-1 flex flex-col justify-center items-center space-y-6 sm:space-y-8 py-4">
                        <div className="flex justify-center gap-1.5">
                           {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                            <Star key={i} className="w-5 h-5 sm:w-6 sm:h-6 fill-white text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.2)]" />
+                            <Star key={i} className="w-5 h-5 sm:w-6 sm:h-6 fill-primary text-primary drop-shadow-[0_4px_10px_rgba(249,115,22,0.5)]" />
                           ))}
                        </div>
                        
@@ -1209,21 +1217,21 @@ export default function DashPage() {
                      </div>
                    )}
 
-                   <div className="w-full pt-6 border-t border-white/10 mt-4">
+                   <div className="w-full pt-6 border-t border-white/5 mt-4">
                       <div className="flex flex-col items-center gap-3">
                         <div className="space-y-1">
                           <p className="text-white font-black text-xs sm:text-sm uppercase tracking-[0.2em] drop-shadow-sm">
                             {selectedTestimonialForShare?.userName}
                           </p>
-                          <div className="bg-white/10 backdrop-blur-xl px-4 py-1.5 rounded-full border border-white/20 inline-flex items-center gap-2 shadow-sm">
-                             <CheckCircle2 className="w-3 h-3 text-white" />
-                             <p className="text-[8px] sm:text-[9px] text-white font-bold uppercase tracking-widest">
+                          <div className="bg-white/5 backdrop-blur-xl px-4 py-1.5 rounded-full border border-white/10 inline-flex items-center gap-2 shadow-sm">
+                             <CheckCircle2 className="w-3 h-3 text-primary" />
+                             <p className="text-[8px] sm:text-[9px] text-white/80 font-bold uppercase tracking-widest">
                                Avaliado via Proova
                              </p>
                           </div>
                         </div>
 
-                        <div className="w-full flex justify-between items-center pt-4 opacity-50">
+                        <div className="w-full flex justify-between items-center pt-4 opacity-40">
                           <span className="text-[8px] text-white font-black uppercase tracking-[0.2em] truncate max-w-[150px]">{userData?.companyName}</span>
                           <div className="h-4 w-16 relative">
                             <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Proova" fill className="object-contain" />
