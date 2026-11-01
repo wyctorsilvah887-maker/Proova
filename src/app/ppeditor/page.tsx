@@ -223,9 +223,8 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
         side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in"
       )}
       style={{ 
-        backgroundColor: secondaryColor && secondaryColor !== '#ffffff' ? `${secondaryColor}10` : undefined,
         boxShadow: `0 20px 40px -20px ${themeColor}25`,
-        border: `1px solid ${themeColor}15`
+        border: `2px solid ${secondaryColor || themeColor + '15'}`
       }}
     >
       <div className="space-y-6">
@@ -286,6 +285,7 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
 
 const PublicPageSettings = ({ 
   themeColor, setThemeColor,
+  secondaryColor, setSecondaryColor,
   layout, setLayout,
   logoUrl, setLogoUrl,
   heroTitle, setHeroTitle,
@@ -370,11 +370,24 @@ const PublicPageSettings = ({
 
               <div className="space-y-6 pt-4 border-t">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 ml-1">
-                  <Palette className="w-3 h-3 text-primary" /> Cor Principal
+                  <Palette className="w-3 h-3 text-primary" /> Cor Primária
                 </Label>
+                <p className="text-[9px] text-muted-foreground ml-1 mb-2">(Estrelas e Perfil)</p>
                 <div className="flex flex-wrap gap-2">
                   {colors.map((color) => (
                     <button key={color} onClick={() => setThemeColor(color)} className={cn("w-7 h-7 rounded-full border-2 transition-transform hover:scale-110", themeColor === color ? "border-foreground" : "border-transparent shadow-inner")} style={{ backgroundColor: color }} />
+                  ))}
+                </div>
+              </div>
+
+              <div className={cn("space-y-6 pt-6 border-t", !isGoldPlan && "opacity-40 grayscale pointer-events-none")}>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 ml-1">
+                  <Palette className="w-3 h-3 text-primary" /> Cor Secundária {!isGoldPlan && <Lock className="w-2.5 h-2.5 ml-1" />}
+                </Label>
+                <p className="text-[9px] text-muted-foreground ml-1 mb-2">(Bordas dos Cards)</p>
+                <div className="flex flex-wrap gap-2">
+                  {colors.map((color) => (
+                    <button key={color} onClick={() => setSecondaryColor(color)} className={cn("w-7 h-7 rounded-full border-2 transition-transform hover:scale-110", secondaryColor === color ? "border-foreground" : "border-transparent shadow-inner")} style={{ backgroundColor: color }} />
                   ))}
                 </div>
               </div>
