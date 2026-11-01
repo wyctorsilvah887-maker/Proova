@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -218,7 +217,7 @@ const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onCha
           setShowToolbar(false);
         }}
         onSelect={handleSelection}
-        className="min-h-[140px] p-6 rounded-[1.5rem] bg-muted/20 border-2 border-transparent focus:border-primary/30 outline-none text-sm font-bold leading-relaxed transition-all cursor-text shadow-inner"
+        className="min-h-[100px] p-6 rounded-[1.5rem] bg-muted/20 border-2 border-transparent focus:border-primary/30 outline-none text-sm font-bold leading-relaxed transition-all cursor-text shadow-inner"
       />
       
       {!value && !isFocused && (
@@ -373,7 +372,7 @@ const PublicPageSettings = ({
                 >
                   {isUploading ? <Loader2 className="animate-spin text-primary" /> : (logoUrl ? <img src={logoUrl} className="w-full h-full object-cover rounded-xl" /> : <Upload className="text-muted-foreground" />)}
                 </div>
-                <input type="file" ref={logoInputRef} className="hidden" accept="image/*" onChange={(e) => onFileSelect(e, 'logo')} />
+                <input type="file" logoInputRef={logoInputRef} className="hidden" accept="image/*" onChange={(e) => onFileSelect(e, 'logo')} />
               </div>
 
               <div className="space-y-4 pt-4 border-t">
@@ -415,11 +414,14 @@ const PublicPageSettings = ({
             <TabsContent value="conteudo" className="mt-0">
               {isEnterprise ? (
                 <div className="space-y-8">
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                       <Type className="w-3 h-3 text-primary" /> Título Principal (Hero)
                     </Label>
                     <HeroTitleEditor value={heroTitle} onChange={setHeroTitle} themeColor={themeColor} />
+                    <p className="text-[9px] text-primary font-bold italic bg-primary/5 p-2 rounded-lg border border-primary/10">
+                      💡 Selecione o texto para ativar o seletor de cores RGB.
+                    </p>
                   </div>
                   
                   <div className="space-y-4">
