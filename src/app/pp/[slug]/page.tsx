@@ -134,8 +134,8 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
   const showProovaBranding = ppData?.showLogo !== false;
 
   useEffect(() => {
-    if (layout === 'popup' && filteredTestimonials.length > 1) {
-      const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % filteredTestimonials.length), 7000);
+    if ((layout === 'mural' || layout === 'popup') && filteredTestimonials.length > 0) {
+      const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % filteredTestimonials.length), 6000);
       return () => clearInterval(interval);
     }
   }, [layout, filteredTestimonials]);
@@ -148,8 +148,20 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
 
   const visibleDisplayPool = useMemo(() => {
     if (filteredTestimonials.length === 0) return [];
-    if (layout === 'grid' || layout === 'mural') return filteredTestimonials;
+    
+    if (layout === 'mural') {
+      const slice = [];
+      const count = Math.min(4, filteredTestimonials.length);
+      for (let i = 0; i < count; i++) {
+        const idx = (muralIndex + i) % filteredTestimonials.length;
+        slice.push(filteredTestimonials[idx]);
+      }
+      return slice;
+    }
+    
+    if (layout === 'grid') return filteredTestimonials;
     if (layout === 'popup') return [filteredTestimonials[muralIndex % filteredTestimonials.length]];
+    
     return filteredTestimonials;
   }, [filteredTestimonials, muralIndex, layout]);
 
@@ -161,13 +173,16 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     );
   }
 
-  const TestimonialCard = ({ t }: { t: any }) => {
+  const TestimonialCard = ({ t, index = 0 }: { t: any, index?: number }) => {
     const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
+    const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
     
     return (
       <Card 
         className={cn(
-          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] border-none"
+          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] border-none",
+          "animate-in fade-in duration-700 ease-out fill-both",
+          side === 'left' ? "slide-in-from-left-12" : "slide-in-from-right-12"
         )}
         style={{ 
           boxShadow: `0 20px 40px -20px ${themeColor}25`,
@@ -254,7 +269,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
            <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4">
              <Globe className="w-12 h-12 text-muted-foreground/20" />
              <h2 className="text-xl font-bold">Página não encontrada</h2>
-             <p className="text-muted-foreground text-sm">Este link pode ter sido alterado ou está disponível.</p>
            </div>
         ) : (
           <div className="w-full max-w-full mx-auto flex-1 flex flex-col">
@@ -268,7 +282,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                   </div>
                 )}
                 <div className="space-y-4">
-                  <h1 className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.05] max-w-5xl mx-auto" dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${companyName || 'nós'}` }} />
+                  <h1 className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.05] max-w-5xl mx-auto" dangerouslySetInnerHTML={{ __html: heroTitle }} />
                   {heroSubtitle && <div className="text-muted-foreground text-base sm:text-lg max-w-3xl mx-auto font-medium leading-relaxed italic" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />}
                 </div>
               </div>
@@ -278,10 +292,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
               {customSections.map((section: any) => (
                 <section key={section.id} className={cn("py-24 px-6 text-center", section.variant === 'accent' ? "text-white" : (section.variant === 'dark' ? "bg-black text-white" : "bg-muted/5"))} style={{ backgroundColor: section.variant === 'accent' ? themeColor : undefined }}>
                   <div className="max-w-4xl mx-auto space-y-8">
-                    <div className="space-y-4">
-                      <h2 className="text-3xl sm:text-5xl font-black tracking-tight">{section.title}</h2>
-                      {section.subtitle && <div className="text-base font-bold" dangerouslySetInnerHTML={{ __html: section.subtitle }} />}
-                    </div>
+                    <h2 className="text-3xl sm:text-5xl font-black tracking-tight">{section.title}</h2>
                     <p className="text-base sm:text-xl leading-relaxed opacity-90 font-medium">{section.content}</p>
                     {section.buttonText && (
                       <div className="pt-8">
@@ -306,29 +317,36 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
               ) : (
                 <div className="w-full">
                   {layout === 'mural' && (
-                    <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-12">
-                      {visibleDisplayPool.map((t) => (
-                        <div key={t.id} className="mb-12 break-inside-avoid"><TestimonialCard t={t} /></div>
+                    <div className="columns-1 sm:columns-2 lg:columns-2 xl:columns-2 gap-12">
+                      {visibleDisplayPool.map((t, i) => (
+                        <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12 break-inside-avoid">
+                          <TestimonialCard t={t} index={i} />
+                        </div>
                       ))}
                     </div>
                   )}
-                  {(layout === 'grid' || layout === 'popup') && (
-                    <div className={cn("w-full", layout === 'popup' ? "max-w-sm mx-auto flex flex-col gap-12" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12")}>
-                      {visibleDisplayPool.map((t) => (
-                        <div key={t.id} className="mb-12"><TestimonialCard t={t} /></div>
+                  {layout === 'grid' && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
+                      {visibleDisplayPool.map((t, i) => (
+                        <TestimonialCard key={`${t.id}-${muralIndex}-${i}`} t={t} index={i} />
                       ))}
                     </div>
                   )}
                   {layout === 'carousel' && (
                     <Carousel setApi={setApi} opts={{ loop: true }} className="w-full max-w-5xl mx-auto">
                       <CarouselContent>
-                        {filteredTestimonials.map((t) => (
+                        {filteredTestimonials.map((t, i) => (
                           <CarouselItem key={t.id} className="p-4 md:basis-1/2 lg:basis-1/3">
-                            <div className="mb-12"><TestimonialCard t={t} /></div>
+                            <TestimonialCard t={t} index={i} />
                           </CarouselItem>
                         ))}
                       </CarouselContent>
                     </Carousel>
+                  )}
+                  {layout === 'popup' && (
+                    <div className="max-w-md mx-auto">
+                      <TestimonialCard t={visibleDisplayPool[0]} />
+                    </div>
                   )}
                 </div>
               )}

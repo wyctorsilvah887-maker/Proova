@@ -12,7 +12,7 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { Card } from '@/components/ui/card';
-import { Star, User, Loader2, MessageSquare, MessageCircle, Globe, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Star, User, Loader2, MessageSquare, MessageCircle, Globe, ArrowRight, ArrowLeft, Clock, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -62,15 +62,14 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
           return;
         }
 
-        // 2. Variações do Slug para garantir match (trata + como espaço ou hífen)
+        // 2. Variações do Slug para garantir match
         const variations = [
-          decodedSlug, // odonto+saude-teixeira
-          decodedSlug.replace(/\+/g, '-'), // odonto-saude-teixeira (padrão proova)
+          decodedSlug,
+          decodedSlug.replace(/\+/g, '-'),
           decodedSlug.replace(/\+/g, ' ').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, '-'),
           decodedSlug.replace(/-/g, '+'),
         ];
 
-        // Remover duplicatas
         const uniqueVariations = Array.from(new Set(variations));
 
         for (const v of uniqueVariations) {
@@ -81,17 +80,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
             setCompanyData(snap.docs[0].data());
             return;
           }
-        }
-
-        // 3. Fallback final: Busca por nome aproximado (se a URL tiver espaços convertidos)
-        const probableName = decodedSlug.replace(/[+-]/g, ' ');
-        const q3 = query(collection(db, 'users'), where('companyName', '>=', probableName), limit(10));
-        const snap3 = await getDocs(q3);
-        const match = snap3.docs.find(d => d.data().companyName.toLowerCase() === probableName.toLowerCase());
-        if (match) {
-          setTargetUserId(match.id);
-          setCompanyData(match.data());
-          return;
         }
         
       } catch (err) {
@@ -112,8 +100,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
     const unsubWidget = onSnapshot(widgetRef, (docSnap) => {
       if (docSnap.exists()) {
         setWidgetData(docSnap.data());
-      } else {
-        setWidgetData(null);
       }
     });
 
@@ -136,43 +122,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
     return allTestimonials.filter(t => selectedIds.includes(t.id));
   }, [widgetData, allTestimonials]);
 
-  // SEO LOCAL - JSON-LD Calculation
-  const seoJsonLd = useMemo(() => {
-    if (!companyData || filteredTestimonials.length === 0) return null;
-
-    const avgRating = filteredTestimonials.reduce((acc, t) => acc + (t.rating || 5), 0) / filteredTestimonials.length;
-
-    return {
-      "@context": "https://schema.org/",
-      "@type": "LocalBusiness",
-      "name": companyData.companyName,
-      "image": widgetData?.logoUrl || "",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": avgRating.toFixed(1),
-        "bestRating": "5",
-        "worstRating": "1",
-        "ratingCount": filteredTestimonials.length,
-        "reviewCount": filteredTestimonials.length
-      },
-      "review": filteredTestimonials.slice(0, 10).map(t => ({
-        "@type": "Review",
-        "reviewRating": {
-          "@type": "Rating",
-          "ratingValue": t.rating || 5,
-          "bestRating": "5"
-        },
-        "author": {
-          "@type": "Person",
-          "name": t.userName
-        },
-        "reviewBody": t.text,
-        "datePublished": t.createdAt?.toDate ? t.createdAt.toDate().toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
-      }))
-    };
-  }, [companyData, widgetData, filteredTestimonials]);
-
-  const layout = widgetData?.layout || 'mural';
+  const layout = widgetData?.layout || 'grid';
   const themeColor = widgetData?.themeColor || '#f97316';
   const secondaryColor = widgetData?.secondaryColor || '#ffffff';
   const whatsappEnabled = widgetData?.whatsappEnabled || false;
@@ -181,19 +131,16 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
   const logoUrl = widgetData?.logoUrl || '';
   const customSections = widgetData?.customSections || [];
   
-  // Link do Google Maps centralizado no perfil da empresa
-  const googleMapsUrl = companyData?.googleMapsUrl || null;
-  
   const heroTitle = widgetData?.heroTitle || `O que dizem sobre ${companyData?.companyName || 'nós'}`;
   const heroSubtitle = widgetData?.heroSubtitle || '';
   const testimonialsTitle = widgetData?.testimonialsTitle || '';
   const footerText = widgetData?.footerText || `${new Date().getFullYear()} ${companyData?.companyName || ''}`;
   const showProovaBranding = widgetData?.showLogo !== false;
 
-  // Efeito de rotação limitado a 5 visíveis
+  // Efeito de rotação limitada a 4 visíveis no modo Mural/Masonry
   useEffect(() => {
-    if ((layout === 'mural' || layout === 'grid') && filteredTestimonials.length > 5) {
-      const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % filteredTestimonials.length), 7000);
+    if ((layout === 'mural' || layout === 'popup') && filteredTestimonials.length > 0) {
+      const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % filteredTestimonials.length), 6000);
       return () => clearInterval(interval);
     }
   }, [layout, filteredTestimonials]);
@@ -207,15 +154,18 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
   const visibleDisplayPool = useMemo(() => {
     if (filteredTestimonials.length === 0) return [];
     
-    if (layout === 'mural' || layout === 'grid') {
+    if (layout === 'mural') {
       const slice = [];
-      const count = Math.min(5, filteredTestimonials.length);
+      const count = Math.min(4, filteredTestimonials.length);
       for (let i = 0; i < count; i++) {
         const idx = (muralIndex + i) % filteredTestimonials.length;
         slice.push(filteredTestimonials[idx]);
       }
       return slice;
     }
+    
+    if (layout === 'grid') return filteredTestimonials;
+    if (layout === 'popup') return [filteredTestimonials[muralIndex % filteredTestimonials.length]];
     
     return filteredTestimonials;
   }, [filteredTestimonials, muralIndex, layout]);
@@ -228,42 +178,73 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
     );
   }
 
-  const hasValidLogo = logoUrl && logoUrl.startsWith('http');
-
   const TestimonialCard = ({ t, index = 0 }: { t: any, index?: number }) => {
     const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
+    const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent' && secondaryColor !== '#ffffff';
     
     return (
       <Card 
         key={`${t.id}-${muralIndex}`}
         className={cn(
-          "bg-card rounded-xl p-6 shadow-sm animate-in duration-700 ease-out fill-both",
-          side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in"
+          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none",
+          "animate-in fade-in duration-700 ease-out fill-both",
+          side === 'left' ? "slide-in-from-left-12" : "slide-in-from-right-12"
         )}
         style={{ 
-          borderTopWidth: layout !== 'popup' ? '4px' : '0',
-          borderTopColor: layout !== 'popup' ? themeColor : 'transparent',
-          borderLeftWidth: layout === 'popup' ? '4px' : '0',
-          borderLeftColor: layout === 'popup' ? themeColor : 'transparent',
-          backgroundColor: secondaryColor && secondaryColor !== '#ffffff' ? `${secondaryColor}20` : undefined,
-          boxShadow: `0 10px 30px -15px ${themeColor}30`
+          boxShadow: `0 20px 40px -20px ${themeColor}25`,
+          border: hasSecondary ? `2px solid ${secondaryColor}` : 'none'
         }}
       >
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-full shrink-0" style={{ backgroundColor: secondaryColor && secondaryColor !== '#ffffff' ? `${secondaryColor}30` : `${themeColor}15` }}>
-              <User className="w-4 h-4" style={{ color: themeColor }} />
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-lg rotate-3 shrink-0" style={{ backgroundColor: themeColor }}>
+                {t.userName?.substring(0, 2).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="font-black text-sm text-foreground tracking-tight truncate max-w-[120px]">{t.userName}</p>
+                <div className="flex items-center gap-1.5">
+                   <CheckCircle2 className="w-2.5 h-2.5 text-green-500 fill-green-500/20" />
+                   <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Verificado</span>
+                </div>
+              </div>
             </div>
-            <span className="font-bold text-sm text-foreground">{t.userName}</span>
+            <div className="flex gap-0.5">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <Star key={s} className={cn("w-3 h-3", s <= (t.rating || 5) ? "fill-current" : "opacity-20")} style={{ color: themeColor }} />
+              ))}
+            </div>
           </div>
-          <div className="flex gap-0.5">
-            {Array.from({ length: t.rating || 5 }).map((_, i) => (
-              <Star key={i} className="w-3 h-3 fill-current" style={{ color: themeColor }} />
-            ))}
-          </div>
-          {t.text && t.text !== '(Depoimento em Vídeo)' && (
-            <p className="text-foreground/80 italic text-sm leading-relaxed">"{t.text}"</p>
+
+          {t.videoUrl && (
+            <div className="relative aspect-video rounded-3xl overflow-hidden bg-black shadow-2xl group ring-1 ring-white/10">
+               <video src={t.videoUrl} className="w-full h-full object-cover" muted loop playsInline autoPlay />
+               <div className="absolute bottom-3 left-3 flex items-center gap-2">
+                 <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                   <p className="text-[8px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
+                     <Play className="w-2 h-2 fill-white" /> Vídeo Review
+                   </p>
+                 </div>
+               </div>
+            </div>
           )}
+
+          {t.text && t.text !== '(Depoimento em Vídeo)' && (
+            <div className="relative">
+              <span className="absolute -top-3 -left-2 text-5xl opacity-10 font-serif select-none pointer-events-none" style={{ color: themeColor }}>“</span>
+              <p className="text-foreground/90 font-medium text-sm sm:text-base leading-relaxed italic relative z-10 px-2">
+                {t.text}
+              </p>
+            </div>
+          )}
+
+          <div className="pt-5 border-t border-muted-foreground/10 flex items-center justify-between">
+            <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] flex items-center gap-1.5">
+              <Clock className="w-3 h-3" />
+              {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Hoje'}
+            </span>
+            <div className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
+          </div>
         </div>
       </Card>
     );
@@ -271,14 +252,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
 
   return (
     <div className="min-h-screen bg-background font-body flex flex-col relative overflow-x-hidden text-foreground">
-      {/* Dynamic SEO JSON-LD Script */}
-      {seoJsonLd && (
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(seoJsonLd) }}
-        />
-      )}
-
       {!isStandalone && (
         <nav className="h-16 border-b flex items-center px-6 justify-between bg-background/50 backdrop-blur-md sticky top-0 z-50">
           <div className="flex items-center gap-3">
@@ -302,61 +275,35 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
            <div className="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4">
              <MessageSquare className="w-12 h-12 text-muted-foreground/20" />
              <h2 className="text-xl font-bold">Empresa não localizada</h2>
-             <p className="text-muted-foreground text-sm">Verifique se o link está correto ou se a empresa ainda está ativa.</p>
            </div>
         ) : (
           <div className="w-full max-w-full mx-auto flex-1 flex flex-col">
             <header className="px-6 text-center space-y-8 py-24 sm:py-32">
               <div className="space-y-6">
-                {hasValidLogo && (
+                {logoUrl && (
                   <div className="flex justify-center">
                     <div className="w-24 h-24 sm:w-32 sm:h-32 relative">
-                      <img src={logoUrl} className="w-full h-full object-cover rounded-[2.5rem] shadow-2xl border-4 border-background" alt="Logo Empresa" />
+                      <img src={logoUrl} className="w-full h-full object-cover rounded-[2.5rem] shadow-2xl border-4 border-background" alt="Logo" />
                     </div>
                   </div>
                 )}
                 <div className="space-y-4">
-                  <h1 
-                    className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.05] max-w-5xl mx-auto"
-                    dangerouslySetInnerHTML={{ __html: heroTitle }}
-                  />
-                  {heroSubtitle && (
-                    <p 
-                      className="text-muted-foreground text-lg sm:text-2xl max-w-3xl mx-auto font-medium leading-relaxed italic opacity-80"
-                      dangerouslySetInnerHTML={{ __html: heroSubtitle }}
-                    />
-                  )}
+                  <h1 className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.05] max-w-5xl mx-auto" dangerouslySetInnerHTML={{ __html: heroTitle }} />
+                  {heroSubtitle && <div className="text-muted-foreground text-lg sm:text-2xl max-w-3xl mx-auto font-medium leading-relaxed italic opacity-80" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />}
                 </div>
               </div>
             </header>
 
             <div className="w-full">
               {customSections.map((section: any) => (
-                <section 
-                  key={section.id} 
-                  className={cn(
-                    "py-24 px-6 text-center",
-                    section.variant === 'accent' ? "text-white" : (section.variant === 'dark' ? "bg-black text-white" : "bg-muted/5")
-                  )}
-                  style={{ backgroundColor: section.variant === 'accent' ? themeColor : undefined }}
-                >
+                <section key={section.id} className={cn("py-24 px-6 text-center", section.variant === 'accent' ? "text-white" : (section.variant === 'dark' ? "bg-black text-white" : "bg-muted/5"))} style={{ backgroundColor: section.variant === 'accent' ? themeColor : undefined }}>
                   <div className="max-w-4xl mx-auto space-y-8">
-                    <div className="space-y-4">
-                      <h2 className="text-3xl sm:text-5xl font-black tracking-tight">{section.title}</h2>
-                      {section.subtitle && <p className="text-xl font-bold opacity-80">{section.subtitle}</p>}
-                    </div>
+                    <h2 className="text-3xl sm:text-5xl font-black tracking-tight">{section.title}</h2>
                     <p className="text-base sm:text-xl leading-relaxed opacity-90 font-medium">{section.content}</p>
                     {section.buttonText && (
                       <div className="pt-8">
                         <a href={section.buttonUrl || '#'} className="inline-block" target="_blank" rel="noopener noreferrer">
-                          <Button 
-                            size="lg" 
-                            className={cn(
-                              "h-16 px-10 rounded-2xl text-lg font-black gap-2 shadow-2xl transition-all hover:scale-105 active:scale-95",
-                              section.variant === 'accent' ? "bg-white text-black hover:bg-white/90" : ""
-                            )}
-                            style={{ backgroundColor: section.variant !== 'accent' ? themeColor : undefined }}
-                          >
+                          <Button size="lg" className={cn("h-16 px-10 rounded-2xl text-lg font-black gap-2 shadow-2xl transition-all hover:scale-105 active:scale-95", section.variant === 'accent' ? "bg-white text-black hover:bg-white/90" : "")} style={{ backgroundColor: section.variant !== 'accent' ? themeColor : undefined }}>
                             {section.buttonText} <ArrowRight className="w-5 h-5" />
                           </Button>
                         </a>
@@ -367,15 +314,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
               ))}
             </div>
 
-            {testimonialsTitle && (
-              <div className="text-center py-20">
-                <h2 className="text-3xl sm:text-4xl font-black font-headline uppercase tracking-widest" style={{ color: themeColor }}>
-                  {testimonialsTitle}
-                </h2>
-              </div>
-            )}
-
-            <main className="px-6 pb-20 space-y-12 flex-1 w-full max-w-[1600px] mx-auto">
+            <main className="px-6 pb-20 space-y-12 flex-1 w-full max-w-[1600px] mx-auto py-12">
               {filteredTestimonials.length === 0 ? (
                 <div className="text-center py-20 opacity-20 flex flex-col items-center gap-4">
                   <MessageSquare className="w-12 h-12" />
@@ -384,7 +323,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
               ) : (
                 <div className="w-full">
                   {layout === 'mural' && (
-                    <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-10">
+                    <div className="columns-1 sm:columns-2 lg:columns-2 xl:columns-2 gap-10">
                       {visibleDisplayPool.map((t, i) => (
                         <div key={`${t.id}-${muralIndex}-${i}`} className="break-inside-avoid mb-10">
                           <TestimonialCard t={t} index={i} />
@@ -421,25 +360,13 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
 
             <footer className="mt-auto px-6 py-20 text-center space-y-12 border-t bg-muted/5">
               {externalSiteUrl && (
-                <a 
-                  href={externalSiteUrl.startsWith('http') ? externalSiteUrl : `https://${externalSiteUrl}`} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-3 px-12 py-6 rounded-full text-white text-[14px] font-black shadow-2xl hover:scale-105 active:scale-95 transition-all" 
-                  style={{ backgroundColor: themeColor }}
-                >
+                <a href={externalSiteUrl.startsWith('http') ? externalSiteUrl : `https://${externalSiteUrl}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 px-12 py-6 rounded-full text-white text-[14px] font-black shadow-2xl hover:scale-105 active:scale-95 transition-all" style={{ backgroundColor: themeColor }}>
                   Visitar Site Oficial <Globe className="w-5 h-5" />
                 </a>
               )}
               <div className="flex flex-col items-center gap-2 opacity-30">
-                <p className="text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-1">
-                  <span>©</span> {footerText}
-                </p>
-                {showProovaBranding && (
-                  <div className="flex items-center justify-center gap-1.5 mt-2">
-                    <span className="text-[8px] font-black uppercase tracking-[0.3em]">POWERED BY PROOVA</span>
-                  </div>
-                )}
+                <p className="text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-1"><span>©</span> {footerText}</p>
+                {showProovaBranding && <div className="flex items-center justify-center gap-1.5 mt-2"><span className="text-[8px] font-black uppercase tracking-[0.3em]">POWERED BY PROOVA</span></div>}
               </div>
             </footer>
           </div>
@@ -447,16 +374,8 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
       </div>
 
       {whatsappEnabled && whatsappNumber && (
-        <a 
-          href={`https://wa.me/${whatsappNumber.replace(/\D/g, '')}`} 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="fixed bottom-6 right-6 z-[100] bg-[#25D366] text-white p-3.5 rounded-full shadow-[0_10px_25px_rgba(37,211,102,0.4)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center"
-          title="Fale conosco via WhatsApp"
-        >
-          <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.348-.883-.788-1.48-1.76-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.067 2.877 1.215 3.076.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.187-1.622c1.736.946 3.7 1.444 5.703 1.445h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-          </svg>
+        <a href={`https://wa.me/${whatsappNumber.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="fixed bottom-6 right-6 z-[100] bg-[#25D366] text-white p-3.5 rounded-full shadow-[0_10px_25px_rgba(37,211,102,0.4)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center" title="Fale conosco via WhatsApp">
+          <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.348-.883-.788-1.48-1.76-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.067 2.877 1.215 3.076.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.187-1.622c1.736.946 3.7 1.444 5.703 1.445h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         </a>
       )}
     </div>

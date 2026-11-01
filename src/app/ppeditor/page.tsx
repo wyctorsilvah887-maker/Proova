@@ -205,13 +205,16 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
   );
 };
 
-const TestimonialCard = ({ t, themeColor, secondaryColor }: { t: any, themeColor: string, secondaryColor: string }) => {
+const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0 }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number }) => {
   const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
+  const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
   
   return (
     <Card 
       className={cn(
-        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] border-none"
+        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none",
+        "animate-in fade-in duration-700 ease-out fill-both",
+        side === 'left' ? "slide-in-from-left-12" : "slide-in-from-right-12"
       )}
       style={{ 
         boxShadow: `0 20px 40px -20px ${themeColor}25`,
@@ -470,8 +473,8 @@ const PublicPageSettings = ({
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Estilo de Mural</Label>
               <div className="grid grid-cols-1 gap-2">
                 {[
-                  { id: 'grid', icon: Layout, label: 'Grade Estática (Adaptável)', isGold: false },
-                  { id: 'mural', icon: LayoutGrid, label: 'Mural Masonry (Estático)', isGold: true },
+                  { id: 'grid', icon: Layout, label: 'Grade Estática', isGold: false },
+                  { id: 'mural', icon: LayoutGrid, label: 'Mural Dinâmico (Swap)', isGold: true },
                   { id: 'carousel', icon: Play, label: 'Carrossel Dinâmico', isGold: true },
                   { id: 'popup', icon: MessageSquare, label: 'Notificação VIP', isGold: true },
                 ].map((item) => {
@@ -482,7 +485,7 @@ const PublicPageSettings = ({
                       disabled={isLocked}
                       onClick={() => setLayout(item.id as LayoutType)} 
                       className={cn(
-                        "flex items-center justify-between p-3 rounded-xl border-2 transition-all", 
+                        "flex items-center justify-between p-3 rounded-xl border-2 transition-all text-left", 
                         layout === item.id ? "border-primary bg-primary/5" : "border-muted hover:border-primary/20",
                         isLocked && "opacity-40 grayscale cursor-not-allowed"
                       )}
@@ -593,8 +596,8 @@ export default function PPEditorPage() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    if (layout === 'popup' && selectedIds.length > 1) {
-      const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % selectedIds.length), 7000);
+    if ((layout === 'mural' || layout === 'popup') && selectedIds.length > 0) {
+      const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % selectedIds.length), 6000);
       return () => clearInterval(interval);
     }
   }, [layout, selectedIds]);
@@ -669,7 +672,18 @@ export default function PPEditorPage() {
 
   const visibleTestimonialsPreview = useMemo(() => {
     if (currentSelection.length === 0) return [];
-    if (layout === 'grid' || layout === 'mural') return currentSelection;
+    
+    if (layout === 'mural') {
+      const slice = [];
+      const count = Math.min(4, currentSelection.length);
+      for (let i = 0; i < count; i++) {
+        const idx = (muralIndex + i) % currentSelection.length;
+        slice.push(currentSelection[idx]);
+      }
+      return slice;
+    }
+    
+    if (layout === 'grid') return currentSelection;
     if (layout === 'popup') return [currentSelection[muralIndex % currentSelection.length]];
     return currentSelection;
   }, [currentSelection, layout, muralIndex]);
@@ -779,7 +793,7 @@ export default function PPEditorPage() {
                   )}>
                     {visibleTestimonialsPreview.length > 0 ? visibleTestimonialsPreview.map((t, i) => (
                       <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12 break-inside-avoid">
-                        <TestimonialCard t={t} themeColor={themeColor} secondaryColor={secondaryColor} />
+                        <TestimonialCard t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} />
                       </div>
                     )) : <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos abaixo.</div>}
                   </div>
