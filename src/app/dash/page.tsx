@@ -468,7 +468,7 @@ export default function DashPage() {
     if (!selectedTestimonialForShare || !dialogVideoRef.current || !shareCardRef.current) return;
 
     setIsExportingCard(true);
-    toast({ title: "Processando Vídeo VIP", description: "Gravando moldura digital... aguarde." });
+    toast({ title: "Processando Vídeo VIP", description: "Gravando moldura digital arredondada... aguarde." });
 
     try {
       const videoEl = dialogVideoRef.current;
@@ -504,7 +504,7 @@ export default function DashPage() {
         link.download = `proova-social-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
         link.click();
         setIsExportingCard(false);
-        toast({ title: "Vídeo Gerado!", description: "Seu depoimento com moldura está pronto." });
+        toast({ title: "Vídeo Gerado!", description: "Seu depoimento com moldura arredondada está pronto." });
       };
 
       videoEl.currentTime = 0;
@@ -512,6 +512,7 @@ export default function DashPage() {
       
       const cardImage = await toPng(cardEl, { 
         pixelRatio: 2,
+        backgroundColor: 'rgba(0,0,0,0)',
         filter: (node) => {
           const el = node as HTMLElement;
           return el.tagName !== 'VIDEO' && el.id !== 'video-overlay-badge' && el.id !== 'card-header-cta';
@@ -530,12 +531,32 @@ export default function DashPage() {
           return;
         }
 
+        ctx.clearRect(0, 0, size, size);
+
+        // MÁSCARA ARREDONDADA PARA O CARD INTEIRO
+        const cardRadius = 40; 
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(cardRadius, 0);
+        ctx.lineTo(size - cardRadius, 0);
+        ctx.quadraticCurveTo(size, 0, size, cardRadius);
+        ctx.lineTo(size, size - cardRadius);
+        ctx.quadraticCurveTo(size, size, size - cardRadius, size);
+        ctx.lineTo(cardRadius, size);
+        ctx.quadraticCurveTo(0, size, 0, size - cardRadius);
+        ctx.lineTo(0, cardRadius);
+        ctx.quadraticCurveTo(0, 0, cardRadius, 0);
+        ctx.closePath();
+        ctx.clip();
+
+        // Desenha o fundo e textos
         ctx.drawImage(frameImg, 0, 0, size, size);
 
+        // Desenha o vídeo com seu próprio clip arredondado
         const vWidth = size * 0.85;
         const vHeight = vWidth * (9/16);
         const vX = (size - vWidth) / 2;
-        const vY = size * 0.22; // Adjusted for the header text
+        const vY = size * 0.22;
 
         ctx.save();
         ctx.beginPath();
@@ -550,6 +571,7 @@ export default function DashPage() {
         
         ctx.drawImage(videoEl, vX, vY, vWidth, vHeight);
         ctx.restore();
+        ctx.restore(); // Restaura o clip do card principal
 
         requestAnimationFrame(renderLoop);
       };
@@ -579,16 +601,22 @@ export default function DashPage() {
     setIsExportingCard(true);
     try {
       if (!shareCardRef.current) return;
+      
+      // Captura a imagem preservando as bordas arredondadas e transparência
       const dataUrl = await toPng(shareCardRef.current, { 
         quality: 1.0, 
         pixelRatio: 3, 
-        backgroundColor: cardVariant === 'dark' ? '#000000' : '#f97316'
+        backgroundColor: 'rgba(0,0,0,0)', // Transparência para respeitar quinas arredondadas
+        style: {
+          borderRadius: '2.5rem',
+        }
       });
+      
       const link = document.createElement('a');
       link.download = `proova-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
       link.href = dataUrl;
       link.click();
-      toast({ title: "Imagem Gerada!", description: "Seu card está pronto para as redes sociais." });
+      toast({ title: "Imagem Gerada!", description: "Seu card arredondado está pronto para as redes sociais." });
     } catch (err) {
       console.error("Erro fatal ao exportar:", err);
       toast({ variant: "destructive", title: "Erro ao exportar conteúdo" });
@@ -780,9 +808,9 @@ export default function DashPage() {
                           <p className="text-[11px] text-muted-foreground leading-snug">{item.description}</p>
                         </div>
                       </div>
-                      <Button size="sm" variant="secondary" className="w-full sm:w-auto text-[10px] font-black uppercase h-8 rounded-lg shadow-sm shrink-0" onClick={item.action}>
+                      <button className="w-full sm:w-auto text-[10px] font-black uppercase h-8 rounded-lg shadow-sm shrink-0 bg-secondary hover:bg-secondary/80 px-4" onClick={item.action}>
                         {item.actionLabel} <ArrowRight className="ml-1 w-3 h-3" />
-                      </Button>
+                      </button>
                     </CardContent>
                   </Card>
                 );
