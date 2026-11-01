@@ -93,7 +93,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from 'next-themes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { generateCopyFlow } from '@/ai/flows/generate-copy-flow';
 
 type LayoutType = 'mural' | 'carousel' | 'grid' | 'popup';
 
@@ -258,30 +257,6 @@ const PublicPageSettings = ({
   companyName
 }: any) => {
   const colors = ['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff'];
-  const [isAIWriting, setIsAIWriter] = useState(false);
-
-  const handleAIWriter = async (type: string, targetId?: string) => {
-    setIsAIWriter(true);
-    try {
-      const suggestion = await generateCopyFlow({ 
-        type, 
-        companyName, 
-        context: type.includes('content') ? 'Focar em benefícios e resultados reais' : 'Focar em autoridade' 
-      });
-      
-      if (targetId) {
-        updateSection(targetId, type.includes('title') ? 'title' : 'content', suggestion);
-      } else {
-        if (type === 'hero_title') setHeroTitle(suggestion);
-        if (type === 'hero_subtitle') setHeroSubtitle(suggestion);
-      }
-      toast({ title: "Sugestão da IA aplicada!" });
-    } catch (e) {
-      toast({ variant: "destructive", title: "Erro na IA" });
-    } finally {
-      setIsAIWriter(false);
-    }
-  };
 
   const addSection = () => {
     setCustomSections((prev: CustomSection[]) => [
@@ -306,15 +281,13 @@ const PublicPageSettings = ({
     setCustomSections((prev: CustomSection[]) => prev.map(s => s.id === id ? { ...s, [field]: value } : s));
   };
 
-  const AIButton = ({ onClick }: { onClick: () => void }) => (
+  const AIButtonPlaceholder = () => (
     <Button 
       variant="ghost" 
       size="sm" 
-      disabled={isAIWriting}
-      onClick={(e) => { e.preventDefault(); onClick(); }}
       className="h-6 px-1.5 gap-1 text-[9px] font-black uppercase text-primary hover:bg-primary/10 rounded-lg shrink-0"
     >
-      {isAIWriting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+      <Sparkles className="w-3 h-3" />
       Copywriter
     </Button>
   );
@@ -376,7 +349,7 @@ const PublicPageSettings = ({
                   <div className="space-y-3">
                     <div className="flex items-center justify-between ml-1">
                       <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Título Hero (RGB)</Label>
-                      <AIButton onClick={() => handleAIWriter('hero_title')} />
+                      <AIButtonPlaceholder />
                     </div>
                     <RichTextEditor value={heroTitle} onChange={setHeroTitle} placeholder="O que dizem sobre nós..." />
                   </div>
@@ -384,7 +357,7 @@ const PublicPageSettings = ({
                   <div className="space-y-3">
                     <div className="flex items-center justify-between ml-1">
                       <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Subtítulo Hero (Nítido)</Label>
-                      <AIButton onClick={() => handleAIWriter('hero_subtitle')} />
+                      <AIButtonPlaceholder />
                     </div>
                     <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} placeholder="Texto de apoio persuasivo..." className="min-h-[60px] text-sm text-foreground" />
                   </div>
@@ -414,18 +387,21 @@ const PublicPageSettings = ({
                                 <div className="space-y-1.5">
                                   <div className="flex items-center justify-between ml-1">
                                     <Label className="text-[9px] font-bold uppercase opacity-50">Título Bloco</Label>
-                                    <AIButton onClick={() => handleAIWriter('section_title', section.id)} />
+                                    <AIButtonPlaceholder />
                                   </div>
                                   <Input value={section.title} onChange={(e) => updateSection(section.id, 'title', e.target.value)} className="h-8 text-[11px]" />
                                 </div>
                                 <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Subtítulo Bloco (RGB)</Label>
+                                  <div className="flex items-center justify-between ml-1">
+                                    <Label className="text-[9px] font-bold uppercase opacity-50">Subtítulo Bloco (RGB)</Label>
+                                    <AIButtonPlaceholder />
+                                  </div>
                                   <RichTextEditor value={section.subtitle} onChange={(val) => updateSection(section.id, 'subtitle', val)} className="min-h-[50px] text-[11px] text-foreground" />
                                 </div>
                                 <div className="space-y-1.5">
                                   <div className="flex items-center justify-between ml-1">
                                     <Label className="text-[9px] font-bold uppercase opacity-50">Conteúdo</Label>
-                                    <AIButton onClick={() => handleAIWriter('section_content', section.id)} />
+                                    <AIButtonPlaceholder />
                                   </div>
                                   <Textarea value={section.content} onChange={(e) => updateSection(section.id, 'content', e.target.value)} className="text-[11px] min-h-[60px]" />
                                 </div>
@@ -901,7 +877,7 @@ export default function PPEditorPage() {
             <DialogTitle>Recortar Logo</DialogTitle>
             <DialogDescription>Ajuste o enquadramento do seu logotipo.</DialogDescription>
           </DialogHeader>
-          <div className="flex-1 relative bg-black">
+          <div className="flex-1 relative bg-background">
             {tempImage && <Cropper image={tempImage} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onCropComplete={(a, p) => setCroppedAreaPixels(p)} onZoomChange={setZoom} />}
           </div>
           <div className="p-6 border-t bg-background shrink-0 space-y-6">
