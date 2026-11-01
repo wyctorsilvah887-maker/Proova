@@ -137,7 +137,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
   const footerText = widgetData?.footerText || `${new Date().getFullYear()} ${companyData?.companyName || ''}`;
   const showProovaBranding = widgetData?.showLogo !== false;
 
-  // Efeito de rotação limitada a 4 visíveis no modo Mural/Masonry
+  // Efeito de rotação para layouts específicos
   useEffect(() => {
     if ((layout === 'mural' || layout === 'popup') && filteredTestimonials.length > 0) {
       const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % filteredTestimonials.length), 6000);
@@ -156,7 +156,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
     
     if (layout === 'mural') {
       const slice = [];
-      const count = Math.min(4, filteredTestimonials.length);
+      const count = Math.min(2, filteredTestimonials.length);
       for (let i = 0; i < count; i++) {
         const idx = (muralIndex + i) % filteredTestimonials.length;
         slice.push(filteredTestimonials[idx]);
@@ -339,10 +339,10 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
                     </div>
                   )}
                   {layout === 'carousel' && (
-                    <Carousel setApi={setApi} opts={{ loop: true }} className="w-full max-w-5xl mx-auto">
+                    <Carousel setApi={setApi} opts={{ loop: true }} className="w-full max-w-xl mx-auto">
                       <CarouselContent>
                         {filteredTestimonials.map((t, i) => (
-                          <CarouselItem key={t.id} className="p-4 md:basis-1/2 lg:basis-1/3">
+                          <CarouselItem key={t.id} className="p-4 basis-full">
                             <TestimonialCard t={t} index={i} />
                           </CarouselItem>
                         ))}

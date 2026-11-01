@@ -206,7 +206,7 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
 };
 
 const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0 }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number }) => {
-  const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
+  const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent' && secondaryColor !== '#ffffff';
   const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
   
   return (
@@ -336,24 +336,56 @@ const PublicPageSettings = ({
             <Button variant="ghost" size="icon" onClick={onClose} className="lg:hidden h-8 w-8 rounded-full"><X className="w-4 h-4" /></Button>
           )}
         </div>
-        <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm">
+        <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm bg-primary hover:bg-primary/90 text-white">
           {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
           Salvar Página
         </Button>
       </div>
 
-      <Tabs defaultValue="geral" className="w-full flex-1 flex flex-col min-h-0">
+      <Tabs defaultValue="design" className="w-full flex-1 flex flex-col min-h-0">
         <TabsList className="w-full justify-start rounded-none border-b bg-transparent h-12 px-2 shrink-0">
+          <TabsTrigger value="design" className="text-xs font-bold uppercase tracking-widest">Layout</TabsTrigger>
           <TabsTrigger value="geral" className="text-xs font-bold uppercase tracking-widest">Visual</TabsTrigger>
           <TabsTrigger value="conteudo" className="text-xs font-bold uppercase tracking-widest flex items-center gap-1.5">
-            Conteúdo {!isGoldPlan && <Lock className="w-2.5 h-2.5 opacity-40" />}
+            Texto {!isGoldPlan && <Lock className="w-2.5 h-2.5 opacity-40" />}
           </TabsTrigger>
-          <TabsTrigger value="design" className="text-xs font-bold uppercase tracking-widest">Layout</TabsTrigger>
           <TabsTrigger value="social" className="text-xs font-bold uppercase tracking-widest">Bio</TabsTrigger>
         </TabsList>
         
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-8 pb-10">
+            <TabsContent value="design" className="mt-0 space-y-6">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Estilo de Exibição</Label>
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  { id: 'grid', icon: Layout, label: 'Grade Estática', isGold: false },
+                  { id: 'mural', icon: LayoutGrid, label: 'Mural Masonry (Swap)', isGold: true },
+                  { id: 'carousel', icon: Play, label: 'Carrossel Dinâmico', isGold: true },
+                  { id: 'popup', icon: MessageSquare, label: 'Notificação VIP', isGold: true },
+                ].map((item) => {
+                   const isLocked = item.isGold && !isGoldPlan;
+                   return (
+                    <button 
+                      key={item.id}
+                      disabled={isLocked}
+                      onClick={() => setLayout(item.id as LayoutType)} 
+                      className={cn(
+                        "flex items-center justify-between p-3 rounded-xl border-2 transition-all text-left", 
+                        layout === item.id ? "border-primary bg-primary/5" : "border-muted hover:border-primary/20",
+                        isLocked && "opacity-40 grayscale cursor-not-allowed"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                         <item.icon className={cn("w-4 h-4", layout === item.id ? "text-primary" : "text-muted-foreground")} />
+                         <span className="text-xs font-bold">{item.label}</span>
+                      </div>
+                      {isLocked ? <Lock className="w-3 h-3 text-muted-foreground" /> : (layout === item.id && <Check className="w-3.5 h-3.5 text-primary" />)}
+                    </button>
+                   );
+                })}
+              </div>
+            </TabsContent>
+
             <TabsContent value="geral" className="mt-0 space-y-8">
               <div className="space-y-4 text-center">
                 <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block text-left ml-1">Logotipo</Label>
@@ -469,38 +501,6 @@ const PublicPageSettings = ({
               )}
             </TabsContent>
 
-            <TabsContent value="design" className="mt-0 space-y-6">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Estilo de Mural</Label>
-              <div className="grid grid-cols-1 gap-2">
-                {[
-                  { id: 'grid', icon: Layout, label: 'Grade Estática', isGold: false },
-                  { id: 'mural', icon: LayoutGrid, label: 'Mural Dinâmico (Swap)', isGold: true },
-                  { id: 'carousel', icon: Play, label: 'Carrossel Dinâmico', isGold: true },
-                  { id: 'popup', icon: MessageSquare, label: 'Notificação VIP', isGold: true },
-                ].map((item) => {
-                   const isLocked = item.isGold && !isGoldPlan;
-                   return (
-                    <button 
-                      key={item.id}
-                      disabled={isLocked}
-                      onClick={() => setLayout(item.id as LayoutType)} 
-                      className={cn(
-                        "flex items-center justify-between p-3 rounded-xl border-2 transition-all text-left", 
-                        layout === item.id ? "border-primary bg-primary/5" : "border-muted hover:border-primary/20",
-                        isLocked && "opacity-40 grayscale cursor-not-allowed"
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                         <item.icon className={cn("w-4 h-4", layout === item.id ? "text-primary" : "text-muted-foreground")} />
-                         <span className="text-xs font-bold">{item.label}</span>
-                      </div>
-                      {isLocked ? <Lock className="w-3 h-3 text-muted-foreground" /> : (layout === item.id && <Check className="w-3.5 h-3.5 text-primary" />)}
-                    </button>
-                   );
-                })}
-              </div>
-            </TabsContent>
-
             <TabsContent value="social" className="mt-0 space-y-6">
               <div className="space-y-4">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 ml-1"><Globe className="w-3 h-3" /> Link da Bio (Slug)</Label>
@@ -512,8 +512,7 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </Tabs>
-    </div>
+      </div>
   );
 };
 
@@ -596,7 +595,7 @@ export default function PPEditorPage() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    if ((layout === 'mural' || layout === 'popup') && selectedIds.length > 0) {
+    if ((layout === 'mural' || layout === 'popup' || layout === 'carousel') && selectedIds.length > 0) {
       const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % selectedIds.length), 6000);
       return () => clearInterval(interval);
     }
@@ -683,8 +682,12 @@ export default function PPEditorPage() {
       return slice;
     }
     
+    // Layout Carrossel e Notificação mostram 1 por vez no preview
+    if (layout === 'carousel' || layout === 'popup') {
+      return [currentSelection[muralIndex % currentSelection.length]];
+    }
+    
     if (layout === 'grid') return currentSelection;
-    if (layout === 'popup') return [currentSelection[muralIndex % currentSelection.length]];
     return currentSelection;
   }, [currentSelection, layout, muralIndex]);
 
@@ -707,7 +710,7 @@ export default function PPEditorPage() {
           </div>
         </div>
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <Button onClick={handleSave} disabled={isSaving || isUploading} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg">{isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar</Button>
+          <Button onClick={handleSave} disabled={isSaving || isUploading} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg bg-primary hover:bg-primary/90 text-white transition-all active:scale-95">{isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar</Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-10 md:h-12 px-2 gap-2 rounded-xl focus:ring-0 focus-visible:ring-0 outline-none data-[state=open]:bg-transparent shadow-none hover:bg-transparent">
@@ -795,7 +798,7 @@ export default function PPEditorPage() {
 
                   <div className={cn(
                     "px-6 sm:px-12 w-full max-w-[1400px] mx-auto py-12 pb-32",
-                    layout === 'popup' ? "max-w-sm mx-auto flex flex-col gap-12" : (
+                    (layout === 'popup' || layout === 'carousel') ? "max-w-sm mx-auto flex flex-col gap-12" : (
                       layout === 'mural' 
                         ? "columns-1 sm:columns-2 lg:columns-2 xl:columns-2 gap-12" 
                         : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12"

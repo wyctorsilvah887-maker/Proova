@@ -129,7 +129,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
   
   const heroTitle = ppData?.heroTitle || `O que dizem sobre ${companyName || 'nós'}`;
   const heroSubtitle = ppData?.heroSubtitle || '';
-  const testimonialsTitle = ppData?.testimonialsTitle || '';
   const footerText = ppData?.footerText || `${new Date().getFullYear()} ${companyName || ''}`;
   const showProovaBranding = ppData?.showLogo !== false;
 
@@ -333,10 +332,10 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                     </div>
                   )}
                   {layout === 'carousel' && (
-                    <Carousel setApi={setApi} opts={{ loop: true }} className="w-full max-w-5xl mx-auto">
+                    <Carousel setApi={setApi} opts={{ loop: true }} className="w-full max-w-xl mx-auto">
                       <CarouselContent>
                         {filteredTestimonials.map((t, i) => (
-                          <CarouselItem key={t.id} className="p-4 md:basis-1/2 lg:basis-1/3">
+                          <CarouselItem key={t.id} className="p-4 basis-full">
                             <TestimonialCard t={t} index={i} />
                           </CarouselItem>
                         ))}
