@@ -219,8 +219,9 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
     <Card 
       key={`${t.id}-${muralIndex}`}
       className={cn(
-        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl border-none transition-all duration-500 hover:scale-[1.02] animate-in fill-both",
-        side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in"
+        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] animate-in fill-both",
+        side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in",
+        !secondaryColor ? "border-none" : ""
       )}
       style={{ 
         boxShadow: `0 20px 40px -20px ${themeColor}25`,
@@ -372,7 +373,6 @@ const PublicPageSettings = ({
                 <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 ml-1">
                   <Palette className="w-3 h-3 text-primary" /> Cor Primária
                 </Label>
-                <p className="text-[9px] text-muted-foreground ml-1 mb-2">(Estrelas e Perfil)</p>
                 <div className="flex flex-wrap gap-2">
                   {colors.map((color) => (
                     <button key={color} onClick={() => setThemeColor(color)} className={cn("w-7 h-7 rounded-full border-2 transition-transform hover:scale-110", themeColor === color ? "border-foreground" : "border-transparent shadow-inner")} style={{ backgroundColor: color }} />
@@ -384,7 +384,6 @@ const PublicPageSettings = ({
                 <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 ml-1">
                   <Palette className="w-3 h-3 text-primary" /> Cor Secundária {!isGoldPlan && <Lock className="w-2.5 h-2.5 ml-1" />}
                 </Label>
-                <p className="text-[9px] text-muted-foreground ml-1 mb-2">(Bordas dos Cards)</p>
                 <div className="flex flex-wrap gap-2">
                   <button 
                     onClick={() => setSecondaryColor('')} 
@@ -423,16 +422,12 @@ const PublicPageSettings = ({
               ) : (
                 <div className="space-y-8">
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1 flex items-center gap-1.5">
-                      Título Hero
-                    </Label>
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Título Hero</Label>
                     <RichTextEditor value={heroTitle} onChange={setHeroTitle} allowColor={isGoldPlan} placeholder="O que dizem sobre nós..." />
                   </div>
                   
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1 flex items-center gap-1.5">
-                      Subtítulo Hero
-                    </Label>
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Subtítulo Hero</Label>
                     <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} allowColor={isGoldPlan} placeholder="Texto de apoio persuasivo..." className="min-h-[60px] text-sm text-foreground" />
                   </div>
 
@@ -572,7 +567,8 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </div>
+      </Tabs>
+    </div>
   );
 };
 
@@ -781,6 +777,14 @@ export default function PPEditorPage() {
 
   const membershipLabel = isEnterprise ? 'Membro Enterprise' : (isGoldPlan ? 'Membro Gold' : 'Plano Base');
 
+  if (authLoading || userDataLoading || testimonialsLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-muted/30">
+        <Loader2 className="animate-spin h-10 w-10 text-primary mx-auto" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body w-full overflow-hidden text-foreground">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
@@ -809,7 +813,7 @@ export default function PPEditorPage() {
             <DropdownMenuTrigger asChild>
               <Button 
                 variant="ghost" 
-                className="h-10 md:h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all outline-none border-none ring-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:bg-transparent data-[state=open]:bg-transparent active:bg-transparent"
+                className="h-10 md:h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all outline-none border-none ring-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:bg-transparent data-[state=open]:bg-transparent active:bg-transparent shadow-none"
               >
                 <div className="hidden sm:flex flex-col items-end">
                   <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
@@ -844,7 +848,7 @@ export default function PPEditorPage() {
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
-                <span>Planos de Upgrade</span>
+                <span>Upgrade</span>
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => router.push('/pricing')} 
@@ -948,7 +952,7 @@ export default function PPEditorPage() {
 
                 <div className={cn(
                   "px-8 sm:px-12 w-full max-w-5xl mx-auto",
-                  layout === 'popup' ? "max-w-sm mx-auto" : (layout === 'grid' || layout === 'mural' ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" : "flex justify-center")
+                  layout === 'popup' ? "max-w-sm mx-auto" : (layout === 'grid' || layout === 'mural' ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" : "flex justify-center")
                 )}>
                   {visibleTestimonialsPreview.length > 0 ? (
                     visibleTestimonialsPreview.map((t, i) => (
@@ -987,7 +991,7 @@ export default function PPEditorPage() {
                           <div key={t.id} onClick={() => toggleSelection(t.id)} className={cn("cursor-pointer transition-all rounded-xl border-2 p-4 bg-background group", isSelected ? "border-primary bg-primary/5" : "border-transparent shadow-sm hover:border-primary/20")}>
                             <div className="flex items-start gap-3">
                               <div className={cn("mt-1 w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors", isSelected ? "bg-primary border-primary" : "border-muted-foreground/30")}>
-                                {isSelected && <Check className="w-2.5 h-2.5" />}
+                                {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <span className="font-bold text-[11px] block truncate group-hover:text-primary transition-colors">{t.userName}</span>
