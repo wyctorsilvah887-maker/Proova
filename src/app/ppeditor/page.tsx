@@ -695,7 +695,7 @@ export default function PPEditorPage() {
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-3 flex-1">
           <Link href="/dash">
-            <Button variant="ghost" size="sm" className="h-10 px-2 gap-2 text-muted-foreground hover:text-primary transition-all rounded-xl">
+            <Button variant="ghost" size="sm" className="h-10 px-2 gap-2 text-muted-foreground hover:text-primary transition-all rounded-xl shadow-none focus-visible:ring-0">
                <ArrowLeft className="w-4 h-4" /><span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Voltar</span>
             </Button>
           </Link>
@@ -710,7 +710,7 @@ export default function PPEditorPage() {
           <Button onClick={handleSave} disabled={isSaving || isUploading} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg">{isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar</Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-10 md:h-12 px-2 gap-2 rounded-xl focus:ring-0 focus-visible:ring-0 outline-none data-[state=open]:bg-transparent shadow-none">
+              <Button variant="ghost" className="h-10 md:h-12 px-2 gap-2 rounded-xl focus:ring-0 focus-visible:ring-0 outline-none data-[state=open]:bg-transparent shadow-none hover:bg-transparent">
                 <div className="hidden sm:flex flex-col items-end">
                   <span className="text-xs font-bold truncate max-w-[120px]">{userData?.companyName}</span>
                   <span className={cn("text-[8px] uppercase tracking-widest font-black", isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground")}>{isEnterprise ? 'Enterprise' : (isGoldPlan ? 'Gold' : 'Base')}</span>
@@ -721,12 +721,22 @@ export default function PPEditorPage() {
             <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl bg-background border">
               <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-widest text-muted-foreground">Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold"><TrendingUp className="mr-2 h-4 w-4 text-primary" />Dash</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl font-bold"><Gem className="mr-2 h-4 w-4 text-primary" />Upgrade</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"><Handshake className="mr-2 h-4 w-4 text-primary" /><span>Parceiros</span><Lock className="ml-auto w-3.5 h-3.5 opacity-60" /></DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl font-bold">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}Tema</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold py-2.5 cursor-pointer">
+                <TrendingUp className="mr-2 h-4 w-4 text-primary" />Dash
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl font-bold py-2.5 cursor-pointer">
+                <Gem className="mr-2 h-4 w-4 text-primary" />Upgrade
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70">
+                <Handshake className="mr-2 h-4 w-4 text-primary" /><span>Parceiros</span><Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl font-bold py-2.5 cursor-pointer">
+                {theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}Tema
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive font-bold"><LogOut className="mr-2 h-4 w-4" />Sair</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive font-bold py-2.5 cursor-pointer">
+                <LogOut className="mr-2 h-4 w-4" />Sair
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -787,7 +797,7 @@ export default function PPEditorPage() {
                     "px-6 sm:px-12 w-full max-w-[1400px] mx-auto py-12 pb-32",
                     layout === 'popup' ? "max-w-sm mx-auto flex flex-col gap-12" : (
                       layout === 'mural' 
-                        ? "columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-12" 
+                        ? "columns-1 sm:columns-2 lg:columns-2 xl:columns-2 gap-12" 
                         : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12"
                     )
                   )}>
@@ -847,6 +857,7 @@ export default function PPEditorPage() {
               customSections={customSections} setCustomSections={setCustomSections} onFileSelect={onFileSelect}
               isUploading={isUploading} handleSave={handleSave} isSaving={isSaving} isGoldPlan={isGoldPlan}
               logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
+              onClose={() => {}}
             />
           </SheetContent>
         </Sheet>

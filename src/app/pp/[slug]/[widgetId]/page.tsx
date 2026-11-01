@@ -12,7 +12,7 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { Card } from '@/components/ui/card';
-import { Star, User, Loader2, MessageSquare, MessageCircle, Globe, ArrowRight, ArrowLeft, Clock, Play } from 'lucide-react';
+import { Star, User, Loader2, MessageSquare, MessageCircle, Globe, ArrowRight, ArrowLeft, Clock, Play, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
