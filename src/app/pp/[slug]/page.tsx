@@ -133,33 +133,30 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
   const showProovaBranding = ppData?.showLogo !== false;
 
   useEffect(() => {
-    if ((layout === 'mural' || layout === 'popup') && filteredTestimonials.length > 0) {
+    if ((layout === 'mural' || layout === 'popup' || layout === 'carousel') && filteredTestimonials.length > 0) {
       const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % filteredTestimonials.length), 6000);
       return () => clearInterval(interval);
     }
   }, [layout, filteredTestimonials]);
-
-  useEffect(() => {
-    if (!api || layout !== 'carousel') return;
-    const interval = setInterval(() => api.scrollNext(), 5000);
-    return () => clearInterval(interval);
-  }, [api, layout]);
 
   const visibleDisplayPool = useMemo(() => {
     if (filteredTestimonials.length === 0) return [];
     
     if (layout === 'mural') {
       const slice = [];
-      const count = Math.min(2, filteredTestimonials.length);
-      for (let i = 0; i < count; i++) {
+      const count = 2; // Fixed to 2 items swap
+      for (let i = 0; i < Math.min(count, filteredTestimonials.length); i++) {
         const idx = (muralIndex + i) % filteredTestimonials.length;
         slice.push(filteredTestimonials[idx]);
       }
       return slice;
     }
     
+    if (layout === 'carousel' || layout === 'popup') {
+      return [filteredTestimonials[muralIndex % filteredTestimonials.length]]; // Fixed to 1 item loop
+    }
+    
     if (layout === 'grid') return filteredTestimonials;
-    if (layout === 'popup') return [filteredTestimonials[muralIndex % filteredTestimonials.length]];
     
     return filteredTestimonials;
   }, [filteredTestimonials, muralIndex, layout]);
@@ -179,7 +176,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     return (
       <Card 
         className={cn(
-          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none",
+          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none mb-12",
           "animate-in fade-in duration-700 ease-out fill-both",
           side === 'left' ? "slide-in-from-left-12" : "slide-in-from-right-12"
         )}
@@ -292,6 +289,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                 <section key={section.id} className={cn("py-24 px-6 text-center", section.variant === 'accent' ? "text-white" : (section.variant === 'dark' ? "bg-black text-white" : "bg-muted/5"))} style={{ backgroundColor: section.variant === 'accent' ? themeColor : undefined }}>
                   <div className="max-w-4xl mx-auto space-y-8">
                     <h2 className="text-3xl sm:text-5xl font-black tracking-tight">{section.title}</h2>
+                    {section.subtitle && <div className="text-lg font-bold opacity-80 italic" dangerouslySetInnerHTML={{ __html: section.subtitle }} />}
                     <p className="text-base sm:text-xl leading-relaxed opacity-90 font-medium">{section.content}</p>
                     {section.buttonText && (
                       <div className="pt-8">
@@ -316,11 +314,9 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
               ) : (
                 <div className="w-full">
                   {layout === 'mural' && (
-                    <div className="columns-1 sm:columns-2 lg:columns-2 xl:columns-2 gap-12">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 max-w-5xl mx-auto">
                       {visibleDisplayPool.map((t, i) => (
-                        <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12 break-inside-avoid">
-                          <TestimonialCard t={t} index={i} />
-                        </div>
+                        <TestimonialCard key={`${t.id}-${muralIndex}-${i}`} t={t} index={i} />
                       ))}
                     </div>
                   )}
@@ -332,15 +328,9 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                     </div>
                   )}
                   {layout === 'carousel' && (
-                    <Carousel setApi={setApi} opts={{ loop: true }} className="w-full max-w-xl mx-auto">
-                      <CarouselContent>
-                        {filteredTestimonials.map((t, i) => (
-                          <CarouselItem key={t.id} className="p-4 basis-full">
-                            <TestimonialCard t={t} index={i} />
-                          </CarouselItem>
-                        ))}
-                      </CarouselContent>
-                    </Carousel>
+                    <div className="max-w-xl mx-auto">
+                      <TestimonialCard t={visibleDisplayPool[0]} />
+                    </div>
                   )}
                   {layout === 'popup' && (
                     <div className="max-w-md mx-auto">

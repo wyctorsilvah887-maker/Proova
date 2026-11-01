@@ -206,7 +206,7 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
 };
 
 const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0 }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number }) => {
-  const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent' && secondaryColor !== '#ffffff';
+  const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
   const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
   
   return (
@@ -358,10 +358,10 @@ const PublicPageSettings = ({
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Estilo de Exibição</Label>
               <div className="grid grid-cols-1 gap-2">
                 {[
-                  { id: 'grid', icon: Layout, label: 'Grade Estática', isGold: false },
-                  { id: 'mural', icon: LayoutGrid, label: 'Mural Masonry (Swap)', isGold: true },
-                  { id: 'carousel', icon: Play, label: 'Carrossel Dinâmico', isGold: true },
-                  { id: 'popup', icon: MessageSquare, label: 'Notificação VIP', isGold: true },
+                  { id: 'grid', icon: Layout, label: 'Grade Padrão', isGold: false },
+                  { id: 'mural', icon: LayoutGrid, label: 'Mural (2 Itens Swap)', isGold: true },
+                  { id: 'carousel', icon: Play, label: 'Carrossel VIP (1 Item)', isGold: true },
+                  { id: 'popup', icon: MessageSquare, label: 'Notificação', isGold: true },
                 ].map((item) => {
                    const isLocked = item.isGold && !isGoldPlan;
                    return (
@@ -674,15 +674,14 @@ export default function PPEditorPage() {
     
     if (layout === 'mural') {
       const slice = [];
-      const count = Math.min(2, currentSelection.length);
-      for (let i = 0; i < count; i++) {
+      const count = 2; 
+      for (let i = 0; i < Math.min(count, currentSelection.length); i++) {
         const idx = (muralIndex + i) % currentSelection.length;
         slice.push(currentSelection[idx]);
       }
       return slice;
     }
     
-    // Layout Carrossel e Notificação mostram 1 por vez no preview
     if (layout === 'carousel' || layout === 'popup') {
       return [currentSelection[muralIndex % currentSelection.length]];
     }
@@ -800,12 +799,12 @@ export default function PPEditorPage() {
                     "px-6 sm:px-12 w-full max-w-[1400px] mx-auto py-12 pb-32",
                     (layout === 'popup' || layout === 'carousel') ? "max-w-sm mx-auto flex flex-col gap-12" : (
                       layout === 'mural' 
-                        ? "columns-1 sm:columns-2 lg:columns-2 xl:columns-2 gap-12" 
+                        ? "grid grid-cols-1 sm:grid-cols-2 gap-12" 
                         : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12"
                     )
                   )}>
                     {visibleTestimonialsPreview.length > 0 ? visibleTestimonialsPreview.map((t, i) => (
-                      <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12 break-inside-avoid">
+                      <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12">
                         <TestimonialCard t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} />
                       </div>
                     )) : <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos abaixo.</div>}
