@@ -692,6 +692,7 @@ export default function DashPage() {
   }
 
   const collectionLink = `${baseUrl}/c/${userData?.companySlug}`;
+  const publicPageLink = `${baseUrl}/pp/${userData?.companySlug}`;
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
@@ -1172,15 +1173,9 @@ export default function DashPage() {
             <Button 
               className="w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 bg-primary hover:bg-primary/90 shadow-xl transition-all active:scale-95 group"
               onClick={() => {
-                const firstWidget = widgetsList?.[0];
-                if (firstWidget) {
-                  const slug = userData?.companySlug || userData?.companyName?.toLowerCase().replace(/\s+/g, '-') || '';
-                  // Navegação interna sem abrir nova aba
-                  router.push(`/pp/${slug}/${firstWidget.id}`);
-                  setIsPublicPageChoiceOpen(false);
-                } else {
-                  toast({ title: "Mural Necessário", description: "Crie seu primeiro mural para visualizar." });
-                }
+                const slug = userData?.companySlug || userData?.companyName?.toLowerCase().replace(/\s+/g, '-') || '';
+                router.push(`/pp/${slug}`);
+                setIsPublicPageChoiceOpen(false);
               }}
             >
               <div className="flex items-center gap-2">
@@ -1213,14 +1208,7 @@ export default function DashPage() {
               variant="link" 
               className="w-full text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary/70 h-auto p-0"
               onClick={() => {
-                const firstWidget = widgetsList?.[0];
-                if (firstWidget) {
-                  const slug = userData?.companySlug || userData?.companyName?.toLowerCase().replace(/\s+/g, '-') || '';
-                  const link = `${window.location.origin}/pp/${slug}/${firstWidget.id}`;
-                  copyToClipboard(link, "Link da Página Pública");
-                } else {
-                   toast({ variant: "destructive", title: "Erro", description: "Você ainda não possui um mural criado." });
-                }
+                copyToClipboard(publicPageLink, "Link da Página Pública");
               }}
             >
               <Copy className="w-3 h-3 mr-1" /> Copiar Link da Página

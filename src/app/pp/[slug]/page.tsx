@@ -151,7 +151,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     
     if (layout === 'mural') {
       const slice = [];
-      const count = Math.min(4, filteredTestimonials.length);
+      const count = Math.min(2, filteredTestimonials.length);
       for (let i = 0; i < count; i++) {
         const idx = (muralIndex + i) % filteredTestimonials.length;
         slice.push(filteredTestimonials[idx]);
@@ -180,7 +180,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     return (
       <Card 
         className={cn(
-          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] border-none",
+          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none",
           "animate-in fade-in duration-700 ease-out fill-both",
           side === 'left' ? "slide-in-from-left-12" : "slide-in-from-right-12"
         )}
@@ -282,7 +282,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                   </div>
                 )}
                 <div className="space-y-4">
-                  <h1 className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.05] max-w-5xl mx-auto" dangerouslySetInnerHTML={{ __html: heroTitle }} />
+                  <h1 className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.05] max-w-5xl mx-auto" dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${companyName}` }} />
                   {heroSubtitle && <div className="text-muted-foreground text-base sm:text-lg max-w-3xl mx-auto font-medium leading-relaxed italic" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />}
                 </div>
               </div>

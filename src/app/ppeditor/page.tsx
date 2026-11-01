@@ -675,7 +675,7 @@ export default function PPEditorPage() {
     
     if (layout === 'mural') {
       const slice = [];
-      const count = Math.min(4, currentSelection.length);
+      const count = Math.min(2, currentSelection.length);
       for (let i = 0; i < count; i++) {
         const idx = (muralIndex + i) % currentSelection.length;
         slice.push(currentSelection[idx]);
