@@ -207,11 +207,12 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
 };
 
 const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0, isPopup = false, isAnimating = false }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number, isPopup?: boolean, isAnimating?: boolean }) => {
-  const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
+  const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent' && secondaryColor !== '#ffffff';
   const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
   
   return (
     <Card 
+      key={t.id}
       className={cn(
         "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none mb-12 w-full",
         !isPopup && "animate-in fade-in duration-700 ease-out fill-both",
