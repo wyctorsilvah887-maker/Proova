@@ -1,4 +1,3 @@
-
 {
   "entities": {
     "User": {
@@ -6,289 +5,49 @@
       "description": "Perfil de usuário unificado (Lead ou Admin).",
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Nome completo."
-        },
-        "companyName": {
-          "type": "string",
-          "description": "Nome da empresa ou marca."
-        },
-        "companySlug": {
-          "type": "string",
-          "description": "Slug único da empresa para URLs."
-        },
-        "email": {
-          "type": "string",
-          "format": "email",
-          "description": "Endereço de e-mail."
-        },
-        "businessType": {
-          "type": "string",
-          "enum": ["local", "digital"],
-          "description": "Tipo de operação do negócio (Local ou Digital/SaaS)."
-        },
-        "city": {
-          "type": "string",
-          "description": "Cidade da empresa."
-        },
-        "state": {
-          "type": "string",
-          "description": "Estado (UF) da empresa."
-        },
-        "googleMapsUrl": {
-          "type": "string",
-          "description": "Link global do Google Maps da empresa."
-        },
-        "googlePlaceId": {
-          "type": "string",
-          "description": "ID oficial do Google Places para a empresa."
-        },
-        "isAdmin": {
-          "type": "boolean",
-          "description": "Define se o usuário tem privilégios administrativos."
-        },
-        "membershipStatus": {
-          "type": "string",
-          "enum": ["gold", "enterprise", "trial", "expired", "base"],
-          "description": "Status da assinatura ou nível de membro."
-        },
-        "trialStartedAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Data e hora em que o período de teste começou."
-        },
-        "trialUsed": {
-          "type": "boolean",
-          "description": "Indica se o usuário já utilizou o período de teste gratuito."
-        },
-        "testimonialsCount": {
-          "type": "integer",
-          "description": "Total de depoimentos recebidos (Counter Pattern para performance)."
-        },
-        "googleRedirectCount": {
-          "type": "integer",
-          "description": "Total de cliques para o Google Maps (Counter Pattern para performance)."
-        },
-        "lastMonthCount": {
-          "type": "integer",
-          "description": "Total de depoimentos no final do mês anterior para comparação de métricas."
-        },
-        "termsAccepted": {
-          "type": "boolean",
-          "description": "Indica se o usuário aceitou explicitamente os termos de uso e privacidade."
-        },
-        "termsAcceptedAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Timestamp exato do aceite dos termos (Audit Log)."
-        },
-        "userIp": {
-          "type": "string",
-          "description": "Endereço IP do usuário no momento do cadastro (Audit Log)."
-        },
-        "legalConsentVersion": {
-          "type": "string",
-          "description": "Versão dos documentos legais aceitos pelo usuário."
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Data de criação."
-        }
-      },
-      "required": [
-        "name",
-        "companyName",
-        "companySlug",
-        "email",
-        "isAdmin",
-        "businessType",
-        "createdAt",
-        "termsAccepted"
-      ]
-    },
-    "PaymentEvent": {
-      "title": "PaymentEvent",
-      "description": "Log de eventos recebidos via Webhook da Cakto.",
-      "type": "object",
-      "properties": {
-        "externalId": { "type": "string" },
-        "customerEmail": { "type": "string" },
-        "status": { "type": "string" },
-        "productName": { "type": "string" },
-        "payload": { "type": "object" },
-        "createdAt": { "type": "string", format: "date-time" }
+        "name": { "type": "string" },
+        "companyName": { "type": "string" },
+        "companySlug": { "type": "string", "description": "Link único global para /c/ e /pp/." },
+        "email": { "type": "string", "format": "email" },
+        "businessType": { "type": "string" },
+        "city": { "type": "string" },
+        "state": { "type": "string" },
+        "googleMapsUrl": { "type": "string" },
+        "googlePlaceId": { "type": "string" },
+        "isAdmin": { "type": "boolean" },
+        "membershipStatus": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
       }
     },
-    "Testimonial": {
-      "title": "Testimonial",
-      "description": "Depoimento enviado por um cliente.",
+    "Slug": {
+      "title": "Global Slug Registry",
+      "description": "Garante que URLs personalizadas sejam únicas em toda a plataforma.",
       "type": "object",
       "properties": {
-        "userName": {
-          "type": "string",
-          "description": "Nome do cliente."
-        },
-        "userEmail": {
-          "type": "string",
-          "format": "email",
-          "description": "Endereço de e-mail do cliente."
-        },
-        "rating": {
-          "type": "number",
-          "description": "Avaliação de 1 a 5 estrelas."
-        },
-        "text": {
-          "type": "string",
-          "description": "Conteúdo do depoimento."
-        },
-        "status": {
-          "type": "string",
-          "enum": ["pending", "approved", "archived"],
-          "description": "Status de moderação."
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Data de envio."
-        }
-      },
-      "required": ["userName", "rating", "text", "status", "createdAt"]
+        "userId": { "type": "string" },
+        "type": { "type": "string", "enum": ["account", "pp"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
     },
-    "Widget": {
-      "title": "Widget",
-      "description": "Configuração de um widget de prova social.",
+    "PublicPage": {
+      "title": "PublicPage Configuration",
+      "description": "Configurações exclusivas da Landing Page do usuário.",
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string",
-          "description": "Nome identificador do widget."
-        },
-        "selectedTestimonialIds": {
-          "array": "array",
-          "items": { "type": "string" },
-          "description": "Lista de IDs de depoimentos selecionados para este widget."
-        },
-        "themeColor": {
-          "type": "string",
-          "description": "Cor principal do widget."
-        },
-        "secondaryColor": {
-          "type": "string",
-          "description": "Cor secundária ou de fundo do widget."
-        },
-        "autoPublishEnabled": {
-          "type": "boolean",
-          "description": "Publica automaticamente novos depoimentos que atendem às regras."
-        },
-        "autoPublishMinRating": {
-          "type": "number",
-          "description": "Nota mínima para publicação automática (Ex: 5)."
-        },
-        "autoPublishMinChars": {
-          "type": "number",
-          "description": "Tamanho mínimo do texto para publicação automática."
-        },
-        "coverImageUrl": {
-          "type": "string",
-          "description": "URL da imagem de capa da página pública."
-        },
-        "logoUrl": {
-          "type": "string",
-          "description": "URL da logo da empresa."
-        },
-        "whatsappEnabled": {
-          "type": "boolean",
-          "description": "Ativa botão de WhatsApp."
-        },
-        "whatsappNumber": {
-          "type": "string",
-          "description": "Número para contato via WhatsApp."
-        },
-        "googleMapsUrl": {
-          "type": "string",
-          "description": "Link do Perfil da Empresa no Google Maps."
-        },
-        "externalSiteUrl": {
-          "type": "string",
-          "description": "URL do site externo da empresa."
-        },
-        "layout": {
-          "type": "string",
-          "enum": ["mural", "carousel", "grid", "popup"],
-          "description": "Tipo de layout do widget."
-        },
-        "heroTitle": {
-          "type": "string",
-          "description": "Título principal customizado da página pública."
-        },
-        "heroSubtitle": {
-          "type": "string",
-          "description": "Subtítulo do hero."
-        },
-        "testimonialsTitle": {
-          "type": "string",
-          "description": "Título da seção de depoimentos."
-        },
-        "footerText": {
-          "type": "string",
-          "description": "Texto do rodapé."
-        },
-        "showLogo": {
-          "type": "boolean",
-          "description": "Controla a exibição da marca Proova na página pública (White Label)."
-        },
-        "customSections": {
-          "type": "array",
-          "description": "Seções de conteúdo dinâmicas da página.",
-          "items": {
-            "type": "object",
-            "properties": {
-              "id": { "type": "string" },
-              "title": { "type": "string" },
-              "subtitle": { "type": "string" },
-              "content": { "type": "string" },
-              "buttonText": { "type": "string" },
-              "buttonUrl": { "type": "string" },
-              "variant": { "type": "string", "enum": ["light", "dark", "accent"] }
-            }
-          }
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "Data de criação."
-        }
-      },
-      "required": ["name", "createdAt"]
+        "themeColor": { "type": "string" },
+        "heroTitle": { "type": "string" },
+        "selectedTestimonialIds": { "type": "array", "items": { "type": "string" } }
+      }
     }
   },
-  "auth": {
-    "providers": [
-      "password"
-    ]
-  },
   "firestore": {
-    "/users/{userId}": {
-      "schema": "User",
-      "description": "Coleção central de todos os usuários e leads do sistema."
+    "/slugs/{slug}": {
+      "schema": "Slug",
+      "description": "Cartório global de slugs únicos."
     },
-    "/payment_events/{eventId}": {
-      "schema": "PaymentEvent",
-      "description": "Logs de webhooks da Cakto para auditoria admin."
-    },
-    "/users/{userId}/testimonials/{testimonialId}": {
-      "schema": "Testimonial",
-      "description": "Depoimentos públicos (4-5 estrelas)."
-    },
-    "/users/{userId}/private_feedbacks/{feedbackId}": {
-      "schema": "Testimonial",
-      "description": "Feedbacks privados (1-3 estrelas)."
-    },
-    "/users/{userId}/widgets/{widgetId}": {
-      "schema": "Widget",
-      "description": "Configurações de widgets de cada usuário."
+    "/users/{userId}/pp/{slug}": {
+      "schema": "PublicPage",
+      "description": "Configuração da Página Pública independente de widgets."
     }
   }
 }

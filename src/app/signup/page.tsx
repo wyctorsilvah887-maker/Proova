@@ -9,7 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, getDoc, writeBatch } from "firebase/firestore";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useFirestore, useAuth, useUser } from "@/firebase";
 import { toast } from "@/hooks/use-toast";
@@ -62,6 +62,19 @@ export default function SignupPage() {
     setIsSubmitting(true);
     
     try {
+      const slug = company.trim().toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+
+      // 1. Verifica se o slug já existe globalmente
+      const slugRef = doc(db, 'slugs', slug);
+      const slugCheck = await getDoc(slugRef);
+      if (slugCheck.exists()) {
+        throw new Error("Este nome de empresa/link já está em uso. Tente uma variação.");
+      }
+
       let userIp = 'Não capturado';
       try {
         const ipRes = await fetch('https://api.ipify.org?format=json');
@@ -74,12 +87,16 @@ export default function SignupPage() {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const newUser = userCredential.user;
       
-      const slug = company.trim().toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-');
+      const batch = writeBatch(db);
 
+      // Reserva o slug no cartório global
+      batch.set(slugRef, {
+        userId: newUser.uid,
+        type: 'account',
+        createdAt: serverTimestamp()
+      });
+
+      // Cria o perfil do usuário
       const userData = {
         name: name.trim(),
         companyName: company.trim(),
@@ -97,7 +114,9 @@ export default function SignupPage() {
         legalConsentVersion: '4.0'
       };
 
-      await setDoc(doc(db, "users", newUser.uid), userData);
+      batch.set(doc(db, "users", newUser.uid), userData);
+      
+      await batch.commit();
       
       toast({
         title: "Conta Criada!",
@@ -259,7 +278,7 @@ export default function SignupPage() {
 
                 <Button 
                   type="submit" 
-                  className="w-full h-12 md:h-14 text-base md:text-lg font-black shadow-xl hover:scale-[1.02] active:scale-95 transition-all rounded-xl md:rounded-2xl gap-2"
+                  className="w-full h-12 md:h-14 text-base md:text-lg font-black shadow-xl hover:scale-102 active:scale-95 transition-all rounded-xl md:rounded-2xl gap-2"
                   disabled={isSubmitting || !termsAccepted}
                 >
                   {isSubmitting ? (

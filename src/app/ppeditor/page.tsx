@@ -51,7 +51,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useUser, useFirestore, useDoc, useCollection, useStorage, useAuth } from '@/firebase';
-import { doc, updateDoc, collection, query, where, getDocs, limit, serverTimestamp, setDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, getDocs, limit, serverTimestamp, setDoc, deleteDoc, writeBatch } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from '@/hooks/use-toast';
@@ -265,7 +265,6 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
 };
 
 const PublicPageSettings = ({ 
-  widgetName, setWidgetName,
   themeColor, setThemeColor,
   secondaryColor, setSecondaryColor,
   whatsappEnabled, setWhatsappEnabled,
@@ -285,7 +284,8 @@ const PublicPageSettings = ({
   isSaving,
   isEnterprise,
   isGoldPlan,
-  logoInputRef
+  logoInputRef,
+  currentSlug, setSlugEdit
 }: any) => {
   const colors = ['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff'];
 
@@ -338,7 +338,7 @@ const PublicPageSettings = ({
         </Link>
         <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground">
           {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
-          Salvar Alterações
+          Salvar Página Pública
         </Button>
       </div>
 
@@ -349,7 +349,7 @@ const PublicPageSettings = ({
             Conteúdo {!isEnterprise && <Lock className="w-2.5 h-2.5 opacity-40" />}
           </TabsTrigger>
           <TabsTrigger value="design" className="text-xs">Layout</TabsTrigger>
-          <TabsTrigger value="social" className="text-xs">Social</TabsTrigger>
+          <TabsTrigger value="social" className="text-xs">Identidade</TabsTrigger>
         </TabsList>
         
         <ScrollArea className="flex-1">
@@ -557,6 +557,24 @@ const PublicPageSettings = ({
             </TabsContent>
 
             <TabsContent value="social" className="mt-0 space-y-6">
+              <div className="space-y-6 p-4 border rounded-xl bg-muted/5">
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                    <Globe className="w-3 h-3" /> Endereço da Página (Slug)
+                  </Label>
+                  <div className="flex items-center gap-1 bg-background rounded-lg px-3 border focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+                    <span className="text-[10px] font-bold opacity-40">/pp/</span>
+                    <input 
+                      placeholder="seu-link-unico"
+                      value={currentSlug} 
+                      onChange={(e) => setSlugEdit(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/\s+/g, '-'))} 
+                      className="h-10 flex-1 bg-transparent border-none focus:ring-0 text-xs font-mono font-bold"
+                    />
+                  </div>
+                  <p className="text-[9px] text-muted-foreground italic">Este é o link que você usará no seu Instagram.</p>
+                </div>
+              </div>
+
               <div className="space-y-4 p-4 border rounded-xl bg-muted/5">
                 <div className="flex items-center justify-between">
                   <Label className="text-xs font-bold">Botão WhatsApp</Label>
@@ -586,13 +604,13 @@ export default function PPEditorPage() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
-  const [activeWidgetId, setActiveWidgetId] = useState<string | null>(null);
-  
-  const widgetRef = useMemo(() => (db && user && activeWidgetId ? doc(db, 'users', user.uid, 'widgets', activeWidgetId) : null), [db, user, activeWidgetId]);
-  const { data: widgetData, loading: widgetLoading } = useDoc(widgetRef);
-
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
+
+  // Carregar dados da Página Pública (Subcoleção PP)
+  const [activeSlug, setActiveSlug] = useState<string | null>(null);
+  const ppRef = useMemo(() => (db && user && activeSlug ? doc(db, 'users', user.uid, 'pp', activeSlug) : null), [db, user, activeSlug]);
+  const { data: ppData, loading: ppLoading } = useDoc(ppRef);
 
   const membershipStatus = userData?.membershipStatus;
   const isEnterprise = membershipStatus === 'enterprise';
@@ -606,7 +624,6 @@ export default function PPEditorPage() {
 
   const { data: approvedTestimonials, loading: testimonialsLoading } = useCollection(testimonialsQuery);
 
-  const [widgetName, setWidgetName] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [themeColor, setThemeColor] = useState('#f97316');
   const [secondaryColor, setSecondaryColor] = useState('#ffffff');
@@ -621,13 +638,12 @@ export default function PPEditorPage() {
   const [footerText, setFooterText] = useState('');
   const [showLogo, setShowLogo] = useState(true);
   const [customSections, setCustomSections] = useState<CustomSection[]>([]);
+  const [slugEdit, setSlugEdit] = useState('');
 
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [muralIndex, setMuralIndex] = useState(0);
   const [baseUrl, setBaseUrl] = useState('');
-  const [showAll, setShowAll] = useState(false);
 
   const [tempImage, setTempImage] = useState<string | null>(null);
   const [cropType, setCropType] = useState<'logo' | null>(null);
@@ -640,48 +656,46 @@ export default function PPEditorPage() {
     if (typeof window !== 'undefined') setBaseUrl(window.location.origin);
   }, []);
 
+  // Inicializa o slug ativo com base no perfil do usuário
   useEffect(() => {
-    async function initWidget() {
-      if (!db || !user) return;
-      const q = query(collection(db, 'users', user.uid, 'widgets'), limit(1));
-      const snap = await getDocs(q);
-      
-      if (!snap.empty) {
-        setActiveWidgetId(snap.docs[0].id);
-      } else {
-        const id = 'pagina-publica-principal';
-        await setDoc(doc(db, 'users', user.uid, 'widgets', id), {
-          name: 'Página Pública Principal',
-          layout: 'grid',
-          themeColor: '#f97316',
-          selectedTestimonialIds: [],
-          createdAt: serverTimestamp()
-        });
-        setActiveWidgetId(id);
-      }
+    if (userData?.companySlug) {
+      setActiveSlug(userData.companySlug);
+      setSlugEdit(userData.companySlug);
     }
-    initWidget();
-  }, [db, user]);
+  }, [userData]);
 
+  // Carrega as configurações da PP quando o documento é retornado
   useEffect(() => {
-    if (widgetData) {
-      setWidgetName(widgetData.name || '');
-      setSelectedIds(widgetData.selectedTestimonialIds || []);
-      setThemeColor(widgetData.themeColor || '#f97316');
-      setSecondaryColor(widgetData.secondaryColor || '#ffffff');
-      setLayout(widgetData.layout || 'grid');
-      setLogoUrl(widgetData.logoUrl || '');
-      setWhatsappEnabled(widgetData.whatsappEnabled || false);
-      setWhatsappNumber(widgetData.whatsappNumber || '');
-      setExternalSiteUrl(widgetData.externalSiteUrl || '');
-      setHeroTitle(widgetData.heroTitle || '');
-      setHeroSubtitle(widgetData.heroSubtitle || '');
-      setTestimonialsTitle(widgetData.testimonialsTitle || '');
-      setFooterText(widgetData.footerText || '');
-      setShowLogo(widgetData.showLogo !== undefined ? widgetData.showLogo : true);
-      setCustomSections(widgetData.customSections || []);
+    if (ppData) {
+      setSelectedIds(ppData.selectedTestimonialIds || []);
+      setThemeColor(ppData.themeColor || '#f97316');
+      setSecondaryColor(ppData.secondaryColor || '#ffffff');
+      setLayout(ppData.layout || 'grid');
+      setLogoUrl(ppData.logoUrl || '');
+      setWhatsappEnabled(ppData.whatsappEnabled || false);
+      setWhatsappNumber(ppData.whatsappNumber || '');
+      setExternalSiteUrl(ppData.externalSiteUrl || '');
+      setHeroTitle(ppData.heroTitle || '');
+      setHeroSubtitle(ppData.heroSubtitle || '');
+      setTestimonialsTitle(ppData.testimonialsTitle || '');
+      setFooterText(ppData.footerText || '');
+      setShowLogo(ppData.showLogo !== undefined ? ppData.showLogo : true);
+      setCustomSections(ppData.customSections || []);
+    } else if (!ppLoading && activeSlug && user) {
+      // Se não existe documento PP para o slug atual, tentamos localizar o primeiro widget e clonar como inicial
+      const tryInitPP = async () => {
+        const widgetsRef = collection(db, 'users', user.uid, 'widgets');
+        const snap = await getDocs(query(widgetsRef, limit(1)));
+        const baseData = !snap.empty ? snap.docs[0].data() : {};
+        
+        await setDoc(doc(db, 'users', user.uid, 'pp', activeSlug), {
+          ...baseData,
+          createdAt: serverTimestamp()
+        }, { merge: true });
+      };
+      tryInitPP();
     }
-  }, [widgetData]);
+  }, [ppData, ppLoading, activeSlug, user, db]);
 
   useEffect(() => {
     if (!authLoading && !user) router.replace('/login');
@@ -695,28 +709,83 @@ export default function PPEditorPage() {
   }, [layout, selectedIds]);
 
   const handleSave = async () => {
-    if (!widgetRef) return;
+    if (!user || !db || !userData) return;
     setIsSaving(true);
-    updateDoc(widgetRef, {
-      name: widgetName.trim(),
-      selectedTestimonialIds: selectedIds,
-      themeColor,
-      secondaryColor,
-      layout,
-      logoUrl,
-      whatsappEnabled,
-      whatsappNumber,
-      externalSiteUrl,
-      heroTitle,
-      heroSubtitle,
-      testimonialsTitle,
-      footerText,
-      showLogo,
-      customSections
-    }).then(() => {
+
+    const oldSlug = userData.companySlug;
+    const newSlug = slugEdit.trim().toLowerCase();
+    const isSlugChanging = newSlug !== oldSlug;
+
+    try {
+      const batch = writeBatch(db);
+
+      // 1. Validação de Unicidade Global se o slug mudou
+      if (isSlugChanging) {
+        if (!newSlug) throw new Error("O link da página não pode ser vazio.");
+        
+        const slugCheck = await getDoc(doc(db, 'slugs', newSlug));
+        if (slugCheck.exists()) {
+          throw new Error("Este link já está sendo utilizado por outro usuário.");
+        }
+
+        // Reserva novo slug global
+        batch.set(doc(db, 'slugs', newSlug), {
+          userId: user.uid,
+          type: 'pp',
+          createdAt: serverTimestamp()
+        });
+
+        // Remove slug antigo global
+        if (oldSlug) {
+          batch.delete(doc(db, 'slugs', oldSlug));
+        }
+
+        // Atualiza perfil do usuário
+        batch.update(doc(db, 'users', user.uid), { companySlug: newSlug });
+
+        // Remove documento PP antigo
+        if (oldSlug) {
+          batch.delete(doc(db, 'users', user.uid, 'pp', oldSlug));
+        }
+      }
+
+      // 2. Salva configurações no documento PP (novo ou atual)
+      const targetSlug = isSlugChanging ? newSlug : oldSlug;
+      const targetPPRef = doc(db, 'users', user.uid, 'pp', targetSlug);
+
+      const configData = {
+        selectedTestimonialIds: selectedIds,
+        themeColor,
+        secondaryColor,
+        layout,
+        logoUrl,
+        whatsappEnabled,
+        whatsappNumber,
+        externalSiteUrl,
+        heroTitle,
+        heroSubtitle,
+        testimonialsTitle,
+        footerText,
+        showLogo,
+        customSections,
+        updatedAt: serverTimestamp()
+      };
+
+      batch.set(targetPPRef, configData, { merge: true });
+
+      await batch.commit();
+      
+      if (isSlugChanging) {
+        setActiveSlug(newSlug);
+        toast({ title: "Link Atualizado!", description: `Sua nova página é /pp/${newSlug}` });
+      } else {
+        toast({ title: "Página Pública Salva!" });
+      }
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Erro ao salvar", description: err.message });
+    } finally {
       setIsSaving(false);
-      toast({ title: "Página Pública Salva!" });
-    }).catch(() => setIsSaving(false));
+    }
   };
 
   const onFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'logo') => {
@@ -731,12 +800,12 @@ export default function PPEditorPage() {
   };
 
   const handleConfirmCrop = async () => {
-    if (!tempImage || !cropType || !user || !storage || !croppedAreaPixels) return;
+    if (!tempImage || !cropType || !user || !storage || !croppedAreaPixels || !activeSlug) return;
     setIsUploading(true);
     setTempImage(null);
     try {
       const croppedBlob = await getCroppedImg(tempImage, croppedAreaPixels, cropType);
-      const storageRef = ref(storage, `users/${user.uid}/widgets/${activeWidgetId}/${cropType}_${Date.now()}.jpg`);
+      const storageRef = ref(storage, `users/${user.uid}/pp/${activeSlug}/${cropType}_${Date.now()}.jpg`);
       const snapshot = await uploadBytes(storageRef, croppedBlob);
       const url = await getDownloadURL(snapshot.ref);
       setLogoUrl(url);
@@ -748,18 +817,19 @@ export default function PPEditorPage() {
     }
   };
 
-  if (authLoading || widgetLoading || testimonialsLoading || !activeWidgetId) {
+  if (authLoading || ppLoading || userDataLoading || testimonialsLoading || !activeSlug) {
     return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
   }
 
   const sidebarProps = { 
-    widgetName, setWidgetName, themeColor, setThemeColor, secondaryColor, setSecondaryColor,
+    themeColor, setThemeColor, secondaryColor, setSecondaryColor,
     whatsappEnabled, setWhatsappEnabled, whatsappNumber, setWhatsappNumber,
     externalSiteUrl, setExternalSiteUrl, layout, setLayout, logoUrl, setLogoUrl,
     heroTitle, setHeroTitle, heroSubtitle, setHeroSubtitle,
     testimonialsTitle, setTestimonialsTitle, footerText, setFooterText,
     showLogo, setShowLogo, customSections, setCustomSections,
-    onFileSelect, isUploading, handleSave, isSaving, isEnterprise, isGoldPlan, logoInputRef
+    onFileSelect, isUploading, handleSave, isSaving, isEnterprise, isGoldPlan, logoInputRef,
+    currentSlug: slugEdit, setSlugEdit
   };
 
   const visibleTestimonials = approvedTestimonials?.filter(t => selectedIds.includes(t.id)).slice(0, 5) || [];
@@ -833,6 +903,13 @@ export default function PPEditorPage() {
               <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                 <Eye className="w-4 h-4" /> Preview da Página Pública
               </h2>
+              <div className="flex items-center gap-2 bg-background border px-3 py-1 rounded-full shadow-sm">
+                 <span className="text-[10px] font-bold opacity-50 uppercase tracking-widest">Link:</span>
+                 <span className="text-[10px] font-mono font-black text-primary">/pp/{activeSlug}</span>
+                 <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => copyToClipboard(`${baseUrl}/pp/${activeSlug}`)}>
+                   <Copy className="w-3 h-3" />
+                 </Button>
+              </div>
             </div>
 
             <div className="relative bg-background rounded-[2.5rem] shadow-2xl min-h-[600px] flex flex-col overflow-hidden border border-primary/5">
@@ -848,7 +925,7 @@ export default function PPEditorPage() {
                     dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${userData?.companyName}` }}
                   />
                   {heroSubtitle && (
-                    <p 
+                    <div 
                       className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium"
                       dangerouslySetInnerHTML={{ __html: heroSubtitle }}
                     />
@@ -933,6 +1010,11 @@ export default function PPEditorPage() {
       </Dialog>
     </div>
   );
+}
+
+function copyToClipboard(text: string) {
+  navigator.clipboard.writeText(text);
+  toast({ title: "Copiado!" });
 }
 
 async function getCroppedImg(imageSrc: string, pixelCrop: any, type: string): Promise<Blob> {
