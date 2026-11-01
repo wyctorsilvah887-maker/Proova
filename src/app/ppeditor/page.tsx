@@ -303,7 +303,7 @@ const PublicPageSettings = ({
         
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-8 pb-10">
-            <TabsContent value="geral" className="mt-0 space-y-8 animate-in fade-in duration-300">
+            <TabsContent value="geral" className="mt-0 space-y-8">
               <div className="space-y-4 text-center">
                 <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block text-left ml-1">Logo Marca</Label>
                 <div 
@@ -327,7 +327,7 @@ const PublicPageSettings = ({
               </div>
             </TabsContent>
 
-            <TabsContent value="conteudo" className="mt-0 space-y-8 animate-in fade-in duration-300">
+            <TabsContent value="conteudo" className="mt-0 space-y-8">
               {!isGoldPlan ? (
                 <div className="py-20 px-4 text-center space-y-6 bg-primary/5 rounded-3xl border border-dashed border-primary/20 animate-in zoom-in duration-500">
                    <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit">
@@ -384,7 +384,7 @@ const PublicPageSettings = ({
                                   <Input value={section.title} onChange={(e) => updateSection(section.id, 'title', e.target.value)} className="h-8 text-[11px]" />
                                 </div>
                                 <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Subtítulo Bloco (RGB)</Label>
+                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Subtítulo Bloco</Label>
                                   <RichTextEditor value={section.subtitle} allowColor={isGoldPlan} onChange={(val) => updateSection(section.id, 'subtitle', val)} className="min-h-[50px] text-[11px] text-foreground" />
                                 </div>
                                 <div className="space-y-1.5">
@@ -449,7 +449,7 @@ const PublicPageSettings = ({
               )}
             </TabsContent>
 
-            <TabsContent value="design" className="mt-0 space-y-6 animate-in fade-in duration-300">
+            <TabsContent value="design" className="mt-0 space-y-6">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Layout do Mural</Label>
               <div className="grid grid-cols-1 gap-2">
                 {[
@@ -476,7 +476,7 @@ const PublicPageSettings = ({
               </div>
             </TabsContent>
 
-            <TabsContent value="social" className="mt-0 space-y-6 animate-in fade-in duration-300">
+            <TabsContent value="social" className="mt-0 space-y-6">
               <div className="space-y-4">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 ml-1">
                   <Globe className="w-3 h-3" /> Link Único (Bio)
@@ -720,7 +720,7 @@ export default function PPEditorPage() {
           <div className="h-6 w-px bg-border mx-1 hidden sm:block" />
           <Sheet>
             <SheetTrigger asChild>
-              <button className="flex flex-col items-center justify-center gap-1 group transition-all text-primary hover:text-primary/80">
+              <button className="flex flex-col items-center justify-center gap-1 group transition-all text-primary hover:text-primary/80 outline-none focus:ring-0">
                 <div className="h-10 w-10 flex items-center justify-center rounded-xl transition-all bg-transparent group-hover:bg-primary/5">
                   <Monitor className="h-6 w-6" />
                 </div>
@@ -750,7 +750,10 @@ export default function PPEditorPage() {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-10 md:h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all outline-none focus-visible:ring-0 focus:bg-transparent">
+              <Button 
+                variant="ghost" 
+                className="h-10 md:h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all outline-none border-none ring-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:bg-transparent data-[state=open]:bg-transparent active:bg-transparent"
+              >
                 <div className="hidden sm:flex flex-col items-end">
                   <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Minha Empresa'}
@@ -791,7 +794,10 @@ export default function PPEditorPage() {
                 <span>Planos de Upgrade</span>
               </DropdownMenuItem>
               
-              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70">
+              <DropdownMenuItem 
+                onClick={() => router.push('/pricing')} 
+                className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
+              >
                 <Handshake className="mr-2 h-4 w-4 text-primary" />
                 <span>Serviços de Parceiros</span>
                 <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
