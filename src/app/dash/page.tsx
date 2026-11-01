@@ -1208,6 +1208,23 @@ export default function DashPage() {
               </div>
               <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Personalizar textos, cores e seções</span>
             </Button>
+
+            <Button 
+              variant="link" 
+              className="w-full text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary/70 h-auto p-0"
+              onClick={() => {
+                const firstWidget = widgetsList?.[0];
+                if (firstWidget) {
+                  const slug = userData?.companySlug || userData?.companyName?.toLowerCase().replace(/\s+/g, '-') || '';
+                  const link = `${window.location.origin}/pp/${slug}/${firstWidget.id}`;
+                  copyToClipboard(link, "Link da Página Pública");
+                } else {
+                   toast({ variant: "destructive", title: "Erro", description: "Você ainda não possui um mural criado." });
+                }
+              }}
+            >
+              <Copy className="w-3 h-3 mr-1" /> Copiar Link da Página
+            </Button>
           </div>
 
           <DialogFooter className="p-4 bg-muted/30 border-t text-center flex justify-center">
