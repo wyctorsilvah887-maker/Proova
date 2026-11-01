@@ -190,6 +190,14 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
         onFocus={() => setIsFocused(true)}
         onBlur={() => { setIsFocused(false); setShowToolbar(false); }}
         onSelect={handleSelection}
+        onContextMenu={(e) => e.preventDefault()}
+        onCopy={(e) => e.preventDefault()}
+        onCut={(e) => e.preventDefault()}
+        onPaste={(e) => {
+          e.preventDefault();
+          const text = e.clipboardData.getData('text/plain');
+          document.execCommand('insertText', false, text);
+        }}
         className={cn(
           "min-h-[80px] p-4 rounded-2xl bg-muted/20 border-2 border-transparent focus:border-primary/30 outline-none text-sm font-bold leading-relaxed transition-all cursor-text",
           className
@@ -346,18 +354,19 @@ const PublicPageSettings = ({
       </div>
 
       <Tabs defaultValue="geral" className="w-full flex-1 flex flex-col min-h-0">
-        <TabsList className="w-full justify-start rounded-none border-b bg-transparent h-12 px-2 shrink-0">
-          <TabsTrigger value="geral" className="text-xs font-bold uppercase tracking-widest">Visual</TabsTrigger>
-          <TabsTrigger value="conteudo" className="text-xs font-bold uppercase tracking-widest flex items-center gap-1.5">
-            Conteúdo {!isGoldPlan && <Lock className="w-2.5 h-2.5 opacity-40" />}
-          </TabsTrigger>
-          <TabsTrigger value="design" className="text-xs font-bold uppercase tracking-widest">Layout</TabsTrigger>
-          <TabsTrigger value="social" className="text-xs font-bold uppercase tracking-widest">Contato/Info</TabsTrigger>
-        </TabsList>
+        <div className="w-full border-b overflow-x-auto scrollbar-hide">
+          <TabsList className="flex w-max justify-start rounded-none bg-transparent h-12 px-2 shrink-0">
+            <TabsTrigger value="geral" className="text-[10px] font-bold uppercase tracking-widest px-3">Visual</TabsTrigger>
+            <TabsTrigger value="conteudo" className="text-[10px] font-bold uppercase tracking-widest px-3 flex items-center gap-1.5">
+              Conteúdo {!isGoldPlan && <Lock className="w-2.5 h-2.5 opacity-40" />}
+            </TabsTrigger>
+            <TabsTrigger value="design" className="text-[10px] font-bold uppercase tracking-widest px-3">Layout</TabsTrigger>
+            <TabsTrigger value="social" className="text-[10px] font-bold uppercase tracking-widest px-3">Contato/Info</TabsTrigger>
+          </TabsList>
+        </div>
         
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-8 pb-10">
-            {/* ABA VISUAL */}
             <TabsContent value="geral" className="mt-0 space-y-8">
               <div className="space-y-4 text-center">
                 <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block text-left ml-1">Logotipo</Label>
@@ -403,7 +412,6 @@ const PublicPageSettings = ({
               </div>
             </TabsContent>
 
-            {/* ABA CONTEÚDO */}
             <TabsContent value="conteudo" className="mt-0 space-y-8">
               {!isGoldPlan ? (
                 <div className="py-16 px-4 text-center space-y-6 bg-primary/5 rounded-3xl border border-dashed border-primary/20 m-2">
@@ -419,10 +427,12 @@ const PublicPageSettings = ({
                   <div className="space-y-3">
                     <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Título Hero</Label>
                     <RichTextEditor value={heroTitle} onChange={setHeroTitle} allowColor={isGoldPlan} placeholder="O que dizem sobre nós..." />
+                    <p className="text-[9px] text-muted-foreground font-medium italic mt-1.5 ml-1">💡 Segure e escolha um trecho ou letra para mudar de cor.</p>
                   </div>
                   <div className="space-y-3">
                     <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Subtítulo Hero</Label>
                     <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} allowColor={isGoldPlan} placeholder="Texto persuasivo..." className="min-h-[60px]" />
+                    <p className="text-[9px] text-muted-foreground font-medium italic mt-1.5 ml-1">💡 Segure e escolha um trecho ou letra para mudar de cor.</p>
                   </div>
 
                   <div className="space-y-6 pt-6 border-t">
@@ -474,7 +484,6 @@ const PublicPageSettings = ({
               )}
             </TabsContent>
 
-            {/* ABA LAYOUT */}
             <TabsContent value="design" className="mt-0 space-y-6">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Estilo de Exibição</Label>
               <div className="grid grid-cols-1 gap-2">
@@ -507,7 +516,6 @@ const PublicPageSettings = ({
               </div>
             </TabsContent>
 
-            {/* ABA CONTATO/INFO */}
             <TabsContent value="social" className="mt-0 space-y-6">
               <div className="space-y-4">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 ml-1"><Globe className="w-3 h-3" /> Link da Bio (Slug)</Label>
