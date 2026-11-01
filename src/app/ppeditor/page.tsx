@@ -73,6 +73,7 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
+  SheetTrigger,
 } from "@/components/ui/sheet";
 import {
   Accordion,
@@ -106,7 +107,7 @@ interface CustomSection {
 }
 
 /**
- * RichTextEditor - Editor de texto rico com seletor RGB e estabilidade de cursor.
+ * RichTextEditor - Editor de texto rico com seletor RGB e estabilidade de cursor para mobile.
  */
 const RichTextEditor = ({ value, onChange, placeholder, themeColor }: { value: string, onChange: (val: string) => void, placeholder?: string, themeColor: string }) => {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -116,6 +117,7 @@ const RichTextEditor = ({ value, onChange, placeholder, themeColor }: { value: s
   const [isFocused, setIsFocused] = useState(false);
   const lastHtml = useRef(value);
 
+  // Sincroniza apenas quando não está em foco para evitar saltos do cursor
   useEffect(() => {
     if (editorRef.current && !isFocused && value !== editorRef.current.innerHTML) {
       editorRef.current.innerHTML = value || '';
@@ -244,30 +246,30 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
     <Card 
       key={`${t.id}-${muralIndex}`}
       className={cn(
-        "bg-card shadow-lg border-none text-left overflow-hidden transition-all duration-700 p-4",
-        "border-t-4 animate-in duration-700 ease-out fill-both",
+        "bg-card rounded-xl p-6 shadow-sm animate-in duration-700 ease-out fill-both",
         side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in"
-      )} 
+      )}
       style={{ 
+        borderTopWidth: '4px',
         borderTopColor: themeColor,
-        boxShadow: `0 10px 30px -15px ${themeColor}30`,
-        backgroundColor: secondaryColor && secondaryColor !== '#ffffff' ? `${secondaryColor}20` : undefined
+        backgroundColor: secondaryColor && secondaryColor !== '#ffffff' ? `${secondaryColor}20` : undefined,
+        boxShadow: `0 10px 30px -15px ${themeColor}30`
       }}
     >
-      <div className="flex flex-col space-y-3">
+      <div className="space-y-4">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-full shrink-0" style={{ backgroundColor: secondaryColor && secondaryColor !== '#ffffff' ? `${secondaryColor}30` : `${themeColor}15` }}>
             <User className="w-4 h-4" style={{ color: themeColor }} />
           </div>
-          <span className="font-bold text-foreground leading-tight truncate text-xs">{t.userName}</span>
+          <span className="font-bold text-sm text-foreground">{t.userName}</span>
         </div>
         <div className="flex gap-0.5">
           {Array.from({ length: t.rating || 5 }).map((_, i) => (
-            <Star key={i} className="fill-primary text-primary w-3 h-3" style={{ color: themeColor, fill: themeColor }} />
+            <Star key={i} className="w-3 h-3 fill-current" style={{ color: themeColor }} />
           ))}
         </div>
         {t.text && t.text !== '(Depoimento em Vídeo)' && (
-          <p className="text-foreground/80 italic leading-relaxed text-xs line-clamp-4">"{t.text}"</p>
+          <p className="text-foreground/80 italic text-sm leading-relaxed">"{t.text}"</p>
         )}
       </div>
     </Card>
@@ -378,7 +380,7 @@ const PublicPageSettings = ({
                   onClick={() => !isUploading && logoInputRef.current?.click()}
                   className="aspect-square w-24 border-2 border-dashed rounded-2xl flex items-center justify-center bg-muted/20 overflow-hidden relative group mx-auto cursor-pointer"
                 >
-                  {isUploading ? <Loader2 className="animate-spin text-primary" /> : (logoUrl ? <img src={logoUrl} className="w-full h-full object-cover rounded-xl" /> : <Upload className="text-muted-foreground" />)}
+                  {isUploading ? <Loader2 className="animate-spin text-primary" /> : (logoUrl ? <img src={logoUrl} className="w-full h-full object-cover rounded-xl" alt="Logo" /> : <Upload className="text-muted-foreground" />)}
                 </div>
                 <input type="file" ref={logoInputRef} className="hidden" accept="image/*" onChange={(e) => onFileSelect(e, 'logo')} />
               </div>
@@ -849,6 +851,11 @@ export default function PPEditorPage() {
     });
   };
 
+  const copyToClipboardFunc = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({ title: "Copiado!" });
+  };
+
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body w-full overflow-hidden text-foreground">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
@@ -906,7 +913,7 @@ export default function PPEditorPage() {
               <div className="flex items-center gap-2 bg-background border px-3 py-1 rounded-full shadow-sm">
                  <span className="text-[10px] font-bold opacity-50 uppercase tracking-widest">Link:</span>
                  <span className="text-[10px] font-mono font-black text-primary">/pp/{activeSlug}</span>
-                 <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => copyToClipboard(`${baseUrl}/pp/${activeSlug}`)}>
+                 <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => copyToClipboardFunc(`${baseUrl}/pp/${activeSlug}`)}>
                    <Copy className="w-3 h-3" />
                  </Button>
               </div>
@@ -1010,11 +1017,6 @@ export default function PPEditorPage() {
       </Dialog>
     </div>
   );
-}
-
-function copyToClipboard(text: string) {
-  navigator.clipboard.writeText(text);
-  toast({ title: "Copiado!" });
 }
 
 async function getCroppedImg(imageSrc: string, pixelCrop: any, type: string): Promise<Blob> {
