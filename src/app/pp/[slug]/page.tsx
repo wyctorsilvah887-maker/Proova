@@ -44,26 +44,25 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     }
   }, []);
 
-  // Busca o dono do slug no Cartório Global
+  // Busca o dono do slug no Cartório Global de forma resiliente
   useEffect(() => {
     async function resolveSlug() {
       if (!db || !rawSlug) return;
       
       try {
         setIsLoading(true);
-        const slug = decodeURIComponent(rawSlug).toLowerCase();
+        const slug = decodeURIComponent(rawSlug).toLowerCase().trim();
         
-        // Busca na coleção global de slugs para achar o userId
-        const slugRef = doc(db, 'slugs', slug);
-        const slugSnap = await getDocs(query(collection(db, 'slugs'), where('__name__', '==', slug), limit(1)));
+        // 1. Busca na coleção global de slugs (Cartório)
+        const slugQuery = query(collection(db, 'slugs'), where('__name__', '==', slug), limit(1));
+        const slugSnap = await getDocs(slugQuery);
         
         if (!slugSnap.empty) {
           const sData = slugSnap.docs[0].data();
           const uid = sData.userId;
           setTargetUserId(uid);
 
-          // Busca o nome da empresa no perfil do usuário
-          const userRef = doc(db, 'users', uid);
+          // 2. Busca o nome da empresa e dados básicos no perfil do usuário
           const userSnap = await getDocs(query(collection(db, 'users'), where('__name__', '==', uid), limit(1)));
           if (!userSnap.empty) {
             setCompanyName(userSnap.docs[0].data().companyName);
@@ -79,12 +78,13 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     resolveSlug();
   }, [db, rawSlug]);
 
-  // Carrega as configurações da PP do usuário resolvido
+  // Carrega as configurações da PP e Testemunhos
   useEffect(() => {
     if (!db || !targetUserId || !rawSlug) return;
 
-    const slug = decodeURIComponent(rawSlug).toLowerCase();
+    const slug = decodeURIComponent(rawSlug).toLowerCase().trim();
     const ppRef = doc(db, 'users', targetUserId, 'pp', slug);
+    
     const unsubPP = onSnapshot(ppRef, (docSnap) => {
       if (docSnap.exists()) {
         setPPData(docSnap.data());
@@ -93,6 +93,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
 
     const testimonialsRef = collection(db, 'users', targetUserId, 'testimonials');
     const tQuery = query(testimonialsRef, where('status', '==', 'approved'));
+    
     const unsubTestimonials = onSnapshot(tQuery, (snapshot) => {
       const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
       setAllTestimonials(docs);
@@ -110,6 +111,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     return allTestimonials.filter(t => selectedIds.includes(t.id));
   }, [ppData, allTestimonials]);
 
+  // Extração de variáveis com fallbacks seguros
   const layout = ppData?.layout || 'grid';
   const themeColor = ppData?.themeColor || '#f97316';
   const secondaryColor = ppData?.secondaryColor || '#ffffff';
@@ -125,6 +127,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
   const footerText = ppData?.footerText || `${new Date().getFullYear()} ${companyName || ''}`;
   const showProovaBranding = ppData?.showLogo !== false;
 
+  // Lógica de rotação para layouts estáticos
   useEffect(() => {
     if ((layout === 'mural' || layout === 'grid') && filteredTestimonials.length > 5) {
       const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % filteredTestimonials.length), 7000);
@@ -132,6 +135,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     }
   }, [layout, filteredTestimonials]);
 
+  // Lógica de auto-play para carrossel
   useEffect(() => {
     if (!api || layout !== 'carousel') return;
     const interval = setInterval(() => api.scrollNext(), 5000);
@@ -253,6 +257,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
               </div>
             </header>
 
+            {/* SEÇÕES CUSTOMIZADAS */}
             <div className="w-full">
               {customSections.map((section: any) => (
                 <section 
