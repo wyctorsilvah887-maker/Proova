@@ -11,6 +11,7 @@ service cloud.firestore {
     }
 
     // Regras para Slugs Globais (Cartório de Nomes)
+    // Permite que qualquer pessoa verifique se um slug existe, mas apenas usuários logados reservem nomes.
     match /slugs/{slug} {
       allow read: if true;
       allow create: if request.auth != null;
@@ -40,12 +41,13 @@ service cloud.firestore {
       allow delete: if request.auth != null && request.auth.uid == userId;
       
       // Página Pública Independente (Subcoleção)
+      // Leitura é pública para que os visitantes acessem a PP. Escrita apenas pelo dono.
       match /pp/{slug} {
         allow read: if true;
         allow write: if request.auth != null && request.auth.uid == userId;
       }
 
-      // Depoimentos Públicos
+      // Depoimentos Públicos (Fila de Curadoria e Mural)
       match /testimonials/{testimonialId} {
         allow create, read: if true; 
         allow update, delete: if request.auth != null && (request.auth.uid == userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
@@ -60,8 +62,7 @@ service cloud.firestore {
       // Configurações de Widgets
       match /widgets/{widgetId} {
         allow read: if true;
-        allow update: if request.auth != null && request.auth.uid == userId;
-        allow create, delete: if request.auth != null && request.auth.uid == userId;
+        allow update, create, delete: if request.auth != null && request.auth.uid == userId;
       }
     }
 
