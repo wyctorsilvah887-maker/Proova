@@ -1175,7 +1175,8 @@ export default function DashPage() {
                 const firstWidget = widgetsList?.[0];
                 if (firstWidget) {
                   const slug = userData?.companySlug || userData?.companyName?.toLowerCase().replace(/\s+/g, '-') || '';
-                  window.open(`${baseUrl}/pp/${slug}/${firstWidget.id}`, '_blank');
+                  // Navegação interna sem abrir nova aba
+                  router.push(`/pp/${slug}/${firstWidget.id}`);
                   setIsPublicPageChoiceOpen(false);
                 } else {
                   toast({ title: "Mural Necessário", description: "Crie seu primeiro mural para visualizar." });

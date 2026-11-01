@@ -546,6 +546,7 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
   const [muralIndex, setMuralIndex] = useState(0);
   const [baseUrl, setBaseUrl] = useState('');
   const [showAll, setShowAll] = useState(false);
+  const [isStandalone, setIsStandalone] = useState(false);
 
   const [tempImage, setTempImage] = useState<string | null>(null);
   const [cropType, setCropType] = useState<'logo' | 'cover' | null>(null);
@@ -556,6 +557,7 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setBaseUrl(window.location.origin);
+      setIsStandalone(window.matchMedia('(display-mode: standalone)').matches);
     }
   }, []);
 
@@ -870,36 +872,39 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
                 </Button>
               </Link>
               
-              <div className="flex items-center gap-2 bg-background border rounded-xl p-1.5 shadow-sm max-w-md w-full">
-                <div className="flex-1 px-3">
-                  <p className="text-[9px] font-black uppercase text-muted-foreground tracking-tighter mb-0.5">Link da Página Pública</p>
-                  <Input 
-                    readOnly 
-                    value={publicPageLink} 
-                    className="h-6 border-none bg-transparent p-0 text-[11px] font-mono focus-visible:ring-0"
-                  />
+              {/* Oculta link de compartilhamento se o app estiver instalado para maximizar espaço de edição */}
+              {!isStandalone && (
+                <div className="flex items-center gap-2 bg-background border rounded-xl p-1.5 shadow-sm max-w-md w-full">
+                  <div className="flex-1 px-3">
+                    <p className="text-[9px] font-black uppercase text-muted-foreground tracking-tighter mb-0.5">Link da Página Pública</p>
+                    <Input 
+                      readOnly 
+                      value={publicPageLink} 
+                      className="h-6 border-none bg-transparent p-0 text-[11px] font-mono focus-visible:ring-0"
+                    />
+                  </div>
+                  <div className="flex gap-1 pr-1">
+                    <Button 
+                      variant="secondary" 
+                      size="icon" 
+                      className="h-8 w-8 rounded-lg"
+                      onClick={() => copyToClipboard(publicPageLink, "Link da Página Pública")}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="h-8 w-8 rounded-lg border-primary/20 text-primary"
+                      asChild
+                    >
+                      <a href={publicPageLink} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex gap-1 pr-1">
-                  <Button 
-                    variant="secondary" 
-                    size="icon" 
-                    className="h-8 w-8 rounded-lg"
-                    onClick={() => copyToClipboard(publicPageLink, "Link da Página Pública")}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="icon" 
-                    className="h-8 w-8 rounded-lg border-primary/20 text-primary"
-                    asChild
-                  >
-                    <a href={publicPageLink} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
-                  </Button>
-                </div>
-              </div>
+              )}
             </div>
 
             <div className="flex items-center justify-between">

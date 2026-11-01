@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect, use } from 'react';
-import { useFirestore } from '@/firebase';
+import { useFirestore, useUser } from '@/firebase';
 import { 
   collection, 
   query, 
@@ -12,7 +12,7 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { Card } from '@/components/ui/card';
-import { Star, User, Loader2, MessageSquare, MessageCircle, Globe, ArrowRight } from 'lucide-react';
+import { Star, User, Loader2, MessageSquare, MessageCircle, Globe, ArrowRight, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -27,6 +27,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 export default function PublicPage({ params }: { params: Promise<{ slug: string, widgetId: string }> }) {
   const { slug: rawSlug, widgetId } = use(params);
   const db = useFirestore();
+  const { user } = useUser();
 
   const [isLoading, setIsLoading] = useState(true);
   const [companyData, setCompanyData] = useState<any>(null);
@@ -35,6 +36,13 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
   const [targetUserId, setTargetUserId] = useState<string | null>(null);
   const [muralIndex, setMuralIndex] = useState(0);
   const [api, setApi] = useState<CarouselApi>();
+  const [isStandalone, setIsStandalone] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setIsStandalone(window.matchMedia('(display-mode: standalone)').matches);
+    }
+  }, []);
 
   // Busca Ultra Resiliente pela empresa
   useEffect(() => {
@@ -271,17 +279,24 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
         />
       )}
 
-      <nav className="h-16 border-b flex items-center px-6 justify-between bg-background/50 backdrop-blur-md sticky top-0 z-50">
-        <div className="flex items-center gap-3">
-          {showProovaBranding && (
-            <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">PROOVA</span>
-          )}
-        </div>
-        <div className="flex items-center gap-4">
-          <ThemeToggle />
-          <Link href="/"><Button variant="ghost" size="sm" className="text-[9px] font-bold uppercase tracking-widest">Início</Button></Link>
-        </div>
-      </nav>
+      {/* Oculta navegação se for app instalado para evitar "dobra" visual no topo */}
+      {!isStandalone && (
+        <nav className="h-16 border-b flex items-center px-6 justify-between bg-background/50 backdrop-blur-md sticky top-0 z-50">
+          <div className="flex items-center gap-3">
+            {showProovaBranding && (
+              <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">PROOVA</span>
+            )}
+          </div>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            {user ? (
+               <Link href="/dash"><Button variant="ghost" size="sm" className="text-[9px] font-bold uppercase tracking-widest gap-2"><ArrowLeft className="w-3 h-3" /> Dashboard</Button></Link>
+            ) : (
+               <Link href="/"><Button variant="ghost" size="sm" className="text-[9px] font-bold uppercase tracking-widest">Início</Button></Link>
+            )}
+          </div>
+        </nav>
+      )}
 
       <div className="flex-1 flex flex-col">
         {!targetUserId ? (
