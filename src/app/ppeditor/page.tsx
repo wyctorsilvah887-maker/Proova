@@ -206,7 +206,7 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
   );
 };
 
-const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0, isPopup = false }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number, isPopup?: boolean }) => {
+const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0, isPopup = false, isAnimating = false }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number, isPopup?: boolean, isAnimating?: boolean }) => {
   const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
   const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
   
@@ -216,7 +216,8 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
         "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none mb-12",
         !isPopup && "animate-in fade-in duration-700 ease-out fill-both",
         !isPopup && (side === 'left' ? "slide-in-from-left-12" : "slide-in-from-right-12"),
-        isPopup && "animate-in fade-in slide-in-from-bottom-10 duration-1000"
+        isPopup && !isAnimating && "animate-in fade-in slide-in-from-bottom-10 duration-1000",
+        isPopup && isAnimating && "animate-out fade-out slide-out-to-top-10 duration-1000"
       )}
       style={{ 
         boxShadow: `0 20px 40px -20px ${themeColor}25`,
@@ -361,8 +362,8 @@ const PublicPageSettings = ({
               <div className="grid grid-cols-1 gap-2">
                 {[
                   { id: 'grid', icon: Layout, label: 'Grade Estática', isGold: false },
-                  { id: 'mural', icon: LayoutGrid, label: 'Mural Masonry (Swap 2)', isGold: true },
-                  { id: 'carousel', icon: Play, label: 'Carrossel VIP (Loop 1)', isGold: true },
+                  { id: 'mural', icon: LayoutGrid, label: 'Mural Swap (2 itens)', isGold: true },
+                  { id: 'carousel', icon: Play, label: 'Carrossel VIP (Loop)', isGold: true },
                   { id: 'popup', icon: Bell, label: 'Notificações VIP', isGold: true },
                 ].map((item) => {
                    const isLocked = item.isGold && !isGoldPlan;
@@ -562,6 +563,7 @@ export default function PPEditorPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [muralIndex, setMuralIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   const [tempImage, setTempImage] = useState<string | null>(null);
   const [cropType, setCropType] = useState<'logo' | null>(null);
@@ -598,7 +600,13 @@ export default function PPEditorPage() {
 
   useEffect(() => {
     if ((layout === 'mural' || layout === 'popup' || layout === 'carousel') && selectedIds.length > 0) {
-      const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % selectedIds.length), 6000);
+      const interval = setInterval(() => {
+        setIsAnimating(true);
+        setTimeout(() => {
+          setMuralIndex(prev => (prev + 1) % selectedIds.length);
+          setIsAnimating(false);
+        }, 500);
+      }, layout === 'popup' ? 8000 : 6000);
       return () => clearInterval(interval);
     }
   }, [layout, selectedIds]);
@@ -799,7 +807,7 @@ export default function PPEditorPage() {
 
                   <div className={cn(
                     "px-6 sm:px-12 w-full max-w-[1400px] mx-auto py-12 pb-32",
-                    (layout === 'popup' || layout === 'carousel') ? "max-w-sm mx-auto flex flex-col gap-12" : (
+                    (layout === 'popup' || layout === 'carousel') ? "max-w-md mx-auto flex flex-col gap-12" : (
                       layout === 'mural' 
                         ? "grid grid-cols-1 sm:grid-cols-2 gap-12" 
                         : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12"
@@ -807,7 +815,7 @@ export default function PPEditorPage() {
                   )}>
                     {visibleTestimonialsPreview.length > 0 ? visibleTestimonialsPreview.map((t, i) => (
                       <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12">
-                        <TestimonialCard t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} isPopup={layout === 'popup'} />
+                        <TestimonialCard t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} isPopup={layout === 'popup'} isAnimating={isAnimating} />
                       </div>
                     )) : <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos abaixo.</div>}
                   </div>

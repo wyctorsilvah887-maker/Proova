@@ -133,7 +133,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
         setTimeout(() => {
           setMuralIndex(prev => (prev + 1) % filteredTestimonials.length);
           setIsAnimating(false);
-        }, 500); // Metade do tempo da animação de saída se houvesse AnimatePresence, aqui usamos para delay de troca
+        }, 500);
       }, layout === 'popup' ? 8000 : 6000);
       return () => clearInterval(interval);
     }
