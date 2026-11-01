@@ -567,8 +567,7 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </Tabs>
-    </div>
+      </div>
   );
 };
 
@@ -952,7 +951,7 @@ export default function PPEditorPage() {
 
                 <div className={cn(
                   "px-8 sm:px-12 w-full max-w-5xl mx-auto",
-                  layout === 'popup' ? "max-w-sm mx-auto" : (layout === 'grid' || layout === 'mural' ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" : "flex justify-center")
+                  layout === 'popup' ? "max-w-sm mx-auto" : (layout === 'grid' || layout === 'mural' ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10" : "flex justify-center")
                 )}>
                   {visibleTestimonialsPreview.length > 0 ? (
                     visibleTestimonialsPreview.map((t, i) => (

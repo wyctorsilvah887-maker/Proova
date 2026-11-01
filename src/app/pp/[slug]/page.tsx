@@ -365,16 +365,16 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
               ) : (
                 <div className="w-full">
                   {layout === 'mural' && (
-                    <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-8">
+                    <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-10">
                       {visibleDisplayPool.map((t, i) => (
-                        <div key={`${t.id}-${muralIndex}-${i}`} className="break-inside-avoid mb-8">
+                        <div key={`${t.id}-${muralIndex}-${i}`} className="break-inside-avoid mb-10">
                           <TestimonialCard t={t} index={i} />
                         </div>
                       ))}
                     </div>
                   )}
                   {layout === 'grid' && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:columns-4 gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
                       {visibleDisplayPool.map((t, i) => (
                         <TestimonialCard key={`${t.id}-${muralIndex}-${i}`} t={t} index={i} />
                       ))}
