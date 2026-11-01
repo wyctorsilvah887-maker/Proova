@@ -328,38 +328,45 @@ const PublicPageSettings = ({
             </TabsContent>
 
             <TabsContent value="conteudo" className="mt-0 space-y-8 animate-in fade-in duration-300">
-              <div className="space-y-8">
-                <div className="space-y-3">
-                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1 flex items-center gap-1.5">
-                    Título Hero {!isGoldPlan && <Lock className="w-2.5 h-2.5 opacity-40" />}
-                  </Label>
-                  <RichTextEditor value={heroTitle} onChange={setHeroTitle} allowColor={isGoldPlan} placeholder="O que dizem sobre nós..." />
+              {!isGoldPlan ? (
+                <div className="py-20 px-4 text-center space-y-6 bg-primary/5 rounded-3xl border border-dashed border-primary/20 animate-in zoom-in duration-500">
+                   <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit">
+                     <Gem className="w-10 h-10 text-primary" />
+                   </div>
+                   <div className="space-y-2">
+                     <h3 className="text-sm font-black uppercase tracking-tight">Conteúdo Bloqueado</h3>
+                     <p className="text-[10px] text-muted-foreground leading-relaxed max-w-[200px] mx-auto">
+                       A edição de textos ricos, seções ilimitadas e o Hero Persuasivo são recursos exclusivos dos planos <strong>Gold e Enterprise</strong>.
+                     </p>
+                   </div>
+                   <Button className="w-full font-black uppercase tracking-widest text-[10px] h-12 rounded-xl shadow-lg" onClick={() => router.push('/pricing')}>Fazer Upgrade Agora</Button>
                 </div>
-                
-                <div className="space-y-3">
-                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1 flex items-center gap-1.5">
-                    Subtítulo Hero {!isGoldPlan && <Lock className="w-2.5 h-2.5 opacity-40" />}
-                  </Label>
-                  <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} allowColor={isGoldPlan} placeholder="Texto de apoio persuasivo..." className="min-h-[60px] text-sm text-foreground" />
-                </div>
+              ) : (
+                <div className="space-y-8">
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1 flex items-center gap-1.5">
+                      Título Hero
+                    </Label>
+                    <RichTextEditor value={heroTitle} onChange={setHeroTitle} allowColor={isGoldPlan} placeholder="O que dizem sobre nós..." />
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1 flex items-center gap-1.5">
+                      Subtítulo Hero
+                    </Label>
+                    <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} allowColor={isGoldPlan} placeholder="Texto de apoio persuasivo..." className="min-h-[60px] text-sm text-foreground" />
+                  </div>
 
-                <div className="space-y-6 pt-6 border-t">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Seções Adicionais</Label>
-                    {isGoldPlan ? (
+                  <div className="space-y-6 pt-6 border-t">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Seções Adicionais</Label>
                       <Button variant="outline" size="sm" onClick={addSection} className="h-7 text-[9px] font-black uppercase gap-1">
                         <Plus className="w-3 h-3" /> Adicionar
                       </Button>
-                    ) : (
-                      <Badge variant="outline" className="text-[8px] font-black h-5 gap-1 uppercase opacity-60">
-                        <Lock className="w-2.5 h-2.5" /> Gold / Enterprise
-                      </Badge>
-                    )}
-                  </div>
+                    </div>
 
-                  <div className="space-y-4">
-                    {isGoldPlan ? (
-                      customSections.map((section: CustomSection) => (
+                    <div className="space-y-4">
+                      {customSections.map((section: CustomSection) => (
                         <Card key={section.id} className="border bg-muted/5 overflow-hidden">
                           <Accordion type="single" collapsible>
                             <AccordionItem value="item-1" className="border-none">
@@ -409,46 +416,37 @@ const PublicPageSettings = ({
                             </AccordionItem>
                           </Accordion>
                         </Card>
-                      ))
-                    ) : (
-                      <div className="py-10 px-4 text-center space-y-4 bg-primary/5 rounded-2xl border border-dashed border-primary/20">
-                        <Plus className="w-8 h-8 text-primary/30 mx-auto" />
-                        <div className="space-y-1">
-                          <p className="text-[10px] font-black uppercase text-muted-foreground">Seções No-Code</p>
-                          <p className="text-[9px] text-muted-foreground/60 leading-tight">Adicione blocos de conteúdo e ofertas ilimitados no Gold/Enterprise.</p>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-6 pt-6 border-t">
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Copywriter do Rodapé</Label>
+                      <div className="relative group">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground select-none">©</span>
+                        <Input 
+                          value={footerText} 
+                          onChange={(e) => setFooterText(e.target.value)} 
+                          placeholder="2026 Nome da Sua Empresa" 
+                          className="h-10 text-xs font-medium pl-7"
+                        />
+                      </div>
+                    </div>
+
+                    <div className={cn("flex items-center justify-between p-3 bg-muted/10 rounded-xl", !isGoldPlan && "opacity-50 grayscale")}>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center gap-1.5">
+                          <Label className="text-[11px] font-bold">Exibir Marca Proova</Label>
+                          {!isGoldPlan && <Lock className="w-2.5 h-2.5" />}
                         </div>
-                        <Button size="sm" className="h-7 text-[9px] font-black px-4 rounded-lg" onClick={() => router.push('/pricing')}>Upgrade Agora</Button>
+                        <p className="text-[9px] text-muted-foreground">Ativar rodapé "Powered by Proova"</p>
                       </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="space-y-6 pt-6 border-t">
-                  <div className="space-y-3">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Copywriter do Rodapé</Label>
-                    <div className="relative group">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground select-none">©</span>
-                      <Input 
-                        value={footerText} 
-                        onChange={(e) => setFooterText(e.target.value)} 
-                        placeholder="2026 Nome da Sua Empresa" 
-                        className="h-10 text-xs font-medium pl-7"
-                      />
+                      <Switch checked={showLogo} onCheckedChange={setShowLogo} disabled={!isGoldPlan} />
                     </div>
                   </div>
-
-                  <div className={cn("flex items-center justify-between p-3 bg-muted/10 rounded-xl", !isGoldPlan && "opacity-50 grayscale")}>
-                    <div className="space-y-0.5">
-                      <div className="flex items-center gap-1.5">
-                        <Label className="text-[11px] font-bold">Exibir Marca Proova</Label>
-                        {!isGoldPlan && <Lock className="w-2.5 h-2.5" />}
-                      </div>
-                      <p className="text-[9px] text-muted-foreground">Ativar rodapé "Powered by Proova"</p>
-                    </div>
-                    <Switch checked={showLogo} onCheckedChange={setShowLogo} disabled={!isGoldPlan} />
-                  </div>
                 </div>
-              </div>
+              )}
             </TabsContent>
 
             <TabsContent value="design" className="mt-0 space-y-6 animate-in fade-in duration-300">
@@ -752,7 +750,7 @@ export default function PPEditorPage() {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-10 md:h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
+              <Button variant="ghost" className="h-10 md:h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all outline-none focus-visible:ring-0 focus:bg-transparent">
                 <div className="hidden sm:flex flex-col items-end">
                   <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Minha Empresa'}
