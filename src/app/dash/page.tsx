@@ -1103,7 +1103,7 @@ export default function DashPage() {
           </div>
 
           <DialogFooter className="p-4 bg-muted/30 border-t text-center flex justify-center">
-            <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-60">Dica: Um link curto e amigável converte 40% mais.</p>
+            <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-60">Dica: Un link curto e amigável converte 40% mais.</p>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1471,11 +1471,67 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
       
+      {/* QR CODE DIALOG - REDESENHADO PREMIUM */}
       <Dialog open={isQrDialogOpenManual} onOpenChange={setIsQrDialogOpenManual}>
-        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-8 space-y-6 text-center">
-          <DialogTitle className="text-2xl font-black font-headline">Cartaz de Balcão</DialogTitle>
-          <div className="p-6 bg-white rounded-3xl shadow-inner border-4 border-primary/10 flex justify-center"><QRCodeSVG value={collectionLink} size={180} level="H" /></div>
-          <Button className="w-full h-14 rounded-2xl text-lg font-black shadow-xl gap-2" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>{isGeneratingPdf ? <Loader2 className="animate-spin" /> : <Download className="w-5 h-5" />}Baixar PDF</Button>
+        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background">
+          <div className="h-2 bg-primary w-full" />
+          <DialogHeader className="p-8 pb-4 text-center shrink-0">
+            <DialogTitle className="text-2xl font-black font-headline tracking-tight uppercase">Cartaz de Balcão</DialogTitle>
+            <DialogDescription className="text-sm font-medium">Capture elogios reais diretamente no ponto de venda.</DialogDescription>
+          </DialogHeader>
+
+          <div className="px-8 pb-10 flex flex-col items-center space-y-8">
+            <div className="relative group">
+              <div className="absolute -inset-4 bg-primary/5 rounded-[2.5rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-700" />
+              <div className="relative bg-white p-8 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-8 border-primary/5 flex flex-col items-center space-y-4">
+                <QRCodeSVG 
+                  value={collectionLink} 
+                  size={200} 
+                  level="H" 
+                  includeMargin={false}
+                  imageSettings={{
+                    src: "/maskable_icon_x192 (6).png",
+                    x: undefined,
+                    y: undefined,
+                    height: 40,
+                    width: 40,
+                    excavate: true,
+                  }}
+                />
+                <div className="pt-2 text-center space-y-1">
+                   <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Escaneie para Avaliar</p>
+                   <p className="text-[8px] font-bold text-muted-foreground uppercase">{userData?.companyName}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="w-full space-y-4">
+              <Button 
+                className="w-full h-14 rounded-2xl text-lg font-black shadow-xl gap-3 transition-all hover:scale-[1.02] active:scale-95" 
+                onClick={handleDownloadPdf} 
+                disabled={isGeneratingPdf}
+              >
+                {isGeneratingPdf ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="h-5 w-5" />}
+                Baixar PDF de Impressão
+              </Button>
+              
+              <div className="flex flex-col items-center gap-2 opacity-60">
+                 <div className="flex items-center gap-1.5">
+                   <span className="text-[8px] font-black uppercase tracking-widest">Powered by</span>
+                   <div className="relative w-16 h-5">
+                      <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Proova" fill className="object-contain dark:hidden" />
+                      <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Proova" fill className="object-contain hidden dark:block" />
+                   </div>
+                 </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="p-4 bg-muted/30 border-t flex justify-center text-center">
+            <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2">
+              <Zap className="w-3 h-3 text-primary" /> Dica: Coloque o QR Code perto do caixa ou na recepção.
+            </p>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
