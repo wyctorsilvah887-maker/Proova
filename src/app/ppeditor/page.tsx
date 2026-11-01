@@ -36,7 +36,8 @@ import {
   Clock,
   ChevronDown,
   Handshake,
-  X
+  X,
+  Bell
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -205,7 +206,7 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
   );
 };
 
-const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0 }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number }) => {
+const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0, isPopup = false }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number, isPopup?: boolean }) => {
   const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
   const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
   
@@ -213,8 +214,9 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
     <Card 
       className={cn(
         "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none mb-12",
-        "animate-in fade-in duration-700 ease-out fill-both",
-        side === 'left' ? "slide-in-from-left-12" : "slide-in-from-right-12"
+        !isPopup && "animate-in fade-in duration-700 ease-out fill-both",
+        !isPopup && (side === 'left' ? "slide-in-from-left-12" : "slide-in-from-right-12"),
+        isPopup && "animate-in fade-in slide-in-from-bottom-10 duration-1000"
       )}
       style={{ 
         boxShadow: `0 20px 40px -20px ${themeColor}25`,
@@ -358,10 +360,10 @@ const PublicPageSettings = ({
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Estilo de Exibição</Label>
               <div className="grid grid-cols-1 gap-2">
                 {[
-                  { id: 'grid', icon: Layout, label: 'Grade Padrão (Fixo)', isGold: false },
-                  { id: 'mural', icon: LayoutGrid, label: 'Mural (Swap 2 Itens)', isGold: true },
-                  { id: 'carousel', icon: Play, label: 'Carrossel VIP (Loop 1 Item)', isGold: true },
-                  { id: 'popup', icon: MessageSquare, label: 'Notificação', isGold: true },
+                  { id: 'grid', icon: Layout, label: 'Grade Estática', isGold: false },
+                  { id: 'mural', icon: LayoutGrid, label: 'Mural Masonry (Swap 2)', isGold: true },
+                  { id: 'carousel', icon: Play, label: 'Carrossel VIP (Loop 1)', isGold: true },
+                  { id: 'popup', icon: Bell, label: 'Notificações VIP', isGold: true },
                 ].map((item) => {
                    const isLocked = item.isGold && !isGoldPlan;
                    return (
@@ -379,7 +381,7 @@ const PublicPageSettings = ({
                          <item.icon className={cn("w-4 h-4", layout === item.id ? "text-primary" : "text-muted-foreground")} />
                          <span className="text-xs font-bold">{item.label}</span>
                       </div>
-                      {isLocked ? <Lock className="w-3 h-3 text-muted-foreground" /> : (layout === item.id && <Check className="w-3.5 h-3.5 text-primary" />)}
+                      {isLocked ? <Lock className="w-3.5 h-3.5 text-muted-foreground" /> : (layout === item.id && <Check className="w-3.5 h-3.5 text-primary" />)}
                     </button>
                    );
                 })}
@@ -512,8 +514,7 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </Tabs>
-    </div>
+      </div>
   );
 };
 
@@ -806,7 +807,7 @@ export default function PPEditorPage() {
                   )}>
                     {visibleTestimonialsPreview.length > 0 ? visibleTestimonialsPreview.map((t, i) => (
                       <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12">
-                        <TestimonialCard t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} />
+                        <TestimonialCard t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} isPopup={layout === 'popup'} />
                       </div>
                     )) : <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos abaixo.</div>}
                   </div>

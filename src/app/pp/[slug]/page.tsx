@@ -31,6 +31,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
   const [muralIndex, setMuralIndex] = useState(0);
   const [isStandalone, setIsStandalone] = useState(false);
   const [companyName, setCompanyName] = useState('');
+  const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -127,7 +128,13 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
 
   useEffect(() => {
     if ((layout === 'mural' || layout === 'popup' || layout === 'carousel') && filteredTestimonials.length > 0) {
-      const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % filteredTestimonials.length), 6000);
+      const interval = setInterval(() => {
+        setIsAnimating(true);
+        setTimeout(() => {
+          setMuralIndex(prev => (prev + 1) % filteredTestimonials.length);
+          setIsAnimating(false);
+        }, 500); // Metade do tempo da animação de saída se houvesse AnimatePresence, aqui usamos para delay de troca
+      }, layout === 'popup' ? 8000 : 6000);
       return () => clearInterval(interval);
     }
   }, [layout, filteredTestimonials]);
@@ -162,16 +169,19 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     );
   }
 
-  const TestimonialCard = ({ t, index = 0 }: { t: any, index?: number }) => {
+  const TestimonialCard = ({ t, index = 0, isPopup = false }: { t: any, index?: number, isPopup?: boolean }) => {
     const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
     const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
     
     return (
       <Card 
+        key={t.id}
         className={cn(
           "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none mb-12",
-          "animate-in fade-in duration-700 ease-out fill-both",
-          side === 'left' ? "slide-in-from-left-12" : "slide-in-from-right-12"
+          !isPopup && "animate-in fade-in duration-700 ease-out fill-both",
+          !isPopup && (side === 'left' ? "slide-in-from-left-12" : "slide-in-from-right-12"),
+          isPopup && !isAnimating && "animate-in fade-in slide-in-from-bottom-10 duration-1000",
+          isPopup && isAnimating && "animate-out fade-out slide-out-to-top-10 duration-1000"
         )}
         style={{ 
           boxShadow: `0 20px 40px -20px ${themeColor}25`,
@@ -309,14 +319,14 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                   {layout === 'mural' && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-12 max-w-5xl mx-auto">
                       {visibleDisplayPool.map((t, i) => (
-                        <TestimonialCard key={`${t.id}-${muralIndex}-${i}`} t={t} index={i} />
+                        <TestimonialCard key={t.id} t={t} index={i} />
                       ))}
                     </div>
                   )}
                   {layout === 'grid' && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
                       {visibleDisplayPool.map((t, i) => (
-                        <TestimonialCard key={`${t.id}-${muralIndex}-${i}`} t={t} index={i} />
+                        <TestimonialCard key={t.id} t={t} index={i} />
                       ))}
                     </div>
                   )}
@@ -327,7 +337,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                   )}
                   {layout === 'popup' && (
                     <div className="max-w-md mx-auto">
-                      <TestimonialCard t={visibleDisplayPool[0]} />
+                      <TestimonialCard t={visibleDisplayPool[0]} isPopup />
                     </div>
                   )}
                 </div>
@@ -342,7 +352,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
               )}
               <div className="flex flex-col items-center gap-2 opacity-30">
                 <p className="text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-1"><span>©</span> {footerText}</p>
-                {showProovaBranding && <div className="flex items-center justify-center gap-1.5 mt-2"><span className="text-[8px] font-black uppercase tracking-[0.3em]">POWERED BY PROOVA</span></div>}
+                {showProovaBranding && <div className="flex items-center justify-center gap-1.5 mt-2"><span className="text-[8px] font-black uppercase tracking-[0.2em]">POWERED BY PROOVA</span></div>}
               </div>
             </footer>
           </div>
