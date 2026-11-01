@@ -41,7 +41,8 @@ import {
   Settings2,
   Handshake,
   X,
-  Pipette
+  Pipette,
+  SheetTrigger
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -73,7 +74,6 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import {
   Accordion,
@@ -523,7 +523,7 @@ const PublicPageSettings = ({
                   </div>
 
                   <div className="space-y-4 pt-4 border-t">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Texto do Rodapé</Label>
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Rodapé Copyright</Label>
                     <div className="relative">
                       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground select-none">©</span>
                       <Input value={footerText} onChange={(e) => setFooterText(e.target.value)} placeholder="2026 Sua Empresa" className="text-xs pl-7 h-10" />
@@ -956,7 +956,7 @@ export default function PPEditorPage() {
                     />
                     {heroSubtitle && (
                       <div 
-                        className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium leading-relaxed italic opacity-80"
+                        className="text-muted-foreground text-base max-w-2xl mx-auto font-medium leading-relaxed italic"
                         dangerouslySetInnerHTML={{ __html: heroSubtitle }}
                       />
                     )}
@@ -976,7 +976,7 @@ export default function PPEditorPage() {
                     >
                       <div className="max-w-3xl mx-auto space-y-4">
                         <h2 className="text-2xl sm:text-4xl font-black tracking-tight">{section.title}</h2>
-                        {section.subtitle && <p className="text-lg font-bold opacity-80">{section.subtitle}</p>}
+                        {section.subtitle && <p className="text-base font-bold italic">{section.subtitle}</p>}
                         <p className="text-sm sm:text-base leading-relaxed opacity-90 font-medium">{section.content}</p>
                         {section.buttonText && (
                           <div className="pt-4">

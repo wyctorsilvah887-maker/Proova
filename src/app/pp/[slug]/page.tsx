@@ -249,7 +249,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                   />
                   {heroSubtitle && (
                     <div 
-                      className="text-muted-foreground text-lg sm:text-2xl max-w-3xl mx-auto font-medium leading-relaxed italic opacity-80"
+                      className="text-muted-foreground text-base sm:text-lg max-w-3xl mx-auto font-medium leading-relaxed italic"
                       dangerouslySetInnerHTML={{ __html: heroSubtitle }}
                     />
                   )}
@@ -271,7 +271,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                   <div className="max-w-4xl mx-auto space-y-8">
                     <div className="space-y-4">
                       <h2 className="text-3xl sm:text-5xl font-black tracking-tight">{section.title}</h2>
-                      {section.subtitle && <p className="text-xl font-bold opacity-80">{section.subtitle}</p>}
+                      {section.subtitle && <p className="text-base font-bold">{section.subtitle}</p>}
                     </div>
                     <p className="text-base sm:text-xl leading-relaxed opacity-90 font-medium">{section.content}</p>
                     {section.buttonText && (
