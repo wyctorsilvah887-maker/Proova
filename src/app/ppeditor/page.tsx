@@ -224,7 +224,7 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
       )}
       style={{ 
         boxShadow: `0 20px 40px -20px ${themeColor}25`,
-        border: `2px solid ${secondaryColor || themeColor + '15'}`
+        border: secondaryColor ? `2px solid ${secondaryColor}` : 'none'
       }}
     >
       <div className="space-y-6">
@@ -386,6 +386,20 @@ const PublicPageSettings = ({
                 </Label>
                 <p className="text-[9px] text-muted-foreground ml-1 mb-2">(Bordas dos Cards)</p>
                 <div className="flex flex-wrap gap-2">
+                  {/* Botão Sem Cor */}
+                  <button 
+                    onClick={() => setSecondaryColor('')} 
+                    className={cn(
+                      "w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 flex items-center justify-center bg-muted/20 relative overflow-hidden", 
+                      !secondaryColor ? "border-foreground shadow-lg" : "border-transparent shadow-inner"
+                    )}
+                    title="Nenhuma cor"
+                  >
+                    <div className="absolute inset-0 bg-white dark:bg-zinc-800" />
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-px h-full bg-red-500 rotate-45" />
+                    </div>
+                  </button>
                   {colors.map((color) => (
                     <button key={color} onClick={() => setSecondaryColor(color)} className={cn("w-7 h-7 rounded-full border-2 transition-transform hover:scale-110", secondaryColor === color ? "border-foreground" : "border-transparent shadow-inner")} style={{ backgroundColor: color }} />
                   ))}

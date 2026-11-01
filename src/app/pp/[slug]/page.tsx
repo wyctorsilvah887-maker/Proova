@@ -126,7 +126,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
 
   const layout = ppData?.layout || 'grid';
   const themeColor = ppData?.themeColor || '#f97316';
-  const secondaryColor = ppData?.secondaryColor || '#ffffff';
+  const secondaryColor = ppData?.secondaryColor || ''; // Padrão: sem cor
   const whatsappEnabled = ppData?.whatsappEnabled || false;
   const whatsappNumber = ppData?.whatsappNumber || '';
   const externalSiteUrl = ppData?.externalSiteUrl || '';
@@ -188,14 +188,14 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
         )}
         style={{ 
           boxShadow: `0 20px 40px -20px ${themeColor}25`,
-          border: `2px solid ${secondaryColor || themeColor + '15'}`
+          border: secondaryColor ? `2px solid ${secondaryColor}` : 'none'
         }}
       >
         <div className="space-y-6">
           {/* Header do Card */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-lg rotate-3" style={{ backgroundColor: themeColor }}>
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-lg rotate-3 shrink-0" style={{ backgroundColor: themeColor }}>
                 {t.userName?.substring(0, 2).toUpperCase()}
               </div>
               <div className="min-w-0">
