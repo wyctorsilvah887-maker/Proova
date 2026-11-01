@@ -435,7 +435,7 @@ const PublicPageSettings = ({
               </div>
             </TabsContent>
 
-            <TabsContent value="conteudo" className="mt-0">
+            <TabsContent value="conteudo" className="mt-0 space-y-8">
               {!isGoldPlan ? (
                 <div className="py-16 px-4 text-center space-y-6 bg-primary/5 rounded-3xl border border-dashed border-primary/20 m-2">
                    <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit"><Gem className="w-8 h-8 text-primary" /></div>

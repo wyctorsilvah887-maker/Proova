@@ -133,7 +133,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
         setTimeout(() => {
           setMuralIndex(prev => (prev + 1) % filteredTestimonials.length);
           setIsAnimating(false);
-        }, 1000); // Maior tempo para saída da animação
+        }, 1000); 
       }, layout === 'popup' ? 8000 : 6000);
       return () => clearInterval(interval);
     }
@@ -292,7 +292,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                 <section key={section.id} className={cn("py-24 px-6 text-center", section.variant === 'accent' ? "text-white" : (section.variant === 'dark' ? "bg-black text-white" : "bg-muted/5"))} style={{ backgroundColor: section.variant === 'accent' ? themeColor : undefined }}>
                   <div className="max-w-4xl mx-auto space-y-8">
                     <h2 className="text-3xl sm:text-5xl font-black tracking-tight">{section.title}</h2>
-                    {section.subtitle && <div className="text-lg font-bold opacity-80 italic" dangerouslySetInnerHTML={{ __html: section.subtitle }} />}
                     <p className="text-base sm:text-xl leading-relaxed opacity-90 font-medium">{section.content}</p>
                     {section.buttonText && (
                       <div className="pt-8">
