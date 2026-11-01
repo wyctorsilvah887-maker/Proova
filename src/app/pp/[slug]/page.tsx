@@ -46,7 +46,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     }
   }, []);
 
-  // Busca o dono do slug no Cartório Global de forma resiliente
   useEffect(() => {
     async function resolveSlug() {
       if (!db || !rawSlug) return;
@@ -55,7 +54,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
         setIsLoading(true);
         const slug = decodeURIComponent(rawSlug).toLowerCase().trim();
         
-        // 1. Busca Direta no Cartório de Slugs
         const slugRef = doc(db, 'slugs', slug);
         const slugSnap = await getDoc(slugRef);
         
@@ -64,14 +62,12 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
           const uid = sData.userId;
           setTargetUserId(uid);
 
-          // Busca dados do usuário para ter o nome da empresa como fallback
           const userRef = doc(db, 'users', uid);
           const userSnap = await getDoc(userRef);
           if (userSnap.exists()) {
             setCompanyName(userSnap.data().companyName);
           }
         } else {
-          // 2. Fallback: Busca por Slug no Perfil do Usuário
           const usersRef = collection(db, 'users');
           const q = query(usersRef, where('companySlug', '==', slug), limit(1));
           const userQuerySnap = await getDocs(q);
@@ -91,7 +87,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     resolveSlug();
   }, [db, rawSlug]);
 
-  // Carrega as configurações da PP e Testemunhos
   useEffect(() => {
     if (!db || !targetUserId || !rawSlug) return;
 
@@ -174,8 +169,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     );
   }
 
-  const hasValidLogo = logoUrl && logoUrl.startsWith('http');
-
   const TestimonialCard = ({ t, index = 0 }: { t: any, index?: number }) => {
     const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
     
@@ -183,7 +176,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
       <Card 
         key={`${t.id}-${muralIndex}`}
         className={cn(
-          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl border-none transition-all duration-500 hover:scale-[1.02] animate-in fill-both",
+          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] animate-in fill-both",
           side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in"
         )}
         style={{ 
@@ -192,7 +185,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
         }}
       >
         <div className="space-y-6">
-          {/* Header do Card */}
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-lg rotate-3 shrink-0" style={{ backgroundColor: themeColor }}>
@@ -213,7 +205,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
             </div>
           </div>
 
-          {/* Conteúdo em Vídeo */}
           {t.videoUrl && (
             <div className="relative aspect-video rounded-3xl overflow-hidden bg-black shadow-2xl group ring-1 ring-white/10">
                <video 
@@ -235,7 +226,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
             </div>
           )}
 
-          {/* Conteúdo em Texto */}
           {t.text && t.text !== '(Depoimento em Vídeo)' && (
             <div className="relative">
               <span className="absolute -top-3 -left-2 text-5xl opacity-10 font-serif select-none pointer-events-none" style={{ color: themeColor }}>“</span>
@@ -245,7 +235,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
             </div>
           )}
 
-          {/* Footer do Card */}
           <div className="pt-5 border-t border-muted-foreground/10 flex items-center justify-between">
             <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] flex items-center gap-1.5">
               <Clock className="w-3 h-3" />
@@ -289,7 +278,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
           <div className="w-full max-w-full mx-auto flex-1 flex flex-col">
             <header className="px-6 text-center space-y-8 py-24 sm:py-32">
               <div className="space-y-6">
-                {hasValidLogo && (
+                {logoUrl && (
                   <div className="flex justify-center">
                     <div className="w-24 h-24 sm:w-32 sm:h-32 relative">
                       <img src={logoUrl} className="w-full h-full object-cover rounded-[2.5rem] shadow-xl border-4 border-background" alt="Logo" />
@@ -347,14 +336,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                 </section>
               ))}
             </div>
-
-            {testimonialsTitle && (
-              <div className="text-center py-20">
-                <h2 className="text-3xl sm:text-4xl font-black font-headline uppercase tracking-widest" style={{ color: themeColor }}>
-                  {testimonialsTitle}
-                </h2>
-              </div>
-            )}
 
             <main className="px-6 pb-20 space-y-12 flex-1 w-full max-w-[1600px] mx-auto">
               {filteredTestimonials.length === 0 ? (

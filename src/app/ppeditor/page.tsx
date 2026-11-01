@@ -220,8 +220,7 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
       key={`${t.id}-${muralIndex}`}
       className={cn(
         "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] animate-in fill-both",
-        side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in",
-        !secondaryColor ? "border-none" : ""
+        side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in"
       )}
       style={{ 
         boxShadow: `0 20px 40px -20px ${themeColor}25`,
@@ -336,12 +335,12 @@ const PublicPageSettings = ({
         <Link href="/dash" className="w-full">
           <Button variant="ghost" className="w-full justify-start gap-3 h-10 px-2 group">
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-xs font-black uppercase tracking-[0.2em]">Painel Principal</span>
+            <span className="text-xs font-black uppercase tracking-[0.2em]">Dashboard</span>
           </Button>
         </Link>
         <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm bg-primary text-primary-foreground">
           {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
-          Salvar Alterações
+          Salvar Página
         </Button>
       </div>
 
@@ -359,7 +358,7 @@ const PublicPageSettings = ({
           <div className="p-4 space-y-8 pb-10">
             <TabsContent value="geral" className="mt-0 space-y-8">
               <div className="space-y-4 text-center">
-                <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block text-left ml-1">Logo Marca</Label>
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block text-left ml-1">Logotipo</Label>
                 <div 
                   onClick={() => !isUploading && logoInputRef.current?.click()}
                   className="aspect-square w-24 border-2 border-dashed rounded-2xl flex items-center justify-center bg-muted/20 overflow-hidden mx-auto cursor-pointer group transition-all hover:bg-muted/30"
@@ -382,7 +381,7 @@ const PublicPageSettings = ({
 
               <div className={cn("space-y-6 pt-6 border-t", !isGoldPlan && "opacity-40 grayscale pointer-events-none")}>
                 <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 ml-1">
-                  <Palette className="w-3 h-3 text-primary" /> Cor Secundária {!isGoldPlan && <Lock className="w-2.5 h-2.5 ml-1" />}
+                  <Palette className="w-3 h-3 text-primary" /> Cor Secundária (Bordas) {!isGoldPlan && <Lock className="w-2.5 h-2.5 ml-1" />}
                 </Label>
                 <div className="flex flex-wrap gap-2">
                   <button 
@@ -412,12 +411,12 @@ const PublicPageSettings = ({
                      <Gem className="w-10 h-10 text-primary" />
                    </div>
                    <div className="space-y-2">
-                     <h3 className="text-sm font-black uppercase tracking-tight">Conteúdo Bloqueado</h3>
+                     <h3 className="text-sm font-black uppercase tracking-tight">Recurso Gold</h3>
                      <p className="text-[10px] text-muted-foreground leading-relaxed max-w-[200px] mx-auto">
-                       A edição de textos ricos, seções ilimitadas e o Hero Persuasivo são recursos exclusivos dos planos <strong>Gold e Enterprise</strong>.
+                       A edição de conteúdos persuasivos e seções ilimitadas são exclusivas dos planos Gold e Enterprise.
                      </p>
                    </div>
-                   <Button className="w-full font-black uppercase tracking-widest text-[10px] h-12 rounded-xl shadow-lg" onClick={() => router.push('/pricing')}>Fazer Upgrade Agora</Button>
+                   <Button className="w-full font-black uppercase tracking-widest text-[10px] h-12 rounded-xl" onClick={() => router.push('/pricing')}>Upgrade Agora</Button>
                 </div>
               ) : (
                 <div className="space-y-8">
@@ -428,12 +427,12 @@ const PublicPageSettings = ({
                   
                   <div className="space-y-3">
                     <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Subtítulo Hero</Label>
-                    <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} allowColor={isGoldPlan} placeholder="Texto de apoio persuasivo..." className="min-h-[60px] text-sm text-foreground" />
+                    <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} allowColor={isGoldPlan} placeholder="Texto persuasivo..." className="min-h-[60px]" />
                   </div>
 
                   <div className="space-y-6 pt-6 border-t">
                     <div className="flex items-center justify-between">
-                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Seções Adicionais</Label>
+                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Seções Extras</Label>
                       <Button variant="outline" size="sm" onClick={addSection} className="h-7 text-[9px] font-black uppercase gap-1">
                         <Plus className="w-3 h-3" /> Adicionar
                       </Button>
@@ -454,37 +453,26 @@ const PublicPageSettings = ({
                               </div>
                               <AccordionContent className="p-3 space-y-4 pb-4">
                                 <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Título Bloco</Label>
+                                  <Label className="text-[9px] font-bold uppercase opacity-50">Título Bloco</Label>
                                   <Input value={section.title} onChange={(e) => updateSection(section.id, 'title', e.target.value)} className="h-8 text-[11px]" />
                                 </div>
                                 <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Subtítulo Bloco</Label>
-                                  <RichTextEditor value={section.subtitle} allowColor={isGoldPlan} onChange={(val) => updateSection(section.id, 'subtitle', val)} className="min-h-[50px] text-[11px] text-foreground" />
+                                  <Label className="text-[9px] font-bold uppercase opacity-50">Subtítulo Bloco</Label>
+                                  <RichTextEditor value={section.subtitle} allowColor={isGoldPlan} onChange={(val) => updateSection(section.id, 'subtitle', val)} className="min-h-[50px]" />
                                 </div>
                                 <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Conteúdo</Label>
+                                  <Label className="text-[9px] font-bold uppercase opacity-50">Conteúdo</Label>
                                   <Textarea value={section.content} onChange={(e) => updateSection(section.id, 'content', e.target.value)} className="text-[11px] min-h-[60px]" />
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
                                   <div className="space-y-1.5">
-                                    <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Texto Botão</Label>
-                                    <Input value={section.buttonText} onChange={(e) => updateSection(section.id, 'buttonText', e.target.value)} className="h-8 text-[11px]" placeholder="Ex: Saiba Mais" />
+                                    <Label className="text-[9px] font-bold uppercase opacity-50">Texto Botão</Label>
+                                    <Input value={section.buttonText} onChange={(e) => updateSection(section.id, 'buttonText', e.target.value)} className="h-8 text-[11px]" />
                                   </div>
                                   <div className="space-y-1.5">
-                                    <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Link Botão</Label>
-                                    <Input value={section.buttonUrl} onChange={(e) => updateSection(section.id, 'buttonUrl', e.target.value)} className="h-8 text-[11px]" placeholder="https://..." />
+                                    <Label className="text-[9px] font-bold uppercase opacity-50">Link Botão</Label>
+                                    <Input value={section.buttonUrl} onChange={(e) => updateSection(section.id, 'buttonUrl', e.target.value)} className="h-8 text-[11px]" />
                                   </div>
-                                </div>
-                                <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Estilo do Bloco</Label>
-                                  <Select value={section.variant} onValueChange={(val) => updateSection(section.id, 'variant', val as any)}>
-                                    <SelectTrigger className="h-8 text-[10px]"><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="light">Claro</SelectItem>
-                                      <SelectItem value="dark">Escuro</SelectItem>
-                                      <SelectItem value="accent">Marca</SelectItem>
-                                    </SelectContent>
-                                  </Select>
                                 </div>
                               </AccordionContent>
                             </AccordionItem>
@@ -496,25 +484,17 @@ const PublicPageSettings = ({
 
                   <div className="space-y-6 pt-6 border-t">
                     <div className="space-y-3">
-                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Copywriter do Rodapé</Label>
+                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Copy do Rodapé</Label>
                       <div className="relative group">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground select-none">©</span>
-                        <Input 
-                          value={footerText} 
-                          onChange={(e) => setFooterText(e.target.value)} 
-                          placeholder="2026 Nome da Sua Empresa" 
-                          className="h-10 text-xs font-medium pl-7"
-                        />
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">©</span>
+                        <Input value={footerText} onChange={(e) => setFooterText(e.target.value)} className="h-10 text-xs font-medium pl-7" />
                       </div>
                     </div>
 
                     <div className={cn("flex items-center justify-between p-3 bg-muted/10 rounded-xl", !isGoldPlan && "opacity-50 grayscale")}>
                       <div className="space-y-0.5">
-                        <div className="flex items-center gap-1.5">
-                          <Label className="text-[11px] font-bold">Exibir Marca Proova</Label>
-                          {!isGoldPlan && <Lock className="w-2.5 h-2.5" />}
-                        </div>
-                        <p className="text-[9px] text-muted-foreground">Ativar rodapé "Powered by Proova"</p>
+                        <Label className="text-[11px] font-bold">Marca Proova</Label>
+                        <p className="text-[9px] text-muted-foreground">Exibir "Powered by Proova"</p>
                       </div>
                       <Switch checked={showLogo} onCheckedChange={setShowLogo} disabled={!isGoldPlan} />
                     </div>
@@ -567,7 +547,8 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </div>
+      </Tabs>
+    </div>
   );
 };
 
@@ -670,9 +651,9 @@ export default function PPEditorPage() {
       const batch = writeBatch(db);
 
       if (isSlugChanging) {
-        if (!newSlug) throw new Error("Link não pode ser vazio.");
+        if (!newSlug) throw new Error("Link vazio.");
         const slugCheck = await getDoc(doc(db, 'slugs', newSlug));
-        if (slugCheck.exists()) throw new Error("Link já em uso.");
+        if (slugCheck.exists()) throw new Error("Link em uso.");
 
         batch.set(doc(db, 'slugs', newSlug), { userId: user.uid, type: 'pp', createdAt: serverTimestamp() });
         if (oldSlug) {
@@ -685,16 +666,6 @@ export default function PPEditorPage() {
       const targetSlug = isSlugChanging ? newSlug : oldSlug;
       const targetPPRef = doc(db, 'users', user.uid, 'pp', targetSlug);
 
-      const cleanedSections = customSections.map(s => ({
-        id: s.id,
-        title: s.title || '',
-        subtitle: s.subtitle || '',
-        content: s.content || '',
-        buttonText: s.buttonText || '',
-        buttonUrl: s.buttonUrl || '',
-        variant: s.variant || 'light'
-      }));
-
       const configData = {
         selectedTestimonialIds: selectedIds,
         themeColor,
@@ -706,7 +677,7 @@ export default function PPEditorPage() {
         testimonialsTitle,
         footerText,
         showLogo,
-        customSections: cleanedSections,
+        customSections: customSections || [],
         updatedAt: serverTimestamp()
       };
 
@@ -751,29 +722,18 @@ export default function PPEditorPage() {
     }
   };
 
-  const sidebarProps = { 
-    themeColor, setThemeColor, secondaryColor, setSecondaryColor,
-    layout, setLayout, logoUrl, setLogoUrl,
-    heroTitle, setHeroTitle, heroSubtitle, setHeroSubtitle,
-    testimonialsTitle, setTestimonialsTitle, footerText, setFooterText,
-    showLogo, setShowLogo, customSections, setCustomSections,
-    onFileSelect, isUploading, handleSave, isSaving, isEnterprise, isGoldPlan, logoInputRef,
-    currentSlug: slugEdit, setSlugEdit, companyName: userData?.companyName
-  };
-
-  const visibleTestimonialsPreview = approvedTestimonials?.filter(t => selectedIds.includes(t.id)).slice(0, 5) || [];
-
   const toggleSelection = (id: string) => {
     setSelectedIds(prev => {
       const isRemoving = prev.includes(id);
       if (!isRemoving && prev.length >= SELECTION_LIMIT) {
-        toast({ variant: "destructive", title: "Limite de Seleção", description: `Seu plano permite até ${SELECTION_LIMIT} depoimentos.` });
+        toast({ variant: "destructive", title: "Limite atingido" });
         return prev;
       }
       return isRemoving ? prev.filter(i => i !== id) : [...prev, id];
     });
   };
 
+  const visibleTestimonialsPreview = approvedTestimonials?.filter(t => selectedIds.includes(t.id)).slice(0, 5) || [];
   const membershipLabel = isEnterprise ? 'Membro Enterprise' : (isGoldPlan ? 'Membro Gold' : 'Plano Base');
 
   if (authLoading || userDataLoading || testimonialsLoading) {
@@ -804,7 +764,7 @@ export default function PPEditorPage() {
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <Button onClick={handleSave} disabled={isSaving || isUploading} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg hover:scale-105 active:scale-95 transition-transform">
+          <Button onClick={handleSave} disabled={isSaving || isUploading} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg transition-transform active:scale-95">
             {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar
           </Button>
           
@@ -874,7 +834,17 @@ export default function PPEditorPage() {
 
       <main className="flex-1 flex overflow-hidden relative w-full flex-row">
         <aside className="hidden lg:flex w-80 bg-background border-r flex-col shrink-0 h-full">
-          <PublicPageSettings {...sidebarProps} />
+          <PublicPageSettings 
+            themeColor={themeColor} setThemeColor={setThemeColor} 
+            secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
+            layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
+            heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
+            testimonialsTitle={testimonialsTitle} setTestimonialsTitle={setTestimonialsTitle} 
+            footerText={footerText} setFooterText={setFooterText}
+            showLogo={showLogo} setShowLogo={setShowLogo} customSections={customSections} setCustomSections={setCustomSections}
+            onFileSelect={onFileSelect} isUploading={isUploading} handleSave={handleSave} isSaving={isSaving} isGoldPlan={isGoldPlan}
+            logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
+          />
         </aside>
 
         <div className="flex-1 overflow-y-auto bg-muted/10 p-4 sm:p-8">
@@ -887,11 +857,21 @@ export default function PPEditorPage() {
                   </button>
                 </SheetTrigger>
                 <SheetContent side="left" className="p-0 w-80 border-none">
-                   <SheetHeader className="p-4 border-b bg-muted/10 sr-only">
-                    <SheetTitle>Configurações da Página Pública</SheetTitle>
-                    <SheetDescription>Ajuste o visual e conteúdo da sua Landing Page.</SheetDescription>
+                   <SheetHeader className="sr-only">
+                    <SheetTitle>Configurações</SheetTitle>
+                    <SheetDescription>Ajuste sua página.</SheetDescription>
                   </SheetHeader>
-                   <PublicPageSettings {...sidebarProps} />
+                   <PublicPageSettings 
+                    themeColor={themeColor} setThemeColor={setThemeColor} 
+                    secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
+                    layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
+                    heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
+                    testimonialsTitle={testimonialsTitle} setTestimonialsTitle={setTestimonialsTitle} 
+                    footerText={footerText} setFooterText={setFooterText}
+                    showLogo={showLogo} setShowLogo={setShowLogo} customSections={customSections} setCustomSections={setCustomSections}
+                    onFileSelect={onFileSelect} isUploading={isUploading} handleSave={handleSave} isSaving={isSaving} isGoldPlan={isGoldPlan}
+                    logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
+                  />
                 </SheetContent>
               </Sheet>
 
@@ -943,15 +923,9 @@ export default function PPEditorPage() {
                   ))}
                 </div>
 
-                {testimonialsTitle && (
-                  <div className="text-center py-12">
-                    <h2 className="text-2xl sm:text-3xl font-black font-headline uppercase tracking-widest" style={{ color: themeColor }}>{testimonialsTitle}</h2>
-                  </div>
-                )}
-
                 <div className={cn(
-                  "px-8 sm:px-12 w-full max-w-5xl mx-auto",
-                  layout === 'popup' ? "max-w-sm mx-auto" : (layout === 'grid' || layout === 'mural' ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10" : "flex justify-center")
+                  "px-8 sm:px-12 w-full max-w-5xl mx-auto mt-12",
+                  layout === 'popup' ? "max-w-sm mx-auto" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10"
                 )}>
                   {visibleTestimonialsPreview.length > 0 ? (
                     visibleTestimonialsPreview.map((t, i) => (
@@ -978,7 +952,7 @@ export default function PPEditorPage() {
                         <MessageSquare className="w-4 h-4" /> Depoimentos Aprovados ({approvedTestimonials?.length || 0})
                       </h2>
                       <Badge variant="outline" className="text-[9px] h-5 font-black uppercase">
-                        {selectedIds.length} / {isEnterprise ? '∞' : SELECTION_LIMIT} SELECIONADOS
+                        {selectedIds.length} / {isEnterprise ? '∞' : SELECTION_LIMIT} ATIVOS
                       </Badge>
                     </div>
                   </AccordionTrigger>
@@ -1013,7 +987,6 @@ export default function PPEditorPage() {
         <DialogContent className="sm:max-w-2xl h-[70vh] flex flex-col p-0 overflow-hidden rounded-3xl border-none">
           <DialogHeader className="p-6 bg-background border-b shrink-0">
             <DialogTitle>Recortar Logo</DialogTitle>
-            <DialogDescription>Ajuste o enquadramento do seu logotipo.</DialogDescription>
           </DialogHeader>
           <div className="flex-1 relative bg-black">
             {tempImage && <Cropper image={tempImage} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onCropComplete={(a, p) => setCroppedAreaPixels(p)} onZoomChange={setZoom} />}
@@ -1022,7 +995,7 @@ export default function PPEditorPage() {
             <Slider value={[zoom]} min={1} max={3} step={0.1} onValueChange={(vals) => setZoom(vals[0])} />
             <DialogFooter className="gap-2">
               <Button variant="outline" onClick={() => setTempImage(null)}>Cancelar</Button>
-              <Button onClick={handleConfirmCrop} className="font-bold">Salvar Logo 4K</Button>
+              <Button onClick={handleConfirmCrop} className="font-bold">Salvar Logo</Button>
             </DialogFooter>
           </div>
         </DialogContent>
