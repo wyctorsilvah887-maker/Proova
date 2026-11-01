@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -106,38 +107,44 @@ interface CustomSection {
 }
 
 /**
- * Editor de Título com correção de cursor e menu de cores fixo.
+ * Editor de Título ultra-estável para Mobile e Desktop.
  */
 const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onChange: (val: string) => void, themeColor: string }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const [showToolbar, setShowToolbar] = useState(false);
   const [toolbarPos, setToolbarPos] = useState({ top: 0, left: 0 });
+  const [isFocused, setIsFocused] = useState(false);
 
-  // Sincroniza o conteúdo apenas quando não está em foco para evitar pulos do cursor
+  // Sincroniza o conteúdo apenas quando não está em foco para evitar pulos do cursor no mobile
   useEffect(() => {
-    if (editorRef.current && document.activeElement !== editorRef.current) {
-      if (editorRef.current.innerHTML !== value) {
+    if (editorRef.current && !isFocused) {
+      if (editorRef.current.innerHTML !== (value || '')) {
         editorRef.current.innerHTML = value || '';
       }
     }
-  }, [value]);
+  }, [value, isFocused]);
 
-  // Garantindo que as cores sejam únicas para evitar o erro de duplicate keys no React
   const uniqueColors = useMemo(() => {
-    const defaultColors = ['#000000', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#ffffff'];
-    return Array.from(new Set([themeColor, ...defaultColors]));
+    const base = ['#000000', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#ffffff', themeColor];
+    return Array.from(new Set(base.filter(Boolean)));
   }, [themeColor]);
 
   const handleSelection = () => {
     const selection = window.getSelection();
     if (selection && selection.toString().length > 0 && editorRef.current?.contains(selection.anchorNode)) {
-      const range = selection.getRangeAt(0);
-      const rect = range.getBoundingClientRect();
-      setToolbarPos({
-        top: rect.top - 60,
-        left: rect.left + rect.width / 2
-      });
-      setShowToolbar(true);
+      try {
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        
+        // Ajuste de posicionamento considerando scroll e viewport mobile
+        setToolbarPos({
+          top: rect.top + window.scrollY - 55,
+          left: rect.left + rect.width / 2
+        });
+        setShowToolbar(true);
+      } catch (e) {
+        setShowToolbar(false);
+      }
     } else {
       setShowToolbar(false);
     }
@@ -161,29 +168,29 @@ const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onCha
     <div className="relative">
       {showToolbar && (
         <div 
-          className="fixed z-[500] flex gap-1.5 p-2 bg-background border shadow-2xl rounded-full -translate-x-1/2 animate-in fade-in zoom-in duration-200"
+          className="fixed z-[999] flex gap-1.5 p-2 bg-background border shadow-2xl rounded-full -translate-x-1/2 animate-in fade-in zoom-in duration-200"
           style={{ top: toolbarPos.top, left: toolbarPos.left }}
         >
           {uniqueColors.map(c => (
             <button 
-              key={`color-${c}`} 
+              key={`color-pick-${c}`} 
               className="w-6 h-6 rounded-full border border-border transition-transform hover:scale-110 active:scale-90" 
               style={{ backgroundColor: c }}
               onMouseDown={(e) => {
-                e.preventDefault();
+                e.preventDefault(); // Impede perda de foco e fechamento de teclado mobile
                 applyColor(c);
               }}
             />
           ))}
           <div className="w-px h-4 bg-border mx-1 self-center" />
           <button 
-             className="px-2 text-[10px] font-black uppercase text-muted-foreground hover:text-primary transition-colors"
+             className="px-2 text-[9px] font-black uppercase text-muted-foreground hover:text-primary transition-colors"
              onMouseDown={(e) => {
                 e.preventDefault();
                 clearFormat();
              }}
           >
-            Limpar
+            Reset
           </button>
         </div>
       )}
@@ -191,11 +198,15 @@ const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onCha
         ref={editorRef}
         contentEditable
         onInput={(e: any) => onChange(e.currentTarget.innerHTML)}
-        onMouseUp={handleSelection}
-        onKeyUp={handleSelection}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => {
+          setIsFocused(false);
+          setShowToolbar(false);
+        }}
+        onSelect={handleSelection} // Mais confiável que onMouseUp no mobile
         className="min-h-[120px] p-4 rounded-2xl bg-muted/20 border-2 border-transparent focus:border-primary/20 outline-none text-xs font-bold leading-relaxed transition-all cursor-text"
       />
-      {!value && (
+      {!value && !isFocused && (
         <p className="absolute top-4 left-4 text-muted-foreground opacity-50 pointer-events-none text-xs font-medium italic">
           Ex: O que dizem sobre nossa empresa...
         </p>
