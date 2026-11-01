@@ -107,9 +107,9 @@ interface CustomSection {
 }
 
 /**
- * Editor de Título ultra-estável com seletor de cor RGB e bloqueio de menus nativos.
+ * RichTextEditor - Editor de texto rico com seletor RGB e estabilidade de cursor.
  */
-const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onChange: (val: string) => void, themeColor: string }) => {
+const RichTextEditor = ({ value, onChange, placeholder, themeColor }: { value: string, onChange: (val: string) => void, placeholder?: string, themeColor: string }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const colorInputRef = useRef<HTMLInputElement>(null);
   const [showToolbar, setShowToolbar] = useState(false);
@@ -220,7 +220,7 @@ const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onCha
       
       {!value && !isFocused && (
         <p className="absolute top-6 left-6 text-muted-foreground opacity-40 pointer-events-none text-sm font-medium italic">
-          Ex: O que dizem sobre nossa empresa...
+          {placeholder || 'Digite algo...'}
         </p>
       )}
     </div>
@@ -284,9 +284,9 @@ const PublicPageSettings = ({
   handleSave,
   isSaving,
   isEnterprise,
-  isGoldPlan
+  isGoldPlan,
+  logoInputRef
 }: any) => {
-  const logoInputRef = useRef<HTMLInputElement>(null);
   const colors = ['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff'];
 
   const presets = [
@@ -430,15 +430,15 @@ const PublicPageSettings = ({
                     <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                       <Type className="w-3 h-3 text-primary" /> Título Principal (Hero)
                     </Label>
-                    <HeroTitleEditor value={heroTitle} onChange={setHeroTitle} themeColor={themeColor} />
+                    <RichTextEditor value={heroTitle} onChange={setHeroTitle} themeColor={themeColor} placeholder="Ex: O que dizem sobre nós..." />
                     <p className="text-[9px] text-primary font-bold italic bg-primary/5 p-2 rounded-lg border border-primary/10">
                       💡 Selecione o texto para ativar o seletor de cores RGB.
                     </p>
                   </div>
                   
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Subtítulo Hero</Label>
-                    <Textarea value={heroSubtitle} onChange={(e) => setHeroSubtitle(e.target.value)} placeholder="Uma breve descrição impactante..." className="text-xs min-h-[80px]" />
+                    <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} themeColor={themeColor} placeholder="Uma breve descrição impactante..." />
                   </div>
 
                   <div className="space-y-6 pt-6 border-t">
@@ -634,6 +634,7 @@ export default function PPEditorPage() {
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') setBaseUrl(window.location.origin);
@@ -758,7 +759,7 @@ export default function PPEditorPage() {
     heroTitle, setHeroTitle, heroSubtitle, setHeroSubtitle,
     testimonialsTitle, setTestimonialsTitle, footerText, setFooterText,
     showLogo, setShowLogo, customSections, setCustomSections,
-    onFileSelect, isUploading, handleSave, isSaving, isEnterprise, isGoldPlan
+    onFileSelect, isUploading, handleSave, isSaving, isEnterprise, isGoldPlan, logoInputRef
   };
 
   const visibleTestimonials = approvedTestimonials?.filter(t => selectedIds.includes(t.id)).slice(0, 5) || [];
@@ -846,7 +847,12 @@ export default function PPEditorPage() {
                     className="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] max-w-4xl mx-auto"
                     dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${userData?.companyName}` }}
                   />
-                  {heroSubtitle && <p className="text-muted-foreground text-lg max-w-2xl mx-auto">{heroSubtitle}</p>}
+                  {heroSubtitle && (
+                    <p 
+                      className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium"
+                      dangerouslySetInnerHTML={{ __html: heroSubtitle }}
+                    />
+                  )}
                 </div>
 
                 <div className={cn(

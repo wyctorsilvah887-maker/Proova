@@ -321,9 +321,10 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
                     dangerouslySetInnerHTML={{ __html: heroTitle }}
                   />
                   {heroSubtitle && (
-                    <p className="text-muted-foreground text-lg sm:text-2xl max-w-3xl mx-auto font-medium leading-relaxed italic opacity-80">
-                      {heroSubtitle}
-                    </p>
+                    <p 
+                      className="text-muted-foreground text-lg sm:text-2xl max-w-3xl mx-auto font-medium leading-relaxed italic opacity-80"
+                      dangerouslySetInnerHTML={{ __html: heroSubtitle }}
+                    />
                   )}
                 </div>
               </div>
