@@ -93,6 +93,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from 'next-themes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { generateCopyFlow } from '@/ai/flows/generate-copy-flow';
 
 type LayoutType = 'mural' | 'carousel' | 'grid' | 'popup';
 
@@ -253,9 +254,34 @@ const PublicPageSettings = ({
   isSaving,
   isEnterprise,
   logoInputRef,
-  currentSlug, setSlugEdit
+  currentSlug, setSlugEdit,
+  companyName
 }: any) => {
   const colors = ['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff'];
+  const [isAIWriting, setIsAIWriter] = useState(false);
+
+  const handleAIWriter = async (type: string, targetId?: string) => {
+    setIsAIWriter(true);
+    try {
+      const suggestion = await generateCopyFlow({ 
+        type, 
+        companyName, 
+        context: type.includes('content') ? 'Focar em benefícios e resultados reais' : 'Focar em autoridade' 
+      });
+      
+      if (targetId) {
+        updateSection(targetId, type.includes('title') ? 'title' : 'content', suggestion);
+      } else {
+        if (type === 'hero_title') setHeroTitle(suggestion);
+        if (type === 'hero_subtitle') setHeroSubtitle(suggestion);
+      }
+      toast({ title: "Sugestão da IA aplicada!" });
+    } catch (e) {
+      toast({ variant: "destructive", title: "Erro na IA" });
+    } finally {
+      setIsAIWriter(false);
+    }
+  };
 
   const addSection = () => {
     setCustomSections((prev: CustomSection[]) => [
@@ -265,7 +291,7 @@ const PublicPageSettings = ({
         title: 'Nova Seção de Destaque',
         subtitle: '',
         content: 'Conteúdo descritivo aqui...',
-        buttonText: 'Saiba Mais',
+        buttonText: '',
         buttonUrl: '',
         variant: 'light'
       }
@@ -279,6 +305,19 @@ const PublicPageSettings = ({
   const updateSection = (id: string, field: keyof CustomSection, value: string) => {
     setCustomSections((prev: CustomSection[]) => prev.map(s => s.id === id ? { ...s, [field]: value } : s));
   };
+
+  const AIButton = ({ onClick }: { onClick: () => void }) => (
+    <Button 
+      variant="ghost" 
+      size="sm" 
+      disabled={isAIWriting}
+      onClick={(e) => { e.preventDefault(); onClick(); }}
+      className="h-6 px-1.5 gap-1 text-[9px] font-black uppercase text-primary hover:bg-primary/10 rounded-lg shrink-0"
+    >
+      {isAIWriting ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+      Copywriter
+    </Button>
+  );
 
   return (
     <div className="flex flex-col w-full h-full overflow-hidden bg-background">
@@ -335,12 +374,18 @@ const PublicPageSettings = ({
               {isEnterprise ? (
                 <div className="space-y-8">
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Título Hero (RGB)</Label>
+                    <div className="flex items-center justify-between ml-1">
+                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Título Hero (RGB)</Label>
+                      <AIButton onClick={() => handleAIWriter('hero_title')} />
+                    </div>
                     <RichTextEditor value={heroTitle} onChange={setHeroTitle} placeholder="O que dizem sobre nós..." />
                   </div>
                   
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Subtítulo Hero (Nítido)</Label>
+                    <div className="flex items-center justify-between ml-1">
+                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Subtítulo Hero (Nítido)</Label>
+                      <AIButton onClick={() => handleAIWriter('hero_subtitle')} />
+                    </div>
                     <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} placeholder="Texto de apoio persuasivo..." className="min-h-[60px] text-sm text-foreground" />
                   </div>
 
@@ -367,7 +412,10 @@ const PublicPageSettings = ({
                               </div>
                               <AccordionContent className="p-3 space-y-4 pb-4">
                                 <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Título Bloco</Label>
+                                  <div className="flex items-center justify-between ml-1">
+                                    <Label className="text-[9px] font-bold uppercase opacity-50">Título Bloco</Label>
+                                    <AIButton onClick={() => handleAIWriter('section_title', section.id)} />
+                                  </div>
                                   <Input value={section.title} onChange={(e) => updateSection(section.id, 'title', e.target.value)} className="h-8 text-[11px]" />
                                 </div>
                                 <div className="space-y-1.5">
@@ -375,8 +423,21 @@ const PublicPageSettings = ({
                                   <RichTextEditor value={section.subtitle} onChange={(val) => updateSection(section.id, 'subtitle', val)} className="min-h-[50px] text-[11px] text-foreground" />
                                 </div>
                                 <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Conteúdo</Label>
+                                  <div className="flex items-center justify-between ml-1">
+                                    <Label className="text-[9px] font-bold uppercase opacity-50">Conteúdo</Label>
+                                    <AIButton onClick={() => handleAIWriter('section_content', section.id)} />
+                                  </div>
                                   <Textarea value={section.content} onChange={(e) => updateSection(section.id, 'content', e.target.value)} className="text-[11px] min-h-[60px]" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                  <div className="space-y-1.5">
+                                    <Label className="text-[9px] font-bold uppercase opacity-50">Texto Botão</Label>
+                                    <Input value={section.buttonText} onChange={(e) => updateSection(section.id, 'buttonText', e.target.value)} className="h-8 text-[11px]" placeholder="Ex: Saiba Mais" />
+                                  </div>
+                                  <div className="space-y-1.5">
+                                    <Label className="text-[9px] font-bold uppercase opacity-50">Link Botão</Label>
+                                    <Input value={section.buttonUrl} onChange={(e) => updateSection(section.id, 'buttonUrl', e.target.value)} className="h-8 text-[11px]" placeholder="https://..." />
+                                  </div>
                                 </div>
                                 <div className="space-y-1.5">
                                   <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Estilo do Bloco</Label>
@@ -394,6 +455,16 @@ const PublicPageSettings = ({
                           </Accordion>
                         </Card>
                       ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 pt-4 border-t">
+                    <div className="flex items-center justify-between p-3 bg-muted/10 rounded-xl">
+                      <div className="space-y-0.5">
+                        <Label className="text-[11px] font-bold">Exibir Marca Proova</Label>
+                        <p className="text-[9px] text-muted-foreground">Ativar rodapé "Powered by Proova"</p>
+                      </div>
+                      <Switch checked={showLogo} onCheckedChange={setShowLogo} />
                     </div>
                   </div>
                 </div>
@@ -565,6 +636,16 @@ export default function PPEditorPage() {
       const targetSlug = isSlugChanging ? newSlug : oldSlug;
       const targetPPRef = doc(db, 'users', user.uid, 'pp', targetSlug);
 
+      const cleanedSections = customSections.map(s => ({
+        id: s.id,
+        title: s.title || '',
+        subtitle: s.subtitle || '',
+        content: s.content || '',
+        buttonText: s.buttonText || '',
+        buttonUrl: s.buttonUrl || '',
+        variant: s.variant || 'light'
+      }));
+
       const configData = {
         selectedTestimonialIds: selectedIds,
         themeColor,
@@ -576,7 +657,7 @@ export default function PPEditorPage() {
         testimonialsTitle,
         footerText,
         showLogo,
-        customSections,
+        customSections: cleanedSections,
         updatedAt: serverTimestamp()
       };
 
@@ -632,7 +713,7 @@ export default function PPEditorPage() {
     testimonialsTitle, setTestimonialsTitle, footerText, setFooterText,
     showLogo, setShowLogo, customSections, setCustomSections,
     onFileSelect, isUploading, handleSave, isSaving, isEnterprise, isGoldPlan, logoInputRef,
-    currentSlug: slugEdit, setSlugEdit
+    currentSlug: slugEdit, setSlugEdit, companyName: userData?.companyName
   };
 
   const visibleTestimonialsPreview = approvedTestimonials?.filter(t => selectedIds.includes(t.id)).slice(0, 5) || [];
@@ -734,7 +815,7 @@ export default function PPEditorPage() {
                     >
                       <div className="max-w-3xl mx-auto space-y-4">
                         <h2 className="text-2xl sm:text-4xl font-black tracking-tight">{section.title}</h2>
-                        {section.subtitle && <div className="text-[11px] font-bold leading-relaxed text-foreground" dangerouslySetInnerHTML={{ __html: section.subtitle }} />}
+                        {section.subtitle && <div className="text-[11px] font-bold leading-relaxed" dangerouslySetInnerHTML={{ __html: section.subtitle }} />}
                         <p className="text-xs sm:text-sm leading-relaxed opacity-90 font-medium">{section.content}</p>
                         {section.buttonText && (
                           <div className="pt-4">
