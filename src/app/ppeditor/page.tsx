@@ -625,7 +625,8 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </div>
+      </Tabs>
+    </div>
   );
 };
 
@@ -950,19 +951,18 @@ export default function PPEditorPage() {
                   )}
                   <div className="space-y-4">
                     <h1 
-                      className="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] max-w-4xl mx-auto"
+                      className="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] max-w-4xl mx-auto text-foreground"
                       dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${userData?.companyName}` }}
                     />
                     {heroSubtitle && (
                       <div 
-                        className="text-muted-foreground text-base max-w-2xl mx-auto font-medium leading-relaxed italic"
+                        className="text-foreground text-sm sm:text-base max-w-2xl mx-auto font-medium leading-relaxed italic"
                         dangerouslySetInnerHTML={{ __html: heroSubtitle }}
                       />
                     )}
                   </div>
                 </div>
 
-                {/* SEÇÕES CUSTOMIZADAS NO PREVIEW */}
                 <div className="w-full space-y-0">
                   {customSections.map((section: CustomSection) => (
                     <div 
@@ -975,8 +975,8 @@ export default function PPEditorPage() {
                     >
                       <div className="max-w-3xl mx-auto space-y-4">
                         <h2 className="text-2xl sm:text-4xl font-black tracking-tight">{section.title}</h2>
-                        {section.subtitle && <p className="text-base font-bold italic">{section.subtitle}</p>}
-                        <p className="text-sm sm:text-base leading-relaxed opacity-90 font-medium">{section.content}</p>
+                        {section.subtitle && <p className="text-sm font-bold italic">{section.subtitle}</p>}
+                        <p className="text-xs sm:text-sm leading-relaxed opacity-90 font-medium">{section.content}</p>
                         {section.buttonText && (
                           <div className="pt-4">
                             <Button 
