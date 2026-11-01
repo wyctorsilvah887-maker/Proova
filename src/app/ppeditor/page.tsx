@@ -213,7 +213,7 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
   return (
     <Card 
       className={cn(
-        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none mb-12",
+        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none mb-12 w-full",
         !isPopup && "animate-in fade-in duration-700 ease-out fill-both",
         !isPopup && (side === 'left' ? "slide-in-from-left-12" : "slide-in-from-right-12"),
         isPopup && !isAnimating && "animate-in fade-in slide-in-from-bottom-10 duration-1000",
@@ -814,7 +814,7 @@ export default function PPEditorPage() {
                     )
                   )}>
                     {visibleTestimonialsPreview.length > 0 ? visibleTestimonialsPreview.map((t, i) => (
-                      <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12">
+                      <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12 flex justify-center">
                         <TestimonialCard t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} isPopup={layout === 'popup'} isAnimating={isAnimating} />
                       </div>
                     )) : <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos abaixo.</div>}

@@ -133,7 +133,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
         setTimeout(() => {
           setMuralIndex(prev => (prev + 1) % filteredTestimonials.length);
           setIsAnimating(false);
-        }, 500);
+        }, 1000); // Maior tempo para saída da animação
       }, layout === 'popup' ? 8000 : 6000);
       return () => clearInterval(interval);
     }
@@ -177,7 +177,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
       <Card 
         key={t.id}
         className={cn(
-          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none mb-12",
+          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none mb-12 w-full",
           !isPopup && "animate-in fade-in duration-700 ease-out fill-both",
           !isPopup && (side === 'left' ? "slide-in-from-left-12" : "slide-in-from-right-12"),
           isPopup && !isAnimating && "animate-in fade-in slide-in-from-bottom-10 duration-1000",
@@ -331,12 +331,12 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                     </div>
                   )}
                   {layout === 'carousel' && (
-                    <div className="max-w-xl mx-auto">
+                    <div className="max-w-xl mx-auto flex justify-center">
                       <TestimonialCard t={visibleDisplayPool[0]} />
                     </div>
                   )}
                   {layout === 'popup' && (
-                    <div className="max-w-md mx-auto">
+                    <div className="max-w-md mx-auto flex justify-center">
                       <TestimonialCard t={visibleDisplayPool[0]} isPopup />
                     </div>
                   )}
