@@ -51,7 +51,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useUser, useFirestore, useDoc, useCollection, useStorage, useAuth } from '@/firebase';
-import { doc, updateDoc, collection, query, where, getDocs, limit, serverTimestamp, setDoc, deleteDoc, writeBatch } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, getDocs, limit, serverTimestamp, setDoc, deleteDoc, writeBatch, getDoc } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from '@/hooks/use-toast';
@@ -73,7 +73,6 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
 import {
   Accordion,
@@ -115,12 +114,12 @@ const RichTextEditor = ({ value, onChange, placeholder, themeColor }: { value: s
   const [showToolbar, setShowToolbar] = useState(false);
   const [toolbarPos, setToolbarPos] = useState({ top: 0, left: 0 });
   const [isFocused, setIsFocused] = useState(false);
+  const lastHtml = useRef(value);
 
   useEffect(() => {
-    if (editorRef.current && !isFocused) {
-      if (editorRef.current.innerHTML !== (value || '')) {
-        editorRef.current.innerHTML = value || '';
-      }
+    if (editorRef.current && !isFocused && value !== editorRef.current.innerHTML) {
+      editorRef.current.innerHTML = value || '';
+      lastHtml.current = value;
     }
   }, [value, isFocused]);
 
@@ -148,15 +147,25 @@ const RichTextEditor = ({ value, onChange, placeholder, themeColor }: { value: s
     document.execCommand('styleWithCSS', false, 'true');
     document.execCommand('foreColor', false, color);
     if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
+      const newHtml = editorRef.current.innerHTML;
+      lastHtml.current = newHtml;
+      onChange(newHtml);
     }
   };
 
   const clearFormat = () => {
     document.execCommand('removeFormat');
     if (editorRef.current) {
-      onChange(editorRef.current.innerHTML);
+      const newHtml = editorRef.current.innerHTML;
+      lastHtml.current = newHtml;
+      onChange(newHtml);
     }
+  };
+
+  const handleInput = (e: any) => {
+    const newHtml = e.currentTarget.innerHTML;
+    lastHtml.current = newHtml;
+    onChange(newHtml);
   };
 
   return (
@@ -201,6 +210,7 @@ const RichTextEditor = ({ value, onChange, placeholder, themeColor }: { value: s
       <div
         ref={editorRef}
         contentEditable
+        suppressContentEditableWarning
         style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'text' } as any}
         onContextMenu={(e) => {
           const selection = window.getSelection();
@@ -208,7 +218,7 @@ const RichTextEditor = ({ value, onChange, placeholder, themeColor }: { value: s
             e.preventDefault();
           }
         }}
-        onInput={(e: any) => onChange(e.currentTarget.innerHTML)}
+        onInput={handleInput}
         onFocus={() => setIsFocused(true)}
         onBlur={() => {
           setIsFocused(false);
@@ -287,7 +297,7 @@ const PublicPageSettings = ({
   logoInputRef,
   currentSlug, setSlugEdit
 }: any) => {
-  const colors = ['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff'];
+  const colors = Array.from(new Set(['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff']));
 
   const presets = [
     { name: 'Classic', primary: '#f97316', secondary: '#ffffff' },
@@ -607,9 +617,11 @@ export default function PPEditorPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
-  // Carregar dados da Página Pública (Subcoleção PP)
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
-  const ppRef = useMemo(() => (db && user && activeSlug ? doc(db, 'users', user.uid, 'pp', activeSlug) : null), [db, user, activeSlug]);
+  const ppRef = useMemo(() => {
+    if (!db || !user || !activeSlug) return null;
+    return doc(db, 'users', user.uid, 'pp', activeSlug);
+  }, [db, user, activeSlug]);
   const { data: ppData, loading: ppLoading } = useDoc(ppRef);
 
   const membershipStatus = userData?.membershipStatus;
@@ -656,7 +668,6 @@ export default function PPEditorPage() {
     if (typeof window !== 'undefined') setBaseUrl(window.location.origin);
   }, []);
 
-  // Inicializa o slug ativo com base no perfil do usuário
   useEffect(() => {
     if (userData?.companySlug) {
       setActiveSlug(userData.companySlug);
@@ -664,7 +675,6 @@ export default function PPEditorPage() {
     }
   }, [userData]);
 
-  // Carrega as configurações da PP quando o documento é retornado
   useEffect(() => {
     if (ppData) {
       setSelectedIds(ppData.selectedTestimonialIds || []);
@@ -681,8 +691,7 @@ export default function PPEditorPage() {
       setFooterText(ppData.footerText || '');
       setShowLogo(ppData.showLogo !== undefined ? ppData.showLogo : true);
       setCustomSections(ppData.customSections || []);
-    } else if (!ppLoading && activeSlug && user) {
-      // Se não existe documento PP para o slug atual, tentamos localizar o primeiro widget e clonar como inicial
+    } else if (!ppLoading && activeSlug && user && db) {
       const tryInitPP = async () => {
         const widgetsRef = collection(db, 'users', user.uid, 'widgets');
         const snap = await getDocs(query(widgetsRef, limit(1)));
@@ -719,7 +728,6 @@ export default function PPEditorPage() {
     try {
       const batch = writeBatch(db);
 
-      // 1. Validação de Unicidade Global se o slug mudou
       if (isSlugChanging) {
         if (!newSlug) throw new Error("O link da página não pode ser vazio.");
         
@@ -728,28 +736,20 @@ export default function PPEditorPage() {
           throw new Error("Este link já está sendo utilizado por outro usuário.");
         }
 
-        // Reserva novo slug global
         batch.set(doc(db, 'slugs', newSlug), {
           userId: user.uid,
           type: 'pp',
           createdAt: serverTimestamp()
         });
 
-        // Remove slug antigo global
         if (oldSlug) {
           batch.delete(doc(db, 'slugs', oldSlug));
-        }
-
-        // Atualiza perfil do usuário
-        batch.update(doc(db, 'users', user.uid), { companySlug: newSlug });
-
-        // Remove documento PP antigo
-        if (oldSlug) {
           batch.delete(doc(db, 'users', user.uid, 'pp', oldSlug));
         }
+
+        batch.update(doc(db, 'users', user.uid), { companySlug: newSlug });
       }
 
-      // 2. Salva configurações no documento PP (novo ou atual)
       const targetSlug = isSlugChanging ? newSlug : oldSlug;
       const targetPPRef = doc(db, 'users', user.uid, 'pp', targetSlug);
 
