@@ -41,7 +41,8 @@ import {
   Sparkles,
   Settings2,
   Handshake,
-  X
+  X,
+  Pipette
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -107,15 +108,15 @@ interface CustomSection {
 }
 
 /**
- * Editor de Título ultra-estável para Mobile e Desktop.
+ * Editor de Título ultra-estável com seletor de cor RGB e bloqueio de menus nativos.
  */
 const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onChange: (val: string) => void, themeColor: string }) => {
   const editorRef = useRef<HTMLDivElement>(null);
+  const colorInputRef = useRef<HTMLInputElement>(null);
   const [showToolbar, setShowToolbar] = useState(false);
   const [toolbarPos, setToolbarPos] = useState({ top: 0, left: 0 });
   const [isFocused, setIsFocused] = useState(false);
 
-  // Sincroniza o conteúdo apenas quando não está em foco para evitar pulos do cursor no mobile
   useEffect(() => {
     if (editorRef.current && !isFocused) {
       if (editorRef.current.innerHTML !== (value || '')) {
@@ -124,11 +125,6 @@ const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onCha
     }
   }, [value, isFocused]);
 
-  const uniqueColors = useMemo(() => {
-    const base = ['#000000', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#ffffff', themeColor];
-    return Array.from(new Set(base.filter(Boolean)));
-  }, [themeColor]);
-
   const handleSelection = () => {
     const selection = window.getSelection();
     if (selection && selection.toString().length > 0 && editorRef.current?.contains(selection.anchorNode)) {
@@ -136,9 +132,8 @@ const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onCha
         const range = selection.getRangeAt(0);
         const rect = range.getBoundingClientRect();
         
-        // Ajuste de posicionamento considerando scroll e viewport mobile
         setToolbarPos({
-          top: rect.top + window.scrollY - 55,
+          top: rect.top + window.scrollY - 65,
           left: rect.left + rect.width / 2
         });
         setShowToolbar(true);
@@ -151,6 +146,7 @@ const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onCha
   };
 
   const applyColor = (color: string) => {
+    document.execCommand('styleWithCSS', false, 'true');
     document.execCommand('foreColor', false, color);
     if (editorRef.current) {
       onChange(editorRef.current.innerHTML);
@@ -165,49 +161,68 @@ const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onCha
   };
 
   return (
-    <div className="relative">
+    <div className="relative group">
+      <input 
+        type="color" 
+        ref={colorInputRef} 
+        className="sr-only" 
+        onChange={(e) => applyColor(e.target.value)} 
+      />
+      
       {showToolbar && (
         <div 
-          className="fixed z-[999] flex gap-1.5 p-2 bg-background border shadow-2xl rounded-full -translate-x-1/2 animate-in fade-in zoom-in duration-200"
+          className="fixed z-[999] flex items-center gap-2 p-2 bg-zinc-900 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-2xl -translate-x-1/2 animate-in fade-in zoom-in duration-200"
           style={{ top: toolbarPos.top, left: toolbarPos.left }}
         >
-          {uniqueColors.map(c => (
-            <button 
-              key={`color-pick-${c}`} 
-              className="w-6 h-6 rounded-full border border-border transition-transform hover:scale-110 active:scale-90" 
-              style={{ backgroundColor: c }}
-              onMouseDown={(e) => {
-                e.preventDefault(); // Impede perda de foco e fechamento de teclado mobile
-                applyColor(c);
-              }}
-            />
-          ))}
-          <div className="w-px h-4 bg-border mx-1 self-center" />
           <button 
-             className="px-2 text-[9px] font-black uppercase text-muted-foreground hover:text-primary transition-colors"
+            title="Escolher Cor RGB"
+            className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/10 hover:bg-primary transition-all group"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              colorInputRef.current?.click();
+            }}
+          >
+            <Pipette className="w-5 h-5 text-white group-hover:text-black" />
+          </button>
+          
+          <div className="w-px h-6 bg-white/10 mx-1" />
+          
+          <button 
+             className="h-10 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest text-white hover:bg-white/10 transition-colors"
              onMouseDown={(e) => {
                 e.preventDefault();
                 clearFormat();
              }}
           >
-            Reset
+            Limpar
           </button>
         </div>
       )}
+
       <div
         ref={editorRef}
         contentEditable
+        // Estilos para remover menus nativos e callouts
+        style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'text' } as any}
+        onContextMenu={(e) => {
+          // Bloqueia menu nativo apenas se houver seleção para favorecer nossa toolbar
+          const selection = window.getSelection();
+          if (selection && selection.toString().length > 0) {
+            e.preventDefault();
+          }
+        }}
         onInput={(e: any) => onChange(e.currentTarget.innerHTML)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => {
           setIsFocused(false);
           setShowToolbar(false);
         }}
-        onSelect={handleSelection} // Mais confiável que onMouseUp no mobile
-        className="min-h-[120px] p-4 rounded-2xl bg-muted/20 border-2 border-transparent focus:border-primary/20 outline-none text-xs font-bold leading-relaxed transition-all cursor-text"
+        onSelect={handleSelection}
+        className="min-h-[140px] p-6 rounded-[1.5rem] bg-muted/20 border-2 border-transparent focus:border-primary/30 outline-none text-sm font-bold leading-relaxed transition-all cursor-text shadow-inner"
       />
+      
       {!value && !isFocused && (
-        <p className="absolute top-4 left-4 text-muted-foreground opacity-50 pointer-events-none text-xs font-medium italic">
+        <p className="absolute top-6 left-6 text-muted-foreground opacity-40 pointer-events-none text-sm font-medium italic">
           Ex: O que dizem sobre nossa empresa...
         </p>
       )}
@@ -326,7 +341,7 @@ const PublicPageSettings = ({
         </Link>
         <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground">
           {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
-          Salvar Página Pública
+          Salvar Alterações
         </Button>
       </div>
 
