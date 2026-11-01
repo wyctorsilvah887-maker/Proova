@@ -279,7 +279,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
         />
       )}
 
-      {/* Oculta navegação se for app instalado para evitar "dobra" visual no topo */}
       {!isStandalone && (
         <nav className="h-16 border-b flex items-center px-6 justify-between bg-background/50 backdrop-blur-md sticky top-0 z-50">
           <div className="flex items-center gap-3">
@@ -317,9 +316,10 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
                   </div>
                 )}
                 <div className="space-y-4">
-                  <h1 className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.05] max-w-5xl mx-auto">
-                    {heroTitle}
-                  </h1>
+                  <h1 
+                    className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.05] max-w-5xl mx-auto"
+                    dangerouslySetInnerHTML={{ __html: heroTitle }}
+                  />
                   {heroSubtitle && (
                     <p className="text-muted-foreground text-lg sm:text-2xl max-w-3xl mx-auto font-medium leading-relaxed italic opacity-80">
                       {heroSubtitle}

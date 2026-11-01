@@ -42,7 +42,8 @@ import {
   MapPin,
   Sparkles,
   Settings2,
-  Handshake
+  Handshake,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -107,6 +108,94 @@ interface CustomSection {
   buttonUrl: string;
   variant: 'light' | 'dark' | 'accent';
 }
+
+/**
+ * Editor de Título com coloração por seleção.
+ */
+const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onChange: (val: string) => void, themeColor: string }) => {
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [showToolbar, setShowToolbar] = useState(false);
+  const [toolbarPos, setToolbarPos] = useState({ top: 0, left: 0 });
+
+  const colors = [themeColor, '#000000', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#ffffff'];
+
+  const handleSelection = () => {
+    const selection = window.getSelection();
+    if (selection && selection.toString().length > 0 && editorRef.current?.contains(selection.anchorNode)) {
+      const range = selection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      setToolbarPos({
+        top: rect.top - 45,
+        left: rect.left + rect.width / 2
+      });
+      setShowToolbar(true);
+    } else {
+      setShowToolbar(false);
+    }
+  };
+
+  const applyColor = (color: string) => {
+    document.execCommand('foreColor', false, color);
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+    }
+  };
+
+  const clearFormat = () => {
+    document.execCommand('removeFormat');
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML);
+    }
+  };
+
+  return (
+    <div className="relative">
+      {showToolbar && (
+        <div 
+          className="fixed z-[300] flex gap-1.5 p-1.5 bg-background border shadow-2xl rounded-full -translate-x-1/2 animate-in fade-in zoom-in duration-200"
+          style={{ top: toolbarPos.top, left: toolbarPos.left }}
+        >
+          {colors.map(c => (
+            <button 
+              key={c} 
+              className="w-6 h-6 rounded-full border border-border transition-transform hover:scale-110 active:scale-90" 
+              style={{ backgroundColor: c }}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                applyColor(c);
+              }}
+            />
+          ))}
+          <div className="w-px h-4 bg-border mx-1 self-center" />
+          <button 
+             className="px-2 text-[9px] font-black uppercase text-muted-foreground hover:text-primary transition-colors"
+             onMouseDown={(e) => {
+                e.preventDefault();
+                clearFormat();
+             }}
+          >
+            Limpar
+          </button>
+        </div>
+      )}
+      <div
+        ref={editorRef}
+        contentEditable
+        onInput={(e: any) => onChange(e.currentTarget.innerHTML)}
+        onMouseUp={handleSelection}
+        onKeyUp={handleSelection}
+        className="min-h-[100px] p-4 rounded-2xl bg-muted/20 border-2 border-transparent focus:border-primary/20 outline-none text-xs font-bold leading-relaxed transition-all cursor-text"
+        dangerouslySetInnerHTML={{ __html: value }}
+      />
+      {!value && (
+        <p className="absolute top-4 left-4 text-muted-foreground opacity-50 pointer-events-none text-xs font-medium italic">
+          Ex: O que dizem sobre nossa empresa...
+        </p>
+      )}
+      <p className="mt-2 text-[9px] text-muted-foreground font-medium italic">* Selecione o texto para colorir palavras específicas.</p>
+    </div>
+  );
+};
 
 const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0 }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number }) => {
   const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
@@ -311,7 +400,7 @@ const PublicPageSettings = ({
                     <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                       <Type className="w-3 h-3 text-primary" /> Título Principal (Hero)
                     </Label>
-                    <Input value={heroTitle} onChange={(e) => setHeroTitle(e.target.value)} placeholder="Ex: O que dizem sobre nós" className="text-xs" />
+                    <HeroTitleEditor value={heroTitle} onChange={setHeroTitle} themeColor={themeColor} />
                   </div>
                   
                   <div className="space-y-4">
@@ -872,7 +961,6 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
                 </Button>
               </Link>
               
-              {/* Oculta link de compartilhamento se o app estiver instalado para maximizar espaço de edição */}
               {!isStandalone && (
                 <div className="flex items-center gap-2 bg-background border rounded-xl p-1.5 shadow-sm max-w-md w-full">
                   <div className="flex-1 px-3">
@@ -925,9 +1013,10 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
                     </div>
                   )}
                   <div className="space-y-6">
-                    <h1 className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.1] max-w-4xl mx-auto">
-                      {heroTitle || `O que dizem sobre ${userData?.companyName}`}
-                    </h1>
+                    <h1 
+                      className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.1] max-w-4xl mx-auto"
+                      dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${userData?.companyName}` }}
+                    />
                     {heroSubtitle && (
                       <p className="text-muted-foreground text-lg sm:text-xl max-w-2xl mx-auto font-medium">
                         {heroSubtitle}
@@ -998,7 +1087,7 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
                       ))
                     )
                   ) : (
-                    <div className="col-span-full py-20 text-center opacity-30 italic text-sm">Selecione depoimentos para the preview.</div>
+                    <div className="col-span-full py-20 text-center opacity-30 italic text-sm">Selecione depoimentos para o preview.</div>
                   )}
                 </div>
 
@@ -1117,7 +1206,7 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">Conteúdo Persuasivo</p>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Edite o <strong>Título Principal (Hero)</strong> para algo impactante. Membros Enterprise podem adicionar seções no-code ilimitadas com botões de chamada para ação (CTA).
+                    Edite o <strong>Título Principal (Hero)</strong> para algo impactante. Membros Enterprise podem colorir partes do título e adicionar seções no-code ilimitadas.
                   </p>
                 </div>
               </div>
