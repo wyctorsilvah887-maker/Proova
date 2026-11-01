@@ -1505,7 +1505,7 @@ export default function DashPage() {
               </div>
             </div>
 
-            <div className="w-full space-y-4">
+            <div className="w-full space-y-6">
               <Button 
                 className="w-full h-14 rounded-2xl text-lg font-black shadow-xl gap-3 transition-all hover:scale-[1.02] active:scale-95" 
                 onClick={handleDownloadPdf} 
@@ -1515,10 +1515,10 @@ export default function DashPage() {
                 Baixar PDF de Impressão
               </Button>
               
-              <div className="flex flex-col items-center gap-2 opacity-60">
-                 <div className="flex items-center gap-1.5">
-                   <span className="text-[8px] font-black uppercase tracking-widest">Powered by</span>
-                   <div className="relative w-16 h-5">
+              <div className="flex flex-col items-center gap-2 opacity-80">
+                 <div className="flex items-center gap-2">
+                   <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Powered by</span>
+                   <div className="relative w-28 h-10 transition-transform hover:scale-105">
                       <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Proova" fill className="object-contain dark:hidden" />
                       <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Proova" fill className="object-contain hidden dark:block" />
                    </div>
