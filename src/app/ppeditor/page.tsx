@@ -281,17 +281,6 @@ const PublicPageSettings = ({
     setCustomSections((prev: CustomSection[]) => prev.map(s => s.id === id ? { ...s, [field]: value } : s));
   };
 
-  const AIButtonPlaceholder = () => (
-    <Button 
-      variant="ghost" 
-      size="sm" 
-      className="h-6 px-1.5 gap-1 text-[9px] font-black uppercase text-primary hover:bg-primary/10 rounded-lg shrink-0"
-    >
-      <Sparkles className="w-3 h-3" />
-      Copywriter
-    </Button>
-  );
-
   return (
     <div className="flex flex-col w-full h-full overflow-hidden bg-background">
       <div className="p-4 border-b bg-muted/10 shrink-0 space-y-4">
@@ -347,18 +336,12 @@ const PublicPageSettings = ({
               {isEnterprise ? (
                 <div className="space-y-8">
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between ml-1">
-                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Título Hero (RGB)</Label>
-                      <AIButtonPlaceholder />
-                    </div>
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Título Hero (RGB)</Label>
                     <RichTextEditor value={heroTitle} onChange={setHeroTitle} placeholder="O que dizem sobre nós..." />
                   </div>
                   
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between ml-1">
-                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Subtítulo Hero (Nítido)</Label>
-                      <AIButtonPlaceholder />
-                    </div>
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Subtítulo Hero (Nítido)</Label>
                     <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} placeholder="Texto de apoio persuasivo..." className="min-h-[60px] text-sm text-foreground" />
                   </div>
 
@@ -385,33 +368,24 @@ const PublicPageSettings = ({
                               </div>
                               <AccordionContent className="p-3 space-y-4 pb-4">
                                 <div className="space-y-1.5">
-                                  <div className="flex items-center justify-between ml-1">
-                                    <Label className="text-[9px] font-bold uppercase opacity-50">Título Bloco</Label>
-                                    <AIButtonPlaceholder />
-                                  </div>
+                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Título Bloco</Label>
                                   <Input value={section.title} onChange={(e) => updateSection(section.id, 'title', e.target.value)} className="h-8 text-[11px]" />
                                 </div>
                                 <div className="space-y-1.5">
-                                  <div className="flex items-center justify-between ml-1">
-                                    <Label className="text-[9px] font-bold uppercase opacity-50">Subtítulo Bloco (RGB)</Label>
-                                    <AIButtonPlaceholder />
-                                  </div>
+                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Subtítulo Bloco (RGB)</Label>
                                   <RichTextEditor value={section.subtitle} onChange={(val) => updateSection(section.id, 'subtitle', val)} className="min-h-[50px] text-[11px] text-foreground" />
                                 </div>
                                 <div className="space-y-1.5">
-                                  <div className="flex items-center justify-between ml-1">
-                                    <Label className="text-[9px] font-bold uppercase opacity-50">Conteúdo</Label>
-                                    <AIButtonPlaceholder />
-                                  </div>
+                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Conteúdo</Label>
                                   <Textarea value={section.content} onChange={(e) => updateSection(section.id, 'content', e.target.value)} className="text-[11px] min-h-[60px]" />
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
                                   <div className="space-y-1.5">
-                                    <Label className="text-[9px] font-bold uppercase opacity-50">Texto Botão</Label>
+                                    <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Texto Botão</Label>
                                     <Input value={section.buttonText} onChange={(e) => updateSection(section.id, 'buttonText', e.target.value)} className="h-8 text-[11px]" placeholder="Ex: Saiba Mais" />
                                   </div>
                                   <div className="space-y-1.5">
-                                    <Label className="text-[9px] font-bold uppercase opacity-50">Link Botão</Label>
+                                    <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Link Botão</Label>
                                     <Input value={section.buttonUrl} onChange={(e) => updateSection(section.id, 'buttonUrl', e.target.value)} className="h-8 text-[11px]" placeholder="https://..." />
                                   </div>
                                 </div>
@@ -434,7 +408,17 @@ const PublicPageSettings = ({
                     </div>
                   </div>
 
-                  <div className="space-y-4 pt-4 border-t">
+                  <div className="space-y-6 pt-6 border-t">
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Copywriter do Rodapé</Label>
+                      <Input 
+                        value={footerText} 
+                        onChange={(e) => setFooterText(e.target.value)} 
+                        placeholder="© 2026 Nome da Sua Empresa" 
+                        className="h-10 text-xs font-medium"
+                      />
+                    </div>
+
                     <div className="flex items-center justify-between p-3 bg-muted/10 rounded-xl">
                       <div className="space-y-0.5">
                         <Label className="text-[11px] font-bold">Exibir Marca Proova</Label>
