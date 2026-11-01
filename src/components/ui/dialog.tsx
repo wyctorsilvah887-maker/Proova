@@ -1,4 +1,3 @@
-
 "use client"
 
 import * as React from "react"
@@ -45,8 +44,8 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 z-[110] rounded-full p-2 opacity-100 ring-offset-background transition-all hover:bg-muted focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none bg-background/80 backdrop-blur-md border border-border shadow-md group active:scale-95">
-        <X className="h-5 w-5 text-foreground group-hover:text-primary transition-colors" />
+      <DialogPrimitive.Close className="absolute right-4 top-4 z-[110] rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+        <X className="h-4 w-4" />
         <span className="sr-only">Close</span>
       </DialogPrimitive.Close>
     </DialogPrimitive.Content>
@@ -107,7 +106,8 @@ const DialogDescription = React.forwardRef<
     {...props}
   />
 ))
-DialogDescription.displayName = DialogPrimitive.Description.displayName
+DialogDescription.displayName =
+  DialogPrimitive.Description.displayName
 
 export {
   Dialog,
