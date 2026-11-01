@@ -96,7 +96,7 @@ import {
 import { useTheme } from 'next-themes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-type LayoutType = 'mural' | 'carousel' | 'grid' | 'popup';
+type LayoutType = 'grid' | 'mural' | 'carousel' | 'popup';
 
 interface CustomSection {
   id: string;
@@ -497,13 +497,13 @@ const PublicPageSettings = ({
             </TabsContent>
 
             <TabsContent value="design" className="mt-0 space-y-6">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Layout do Mural</Label>
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Layout da Página</Label>
               <div className="grid grid-cols-1 gap-2">
                 {[
-                  { id: 'grid', icon: Layout, label: 'Grade' },
-                  { id: 'mural', icon: LayoutGrid, label: 'Masonry' },
-                  { id: 'carousel', icon: Play, label: 'Carrossel' },
-                  { id: 'popup', icon: MessageSquare, label: 'Notificação' },
+                  { id: 'grid', icon: Layout, label: 'Grade Estática (Todos)' },
+                  { id: 'mural', icon: LayoutGrid, label: 'Mural Masonry (Rodízio)' },
+                  { id: 'carousel', icon: Play, label: 'Carrossel Dinâmico' },
+                  { id: 'popup', icon: MessageSquare, label: 'Notificação VIP' },
                 ].map((item) => (
                   <button 
                     key={item.id}
@@ -625,8 +625,9 @@ export default function PPEditorPage() {
     if (!authLoading && !user) router.replace('/login');
   }, [user, authLoading, router]);
 
+  // Rotação dinâmica apenas para Mural (Masonry)
   useEffect(() => {
-    if ((layout === 'mural' || layout === 'grid') && selectedIds.length > 5) {
+    if (layout === 'mural' && selectedIds.length > 5) {
       const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % selectedIds.length), 6000);
       return () => clearInterval(interval);
     }
@@ -726,7 +727,21 @@ export default function PPEditorPage() {
     });
   };
 
-  const visibleTestimonialsPreview = approvedTestimonials?.filter(t => selectedIds.includes(t.id)) || [];
+  const currentSelection = approvedTestimonials?.filter(t => selectedIds.includes(t.id)) || [];
+
+  // Pool de exibição: Grade mostra todos, outros fazem rodízio de 5.
+  const visibleTestimonialsPreview = useMemo(() => {
+    if (layout === 'grid') return currentSelection;
+    
+    const slice = [];
+    const count = Math.min(5, currentSelection.length);
+    for (let i = 0; i < count; i++) {
+      const idx = (muralIndex + i) % currentSelection.length;
+      slice.push(currentSelection[idx]);
+    }
+    return slice;
+  }, [currentSelection, layout, muralIndex]);
+
   const membershipLabel = isEnterprise ? 'Membro Enterprise' : (isGoldPlan ? 'Membro Gold' : 'Plano Base');
 
   if (authLoading || userDataLoading || testimonialsLoading) {
@@ -917,7 +932,7 @@ export default function PPEditorPage() {
                 </div>
 
                 <div className={cn(
-                  "px-4 sm:px-12 w-full max-w-5xl mx-auto py-12",
+                  "px-4 sm:px-12 w-full max-w-5xl mx-auto py-12 py-12",
                   layout === 'popup' ? "max-w-sm mx-auto flex flex-col gap-12" : (
                     layout === 'mural' 
                       ? "columns-1 sm:columns-2 lg:columns-3 gap-12" 

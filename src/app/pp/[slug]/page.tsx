@@ -133,8 +133,9 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
   const footerText = ppData?.footerText || `${new Date().getFullYear()} ${companyName || ''}`;
   const showProovaBranding = ppData?.showLogo !== false;
 
+  // Rotação dinâmica apenas para Mural e Notificação
   useEffect(() => {
-    if ((layout === 'mural' || layout === 'grid') && filteredTestimonials.length > 5) {
+    if ((layout === 'mural' || layout === 'popup') && filteredTestimonials.length > 5) {
       const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % filteredTestimonials.length), 7000);
       return () => clearInterval(interval);
     }
@@ -146,9 +147,13 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     return () => clearInterval(interval);
   }, [api, layout]);
 
+  // Pool de exibição: Grade mostra todos os selecionados. Mural faz rodízio de 5.
   const visibleDisplayPool = useMemo(() => {
     if (filteredTestimonials.length === 0) return [];
-    if (layout === 'mural' || layout === 'grid') {
+    
+    if (layout === 'grid') return filteredTestimonials;
+
+    if (layout === 'mural' || layout === 'popup') {
       const slice = [];
       const count = Math.min(5, filteredTestimonials.length);
       for (let i = 0; i < count; i++) {
@@ -157,6 +162,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
       }
       return slice;
     }
+    
     return filteredTestimonials;
   }, [filteredTestimonials, muralIndex, layout]);
 
