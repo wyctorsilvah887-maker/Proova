@@ -509,7 +509,8 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </div>
+      </Tabs>
+    </div>
   );
 };
 
