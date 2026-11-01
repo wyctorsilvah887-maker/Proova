@@ -294,7 +294,8 @@ const PublicPageSettings = ({
   isSaving,
   isGoldPlan,
   logoInputRef,
-  currentSlug, setSlugEdit
+  currentSlug, setSlugEdit,
+  onClose
 }: any) => {
   const colors = ['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff'];
   const router = useRouter();
@@ -326,13 +327,18 @@ const PublicPageSettings = ({
   return (
     <div className="flex flex-col w-full h-full overflow-hidden bg-background">
       <div className="p-4 border-b bg-muted/10 shrink-0 space-y-4">
-        <Link href="/dash" className="w-full">
-          <Button variant="ghost" className="w-full justify-start gap-3 h-10 px-2 group">
-            <ArrowLeft className="w-4 h-4" />
-            <span className="text-xs font-black uppercase tracking-[0.2em]">Dashboard</span>
-          </Button>
-        </Link>
-        <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm bg-primary text-primary-foreground">
+        <div className="flex items-center justify-between">
+          <Link href="/dash" className="group">
+            <Button variant="ghost" size="sm" className="gap-2 px-0 text-muted-foreground hover:text-primary transition-all h-8">
+              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Dash</span>
+            </Button>
+          </Link>
+          {onClose && (
+            <Button variant="ghost" size="sm" onClick={onClose} className="lg:hidden text-muted-foreground">Fechar</Button>
+          )}
+        </div>
+        <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm">
           {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
           Salvar Página
         </Button>
@@ -400,14 +406,10 @@ const PublicPageSettings = ({
             <TabsContent value="conteudo" className="mt-0">
               {!isGoldPlan ? (
                 <div className="py-20 px-4 text-center space-y-6 bg-primary/5 rounded-3xl border border-dashed border-primary/20">
-                   <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit">
-                     <Gem className="w-10 h-10 text-primary" />
-                   </div>
+                   <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit"><Gem className="w-10 h-10 text-primary" /></div>
                    <div className="space-y-2">
                      <h3 className="text-sm font-black uppercase tracking-tight">Recurso Gold</h3>
-                     <p className="text-[10px] text-muted-foreground leading-relaxed max-w-[200px] mx-auto">
-                       A edição de conteúdos persuasivos e seções ilimitadas são exclusivas dos planos Gold e Enterprise.
-                     </p>
+                     <p className="text-[10px] text-muted-foreground leading-relaxed max-w-[200px] mx-auto">A edição de conteúdos persuasivos e seções ilimitadas são exclusivas dos planos Gold e Enterprise.</p>
                    </div>
                    <Button className="w-full font-black uppercase tracking-widest text-[10px] h-12 rounded-xl" onClick={() => router.push('/pricing')}>Upgrade Agora</Button>
                 </div>
@@ -417,7 +419,6 @@ const PublicPageSettings = ({
                     <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Título Hero</Label>
                     <RichTextEditor value={heroTitle} onChange={setHeroTitle} allowColor={isGoldPlan} placeholder="O que dizem sobre nós..." />
                   </div>
-                  
                   <div className="space-y-3">
                     <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Subtítulo Hero</Label>
                     <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} allowColor={isGoldPlan} placeholder="Texto persuasivo..." className="min-h-[60px]" />
@@ -426,11 +427,8 @@ const PublicPageSettings = ({
                   <div className="space-y-6 pt-6 border-t">
                     <div className="flex items-center justify-between">
                       <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Seções Extras</Label>
-                      <Button variant="outline" size="sm" onClick={addSection} className="h-7 text-[9px] font-black uppercase gap-1">
-                        <Plus className="w-3 h-3" /> Adicionar
-                      </Button>
+                      <Button variant="outline" size="sm" onClick={addSection} className="h-7 text-[9px] font-black uppercase gap-1"><Plus className="w-3 h-3" /> Adicionar</Button>
                     </div>
-
                     <div className="space-y-4">
                       {customSections.map((section: CustomSection) => (
                         <Card key={section.id} className="border bg-muted/5 overflow-hidden">
@@ -440,32 +438,15 @@ const PublicPageSettings = ({
                                  <AccordionTrigger className="hover:no-underline py-1 flex-1">
                                    <span className="text-[10px] font-black uppercase truncate">{section.title}</span>
                                  </AccordionTrigger>
-                                 <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => removeSection(section.id)}>
-                                   <Trash2 className="w-3.5 h-3.5" />
-                                 </Button>
+                                 <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => removeSection(section.id)}><Trash2 className="w-3.5 h-3.5" /></Button>
                               </div>
                               <AccordionContent className="p-3 space-y-4 pb-4">
-                                <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50">Título Bloco</Label>
-                                  <Input value={section.title} onChange={(e) => updateSection(section.id, 'title', e.target.value)} className="h-8 text-[11px]" />
-                                </div>
-                                <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50">Subtítulo Bloco</Label>
-                                  <RichTextEditor value={section.subtitle} allowColor={isGoldPlan} onChange={(val) => updateSection(section.id, 'subtitle', val)} className="min-h-[50px]" />
-                                </div>
-                                <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50">Conteúdo</Label>
-                                  <Textarea value={section.content} onChange={(e) => updateSection(section.id, 'content', e.target.value)} className="text-[11px] min-h-[60px]" />
-                                </div>
+                                <div className="space-y-1.5"><Label className="text-[9px] font-bold uppercase opacity-50">Título</Label><Input value={section.title} onChange={(e) => updateSection(section.id, 'title', e.target.value)} className="h-8 text-[11px]" /></div>
+                                <div className="space-y-1.5"><Label className="text-[9px] font-bold uppercase opacity-50">Subtítulo</Label><RichTextEditor value={section.subtitle} allowColor={isGoldPlan} onChange={(val) => updateSection(section.id, 'subtitle', val)} className="min-h-[50px]" /></div>
+                                <div className="space-y-1.5"><Label className="text-[9px] font-bold uppercase opacity-50">Conteúdo</Label><Textarea value={section.content} onChange={(e) => updateSection(section.id, 'content', e.target.value)} className="text-[11px] min-h-[60px]" /></div>
                                 <div className="grid grid-cols-2 gap-2">
-                                  <div className="space-y-1.5">
-                                    <Label className="text-[9px] font-bold uppercase opacity-50">Texto Botão</Label>
-                                    <Input value={section.buttonText} onChange={(e) => updateSection(section.id, 'buttonText', e.target.value)} className="h-8 text-[11px]" />
-                                  </div>
-                                  <div className="space-y-1.5">
-                                    <Label className="text-[9px] font-bold uppercase opacity-50">Link Botão</Label>
-                                    <Input value={section.buttonUrl} onChange={(e) => updateSection(section.id, 'buttonUrl', e.target.value)} className="h-8 text-[11px]" />
-                                  </div>
+                                  <div className="space-y-1.5"><Label className="text-[9px] font-bold uppercase opacity-50">Texto Botão</Label><Input value={section.buttonText} onChange={(e) => updateSection(section.id, 'buttonText', e.target.value)} className="h-8 text-[11px]" /></div>
+                                  <div className="space-y-1.5"><Label className="text-[9px] font-bold uppercase opacity-50">Link Botão</Label><Input value={section.buttonUrl} onChange={(e) => updateSection(section.id, 'buttonUrl', e.target.value)} className="h-8 text-[11px]" /></div>
                                 </div>
                               </AccordionContent>
                             </AccordionItem>
@@ -483,12 +464,8 @@ const PublicPageSettings = ({
                         <Input value={footerText} onChange={(e) => setFooterText(e.target.value)} className="h-10 text-xs font-medium pl-7" />
                       </div>
                     </div>
-
                     <div className={cn("flex items-center justify-between p-3 bg-muted/10 rounded-xl", !isGoldPlan && "opacity-50 grayscale")}>
-                      <div className="space-y-0.5">
-                        <Label className="text-[11px] font-bold">Marca Proova</Label>
-                        <p className="text-[9px] text-muted-foreground">Exibir "Powered by Proova"</p>
-                      </div>
+                      <div className="space-y-0.5"><Label className="text-[11px] font-bold">Marca Proova</Label><p className="text-[9px] text-muted-foreground">Exibir "Powered by Proova"</p></div>
                       <Switch checked={showLogo} onCheckedChange={setShowLogo} disabled={!isGoldPlan} />
                     </div>
                   </div>
@@ -530,16 +507,10 @@ const PublicPageSettings = ({
 
             <TabsContent value="social" className="mt-0 space-y-6">
               <div className="space-y-4">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 ml-1">
-                  <Globe className="w-3 h-3" /> Link Único (Bio)
-                </Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 ml-1"><Globe className="w-3 h-3" /> Link Único (Bio)</Label>
                 <div className="flex items-center gap-1 bg-muted/20 rounded-xl px-3 border border-transparent focus-within:border-primary/20 transition-all">
                   <span className="text-[10px] font-bold opacity-40">/pp/</span>
-                  <input 
-                    value={currentSlug} 
-                    onChange={(e) => setSlugEdit(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/\s+/g, '-'))} 
-                    className="h-10 flex-1 bg-transparent border-none focus:ring-0 text-xs font-mono font-bold"
-                  />
+                  <input value={currentSlug} onChange={(e) => setSlugEdit(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/\s+/g, '-'))} className="h-10 flex-1 bg-transparent border-none focus:ring-0 text-xs font-mono font-bold" />
                 </div>
               </div>
             </TabsContent>
@@ -637,19 +608,16 @@ export default function PPEditorPage() {
   const handleSave = async () => {
     if (!user || !db || !userData) return;
     setIsSaving(true);
-
     const oldSlug = userData.companySlug;
     const newSlug = slugEdit.trim().toLowerCase();
     const isSlugChanging = newSlug !== oldSlug;
 
     try {
       const batch = writeBatch(db);
-
       if (isSlugChanging) {
         if (!newSlug) throw new Error("Link vazio.");
         const slugCheck = await getDoc(doc(db, 'slugs', newSlug));
         if (slugCheck.exists()) throw new Error("Link em uso.");
-
         batch.set(doc(db, 'slugs', newSlug), { userId: user.uid, type: 'pp', createdAt: serverTimestamp() });
         if (oldSlug) {
           batch.delete(doc(db, 'slugs', oldSlug));
@@ -657,27 +625,15 @@ export default function PPEditorPage() {
         }
         batch.update(doc(db, 'users', user.uid), { companySlug: newSlug });
       }
-
       const targetSlug = isSlugChanging ? newSlug : oldSlug;
       const targetPPRef = doc(db, 'users', user.uid, 'pp', targetSlug);
-
-      const configData = {
+      batch.set(targetPPRef, {
         selectedTestimonialIds: selectedIds,
-        themeColor,
-        secondaryColor,
-        layout,
-        logoUrl,
-        heroTitle,
-        heroSubtitle,
-        footerText,
-        showLogo,
+        themeColor, secondaryColor, layout, logoUrl, heroTitle, heroSubtitle, footerText, showLogo,
         customSections: customSections || [],
         updatedAt: serverTimestamp()
-      };
-
-      batch.set(targetPPRef, configData, { merge: true });
+      }, { merge: true });
       await batch.commit();
-      
       if (isSlugChanging) setActiveSlug(newSlug);
       toast({ title: "Configuração Salva!" });
     } catch (err: any) {
@@ -691,38 +647,26 @@ export default function PPEditorPage() {
     const file = e.target.files?.[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.addEventListener('load', () => {
-      setTempImage(reader.result as string);
-      setCropType(type);
-    });
+    reader.addEventListener('load', () => { setTempImage(reader.result as string); setCropType(type); });
     reader.readAsDataURL(file);
   };
 
   const handleConfirmCrop = async () => {
     if (!tempImage || !cropType || !user || !storage || !croppedAreaPixels || !activeSlug) return;
-    setIsUploading(true);
-    setTempImage(null);
+    setIsUploading(true); setTempImage(null);
     try {
       const croppedBlob = await getCroppedImg(tempImage, croppedAreaPixels, cropType);
       const storageRef = ref(storage, `users/${user.uid}/pp/${activeSlug}/${cropType}_${Date.now()}.jpg`);
       await uploadBytes(storageRef, croppedBlob);
       const url = await getDownloadURL(storageRef);
       setLogoUrl(url);
-    } catch (err) {
-      toast({ variant: "destructive", title: "Erro no upload" });
-    } finally {
-      setIsUploading(false);
-      setCropType(null);
-    }
+    } catch (err) { toast({ variant: "destructive", title: "Erro no upload" }); } finally { setIsUploading(false); setCropType(null); }
   };
 
   const toggleSelection = (id: string) => {
     setSelectedIds(prev => {
       const isRemoving = prev.includes(id);
-      if (!isRemoving && prev.length >= SELECTION_LIMIT) {
-        toast({ variant: "destructive", title: "Limite atingido" });
-        return prev;
-      }
+      if (!isRemoving && prev.length >= SELECTION_LIMIT) { toast({ variant: "destructive", title: "Limite atingido" }); return prev; }
       return isRemoving ? prev.filter(i => i !== id) : [...prev, id];
     });
   };
@@ -736,271 +680,180 @@ export default function PPEditorPage() {
     return currentSelection;
   }, [currentSelection, layout, muralIndex]);
 
-  if (authLoading || userDataLoading || testimonialsLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-muted/30">
-        <Loader2 className="animate-spin h-10 w-10 text-primary mx-auto" />
-      </div>
-    );
-  }
+  if (authLoading || userDataLoading || testimonialsLoading) return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body w-full overflow-hidden text-foreground">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center gap-2 md:gap-3 flex-1">
+        <div className="flex items-center gap-3 flex-1">
           <Link href="/dash">
-            <Button variant="ghost" size="sm" className="h-10 px-2 gap-2 text-muted-foreground hover:text-primary transition-all rounded-xl border border-transparent hover:border-primary/10">
-               <ArrowLeft className="w-4 h-4" />
-               <span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Voltar</span>
+            <Button variant="ghost" size="sm" className="h-10 px-2 gap-2 text-muted-foreground hover:text-primary transition-all rounded-xl">
+               <ArrowLeft className="w-4 h-4" /><span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Voltar</span>
             </Button>
           </Link>
-          <div className="h-6 w-px bg-border mx-1 hidden sm:block" />
-          <div className="flex items-center group -ml-1 sm:-ml-2">
+          <div className="flex items-center group">
             <div className="relative w-[160px] h-[55px] md:w-[320px] md:h-[105px]">
               <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
               <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" priority />
             </div>
           </div>
         </div>
-
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <Button onClick={handleSave} disabled={isSaving || isUploading} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg transition-transform active:scale-95">
-            {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar
-          </Button>
-          
+          <Button onClick={handleSave} disabled={isSaving || isUploading} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg">{isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar</Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                className="h-10 md:h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all outline-none border-none ring-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 focus:bg-transparent data-[state=open]:bg-transparent active:bg-transparent shadow-none"
-              >
+              <Button variant="ghost" className="h-10 md:h-12 px-2 gap-2 rounded-xl focus:ring-0 focus-visible:ring-0 outline-none data-[state=open]:bg-transparent shadow-none">
                 <div className="hidden sm:flex flex-col items-end">
-                  <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
-                    {userData?.companyName || 'Minha Empresa'}
-                  </span>
-                  <span className={cn(
-                    "text-[8px] uppercase tracking-widest font-black leading-tight",
-                    isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground"
-                  )}>
-                    {isEnterprise ? 'Membro Enterprise' : (isGoldPlan ? 'Membro Gold' : 'Plano Base')}
-                  </span>
+                  <span className="text-xs font-bold truncate max-w-[120px]">{userData?.companyName}</span>
+                  <span className={cn("text-[8px] uppercase tracking-widest font-black", isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground")}>{isEnterprise ? 'Enterprise' : (isGoldPlan ? 'Gold' : 'Base')}</span>
                 </div>
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
-                  <User className="w-4 h-4" />
-                </div>
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20"><User className="w-4 h-4" /></div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
-              <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <TrendingUp className="mr-2 h-4 w-4 text-primary" />
-                <span>Dash</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Layout className="mr-2 h-4 w-4 text-primary" />
-                <span>Meus Murais</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Inbox className="mr-2 h-4 w-4 text-primary" />
-                <span>Inbox Privado</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Gem className="mr-2 h-4 w-4 text-primary" />
-                <span>Upgrade</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => router.push('/pricing')} 
-                className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
-              >
-                <Handshake className="mr-2 h-4 w-4 text-primary" />
-                <span>Serviços de Parceiros</span>
-                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                {theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}
-                <span>Alternar Tema</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sair</span>
-              </DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl bg-background border">
+              <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-widest text-muted-foreground">Minha Conta</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold"><TrendingUp className="mr-2 h-4 w-4 text-primary" />Dash</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl font-bold"><Gem className="mr-2 h-4 w-4 text-primary" />Upgrade</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl font-bold">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}Tema</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive font-bold"><LogOut className="mr-2 h-4 w-4" />Sair</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </header>
 
       <main className="flex-1 flex overflow-hidden relative w-full flex-row">
-        <aside className="hidden lg:flex w-80 bg-background border-r flex-col shrink-0 h-full">
-          <PublicPageSettings 
-            themeColor={themeColor} setThemeColor={setThemeColor} 
-            secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
-            layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
-            heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
-            footerText={footerText} setFooterText={setFooterText}
-            showLogo={showLogo} setShowLogo={setShowLogo} customSections={customSections} setCustomSections={setCustomSections}
-            onFileSelect={onFileSelect} isUploading={isUploading} handleSave={handleSave} isSaving={isSaving} isGoldPlan={isGoldPlan}
-            logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
-          />
-        </aside>
+        <Sheet>
+          <aside className="hidden lg:flex w-80 bg-background border-r flex-col shrink-0 h-full">
+            <PublicPageSettings 
+              themeColor={themeColor} setThemeColor={setThemeColor} secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
+              layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
+              heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
+              footerText={footerText} setFooterText={setFooterText} showLogo={showLogo} setShowLogo={setShowLogo}
+              customSections={customSections} setCustomSections={setCustomSections} onFileSelect={onFileSelect}
+              isUploading={isUploading} handleSave={handleSave} isSaving={isSaving} isGoldPlan={isGoldPlan}
+              logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
+            />
+          </aside>
 
-        <div className="flex-1 overflow-y-auto bg-muted/10 p-4 sm:p-8">
-          <div className="max-w-5xl mx-auto space-y-8 pb-32">
-            <div className="flex items-center justify-between">
-              <Sheet>
+          <div className="flex-1 overflow-y-auto bg-muted/10 p-4 sm:p-8">
+            <div className="max-w-5xl mx-auto space-y-8 pb-32">
+              <div className="flex items-center justify-between">
                 <SheetTrigger asChild>
                   <button className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 hover:text-primary transition-colors animate-pulse outline-none">
                     <Monitor className="w-4 h-4" /> EDITAR
                   </button>
                 </SheetTrigger>
-                <SheetContent side="left" className="p-0 w-80 border-none">
-                   <SheetHeader className="sr-only">
-                    <SheetTitle>Configurações</SheetTitle>
-                    <SheetDescription>Ajuste sua página.</SheetDescription>
-                  </SheetHeader>
-                   <PublicPageSettings 
-                    themeColor={themeColor} setThemeColor={setThemeColor} 
-                    secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
-                    layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
-                    heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
-                    footerText={footerText} setFooterText={setFooterText}
-                    showLogo={showLogo} setShowLogo={setShowLogo} customSections={customSections} setCustomSections={setCustomSections}
-                    onFileSelect={onFileSelect} isUploading={isUploading} handleSave={handleSave} isSaving={isSaving} isGoldPlan={isGoldPlan}
-                    logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
-                  />
-                </SheetContent>
-              </Sheet>
-
-              <div className="flex items-center gap-2 bg-background border px-3 py-1 rounded-full shadow-sm">
-                 <span className="text-[10px] font-bold opacity-50 uppercase">Link:</span>
-                 <span className="text-[10px] font-mono font-black text-primary">/pp/{activeSlug}</span>
+                <div className="flex items-center gap-2 bg-background border px-3 py-1 rounded-full shadow-sm">
+                   <span className="text-[10px] font-bold opacity-50 uppercase">Link:</span>
+                   <span className="text-[10px] font-mono font-black text-primary">/pp/{activeSlug}</span>
+                </div>
               </div>
-            </div>
 
-            <div className="relative bg-background rounded-[2.5rem] shadow-2xl min-h-[600px] flex flex-col overflow-hidden ring-1 ring-primary/5">
-              <div className="flex-1 flex flex-col pt-24 pb-12">
-                <div className="px-8 sm:px-12 text-center space-y-6 mb-12">
-                  {logoUrl && (
-                    <div className="mx-auto w-20 h-20 relative">
-                      <img src={logoUrl} className="w-full h-full object-cover rounded-[2.5rem] shadow-lg border-2 border-background" alt="Logo" />
-                    </div>
-                  )}
-                  <div className="space-y-4">
-                    <h1 className="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] max-w-4xl mx-auto text-foreground" dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${userData?.companyName}` }} />
-                    {heroSubtitle && (
-                      <div className="text-foreground text-sm font-bold max-w-2xl mx-auto italic leading-relaxed" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />
-                    )}
-                  </div>
-                </div>
-
-                <div className="w-full mb-12">
-                  {customSections.map((section: CustomSection) => (
-                    <div 
-                      key={section.id} 
-                      className={cn(
-                        "py-16 px-8 sm:px-12 text-center space-y-4 mb-12",
-                        section.variant === 'accent' ? "text-white" : (section.variant === 'dark' ? "bg-black text-white" : "bg-muted/5")
-                      )}
-                      style={{ backgroundColor: section.variant === 'accent' ? themeColor : undefined }}
-                    >
-                      <div className="max-w-3xl mx-auto space-y-4">
-                        <h2 className="text-2xl sm:text-4xl font-black tracking-tight">{section.title}</h2>
-                        {section.subtitle && <div className="text-[11px] font-bold leading-relaxed" dangerouslySetInnerHTML={{ __html: section.subtitle }} />}
-                        <p className="text-xs sm:text-sm leading-relaxed opacity-90 font-medium">{section.content}</p>
-                        {section.buttonText && (
-                          <div className="pt-4">
-                            <Button className={cn("h-11 px-8 rounded-xl font-bold shadow-lg", section.variant === 'accent' ? "bg-white text-black" : "")} style={{ backgroundColor: section.variant !== 'accent' ? themeColor : undefined }}>
-                              {section.buttonText} <ArrowRight className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        )}
+              <div className="relative bg-background rounded-[2.5rem] shadow-2xl min-h-[600px] flex flex-col overflow-hidden ring-1 ring-primary/5">
+                <div className="flex-1 flex flex-col pt-24 pb-12">
+                  <div className="px-8 sm:px-12 text-center space-y-6 mb-12">
+                    {logoUrl && (
+                      <div className="mx-auto w-20 h-20 relative">
+                        <img src={logoUrl} className="w-full h-full object-cover rounded-[2.5rem] shadow-lg border-2 border-background" alt="Logo" />
                       </div>
+                    )}
+                    <div className="space-y-4">
+                      <h1 className="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] max-w-4xl mx-auto text-foreground" dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${userData?.companyName}` }} />
+                      {heroSubtitle && <div className="text-foreground text-sm font-bold max-w-2xl mx-auto italic leading-relaxed" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />}
                     </div>
-                  ))}
-                </div>
+                  </div>
 
-                <div className={cn(
-                  "px-4 sm:px-12 w-full max-w-[1400px] mx-auto py-12",
-                  layout === 'popup' ? "max-w-sm mx-auto flex flex-col gap-12" : (
-                    layout === 'mural' 
-                      ? "columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-12" 
-                      : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12"
-                  )
-                )}>
-                  {visibleTestimonialsPreview.length > 0 ? (
-                    visibleTestimonialsPreview.map((t, i) => (
+                  <div className="w-full mb-12">
+                    {customSections.map((section: CustomSection) => (
+                      <div key={section.id} className={cn("py-16 px-8 sm:px-12 text-center space-y-4 mb-12", section.variant === 'accent' ? "text-white" : (section.variant === 'dark' ? "bg-black text-white" : "bg-muted/5"))} style={{ backgroundColor: section.variant === 'accent' ? themeColor : undefined }}>
+                        <div className="max-w-3xl mx-auto space-y-4">
+                          <h2 className="text-2xl sm:text-4xl font-black tracking-tight">{section.title}</h2>
+                          {section.subtitle && <div className="text-[11px] font-bold leading-relaxed" dangerouslySetInnerHTML={{ __html: section.subtitle }} />}
+                          <p className="text-xs sm:text-sm leading-relaxed opacity-90 font-medium">{section.content}</p>
+                          {section.buttonText && <div className="pt-4"><Button className={cn("h-11 px-8 rounded-xl font-bold shadow-lg", section.variant === 'accent' ? "bg-white text-black" : "")} style={{ backgroundColor: section.variant !== 'accent' ? themeColor : undefined }}>{section.buttonText} <ArrowRight className="w-4 h-4" /></Button></div>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className={cn(
+                    "px-6 sm:px-12 w-full max-w-[1400px] mx-auto py-12 pb-32",
+                    layout === 'popup' ? "max-w-sm mx-auto flex flex-col gap-12" : (
+                      layout === 'mural' 
+                        ? "columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-12" 
+                        : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12"
+                    )
+                  )}>
+                    {visibleTestimonialsPreview.length > 0 ? visibleTestimonialsPreview.map((t, i) => (
                       <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12 break-inside-avoid">
                         <TestimonialCard t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} />
                       </div>
-                    ))
-                  ) : (
-                    <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos abaixo.</div>
-                  )}
-                </div>
+                    )) : <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos abaixo.</div>}
+                  </div>
 
-                <div className="mt-auto pt-16 px-8 text-center space-y-2 opacity-50">
-                  <p className="text-[9px] font-black uppercase tracking-widest">© {footerText || `${new Date().getFullYear()} ${userData?.companyName}`}</p>
-                  {showLogo && <span className="text-[7px] font-black tracking-[0.2em]">POWERED BY PROOVA</span>}
+                  <div className="mt-auto pt-16 px-8 text-center space-y-2 opacity-50">
+                    <p className="text-[9px] font-black uppercase tracking-widest">© {footerText || `${new Date().getFullYear()} ${userData?.companyName}`}</p>
+                    {showLogo && <span className="text-[7px] font-black tracking-[0.2em]">POWERED BY PROOVA</span>}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="pt-12 border-t">
-              <Accordion type="single" collapsible className="w-full">
-                <AccordionItem value="selection" className="border-none">
-                  <AccordionTrigger className="hover:no-underline py-0 group">
-                    <div className="flex items-center justify-between w-full pr-6">
-                      <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 group-hover:text-primary transition-colors">
-                        <MessageSquare className="w-4 h-4" /> Depoimentos Aprovados ({approvedTestimonials?.length || 0})
-                      </h2>
-                      <Badge variant="outline" className="text-[9px] h-5 font-black uppercase">
-                        {selectedIds.length} / {isEnterprise ? '∞' : SELECTION_LIMIT} ATIVOS
-                      </Badge>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="pt-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                      {approvedTestimonials?.map((t: any) => {
-                        const isSelected = selectedIds.includes(t.id);
-                        return (
-                          <div key={t.id} onClick={() => toggleSelection(t.id)} className={cn("cursor-pointer transition-all rounded-xl border-2 p-4 bg-background group", isSelected ? "border-primary bg-primary/5" : "border-transparent shadow-sm hover:border-primary/20")}>
-                            <div className="flex items-start gap-3">
-                              <div className={cn("mt-1 w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors", isSelected ? "bg-primary border-primary" : "border-muted-foreground/30")}>
-                                {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <span className="font-bold text-[11px] block truncate group-hover:text-primary transition-colors">{t.userName}</span>
-                                {t.text && t.text !== '(Depoimento em Vídeo)' && <p className="text-[10px] text-muted-foreground italic line-clamp-1 mt-1">"{t.text}"</p>}
+              <div className="pt-12 border-t">
+                <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="selection" className="border-none">
+                    <AccordionTrigger className="hover:no-underline py-0 group">
+                      <div className="flex items-center justify-between w-full pr-6">
+                        <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 group-hover:text-primary transition-colors"><MessageSquare className="w-4 h-4" /> Depoimentos Aprovados ({approvedTestimonials?.length || 0})</h2>
+                        <Badge variant="outline" className="text-[9px] h-5 font-black uppercase">{selectedIds.length} / {isEnterprise ? '∞' : SELECTION_LIMIT} ATIVOS</Badge>
+                      </div>
+                    </AccordionTrigger>
+                    <AccordionContent className="pt-6">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                        {approvedTestimonials?.map((t: any) => {
+                          const isSelected = selectedIds.includes(t.id);
+                          return (
+                            <div key={t.id} onClick={() => toggleSelection(t.id)} className={cn("cursor-pointer transition-all rounded-xl border-2 p-4 bg-background group", isSelected ? "border-primary bg-primary/5" : "border-transparent shadow-sm hover:border-primary/20")}>
+                              <div className="flex items-start gap-3">
+                                <div className={cn("mt-1 w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors", isSelected ? "bg-primary border-primary" : "border-muted-foreground/30")}>{isSelected && <Check className="w-2.5 h-2.5 text-white" />}</div>
+                                <div className="flex-1 min-w-0">
+                                  <span className="font-bold text-[11px] block truncate group-hover:text-primary transition-colors">{t.userName}</span>
+                                  {t.text && t.text !== '(Depoimento em Vídeo)' && <p className="text-[10px] text-muted-foreground italic line-clamp-1 mt-1">"{t.text}"</p>}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
+                          );
+                        })}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
             </div>
           </div>
-        </div>
+          <SheetContent side="left" className="p-0 w-80 border-none">
+            <SheetHeader className="sr-only"><SheetTitle>Configurações</SheetTitle><SheetDescription>Ajuste sua página.</SheetDescription></SheetHeader>
+             <PublicPageSettings 
+              themeColor={themeColor} setThemeColor={setThemeColor} secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
+              layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
+              heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
+              footerText={footerText} setFooterText={setFooterText} showLogo={showLogo} setShowLogo={setShowLogo}
+              customSections={customSections} setCustomSections={setCustomSections} onFileSelect={onFileSelect}
+              isUploading={isUploading} handleSave={handleSave} isSaving={isSaving} isGoldPlan={isGoldPlan}
+              logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
+            />
+          </SheetContent>
+        </Sheet>
       </main>
 
       <Dialog open={!!tempImage} onOpenChange={(open) => !open && setTempImage(null)}>
         <DialogContent className="sm:max-w-2xl h-[70vh] flex flex-col p-0 overflow-hidden rounded-3xl border-none">
-          <DialogHeader className="p-6 bg-background border-b shrink-0">
-            <DialogTitle>Recortar Logo</DialogTitle>
-          </DialogHeader>
-          <div className="flex-1 relative bg-black">
-            {tempImage && <Cropper image={tempImage} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onCropComplete={(a, p) => setCroppedAreaPixels(p)} onZoomChange={setZoom} />}
-          </div>
+          <DialogHeader className="p-6 bg-background border-b shrink-0"><DialogTitle>Recortar Logo</DialogTitle></DialogHeader>
+          <div className="flex-1 relative bg-black">{tempImage && <Cropper image={tempImage} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onCropComplete={(a, p) => setCroppedAreaPixels(p)} onZoomChange={setZoom} />}</div>
           <div className="p-6 border-t bg-background shrink-0 space-y-6">
             <Slider value={[zoom]} min={1} max={3} step={0.1} onValueChange={(vals) => setZoom(vals[0])} />
-            <DialogFooter className="gap-2">
-              <Button variant="outline" onClick={() => setTempImage(null)}>Cancelar</Button>
-              <Button onClick={handleConfirmCrop} className="font-bold">Salvar Logo</Button>
-            </DialogFooter>
+            <DialogFooter className="gap-2"><Button variant="outline" onClick={() => setTempImage(null)}>Cancelar</Button><Button onClick={handleConfirmCrop} className="font-bold">Salvar Logo</Button></DialogFooter>
           </div>
         </DialogContent>
       </Dialog>
@@ -1009,14 +862,10 @@ export default function PPEditorPage() {
 }
 
 async function getCroppedImg(imageSrc: string, pixelCrop: any, type: string): Promise<Blob> {
-  const image = new (window as any).Image();
-  image.src = imageSrc;
+  const image = new (window as any).Image(); image.src = imageSrc;
   await new Promise((resolve) => (image.onload = resolve));
-  const canvas = document.createElement('canvas');
-  canvas.width = pixelCrop.width;
-  canvas.height = pixelCrop.height;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error();
+  const canvas = document.createElement('canvas'); canvas.width = pixelCrop.width; canvas.height = pixelCrop.height;
+  const ctx = canvas.getContext('2d'); if (!ctx) throw new Error();
   ctx.drawImage(image, pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height, 0, 0, pixelCrop.width, pixelCrop.height);
   return new Promise((resolve) => canvas.toBlob((blob) => resolve(blob!), 'image/jpeg', 0.9));
 }
