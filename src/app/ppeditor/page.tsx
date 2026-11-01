@@ -34,7 +34,8 @@ import {
   Sparkles,
   Pipette,
   Clock,
-  ChevronDown
+  ChevronDown,
+  Handshake
 } from 'lucide-react';
 import { 
   Sheet, 
