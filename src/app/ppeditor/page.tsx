@@ -107,9 +107,9 @@ interface CustomSection {
 }
 
 /**
- * RichTextEditor - Editor de texto rico com seletor RGB e estabilidade de cursor para mobile.
+ * RichTextEditor - Editor de texto rico com seletor RGB e estabilidade de cursor.
  */
-const RichTextEditor = ({ value, onChange, placeholder, themeColor }: { value: string, onChange: (val: string) => void, placeholder?: string, themeColor: string }) => {
+const RichTextEditor = ({ value, onChange, placeholder, className }: { value: string, onChange: (val: string) => void, placeholder?: string, className?: string }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const colorInputRef = useRef<HTMLInputElement>(null);
   const [showToolbar, setShowToolbar] = useState(false);
@@ -130,7 +130,6 @@ const RichTextEditor = ({ value, onChange, placeholder, themeColor }: { value: s
       try {
         const range = selection.getRangeAt(0);
         const rect = range.getBoundingClientRect();
-        
         setToolbarPos({
           top: rect.top + window.scrollY - 65,
           left: rect.left + rect.width / 2
@@ -184,24 +183,16 @@ const RichTextEditor = ({ value, onChange, placeholder, themeColor }: { value: s
           style={{ top: toolbarPos.top, left: toolbarPos.left }}
         >
           <button 
-            title="Escolher Cor RGB"
+            title="Cor RGB"
             className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/10 hover:bg-primary transition-all group"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              colorInputRef.current?.click();
-            }}
+            onMouseDown={(e) => { e.preventDefault(); colorInputRef.current?.click(); }}
           >
             <Pipette className="w-5 h-5 text-white group-hover:text-black" />
           </button>
-          
           <div className="w-px h-6 bg-white/10 mx-1" />
-          
           <button 
              className="h-10 px-4 rounded-xl font-black text-[10px] uppercase tracking-widest text-white hover:bg-white/10 transition-colors"
-             onMouseDown={(e) => {
-                e.preventDefault();
-                clearFormat();
-             }}
+             onMouseDown={(e) => { e.preventDefault(); clearFormat(); }}
           >
             Limpar
           </button>
@@ -212,25 +203,18 @@ const RichTextEditor = ({ value, onChange, placeholder, themeColor }: { value: s
         ref={editorRef}
         contentEditable
         suppressContentEditableWarning
-        style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'text' } as any}
-        onContextMenu={(e) => {
-          const selection = window.getSelection();
-          if (selection && selection.toString().length > 0) {
-            e.preventDefault();
-          }
-        }}
         onInput={handleInput}
         onFocus={() => setIsFocused(true)}
-        onBlur={() => {
-          setIsFocused(false);
-          setShowToolbar(false);
-        }}
+        onBlur={() => { setIsFocused(false); setShowToolbar(false); }}
         onSelect={handleSelection}
-        className="min-h-[100px] p-6 rounded-[1.5rem] bg-muted/20 border-2 border-transparent focus:border-primary/30 outline-none text-sm font-bold leading-relaxed transition-all cursor-text shadow-inner"
+        className={cn(
+          "min-h-[100px] p-4 rounded-2xl bg-muted/20 border-2 border-transparent focus:border-primary/30 outline-none text-sm font-bold leading-relaxed transition-all cursor-text shadow-inner",
+          className
+        )}
       />
       
       {!value && !isFocused && (
-        <p className="absolute top-6 left-6 text-muted-foreground opacity-40 pointer-events-none text-sm font-medium italic">
+        <p className="absolute top-4 left-4 text-muted-foreground opacity-40 pointer-events-none text-xs font-medium italic">
           {placeholder || 'Digite algo...'}
         </p>
       )}
@@ -240,7 +224,6 @@ const RichTextEditor = ({ value, onChange, placeholder, themeColor }: { value: s
 
 const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0 }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number }) => {
   const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
-  
   return (
     <Card 
       key={`${t.id}-${muralIndex}`}
@@ -298,44 +281,35 @@ const PublicPageSettings = ({
   logoInputRef,
   currentSlug, setSlugEdit
 }: any) => {
-  const colors = Array.from(new Set(['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff']));
-
-  const presets = [
-    { name: 'Classic', primary: '#f97316', secondary: '#ffffff' },
-    { name: 'Midnight', primary: '#D4AF37', secondary: '#000000' },
-    { name: 'Ocean', primary: '#3b82f6', secondary: '#f8fafc' },
-    { name: 'Forest', primary: '#10b981', secondary: '#064e3b' },
-  ];
+  const colors = ['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff'];
 
   const applyPreset = (p: any) => {
     setThemeColor(p.primary);
-    if (isGoldPlan) {
-      setSecondaryColor(p.secondary);
-    }
+    if (isGoldPlan) setSecondaryColor(p.secondary);
     toast({ title: `Tema ${p.name} aplicado!` });
   };
 
   const addSection = () => {
-    const newSection: CustomSection = {
-      id: Math.random().toString(36).substr(2, 9),
-      title: 'Nova Seção de Destaque',
-      subtitle: 'Chamada secundária persuasiva',
-      content: 'Conte aqui um pouco mais sobre seu diferencial ou uma oferta especial para seu cliente.',
-      buttonText: 'Saiba Mais',
-      buttonUrl: '',
-      variant: 'light'
-    };
-    setCustomSections([...customSections, newSection]);
+    setCustomSections((prev: CustomSection[]) => [
+      ...prev,
+      {
+        id: Math.random().toString(36).substr(2, 9),
+        title: 'Nova Seção de Destaque',
+        subtitle: 'Subtítulo complementar',
+        content: 'Conteúdo descritivo aqui...',
+        buttonText: 'Saiba Mais',
+        buttonUrl: '',
+        variant: 'light'
+      }
+    ]);
   };
 
   const removeSection = (id: string) => {
-    setCustomSections(customSections.filter((s: CustomSection) => s.id !== id));
+    setCustomSections((prev: CustomSection[]) => prev.filter(s => s.id !== id));
   };
 
   const updateSection = (id: string, field: keyof CustomSection, value: string) => {
-    setCustomSections(customSections.map((s: CustomSection) => 
-      s.id === id ? { ...s, [field]: value } : s
-    ));
+    setCustomSections((prev: CustomSection[]) => prev.map(s => s.id === id ? { ...s, [field]: value } : s));
   };
 
   return (
@@ -347,9 +321,9 @@ const PublicPageSettings = ({
             <span className="text-xs font-black uppercase tracking-[0.2em]">Voltar ao Dash</span>
           </Button>
         </Link>
-        <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground">
+        <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm">
           {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
-          Salvar Página Pública
+          Salvar Alterações
         </Button>
       </div>
 
@@ -359,153 +333,91 @@ const PublicPageSettings = ({
           <TabsTrigger value="conteudo" className="text-xs flex items-center gap-1.5">
             Conteúdo {!isEnterprise && <Lock className="w-2.5 h-2.5 opacity-40" />}
           </TabsTrigger>
-          <TabsTrigger value="design" className="text-xs">Layout</TabsTrigger>
-          <TabsTrigger value="social" className="text-xs">Identidade</TabsTrigger>
+          <TabsTrigger value="design" className="text-xs">Design</TabsTrigger>
+          <TabsTrigger value="social" className="text-xs">Bio</TabsTrigger>
         </TabsList>
         
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-8 pb-10">
             <TabsContent value="geral" className="mt-0 space-y-8">
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Logotipo Empresa</Label>
-                  {logoUrl && (
-                    <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => setLogoUrl('')}>
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  )}
-                </div>
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Logo Marca</Label>
                 <div 
                   onClick={() => !isUploading && logoInputRef.current?.click()}
-                  className="aspect-square w-24 border-2 border-dashed rounded-2xl flex items-center justify-center bg-muted/20 overflow-hidden relative group mx-auto cursor-pointer"
+                  className="aspect-square w-24 border-2 border-dashed rounded-2xl flex items-center justify-center bg-muted/20 overflow-hidden mx-auto cursor-pointer"
                 >
-                  {isUploading ? <Loader2 className="animate-spin text-primary" /> : (logoUrl ? <img src={logoUrl} className="w-full h-full object-cover rounded-xl" alt="Logo" /> : <Upload className="text-muted-foreground" />)}
+                  {isUploading ? <Loader2 className="animate-spin text-primary" /> : (logoUrl ? <img src={logoUrl} className="w-full h-full object-cover rounded-xl" /> : <Upload className="text-muted-foreground" />)}
                 </div>
                 <input type="file" ref={logoInputRef} className="hidden" accept="image/*" onChange={(e) => onFileSelect(e, 'logo')} />
               </div>
 
-              <div className="space-y-4 pt-4 border-t">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                  <Sparkles className="w-3 h-3 text-primary" /> Estilos Rápidos (Presets)
+              <div className="space-y-6 pt-4 border-t">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 ml-1">
+                  <Palette className="w-3 h-3 text-primary" /> Cor Principal
                 </Label>
-                <div className="grid grid-cols-2 gap-2">
-                  {presets.map((p) => (
-                    <Button 
-                      key={p.name}
-                      variant="outline"
-                      className="h-10 text-[10px] font-black uppercase tracking-widest rounded-xl border-muted-foreground/10 hover:border-primary transition-all p-0 overflow-hidden relative group"
-                      onClick={() => applyPreset(p)}
-                    >
-                      <div className="absolute inset-0 flex">
-                        <div className="flex-1" style={{ backgroundColor: p.primary }} />
-                        <div className="flex-1" style={{ backgroundColor: p.secondary }} />
-                      </div>
-                      <span className="relative z-10 bg-background/80 px-2 py-0.5 rounded-full shadow-sm border border-border group-hover:bg-background transition-colors">{p.name}</span>
-                    </Button>
+                <div className="flex flex-wrap gap-2">
+                  {colors.map((color) => (
+                    <button key={color} onClick={() => setThemeColor(color)} className={cn("w-7 h-7 rounded-full border-2", themeColor === color ? "border-foreground" : "border-transparent shadow-inner")} style={{ backgroundColor: color }} />
                   ))}
-                </div>
-              </div>
-
-              <div className="space-y-6 pt-4 border-t">
-                <div className="space-y-4">
-                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                    <Palette className="w-3 h-3 text-primary" /> Cor Principal
-                  </Label>
-                  <div className="flex flex-wrap gap-2">
-                    {colors.map((color) => (
-                      <button key={color} onClick={() => setThemeColor(color)} className={cn("w-7 h-7 rounded-full border-2 transition-transform", themeColor === color ? "border-foreground scale-110 shadow-sm" : "border-transparent opacity-80 shadow-inner")} style={{ backgroundColor: color }} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-6 pt-4 border-t">
-                <div className={cn("space-y-4", !isGoldPlan && "opacity-40 grayscale pointer-events-none")}>
-                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                    <Palette className="w-3 h-3 text-primary" /> Cor Secundária (Gold)
-                    {!isGoldPlan && <Lock className="w-2.5 h-2.5" />}
-                  </Label>
-                  <div className="flex flex-wrap gap-2">
-                    {colors.map((color) => (
-                      <button key={color} onClick={() => setSecondaryColor(color)} className={cn("w-7 h-7 rounded-full border-2 transition-transform", secondaryColor === color ? "border-foreground scale-110 shadow-sm" : "border-transparent opacity-80 shadow-inner")} style={{ backgroundColor: color }} />
-                    ))}
-                  </div>
                 </div>
               </div>
             </TabsContent>
 
-            <TabsContent value="conteudo" className="mt-0">
+            <TabsContent value="conteudo" className="mt-0 space-y-8">
               {isEnterprise ? (
                 <div className="space-y-8">
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                      <Type className="w-3 h-3 text-primary" /> Título Principal (Hero)
-                    </Label>
-                    <RichTextEditor value={heroTitle} onChange={setHeroTitle} themeColor={themeColor} placeholder="Ex: O que dizem sobre nós..." />
-                    <p className="text-[9px] text-primary font-bold italic bg-primary/5 p-2 rounded-lg border border-primary/10">
-                      💡 Selecione o texto para ativar o seletor de cores RGB.
-                    </p>
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Título Hero</Label>
+                    <RichTextEditor value={heroTitle} onChange={setHeroTitle} />
                   </div>
                   
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Subtítulo Hero</Label>
-                    <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} themeColor={themeColor} placeholder="Uma breve descrição impactante..." />
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Subtítulo Hero</Label>
+                    <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} className="min-h-[80px]" />
                   </div>
 
                   <div className="space-y-6 pt-6 border-t">
                     <div className="flex items-center justify-between">
-                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Seções Adicionais</Label>
-                      <Button variant="outline" size="sm" onClick={addSection} className="h-7 text-[10px] font-black uppercase gap-1 rounded-lg">
+                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Seções Customizadas</Label>
+                      <Button variant="outline" size="sm" onClick={addSection} className="h-7 text-[9px] font-black uppercase gap-1">
                         <Plus className="w-3 h-3" /> Adicionar
                       </Button>
                     </div>
 
                     <div className="space-y-4">
-                      {customSections.map((section: CustomSection, idx: number) => (
-                        <Card key={section.id} className="border shadow-sm overflow-hidden bg-muted/5">
+                      {customSections.map((section: CustomSection) => (
+                        <Card key={section.id} className="border bg-muted/5 overflow-hidden">
                           <Accordion type="single" collapsible>
                             <AccordionItem value="item-1" className="border-none">
-                              <div className="flex items-center justify-between px-3 py-2 border-b bg-muted/10">
-                                 <AccordionTrigger className="hover:no-underline py-0 flex-1">
-                                   <span className="text-[10px] font-black uppercase truncate pr-2">{section.title || `Seção ${idx + 1}`}</span>
+                              <div className="flex items-center justify-between px-3 py-1.5 border-b bg-muted/10">
+                                 <AccordionTrigger className="hover:no-underline py-1 flex-1">
+                                   <span className="text-[10px] font-black uppercase truncate">{section.title}</span>
                                  </AccordionTrigger>
-                                 <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive shrink-0" onClick={() => removeSection(section.id)}>
+                                 <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => removeSection(section.id)}>
                                    <Trash2 className="w-3.5 h-3.5" />
                                  </Button>
                               </div>
-                              <AccordionContent className="p-3 space-y-3 pb-4">
+                              <AccordionContent className="p-3 space-y-4 pb-4">
                                 <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50">Título</Label>
+                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Título do Bloco</Label>
                                   <Input value={section.title} onChange={(e) => updateSection(section.id, 'title', e.target.value)} className="h-8 text-[11px]" />
                                 </div>
                                 <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50">Subtítulo</Label>
-                                  <Input value={section.subtitle} onChange={(e) => updateSection(section.id, 'subtitle', e.target.value)} className="h-8 text-[11px]" />
+                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Subtítulo (RGB)</Label>
+                                  <RichTextEditor value={section.subtitle} onChange={(val) => updateSection(section.id, 'subtitle', val)} className="min-h-[60px] text-[11px]" />
                                 </div>
                                 <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50">Texto do Bloco</Label>
-                                  <Textarea value={section.content} onChange={(e) => updateSection(section.id, 'content', e.target.value)} className="text-[11px] min-h-[60px]" />
+                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Texto Principal</Label>
+                                  <Textarea value={section.content} onChange={(e) => updateSection(section.id, 'content', e.target.value)} className="text-[11px] min-h-[80px]" />
                                 </div>
-                                <div className="grid grid-cols-2 gap-2">
-                                  <div className="space-y-1.5">
-                                    <Label className="text-[9px] font-bold uppercase opacity-50">Texto Botão</Label>
-                                    <Input value={section.buttonText} onChange={(e) => updateSection(section.id, 'buttonText', e.target.value)} className="h-8 text-[11px]" />
-                                  </div>
-                                  <div className="space-y-1.5">
-                                    <Label className="text-[9px] font-bold uppercase opacity-50">Link Botão</Label>
-                                    <Input value={section.buttonUrl} onChange={(e) => updateSection(section.id, 'buttonUrl', e.target.value)} className="h-8 text-[11px]" />
-                                  </div>
-                                </div>
-                                <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50">Estilo do Bloco</Label>
+                                <div className="space-y-1.5 pt-2 border-t">
+                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Fundo da Seção</Label>
                                   <Select value={section.variant} onValueChange={(val) => updateSection(section.id, 'variant', val as any)}>
-                                    <SelectTrigger className="h-8 text-[11px]">
-                                      <SelectValue />
-                                    </SelectTrigger>
+                                    <SelectTrigger className="h-8 text-[10px]"><SelectValue /></SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="light">Fundo Claro</SelectItem>
-                                      <SelectItem value="dark">Fundo Escuro</SelectItem>
-                                      <SelectItem value="accent">Fundo Marca</SelectItem>
+                                      <SelectItem value="light">Claro</SelectItem>
+                                      <SelectItem value="dark">Escuro</SelectItem>
+                                      <SelectItem value="accent">Marca</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </div>
@@ -516,117 +428,58 @@ const PublicPageSettings = ({
                       ))}
                     </div>
                   </div>
-
-                  <div className="space-y-4 pt-4 border-t">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Título da Seção de Depoimentos</Label>
-                    <Input value={testimonialsTitle} onChange={(e) => setTestimonialsTitle(e.target.value)} placeholder="Ex: Experiência de quem confia" className="text-xs" />
-                  </div>
-
-                  <div className="space-y-4 pt-4 border-t">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Rodapé Copyright</Label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground select-none">©</span>
-                      <Input value={footerText} onChange={(e) => setFooterText(e.target.value)} placeholder="2026 Sua Empresa" className="text-xs pl-7 h-10" />
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 pt-4 border-t">
-                     <div className="flex items-center justify-between p-3 bg-muted/10 rounded-xl">
-                      <div className="space-y-0.5">
-                        <Label className="text-[11px] font-bold">Exibir Marca Proova</Label>
-                        <p className="text-[9px] text-muted-foreground">Ativar rodapé "Powered by Proova"</p>
-                      </div>
-                      <Switch checked={showLogo} onCheckedChange={setShowLogo} />
-                    </div>
-                  </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center py-12 px-4 text-center space-y-4 bg-primary/5 rounded-2xl m-2 border border-primary/10 border-dashed">
-                  <div className="bg-primary/10 p-3 rounded-full text-primary">
-                    <Gem className="w-8 h-8" />
-                  </div>
-                  <div className="space-y-2 px-2">
-                    <h3 className="text-sm font-black uppercase tracking-tight">Recurso Enterprise</h3>
-                    <p className="text-[10px] text-muted-foreground leading-relaxed max-w-[200px] mx-auto">
-                      A personalização total de textos e seções ilimitadas estão disponíveis apenas no plano <span className="font-bold text-primary">Enterprise</span>.
-                    </p>
-                  </div>
-                  <Button size="sm" className="h-9 px-6 font-bold text-[10px] uppercase tracking-widest rounded-xl shadow-lg" onClick={() => router.push('/pricing')}>Fazer Upgrade</Button>
+                <div className="py-12 px-4 text-center space-y-4 bg-primary/5 rounded-2xl m-2 border border-dashed border-primary/20">
+                  <Gem className="w-8 h-8 text-primary mx-auto" />
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground">Customização Enterprise</p>
+                  <Button size="sm" className="h-8 text-[9px] font-black" onClick={() => router.push('/pricing')}>Upgrade</Button>
                 </div>
               )}
             </TabsContent>
 
             <TabsContent value="design" className="mt-0 space-y-6">
-              <div className="space-y-4">
-                <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Estilo de Exibição</Label>
-                <div className="grid grid-cols-1 gap-2">
-                  {[
-                    { id: 'grid', icon: Layout, label: 'Grade Estática', isGold: false },
-                    { id: 'mural', icon: LayoutGrid, label: 'Mural Masonry', isGold: true },
-                    { id: 'carousel', icon: Play, label: 'Carrossel Dinâmico', isGold: true },
-                    { id: 'popup', icon: MessageSquare, label: 'Notificação', isGold: true },
-                  ].map((item) => {
-                    const isLocked = item.isGold && !isGoldPlan;
-                    return (
-                      <button 
-                        key={item.id}
-                        disabled={isLocked}
-                        onClick={() => setLayout(item.id as LayoutType)} 
-                        className={cn(
-                          "flex items-center justify-between p-3 rounded-xl border-2 text-left transition-all", 
-                          layout === item.id ? "border-primary bg-primary/5" : "border-muted hover:border-muted-foreground/20",
-                          isLocked && "opacity-50 grayscale cursor-not-allowed bg-muted/20"
-                        )}
-                      >
-                        <div className="flex items-center gap-3">
-                          <item.icon className={cn("w-4 h-4", layout === item.id ? "text-primary" : "text-muted-foreground")} />
-                          <span className={cn("text-xs font-bold", layout === item.id ? "text-primary" : "text-foreground")}>{item.label}</span>
-                        </div>
-                        {isLocked && <Lock className="w-3 h-3 text-muted-foreground" />}
-                      </button>
-                    );
-                  })}
-                </div>
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Layout dos Depoimentos</Label>
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  { id: 'grid', icon: Layout, label: 'Grade' },
+                  { id: 'mural', icon: LayoutGrid, label: 'Masonry' },
+                  { id: 'carousel', icon: Play, label: 'Carrossel' },
+                  { id: 'popup', icon: MessageSquare, label: 'Notificação' },
+                ].map((item) => (
+                  <button 
+                    key={item.id}
+                    onClick={() => setLayout(item.id as LayoutType)} 
+                    className={cn(
+                      "flex items-center gap-3 p-3 rounded-xl border-2 transition-all", 
+                      layout === item.id ? "border-primary bg-primary/5" : "border-muted"
+                    )}
+                  >
+                    <item.icon className={cn("w-4 h-4", layout === item.id ? "text-primary" : "text-muted-foreground")} />
+                    <span className="text-xs font-bold">{item.label}</span>
+                  </button>
+                ))}
               </div>
             </TabsContent>
 
             <TabsContent value="social" className="mt-0 space-y-6">
-              <div className="space-y-6 p-4 border rounded-xl bg-muted/5">
-                <div className="space-y-1.5">
-                  <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
-                    <Globe className="w-3 h-3" /> Endereço da Página (Slug)
-                  </Label>
-                  <div className="flex items-center gap-1 bg-background rounded-lg px-3 border focus-within:ring-2 focus-within:ring-primary/20 transition-all">
-                    <span className="text-[10px] font-bold opacity-40">/pp/</span>
-                    <input 
-                      placeholder="seu-link-unico"
-                      value={currentSlug} 
-                      onChange={(e) => setSlugEdit(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/\s+/g, '-'))} 
-                      className="h-10 flex-1 bg-transparent border-none focus:ring-0 text-xs font-mono font-bold"
-                    />
-                  </div>
-                  <p className="text-[9px] text-muted-foreground italic">Este é o link que você usará no seu Instagram.</p>
+              <div className="space-y-4">
+                <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 ml-1">
+                  <Globe className="w-3 h-3" /> Link da Bio (Slug)
+                </Label>
+                <div className="flex items-center gap-1 bg-muted/20 rounded-xl px-3 border border-transparent focus-within:border-primary/20">
+                  <span className="text-[10px] font-bold opacity-40">/pp/</span>
+                  <input 
+                    value={currentSlug} 
+                    onChange={(e) => setSlugEdit(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/\s+/g, '-'))} 
+                    className="h-10 flex-1 bg-transparent border-none focus:ring-0 text-xs font-mono font-bold"
+                  />
                 </div>
-              </div>
-
-              <div className="space-y-4 p-4 border rounded-xl bg-muted/5">
-                <div className="flex items-center justify-between">
-                  <Label className="text-xs font-bold">Botão WhatsApp</Label>
-                  <Switch checked={whatsappEnabled} onCheckedChange={setWhatsappEnabled} />
-                </div>
-                {whatsappEnabled && (
-                  <Input type="text" value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} placeholder="Número WhatsApp" className="h-10" />
-                )}
-              </div>
-              <div className="space-y-3">
-                <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">URL do Site Oficial</Label>
-                <Input value={externalSiteUrl} onChange={(e) => setExternalSiteUrl(e.target.value)} placeholder="https://seusite.com.br" />
               </div>
             </TabsContent>
           </div>
         </ScrollArea>
-      </Tabs>
-    </div>
+      </div>
   );
 };
 
@@ -648,9 +501,8 @@ export default function PPEditorPage() {
   }, [db, user, activeSlug]);
   const { data: ppData, loading: ppLoading } = useDoc(ppRef);
 
-  const membershipStatus = userData?.membershipStatus;
-  const isEnterprise = membershipStatus === 'enterprise';
-  const isGoldPlan = isEnterprise || membershipStatus === 'gold' || membershipStatus === 'trial';
+  const isEnterprise = userData?.membershipStatus === 'enterprise';
+  const isGoldPlan = isEnterprise || userData?.membershipStatus === 'gold' || userData?.membershipStatus === 'trial';
   const SELECTION_LIMIT = isEnterprise ? Infinity : (isGoldPlan ? 50 : 10);
 
   const testimonialsQuery = useMemo(() => {
@@ -715,20 +567,8 @@ export default function PPEditorPage() {
       setFooterText(ppData.footerText || '');
       setShowLogo(ppData.showLogo !== undefined ? ppData.showLogo : true);
       setCustomSections(ppData.customSections || []);
-    } else if (!ppLoading && activeSlug && user && db) {
-      const tryInitPP = async () => {
-        const widgetsRef = collection(db, 'users', user.uid, 'widgets');
-        const snap = await getDocs(query(widgetsRef, limit(1)));
-        const baseData = !snap.empty ? snap.docs[0].data() : {};
-        
-        await setDoc(doc(db, 'users', user.uid, 'pp', activeSlug), {
-          ...baseData,
-          createdAt: serverTimestamp()
-        }, { merge: true });
-      };
-      tryInitPP();
     }
-  }, [ppData, ppLoading, activeSlug, user, db]);
+  }, [ppData]);
 
   useEffect(() => {
     if (!authLoading && !user) router.replace('/login');
@@ -754,28 +594,29 @@ export default function PPEditorPage() {
 
       if (isSlugChanging) {
         if (!newSlug) throw new Error("O link da página não pode ser vazio.");
-        
         const slugCheck = await getDoc(doc(db, 'slugs', newSlug));
-        if (slugCheck.exists()) {
-          throw new Error("Este link já está sendo utilizado por outro usuário.");
-        }
+        if (slugCheck.exists()) throw new Error("Este link já está em uso.");
 
-        batch.set(doc(db, 'slugs', newSlug), {
-          userId: user.uid,
-          type: 'pp',
-          createdAt: serverTimestamp()
-        });
-
+        batch.set(doc(db, 'slugs', newSlug), { userId: user.uid, type: 'pp', createdAt: serverTimestamp() });
         if (oldSlug) {
           batch.delete(doc(db, 'slugs', oldSlug));
           batch.delete(doc(db, 'users', user.uid, 'pp', oldSlug));
         }
-
         batch.update(doc(db, 'users', user.uid), { companySlug: newSlug });
       }
 
       const targetSlug = isSlugChanging ? newSlug : oldSlug;
       const targetPPRef = doc(db, 'users', user.uid, 'pp', targetSlug);
+
+      const cleanedSections = customSections.map(s => ({
+        id: s.id,
+        title: s.title || '',
+        subtitle: s.subtitle || '',
+        content: s.content || '',
+        buttonText: s.buttonText || '',
+        buttonUrl: s.buttonUrl || '',
+        variant: s.variant || 'light'
+      }));
 
       const configData = {
         selectedTestimonialIds: selectedIds,
@@ -791,20 +632,15 @@ export default function PPEditorPage() {
         testimonialsTitle,
         footerText,
         showLogo,
-        customSections,
+        customSections: cleanedSections,
         updatedAt: serverTimestamp()
       };
 
       batch.set(targetPPRef, configData, { merge: true });
-
       await batch.commit();
       
-      if (isSlugChanging) {
-        setActiveSlug(newSlug);
-        toast({ title: "Link Atualizado!", description: `Sua nova página é /pp/${newSlug}` });
-      } else {
-        toast({ title: "Página Pública Salva!" });
-      }
+      if (isSlugChanging) setActiveSlug(newSlug);
+      toast({ title: "Configuração Salva!" });
     } catch (err: any) {
       toast({ variant: "destructive", title: "Erro ao salvar", description: err.message });
     } finally {
@@ -834,7 +670,7 @@ export default function PPEditorPage() {
       const url = await getDownloadURL(snapshot.ref);
       setLogoUrl(url);
     } catch (err) {
-      toast({ variant: "destructive", title: "Erro no processamento" });
+      toast({ variant: "destructive", title: "Erro no upload" });
     } finally {
       setIsUploading(false);
       setCropType(null);
@@ -862,20 +698,11 @@ export default function PPEditorPage() {
     setSelectedIds(prev => {
       const isRemoving = prev.includes(id);
       if (!isRemoving && prev.length >= SELECTION_LIMIT) {
-        toast({
-          variant: "destructive",
-          title: `Limite de Seleção`,
-          description: `Seu plano atual permite até ${SELECTION_LIMIT} depoimentos ativos por mural.`,
-        });
+        toast({ variant: "destructive", title: "Limite de Seleção", description: `Seu plano permite até ${SELECTION_LIMIT} depoimentos ativos.` });
         return prev;
       }
       return isRemoving ? prev.filter(i => i !== id) : [...prev, id];
     });
-  };
-
-  const copyToClipboardFunc = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({ title: "Copiado!" });
   };
 
   return (
@@ -884,17 +711,12 @@ export default function PPEditorPage() {
         <div className="flex items-center gap-3 flex-1">
           <Sheet>
             <SheetTrigger asChild>
-              <button className="flex flex-col items-center justify-center gap-1 group transition-all text-primary hover:text-primary/80">
-                <div className="h-10 w-10 flex items-center justify-center rounded-xl transition-all bg-transparent group-hover:bg-primary/5">
-                  <Monitor className="h-6 w-6" />
-                </div>
-                <span className="text-[8px] font-black uppercase tracking-widest leading-none">EDITAR</span>
+              <button className="flex flex-col items-center justify-center gap-1 text-primary">
+                <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/5"><Monitor className="h-6 w-6" /></div>
+                <span className="text-[8px] font-black uppercase tracking-widest">EDITAR</span>
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-80 border-none">
-              <SheetHeader className="sr-only">
-                <SheetTitle>Configurações da Página Pública</SheetTitle>
-              </SheetHeader>
               <PublicPageSettings {...sidebarProps} />
             </SheetContent>
           </Sheet>
@@ -907,9 +729,8 @@ export default function PPEditorPage() {
         </div>
 
         <div className="ml-auto flex items-center gap-4">
-          <Button onClick={handleSave} disabled={isSaving || isUploading} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg">
-            {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
-            Salvar Página
+          <Button onClick={handleSave} disabled={isSaving || isUploading} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2">
+            {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="rounded-xl border h-10 w-10"><User className="w-5 h-5 text-primary" /></Button></DropdownMenuTrigger>
@@ -929,64 +750,46 @@ export default function PPEditorPage() {
         <div className="flex-1 overflow-y-auto bg-muted/10 p-4 sm:p-8">
           <div className="max-w-5xl mx-auto space-y-8 pb-20">
             <div className="flex items-center justify-between">
-              <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                <Eye className="w-4 h-4" /> Preview da Página Pública
-              </h2>
+              <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><Eye className="w-4 h-4" /> Preview da Página</h2>
               <div className="flex items-center gap-2 bg-background border px-3 py-1 rounded-full shadow-sm">
-                 <span className="text-[10px] font-bold opacity-50 uppercase tracking-widest">Link:</span>
+                 <span className="text-[10px] font-bold opacity-50 uppercase">Link:</span>
                  <span className="text-[10px] font-mono font-black text-primary">/pp/{activeSlug}</span>
-                 <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => copyToClipboardFunc(`${baseUrl}/pp/${activeSlug}`)}>
-                   <Copy className="w-3 h-3" />
-                 </Button>
               </div>
             </div>
 
-            <div className="relative bg-background rounded-[2.5rem] shadow-2xl min-h-[600px] flex flex-col overflow-hidden border border-primary/5">
+            <div className="relative bg-background rounded-[2.5rem] shadow-2xl min-h-[600px] flex flex-col overflow-hidden">
               <div className="flex-1 flex flex-col pt-24 pb-12">
                 <div className="px-8 sm:px-12 text-center space-y-6 mb-12">
                   {logoUrl && (
-                    <div className="mx-auto w-24 h-24 relative">
-                      <img src={logoUrl} className="w-full h-full object-cover rounded-[2rem] shadow-lg border-2 border-background" alt="Logo" />
+                    <div className="mx-auto w-20 h-20 relative">
+                      <img src={logoUrl} className="w-full h-full object-cover rounded-[1.5rem] shadow-lg border-2 border-background" />
                     </div>
                   )}
                   <div className="space-y-4">
-                    <h1 
-                      className="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] max-w-4xl mx-auto text-foreground"
-                      dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${userData?.companyName}` }}
-                    />
+                    <h1 className="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] max-w-4xl mx-auto text-foreground" dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${userData?.companyName}` }} />
                     {heroSubtitle && (
-                      <div 
-                        className="text-foreground text-sm sm:text-base max-w-2xl mx-auto font-medium leading-relaxed italic"
-                        dangerouslySetInnerHTML={{ __html: heroSubtitle }}
-                      />
+                      <div className="text-foreground text-sm font-bold max-w-2xl mx-auto italic leading-relaxed" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />
                     )}
                   </div>
                 </div>
 
-                <div className="w-full space-y-0">
+                <div className="w-full">
                   {customSections.map((section: CustomSection) => (
                     <div 
                       key={section.id} 
                       className={cn(
-                        "py-16 px-8 sm:px-12 text-center space-y-6",
+                        "py-16 px-8 sm:px-12 text-center space-y-4",
                         section.variant === 'accent' ? "text-white" : (section.variant === 'dark' ? "bg-black text-white" : "bg-muted/5")
                       )}
                       style={{ backgroundColor: section.variant === 'accent' ? themeColor : undefined }}
                     >
                       <div className="max-w-3xl mx-auto space-y-4">
                         <h2 className="text-2xl sm:text-4xl font-black tracking-tight">{section.title}</h2>
-                        {section.subtitle && <p className="text-sm font-bold italic">{section.subtitle}</p>}
+                        {section.subtitle && <div className="text-xs font-bold leading-relaxed" dangerouslySetInnerHTML={{ __html: section.subtitle }} />}
                         <p className="text-xs sm:text-sm leading-relaxed opacity-90 font-medium">{section.content}</p>
                         {section.buttonText && (
                           <div className="pt-4">
-                            <Button 
-                              size="lg" 
-                              className={cn(
-                                "h-12 px-8 rounded-xl font-bold gap-2 shadow-lg",
-                                section.variant === 'accent' ? "bg-white text-black hover:bg-white/90" : ""
-                              )}
-                              style={{ backgroundColor: section.variant !== 'accent' ? themeColor : undefined }}
-                            >
+                            <Button className={cn("h-11 px-8 rounded-xl font-bold shadow-lg", section.variant === 'accent' ? "bg-white text-black" : "")} style={{ backgroundColor: section.variant !== 'accent' ? themeColor : undefined }}>
                               {section.buttonText} <ArrowRight className="w-4 h-4" />
                             </Button>
                           </div>
@@ -998,9 +801,7 @@ export default function PPEditorPage() {
 
                 {testimonialsTitle && (
                   <div className="text-center py-12">
-                    <h2 className="text-2xl sm:text-3xl font-black font-headline uppercase tracking-widest" style={{ color: themeColor }}>
-                      {testimonialsTitle}
-                    </h2>
+                    <h2 className="text-2xl sm:text-3xl font-black font-headline uppercase tracking-widest" style={{ color: themeColor }}>{testimonialsTitle}</h2>
                   </div>
                 )}
 
@@ -1009,29 +810,17 @@ export default function PPEditorPage() {
                   layout === 'popup' ? "max-w-sm mx-auto" : (layout === 'grid' || layout === 'mural' ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" : "flex justify-center")
                 )}>
                   {visibleTestimonialsPreview.length > 0 ? (
-                    layout === 'popup' ? (
-                      <TestimonialCard t={visibleTestimonialsPreview[0]} themeColor={themeColor} secondaryColor={secondaryColor} />
-                    ) : (
-                      visibleTestimonialsPreview.map((t, i) => (
-                        <TestimonialCard key={`${t.id}-${muralIndex}-${i}`} t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} />
-                      ))
-                    )
+                    visibleTestimonialsPreview.map((t, i) => (
+                      <TestimonialCard key={`${t.id}-${muralIndex}-${i}`} t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} />
+                    ))
                   ) : (
-                    <div className="col-span-full py-12 text-center opacity-20 italic text-sm">
-                      Selecione depoimentos abaixo para o preview.
-                    </div>
+                    <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos para o preview.</div>
                   )}
                 </div>
 
-                <div className="mt-auto pt-16 px-8 text-center space-y-4">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-50 flex items-center justify-center gap-1">
-                    <span>©</span> {footerText || `${new Date().getFullYear()} ${userData?.companyName || 'Sua Empresa'}`}
-                  </p>
-                  {showLogo && (
-                    <div className="flex items-center justify-center gap-1.5 opacity-20">
-                      <span className="text-[8px] font-black uppercase tracking-[0.3em]">POWERED BY PROOVA</span>
-                    </div>
-                  )}
+                <div className="mt-auto pt-16 px-8 text-center space-y-2 opacity-50">
+                  <p className="text-[9px] font-black uppercase tracking-widest">© {footerText || `${new Date().getFullYear()} ${userData?.companyName}`}</p>
+                  {showLogo && <span className="text-[7px] font-black tracking-[0.2em]">POWERED BY PROOVA</span>}
                 </div>
               </div>
             </div>
@@ -1054,23 +843,14 @@ export default function PPEditorPage() {
                       {approvedTestimonials?.map((t: any) => {
                         const isSelected = selectedIds.includes(t.id);
                         return (
-                          <div 
-                            key={t.id} 
-                            onClick={() => toggleSelection(t.id)} 
-                            className={cn(
-                              "cursor-pointer transition-all rounded-xl border-2 p-4 bg-background", 
-                              isSelected ? "border-primary bg-primary/5" : "border-transparent shadow-sm hover:border-muted-foreground/10"
-                            )}
-                          >
+                          <div key={t.id} onClick={() => toggleSelection(t.id)} className={cn("cursor-pointer transition-all rounded-xl border-2 p-4 bg-background", isSelected ? "border-primary bg-primary/5" : "border-transparent shadow-sm")}>
                             <div className="flex items-start gap-3">
                               <div className={cn("mt-1 w-4 h-4 rounded-md border flex items-center justify-center shrink-0", isSelected ? "bg-primary border-primary text-white" : "border-muted-foreground/30")}>
                                 {isSelected && <Check className="w-2.5 h-2.5" />}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <span className="font-bold text-[11px] block truncate">{t.userName}</span>
-                                {t.text && t.text !== '(Depoimento em Vídeo)' && (
-                                  <p className="text-[10px] text-muted-foreground italic line-clamp-1 mt-1">"{t.text}"</p>
-                                )}
+                                {t.text && t.text !== '(Depoimento em Vídeo)' && <p className="text-[10px] text-muted-foreground italic line-clamp-1 mt-1">"{t.text}"</p>}
                               </div>
                             </div>
                           </div>
@@ -1088,15 +868,13 @@ export default function PPEditorPage() {
       <Dialog open={!!tempImage} onOpenChange={(open) => !open && setTempImage(null)}>
         <DialogContent className="sm:max-w-2xl h-[70vh] flex flex-col p-0 overflow-hidden rounded-3xl border-none">
           <div className="flex-1 relative bg-black">
-            {tempImage && (
-              <Cropper image={tempImage} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onCropComplete={(a, p) => setCroppedAreaPixels(p)} onZoomChange={setZoom} />
-            )}
+            {tempImage && <Cropper image={tempImage} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onCropComplete={(a, p) => setCroppedAreaPixels(p)} onZoomChange={setZoom} />}
           </div>
           <div className="p-6 border-t bg-background shrink-0 space-y-6">
             <Slider value={[zoom]} min={1} max={3} step={0.1} onValueChange={(vals) => setZoom(vals[0])} />
             <DialogFooter className="gap-2">
               <Button variant="outline" onClick={() => setTempImage(null)}>Cancelar</Button>
-              <Button onClick={handleConfirmCrop} className="font-bold">Salvar Logotipo</Button>
+              <Button onClick={handleConfirmCrop} className="font-bold">Salvar Logo</Button>
             </DialogFooter>
           </div>
         </DialogContent>
