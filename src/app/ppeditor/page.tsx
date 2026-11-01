@@ -38,7 +38,8 @@ import {
   Handshake,
   X,
   MessageCircle,
-  Link2
+  Link2,
+  Bell
 } from 'lucide-react';
 import { 
   Sheet, 
