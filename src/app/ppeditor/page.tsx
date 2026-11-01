@@ -386,7 +386,6 @@ const PublicPageSettings = ({
                 </Label>
                 <p className="text-[9px] text-muted-foreground ml-1 mb-2">(Bordas dos Cards)</p>
                 <div className="flex flex-wrap gap-2">
-                  {/* Botão Sem Cor */}
                   <button 
                     onClick={() => setSecondaryColor('')} 
                     className={cn(
@@ -573,8 +572,7 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </Tabs>
-    </div>
+      </div>
   );
 };
 
@@ -609,7 +607,7 @@ export default function PPEditorPage() {
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [themeColor, setThemeColor] = useState('#f97316');
-  const [secondaryColor, setSecondaryColor] = useState('#ffffff');
+  const [secondaryColor, setSecondaryColor] = useState('');
   const [layout, setLayout] = useState<LayoutType>('grid'); 
   const [logoUrl, setLogoUrl] = useState('');
   const [heroTitle, setHeroTitle] = useState('');
@@ -642,7 +640,7 @@ export default function PPEditorPage() {
     if (ppData) {
       setSelectedIds(ppData.selectedTestimonialIds || []);
       setThemeColor(ppData.themeColor || '#f97316');
-      setSecondaryColor(ppData.secondaryColor || '#ffffff');
+      setSecondaryColor(ppData.secondaryColor || '');
       setLayout(ppData.layout || 'grid');
       setLogoUrl(ppData.logoUrl || '');
       setHeroTitle(ppData.heroTitle || '');

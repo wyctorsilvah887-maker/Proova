@@ -126,7 +126,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
 
   const layout = ppData?.layout || 'grid';
   const themeColor = ppData?.themeColor || '#f97316';
-  const secondaryColor = ppData?.secondaryColor || ''; // Padrão: sem cor
+  const secondaryColor = ppData?.secondaryColor || ''; 
   const whatsappEnabled = ppData?.whatsappEnabled || false;
   const whatsappNumber = ppData?.whatsappNumber || '';
   const externalSiteUrl = ppData?.externalSiteUrl || '';
