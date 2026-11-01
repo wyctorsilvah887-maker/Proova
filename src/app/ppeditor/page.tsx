@@ -283,19 +283,13 @@ const PublicPageSettings = ({
 }: any) => {
   const colors = ['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff'];
 
-  const applyPreset = (p: any) => {
-    setThemeColor(p.primary);
-    if (isGoldPlan) setSecondaryColor(p.secondary);
-    toast({ title: `Tema ${p.name} aplicado!` });
-  };
-
   const addSection = () => {
     setCustomSections((prev: CustomSection[]) => [
       ...prev,
       {
         id: Math.random().toString(36).substr(2, 9),
         title: 'Nova Seção de Destaque',
-        subtitle: 'Subtítulo complementar',
+        subtitle: '',
         content: 'Conteúdo descritivo aqui...',
         buttonText: 'Saiba Mais',
         buttonUrl: '',
@@ -321,7 +315,7 @@ const PublicPageSettings = ({
             <span className="text-xs font-black uppercase tracking-[0.2em]">Voltar ao Dash</span>
           </Button>
         </Link>
-        <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm">
+        <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm bg-primary text-primary-foreground">
           {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
           Salvar Alterações
         </Button>
@@ -368,12 +362,12 @@ const PublicPageSettings = ({
                 <div className="space-y-8">
                   <div className="space-y-3">
                     <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Título Hero</Label>
-                    <RichTextEditor value={heroTitle} onChange={setHeroTitle} />
+                    <RichTextEditor value={heroTitle} onChange={setHeroTitle} placeholder="Dê um título impactante..." />
                   </div>
                   
                   <div className="space-y-3">
                     <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Subtítulo Hero</Label>
-                    <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} className="min-h-[80px]" />
+                    <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} placeholder="Texto de apoio mais nítido..." className="min-h-[80px] text-sm text-foreground" />
                   </div>
 
                   <div className="space-y-6 pt-6 border-t">
@@ -399,12 +393,12 @@ const PublicPageSettings = ({
                               </div>
                               <AccordionContent className="p-3 space-y-4 pb-4">
                                 <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Título do Bloco</Label>
+                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Título</Label>
                                   <Input value={section.title} onChange={(e) => updateSection(section.id, 'title', e.target.value)} className="h-8 text-[11px]" />
                                 </div>
                                 <div className="space-y-1.5">
                                   <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Subtítulo (RGB)</Label>
-                                  <RichTextEditor value={section.subtitle} onChange={(val) => updateSection(section.id, 'subtitle', val)} className="min-h-[60px] text-[11px]" />
+                                  <RichTextEditor value={section.subtitle} onChange={(val) => updateSection(section.id, 'subtitle', val)} className="min-h-[60px] text-[11px] text-foreground" />
                                 </div>
                                 <div className="space-y-1.5">
                                   <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Texto Principal</Label>
@@ -608,16 +602,6 @@ export default function PPEditorPage() {
       const targetSlug = isSlugChanging ? newSlug : oldSlug;
       const targetPPRef = doc(db, 'users', user.uid, 'pp', targetSlug);
 
-      const cleanedSections = customSections.map(s => ({
-        id: s.id,
-        title: s.title || '',
-        subtitle: s.subtitle || '',
-        content: s.content || '',
-        buttonText: s.buttonText || '',
-        buttonUrl: s.buttonUrl || '',
-        variant: s.variant || 'light'
-      }));
-
       const configData = {
         selectedTestimonialIds: selectedIds,
         themeColor,
@@ -632,7 +616,7 @@ export default function PPEditorPage() {
         testimonialsTitle,
         footerText,
         showLogo,
-        customSections: cleanedSections,
+        customSections,
         updatedAt: serverTimestamp()
       };
 
@@ -711,9 +695,11 @@ export default function PPEditorPage() {
         <div className="flex items-center gap-3 flex-1">
           <Sheet>
             <SheetTrigger asChild>
-              <button className="flex flex-col items-center justify-center gap-1 text-primary">
-                <div className="h-10 w-10 flex items-center justify-center rounded-xl bg-primary/5"><Monitor className="h-6 w-6" /></div>
-                <span className="text-[8px] font-black uppercase tracking-widest">EDITAR</span>
+              <button className="flex flex-col items-center justify-center gap-1 group transition-all text-primary hover:text-primary/80">
+                <div className="h-10 w-10 flex items-center justify-center rounded-xl transition-all bg-transparent group-hover:bg-primary/5">
+                  <Monitor className="h-6 w-6" />
+                </div>
+                <span className="text-[8px] font-black uppercase tracking-widest leading-none">EDITAR</span>
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-80 border-none">
