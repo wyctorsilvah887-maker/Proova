@@ -96,7 +96,6 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from 'next-themes';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type LayoutType = 'grid' | 'mural' | 'carousel' | 'popup';
 
@@ -346,50 +345,19 @@ const PublicPageSettings = ({
         </Button>
       </div>
 
-      <Tabs defaultValue="design" className="w-full flex-1 flex flex-col min-h-0">
+      <Tabs defaultValue="geral" className="w-full flex-1 flex flex-col min-h-0">
         <TabsList className="w-full justify-start rounded-none border-b bg-transparent h-12 px-2 shrink-0">
-          <TabsTrigger value="design" className="text-xs font-bold uppercase tracking-widest">Layout</TabsTrigger>
           <TabsTrigger value="geral" className="text-xs font-bold uppercase tracking-widest">Visual</TabsTrigger>
           <TabsTrigger value="conteudo" className="text-xs font-bold uppercase tracking-widest flex items-center gap-1.5">
-            Texto {!isGoldPlan && <Lock className="w-2.5 h-2.5 opacity-40" />}
+            Conteúdo {!isGoldPlan && <Lock className="w-2.5 h-2.5 opacity-40" />}
           </TabsTrigger>
-          <TabsTrigger value="social" className="text-xs font-bold uppercase tracking-widest">Bio</TabsTrigger>
+          <TabsTrigger value="design" className="text-xs font-bold uppercase tracking-widest">Layout</TabsTrigger>
+          <TabsTrigger value="social" className="text-xs font-bold uppercase tracking-widest">Contato/Info</TabsTrigger>
         </TabsList>
         
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-8 pb-10">
-            <TabsContent value="design" className="mt-0 space-y-6">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Estilo de Exibição</Label>
-              <div className="grid grid-cols-1 gap-2">
-                {[
-                  { id: 'grid', icon: Layout, label: 'Grade Estática', isGold: false },
-                  { id: 'mural', icon: LayoutGrid, label: 'Mural Swap (2 itens)', isGold: true },
-                  { id: 'carousel', icon: Play, label: 'Carrossel VIP (Loop)', isGold: true },
-                  { id: 'popup', icon: Bell, label: 'Notificações VIP', isGold: true },
-                ].map((item) => {
-                   const isLocked = item.isGold && !isGoldPlan;
-                   return (
-                    <button 
-                      key={item.id}
-                      disabled={isLocked}
-                      onClick={() => setLayout(item.id as LayoutType)} 
-                      className={cn(
-                        "flex items-center justify-between p-3 rounded-xl border-2 transition-all text-left", 
-                        layout === item.id ? "border-primary bg-primary/5" : "border-muted hover:border-primary/20",
-                        isLocked && "opacity-40 grayscale cursor-not-allowed"
-                      )}
-                    >
-                      <div className="flex items-center gap-3">
-                         <item.icon className={cn("w-4 h-4", layout === item.id ? "text-primary" : "text-muted-foreground")} />
-                         <span className="text-xs font-bold">{item.label}</span>
-                      </div>
-                      {isLocked ? <Lock className="w-3.5 h-3.5 text-muted-foreground" /> : (layout === item.id && <Check className="w-3.5 h-3.5 text-primary" />)}
-                    </button>
-                   );
-                })}
-              </div>
-            </TabsContent>
-
+            {/* ABA VISUAL */}
             <TabsContent value="geral" className="mt-0 space-y-8">
               <div className="space-y-4 text-center">
                 <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block text-left ml-1">Logotipo</Label>
@@ -435,6 +403,7 @@ const PublicPageSettings = ({
               </div>
             </TabsContent>
 
+            {/* ABA CONTEÚDO */}
             <TabsContent value="conteudo" className="mt-0 space-y-8">
               {!isGoldPlan ? (
                 <div className="py-16 px-4 text-center space-y-6 bg-primary/5 rounded-3xl border border-dashed border-primary/20 m-2">
@@ -505,6 +474,40 @@ const PublicPageSettings = ({
               )}
             </TabsContent>
 
+            {/* ABA LAYOUT */}
+            <TabsContent value="design" className="mt-0 space-y-6">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Estilo de Exibição</Label>
+              <div className="grid grid-cols-1 gap-2">
+                {[
+                  { id: 'grid', icon: Layout, label: 'Grade Estática', isGold: false },
+                  { id: 'mural', icon: LayoutGrid, label: 'Mural Swap (2 itens)', isGold: true },
+                  { id: 'carousel', icon: Play, label: 'Carrossel VIP (Loop)', isGold: true },
+                  { id: 'popup', icon: Bell, label: 'Notificações VIP', isGold: true },
+                ].map((item) => {
+                   const isLocked = item.isGold && !isGoldPlan;
+                   return (
+                    <button 
+                      key={item.id}
+                      disabled={isLocked}
+                      onClick={() => setLayout(item.id as LayoutType)} 
+                      className={cn(
+                        "flex items-center justify-between p-3 rounded-xl border-2 transition-all text-left", 
+                        layout === item.id ? "border-primary bg-primary/5" : "border-muted hover:border-primary/20",
+                        isLocked && "opacity-40 grayscale cursor-not-allowed"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                         <item.icon className={cn("w-4 h-4", layout === item.id ? "text-primary" : "text-muted-foreground")} />
+                         <span className="text-xs font-bold">{item.label}</span>
+                      </div>
+                      {isLocked ? <Lock className="w-3.5 h-3.5 text-muted-foreground" /> : (layout === item.id && <Check className="w-3.5 h-3.5 text-primary" />)}
+                    </button>
+                   );
+                })}
+              </div>
+            </TabsContent>
+
+            {/* ABA CONTATO/INFO */}
             <TabsContent value="social" className="mt-0 space-y-6">
               <div className="space-y-4">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 ml-1"><Globe className="w-3 h-3" /> Link da Bio (Slug)</Label>
