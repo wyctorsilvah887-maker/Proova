@@ -13,9 +13,8 @@ import {
   getDoc
 } from 'firebase/firestore';
 import { Card } from '@/components/ui/card';
-import { Star, User, Loader2, MessageSquare, MessageCircle, Globe, ArrowRight, ArrowLeft, CheckCircle2, Clock, Play } from 'lucide-react';
+import { Star, User, Loader2, Globe, ArrowLeft, CheckCircle2, Clock, Play, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import {
@@ -302,12 +301,12 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
               </div>
             </header>
 
-            <div className="w-full mb-12">
+            <div className="w-full">
               {customSections.map((section: any) => (
                 <section 
                   key={section.id} 
                   className={cn(
-                    "py-24 px-6 text-center mb-12",
+                    "py-24 px-6 text-center",
                     section.variant === 'accent' ? "text-white" : (section.variant === 'dark' ? "bg-black text-white" : "bg-muted/5")
                   )}
                   style={{ backgroundColor: section.variant === 'accent' ? themeColor : undefined }}
@@ -339,10 +338,10 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
               ))}
             </div>
 
-            <main className="px-6 pb-32 space-y-12 flex-1 w-full max-w-[1600px] mx-auto py-8">
+            <main className="px-6 pb-32 space-y-12 flex-1 w-full max-w-[1600px] mx-auto py-12">
               {filteredTestimonials.length === 0 ? (
                 <div className="text-center py-20 opacity-20 flex flex-col items-center gap-4">
-                  <MessageSquare className="w-12 h-12" />
+                  <Globe className="w-12 h-12" />
                   <p className="text-[9px] font-black uppercase">Aguardando depoimentos</p>
                 </div>
               ) : (
@@ -350,7 +349,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                   {layout === 'mural' && (
                     <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-12">
                       {visibleDisplayPool.map((t, i) => (
-                        <div key={`${t.id}-${muralIndex}-${i}`} className="break-inside-avoid mb-12">
+                        <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12 break-inside-avoid">
                           <TestimonialCard t={t} index={i} />
                         </div>
                       ))}

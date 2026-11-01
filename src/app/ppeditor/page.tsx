@@ -8,7 +8,6 @@ import {
   Save, 
   Loader2, 
   Star, 
-  Eye,
   MessageSquare,
   Check,
   User,
@@ -22,10 +21,6 @@ import {
   Trash2,
   Globe,
   Info,
-  Link2,
-  Copy,
-  ExternalLink,
-  ChevronDown,
   LogOut,
   TrendingUp,
   Inbox,
@@ -37,11 +32,9 @@ import {
   ArrowRight,
   Lock,
   Sparkles,
-  Settings2,
-  Handshake,
-  X,
   Pipette,
-  Clock
+  Clock,
+  ChevronDown
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -53,7 +46,7 @@ import {
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
@@ -61,14 +54,12 @@ import { Badge } from '@/components/ui/badge';
 import { useUser, useFirestore, useDoc, useCollection, useStorage, useAuth } from '@/firebase';
 import { 
   doc, 
-  updateDoc, 
   collection, 
   query, 
   where, 
   serverTimestamp, 
   getDoc, 
-  writeBatch,
-  setDoc 
+  writeBatch 
 } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -392,7 +383,6 @@ const PublicPageSettings = ({
                       "w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 flex items-center justify-center bg-muted/20 relative overflow-hidden", 
                       !secondaryColor ? "border-foreground shadow-lg" : "border-transparent shadow-inner"
                     )}
-                    title="Nenhuma cor"
                   >
                     <div className="absolute inset-0 bg-white dark:bg-zinc-800" />
                     <div className="absolute inset-0 flex items-center justify-center">
@@ -549,7 +539,8 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </div>
+      </Tabs>
+    </div>
   );
 };
 
@@ -887,7 +878,7 @@ export default function PPEditorPage() {
                 <div className="px-8 sm:px-12 text-center space-y-6 mb-12">
                   {logoUrl && (
                     <div className="mx-auto w-20 h-20 relative">
-                      <img src={logoUrl} className="w-full h-full object-cover rounded-[1.5rem] shadow-lg border-2 border-background" alt="Logo" />
+                      <img src={logoUrl} className="w-full h-full object-cover rounded-[2.5rem] shadow-lg border-2 border-background" alt="Logo" />
                     </div>
                   )}
                   <div className="space-y-4">
@@ -925,8 +916,8 @@ export default function PPEditorPage() {
                 </div>
 
                 <div className={cn(
-                  "px-4 sm:px-12 w-full max-w-5xl mx-auto mt-12 py-8",
-                  layout === 'popup' ? "max-w-sm mx-auto" : (
+                  "px-4 sm:px-12 w-full max-w-5xl mx-auto py-12",
+                  layout === 'popup' ? "max-w-sm mx-auto flex flex-col gap-12" : (
                     layout === 'mural' 
                       ? "columns-1 sm:columns-2 lg:columns-3 gap-12" 
                       : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12"
