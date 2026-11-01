@@ -37,7 +37,9 @@ import {
   ChevronDown,
   Handshake,
   X,
-  Bell
+  Bell,
+  MessageCircle,
+  Link2
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -296,6 +298,10 @@ const PublicPageSettings = ({
   heroSubtitle, setHeroSubtitle,
   footerText, setFooterText,
   showLogo, setShowLogo,
+  whatsappEnabled, setWhatsappEnabled,
+  whatsappNumber, setWhatsappNumber,
+  externalSiteUrl, setExternalSiteUrl,
+  externalSiteButtonText, setExternalSiteButtonText,
   customSections, setCustomSections,
   onFileSelect,
   isUploading,
@@ -516,12 +522,69 @@ const PublicPageSettings = ({
               </div>
             </TabsContent>
 
-            <TabsContent value="social" className="mt-0 space-y-6">
-              <div className="space-y-4">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 ml-1"><Globe className="w-3 h-3" /> Link da Bio (Slug)</Label>
-                <div className="flex items-center gap-1 bg-muted/20 rounded-xl px-3 border border-transparent focus-within:border-primary/20 transition-all">
-                  <span className="text-[10px] font-bold opacity-40">/pp/</span>
-                  <input value={currentSlug} onChange={(e) => setSlugEdit(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/\s+/g, '-'))} className="h-10 flex-1 bg-transparent border-none focus:ring-0 text-xs font-mono font-bold" />
+            <TabsContent value="social" className="mt-0 space-y-8">
+              <div className="space-y-6">
+                <div className="space-y-3">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 ml-1">
+                    <Globe className="w-3 h-3" /> Link da Bio (Slug)
+                  </Label>
+                  <div className="flex items-center gap-1 bg-muted/20 rounded-xl px-3 border border-transparent focus-within:border-primary/20 transition-all">
+                    <span className="text-[10px] font-bold opacity-40">/pp/</span>
+                    <input 
+                      value={currentSlug} 
+                      onChange={(e) => setSlugEdit(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/\s+/g, '-'))} 
+                      className="h-10 flex-1 bg-transparent border-none focus:ring-0 text-xs font-mono font-bold" 
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4 pt-4 border-t">
+                  <div className="flex items-center justify-between p-1">
+                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                      <MessageCircle className="w-4 h-4 text-green-500" /> Canal WhatsApp
+                    </Label>
+                    <Switch checked={whatsappEnabled} onCheckedChange={setWhatsappEnabled} />
+                  </div>
+                  {whatsappEnabled && (
+                    <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                       <Label className="text-[9px] font-bold uppercase opacity-60 ml-1">Número com DDD</Label>
+                       <div className="relative">
+                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold opacity-40">+55</span>
+                         <Input 
+                           value={whatsappNumber} 
+                           onChange={(e) => setWhatsappNumber(e.target.value.replace(/\D/g, ''))}
+                           placeholder="11999998888"
+                           className="pl-11 text-xs h-11 bg-muted/10 rounded-xl font-bold"
+                         />
+                       </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4 pt-4 border-t">
+                  <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 ml-1">
+                    <Link2 className="w-4 h-4 text-blue-500" /> Botão de Site Externo
+                  </Label>
+                  <div className="space-y-4">
+                    <div className="space-y-1.5">
+                      <Label className="text-[9px] font-bold uppercase opacity-60 ml-1">URL do Site</Label>
+                      <Input 
+                        value={externalSiteUrl} 
+                        onChange={(e) => setExternalSiteUrl(e.target.value)} 
+                        placeholder="https://meusite.com.br"
+                        className="text-xs h-11 bg-muted/10 rounded-xl"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <Label className="text-[9px] font-bold uppercase opacity-60 ml-1">Texto do Botão</Label>
+                      <Input 
+                        value={externalSiteButtonText} 
+                        onChange={(e) => setExternalSiteButtonText(e.target.value)} 
+                        placeholder="Visitar Site Oficial"
+                        className="text-xs h-11 bg-muted/10 rounded-xl font-bold"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </TabsContent>
@@ -570,6 +633,10 @@ export default function PPEditorPage() {
   const [heroSubtitle, setHeroSubtitle] = useState('');
   const [footerText, setFooterText] = useState('');
   const [showLogo, setShowLogo] = useState(true);
+  const [whatsappEnabled, setWhatsappEnabled] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState('');
+  const [externalSiteUrl, setExternalSiteUrl] = useState('');
+  const [externalSiteButtonText, setExternalSiteButtonText] = useState('');
   const [customSections, setCustomSections] = useState<CustomSection[]>([]);
   const [slugEdit, setSlugEdit] = useState('');
 
@@ -603,6 +670,10 @@ export default function PPEditorPage() {
       setHeroSubtitle(ppData.heroSubtitle || '');
       setFooterText(ppData.footerText || '');
       setShowLogo(ppData.showLogo !== undefined ? ppData.showLogo : true);
+      setWhatsappEnabled(ppData.whatsappEnabled || false);
+      setWhatsappNumber(ppData.whatsappNumber || '');
+      setExternalSiteUrl(ppData.externalSiteUrl || '');
+      setExternalSiteButtonText(ppData.externalSiteButtonText || '');
       setCustomSections(ppData.customSections || []);
     }
   }, [ppData]);
@@ -649,6 +720,7 @@ export default function PPEditorPage() {
       batch.set(targetPPRef, {
         selectedTestimonialIds: selectedIds,
         themeColor, secondaryColor, layout, logoUrl, heroTitle, heroSubtitle, footerText, showLogo,
+        whatsappEnabled, whatsappNumber, externalSiteUrl, externalSiteButtonText,
         customSections: customSections || [],
         updatedAt: serverTimestamp()
       }, { merge: true });
@@ -775,6 +847,10 @@ export default function PPEditorPage() {
               layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
               heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
               footerText={footerText} setFooterText={setFooterText} showLogo={showLogo} setShowLogo={setShowLogo}
+              whatsappEnabled={whatsappEnabled} setWhatsappEnabled={setWhatsappEnabled}
+              whatsappNumber={whatsappNumber} setWhatsappNumber={setWhatsappNumber}
+              externalSiteUrl={externalSiteUrl} setExternalSiteUrl={setExternalSiteUrl}
+              externalSiteButtonText={externalSiteButtonText} setExternalSiteButtonText={setExternalSiteButtonText}
               customSections={customSections} setCustomSections={setCustomSections} onFileSelect={onFileSelect}
               isUploading={isUploading} handleSave={handleSave} isSaving={isSaving} isGoldPlan={isGoldPlan}
               logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
@@ -879,6 +955,10 @@ export default function PPEditorPage() {
               layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
               heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
               footerText={footerText} setFooterText={setFooterText} showLogo={showLogo} setShowLogo={setShowLogo}
+              whatsappEnabled={whatsappEnabled} setWhatsappEnabled={setWhatsappEnabled}
+              whatsappNumber={whatsappNumber} setWhatsappNumber={setWhatsappNumber}
+              externalSiteUrl={externalSiteUrl} setExternalSiteUrl={setExternalSiteUrl}
+              externalSiteButtonText={externalSiteButtonText} setExternalSiteButtonText={setExternalSiteButtonText}
               customSections={customSections} setCustomSections={setCustomSections} onFileSelect={onFileSelect}
               isUploading={isUploading} handleSave={handleSave} isSaving={isSaving} isGoldPlan={isGoldPlan}
               logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
