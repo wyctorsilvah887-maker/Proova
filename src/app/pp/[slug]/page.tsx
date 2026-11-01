@@ -13,8 +13,9 @@ import {
   getDoc
 } from 'firebase/firestore';
 import { Card } from '@/components/ui/card';
-import { Star, User, Loader2, MessageSquare, MessageCircle, Globe, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Star, User, Loader2, MessageSquare, MessageCircle, Globe, ArrowRight, ArrowLeft, CheckCircle2, Clock, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import {
@@ -177,37 +178,82 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
 
   const TestimonialCard = ({ t, index = 0 }: { t: any, index?: number }) => {
     const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
+    
     return (
       <Card 
         key={`${t.id}-${muralIndex}`}
         className={cn(
-          "bg-card rounded-xl p-6 shadow-sm animate-in duration-700 ease-out fill-both",
+          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl border-none transition-all duration-500 hover:scale-[1.02] animate-in fill-both",
           side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in"
         )}
         style={{ 
-          borderTopWidth: layout !== 'popup' ? '4px' : '0',
-          borderTopColor: layout !== 'popup' ? themeColor : 'transparent',
-          borderLeftWidth: layout === 'popup' ? '4px' : '0',
-          borderLeftColor: layout === 'popup' ? themeColor : 'transparent',
-          backgroundColor: secondaryColor && secondaryColor !== '#ffffff' ? `${secondaryColor}20` : undefined,
-          boxShadow: `0 10px 30px -15px ${themeColor}30`
+          backgroundColor: secondaryColor && secondaryColor !== '#ffffff' ? `${secondaryColor}10` : undefined,
+          boxShadow: `0 20px 40px -20px ${themeColor}25`,
+          border: `1px solid ${themeColor}15`
         }}
       >
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-full shrink-0" style={{ backgroundColor: secondaryColor && secondaryColor !== '#ffffff' ? `${secondaryColor}30` : `${themeColor}15` }}>
-              <User className="w-4 h-4" style={{ color: themeColor }} />
+        <div className="space-y-6">
+          {/* Header do Card */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-lg rotate-3" style={{ backgroundColor: themeColor }}>
+                {t.userName?.substring(0, 2).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="font-black text-sm text-foreground tracking-tight truncate max-w-[120px]">{t.userName}</p>
+                <div className="flex items-center gap-1.5">
+                   <CheckCircle2 className="w-2.5 h-2.5 text-green-500 fill-green-500/20" />
+                   <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Verificado</span>
+                </div>
+              </div>
             </div>
-            <span className="font-bold text-sm text-foreground">{t.userName}</span>
+            <div className="flex gap-0.5">
+              {[1, 2, 3, 4, 5].map((s) => (
+                <Star key={s} className={cn("w-3 h-3", s <= (t.rating || 5) ? "fill-current" : "opacity-20")} style={{ color: themeColor }} />
+              ))}
+            </div>
           </div>
-          <div className="flex gap-0.5">
-            {Array.from({ length: t.rating || 5 }).map((_, i) => (
-              <Star key={i} className="w-3 h-3 fill-current" style={{ color: themeColor }} />
-            ))}
-          </div>
-          {t.text && t.text !== '(Depoimento em Vídeo)' && (
-            <p className="text-foreground/80 italic text-sm leading-relaxed">"{t.text}"</p>
+
+          {/* Conteúdo em Vídeo */}
+          {t.videoUrl && (
+            <div className="relative aspect-video rounded-3xl overflow-hidden bg-black shadow-2xl group ring-1 ring-white/10">
+               <video 
+                 src={t.videoUrl} 
+                 className="w-full h-full object-cover" 
+                 muted 
+                 loop 
+                 playsInline 
+                 autoPlay
+               />
+               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+               <div className="absolute bottom-3 left-3 flex items-center gap-2">
+                 <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                   <p className="text-[8px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
+                     <Play className="w-2 h-2 fill-white" /> Vídeo Review
+                   </p>
+                 </div>
+               </div>
+            </div>
           )}
+
+          {/* Conteúdo em Texto */}
+          {t.text && t.text !== '(Depoimento em Vídeo)' && (
+            <div className="relative">
+              <span className="absolute -top-3 -left-2 text-5xl opacity-10 font-serif select-none pointer-events-none" style={{ color: themeColor }}>“</span>
+              <p className="text-foreground/90 font-medium text-sm sm:text-base leading-relaxed italic relative z-10 px-2">
+                {t.text}
+              </p>
+            </div>
+          )}
+
+          {/* Footer do Card */}
+          <div className="pt-5 border-t border-muted-foreground/10 flex items-center justify-between">
+            <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] flex items-center gap-1.5">
+              <Clock className="w-3 h-3" />
+              {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Hoje'}
+            </span>
+            <div className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
+          </div>
         </div>
       </Card>
     );
@@ -254,7 +300,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                 <div className="space-y-4">
                   <h1 
                     className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.05] max-w-5xl mx-auto"
-                    dangerouslySetInnerHTML={{ __html: heroTitle }}
+                    dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${companyName}` }}
                   />
                   {heroSubtitle && (
                     <div 
@@ -320,16 +366,16 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
               ) : (
                 <div className="w-full">
                   {layout === 'mural' && (
-                    <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-6">
+                    <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-8">
                       {visibleDisplayPool.map((t, i) => (
-                        <div key={`${t.id}-${muralIndex}-${i}`} className="break-inside-avoid mb-6">
+                        <div key={`${t.id}-${muralIndex}-${i}`} className="break-inside-avoid mb-8">
                           <TestimonialCard t={t} index={i} />
                         </div>
                       ))}
                     </div>
                   )}
                   {layout === 'grid' && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:columns-4 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:columns-4 gap-8">
                       {visibleDisplayPool.map((t, i) => (
                         <TestimonialCard key={`${t.id}-${muralIndex}-${i}`} t={t} index={i} />
                       ))}
