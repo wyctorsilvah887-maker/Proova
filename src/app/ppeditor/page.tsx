@@ -298,7 +298,6 @@ const PublicPageSettings = ({
   isUploading,
   handleSave,
   isSaving,
-  isEnterprise,
   isGoldPlan,
   logoInputRef,
   currentSlug, setSlugEdit
@@ -768,23 +767,6 @@ export default function PPEditorPage() {
             </Button>
           </Link>
           <div className="h-6 w-px bg-border mx-1 hidden sm:block" />
-          <Sheet>
-            <SheetTrigger asChild>
-              <button className="flex flex-col items-center justify-center gap-1 group transition-all text-primary hover:text-primary/80 outline-none focus:ring-0">
-                <div className="h-10 w-10 flex items-center justify-center rounded-xl transition-all bg-transparent group-hover:bg-primary/5">
-                  <Monitor className="h-4 w-4" />
-                </div>
-                <span className="text-[8px] font-black uppercase tracking-widest leading-none">EDITAR</span>
-              </button>
-            </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-80 border-none">
-              <SheetHeader className="p-4 border-b bg-muted/10 sr-only">
-                <SheetTitle>Configurações da Página Pública</SheetTitle>
-                <SheetDescription>Ajuste o visual e conteúdo da sua Landing Page.</SheetDescription>
-              </SheetHeader>
-              <PublicPageSettings {...sidebarProps} />
-            </SheetContent>
-          </Sheet>
           <div className="flex items-center group -ml-1 sm:-ml-2">
             <div className="relative w-[160px] h-[55px] md:w-[320px] md:h-[105px]">
               <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
@@ -877,6 +859,10 @@ export default function PPEditorPage() {
                   </button>
                 </SheetTrigger>
                 <SheetContent side="left" className="p-0 w-80 border-none">
+                   <SheetHeader className="p-4 border-b bg-muted/10 sr-only">
+                    <SheetTitle>Configurações da Página Pública</SheetTitle>
+                    <SheetDescription>Ajuste o visual e conteúdo da sua Landing Page.</SheetDescription>
+                  </SheetHeader>
                    <PublicPageSettings {...sidebarProps} />
                 </SheetContent>
               </Sheet>
