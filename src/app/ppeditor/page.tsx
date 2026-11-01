@@ -41,8 +41,7 @@ import {
   Settings2,
   Handshake,
   X,
-  Pipette,
-  SheetTrigger
+  Pipette
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -74,6 +73,7 @@ import {
   SheetDescription,
   SheetHeader,
   SheetTitle,
+  SheetTrigger,
 } from "@/components/ui/sheet";
 import {
   Accordion,
@@ -625,8 +625,7 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </Tabs>
-    </div>
+      </div>
   );
 };
 
