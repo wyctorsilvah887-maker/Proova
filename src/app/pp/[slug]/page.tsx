@@ -133,9 +133,9 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
   const footerText = ppData?.footerText || `${new Date().getFullYear()} ${companyName || ''}`;
   const showProovaBranding = ppData?.showLogo !== false;
 
-  // Rotação dinâmica apenas para Mural e Notificação
+  // Rotação dinâmica apenas para Popup
   useEffect(() => {
-    if ((layout === 'mural' || layout === 'popup') && filteredTestimonials.length > 5) {
+    if (layout === 'popup' && filteredTestimonials.length > 1) {
       const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % filteredTestimonials.length), 7000);
       return () => clearInterval(interval);
     }
@@ -147,20 +147,14 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     return () => clearInterval(interval);
   }, [api, layout]);
 
-  // Pool de exibição: Grade mostra todos os selecionados. Mural faz rodízio de 5.
+  // Pool de exibição: Grade e Mural agora mostram todos os depoimentos (estático e adaptável).
   const visibleDisplayPool = useMemo(() => {
     if (filteredTestimonials.length === 0) return [];
     
-    if (layout === 'grid') return filteredTestimonials;
+    if (layout === 'grid' || layout === 'mural') return filteredTestimonials;
 
-    if (layout === 'mural' || layout === 'popup') {
-      const slice = [];
-      const count = Math.min(5, filteredTestimonials.length);
-      for (let i = 0; i < count; i++) {
-        const idx = (muralIndex + i) % filteredTestimonials.length;
-        slice.push(filteredTestimonials[idx]);
-      }
-      return slice;
+    if (layout === 'popup') {
+      return [filteredTestimonials[muralIndex % filteredTestimonials.length]];
     }
     
     return filteredTestimonials;

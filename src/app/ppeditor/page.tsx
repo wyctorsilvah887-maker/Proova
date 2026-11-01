@@ -82,7 +82,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/accordion";
 import { Slider } from '@/components/ui/slider';
 import Cropper from 'react-easy-crop';
 import { 
@@ -500,26 +500,31 @@ const PublicPageSettings = ({
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Layout da Página</Label>
               <div className="grid grid-cols-1 gap-2">
                 {[
-                  { id: 'grid', icon: Layout, label: 'Grade Estática (Todos)' },
-                  { id: 'mural', icon: LayoutGrid, label: 'Mural Masonry (Rodízio)' },
-                  { id: 'carousel', icon: Play, label: 'Carrossel Dinâmico' },
-                  { id: 'popup', icon: MessageSquare, label: 'Notificação VIP' },
-                ].map((item) => (
-                  <button 
-                    key={item.id}
-                    onClick={() => setLayout(item.id as LayoutType)} 
-                    className={cn(
-                      "flex items-center justify-between p-3 rounded-xl border-2 transition-all", 
-                      layout === item.id ? "border-primary bg-primary/5" : "border-muted hover:border-primary/20"
-                    )}
-                  >
-                    <div className="flex items-center gap-3">
-                       <item.icon className={cn("w-4 h-4", layout === item.id ? "text-primary" : "text-muted-foreground")} />
-                       <span className="text-xs font-bold">{item.label}</span>
-                    </div>
-                    {layout === item.id && <Check className="w-3.5 h-3.5 text-primary" />}
-                  </button>
-                ))}
+                  { id: 'grid', icon: Layout, label: 'Grade Estática (Todos)', isGold: false },
+                  { id: 'mural', icon: LayoutGrid, label: 'Mural Masonry (Todos)', isGold: true },
+                  { id: 'carousel', icon: Play, label: 'Carrossel Dinâmico', isGold: true },
+                  { id: 'popup', icon: MessageSquare, label: 'Notificação VIP', isGold: true },
+                ].map((item) => {
+                   const isLocked = item.isGold && !isGoldPlan;
+                   return (
+                    <button 
+                      key={item.id}
+                      disabled={isLocked}
+                      onClick={() => setLayout(item.id as LayoutType)} 
+                      className={cn(
+                        "flex items-center justify-between p-3 rounded-xl border-2 transition-all", 
+                        layout === item.id ? "border-primary bg-primary/5" : "border-muted hover:border-primary/20",
+                        isLocked && "opacity-40 grayscale cursor-not-allowed"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                         <item.icon className={cn("w-4 h-4", layout === item.id ? "text-primary" : "text-muted-foreground")} />
+                         <span className="text-xs font-bold">{item.label}</span>
+                      </div>
+                      {isLocked ? <Lock className="w-3 h-3 text-muted-foreground" /> : (layout === item.id && <Check className="w-3.5 h-3.5 text-primary" />)}
+                    </button>
+                   );
+                })}
               </div>
             </TabsContent>
 
@@ -540,8 +545,7 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </Tabs>
-    </div>
+      </div>
   );
 };
 
@@ -625,9 +629,9 @@ export default function PPEditorPage() {
     if (!authLoading && !user) router.replace('/login');
   }, [user, authLoading, router]);
 
-  // Rotação dinâmica apenas para Mural (Masonry)
+  // Rotação dinâmica apenas para Popup
   useEffect(() => {
-    if (layout === 'mural' && selectedIds.length > 5) {
+    if (layout === 'popup' && selectedIds.length > 1) {
       const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % selectedIds.length), 6000);
       return () => clearInterval(interval);
     }
@@ -729,17 +733,17 @@ export default function PPEditorPage() {
 
   const currentSelection = approvedTestimonials?.filter(t => selectedIds.includes(t.id)) || [];
 
-  // Pool de exibição: Grade mostra todos, outros fazem rodízio de 5.
+  // Pool de exibição: Grade e Mural agora são estáticos (mostram todos).
   const visibleTestimonialsPreview = useMemo(() => {
-    if (layout === 'grid') return currentSelection;
+    if (currentSelection.length === 0) return [];
     
-    const slice = [];
-    const count = Math.min(5, currentSelection.length);
-    for (let i = 0; i < count; i++) {
-      const idx = (muralIndex + i) % currentSelection.length;
-      slice.push(currentSelection[idx]);
+    if (layout === 'grid' || layout === 'mural') return currentSelection;
+
+    if (layout === 'popup') {
+      return [currentSelection[muralIndex % currentSelection.length]];
     }
-    return slice;
+    
+    return currentSelection;
   }, [currentSelection, layout, muralIndex]);
 
   const membershipLabel = isEnterprise ? 'Membro Enterprise' : (isGoldPlan ? 'Membro Gold' : 'Plano Base');
@@ -932,7 +936,7 @@ export default function PPEditorPage() {
                 </div>
 
                 <div className={cn(
-                  "px-4 sm:px-12 w-full max-w-5xl mx-auto py-12 py-12",
+                  "px-4 sm:px-12 w-full max-w-5xl mx-auto py-12",
                   layout === 'popup' ? "max-w-sm mx-auto flex flex-col gap-12" : (
                     layout === 'mural' 
                       ? "columns-1 sm:columns-2 lg:columns-3 gap-12" 
