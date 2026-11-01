@@ -215,7 +215,7 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
       className={cn(
         "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] animate-in fill-both",
         side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in",
-        !hasSecondary ? "border-none" : ""
+        !hasSecondary && "border-none"
       )}
       style={{ 
         boxShadow: `0 20px 40px -20px ${themeColor}25`,
@@ -707,7 +707,7 @@ export default function PPEditorPage() {
                   <span className="text-xs font-bold truncate max-w-[120px]">{userData?.companyName}</span>
                   <span className={cn("text-[8px] uppercase tracking-widest font-black", isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground")}>{isEnterprise ? 'Enterprise' : (isGoldPlan ? 'Gold' : 'Base')}</span>
                 </div>
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20"><User className="w-4 h-4" /></div>
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl bg-background border">
@@ -715,6 +715,14 @@ export default function PPEditorPage() {
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold"><TrendingUp className="mr-2 h-4 w-4 text-primary" />Dash</DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl font-bold"><Gem className="mr-2 h-4 w-4 text-primary" />Upgrade</DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => router.push('/pricing')} 
+                className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
+              >
+                <Handshake className="mr-2 h-4 w-4 text-primary" />
+                <span>Serviços de Parceiros</span>
+                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl font-bold">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}Tema</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive font-bold"><LogOut className="mr-2 h-4 w-4" />Sair</DropdownMenuItem>
