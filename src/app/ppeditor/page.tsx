@@ -214,17 +214,19 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
 
 const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0 }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number }) => {
   const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
+  const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
   
   return (
     <Card 
       key={`${t.id}-${muralIndex}`}
       className={cn(
-        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] animate-in fill-both border-none",
-        side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in"
+        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] animate-in fill-both",
+        side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in",
+        !hasSecondary ? "border-none" : ""
       )}
       style={{ 
         boxShadow: `0 20px 40px -20px ${themeColor}25`,
-        border: secondaryColor ? `2px solid ${secondaryColor}` : 'none'
+        border: hasSecondary ? `2px solid ${secondaryColor}` : 'none'
       }}
     >
       <div className="space-y-6">
@@ -547,8 +549,7 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </Tabs>
-    </div>
+      </div>
   );
 };
 
@@ -733,7 +734,7 @@ export default function PPEditorPage() {
     });
   };
 
-  const visibleTestimonialsPreview = approvedTestimonials?.filter(t => selectedIds.includes(t.id)).slice(0, 5) || [];
+  const visibleTestimonialsPreview = approvedTestimonials?.filter(t => selectedIds.includes(t.id)) || [];
   const membershipLabel = isEnterprise ? 'Membro Enterprise' : (isGoldPlan ? 'Membro Gold' : 'Plano Base');
 
   if (authLoading || userDataLoading || testimonialsLoading) {
@@ -848,7 +849,7 @@ export default function PPEditorPage() {
         </aside>
 
         <div className="flex-1 overflow-y-auto bg-muted/10 p-4 sm:p-8">
-          <div className="max-w-5xl mx-auto space-y-8 pb-20">
+          <div className="max-w-5xl mx-auto space-y-8 pb-32">
             <div className="flex items-center justify-between">
               <Sheet>
                 <SheetTrigger asChild>
@@ -924,7 +925,7 @@ export default function PPEditorPage() {
                 </div>
 
                 <div className={cn(
-                  "px-8 sm:px-12 w-full max-w-5xl mx-auto mt-12",
+                  "px-4 sm:px-12 w-full max-w-5xl mx-auto mt-12 py-8",
                   layout === 'popup' ? "max-w-sm mx-auto" : (
                     layout === 'mural' 
                       ? "columns-1 sm:columns-2 lg:columns-3 gap-12" 
@@ -933,7 +934,7 @@ export default function PPEditorPage() {
                 )}>
                   {visibleTestimonialsPreview.length > 0 ? (
                     visibleTestimonialsPreview.map((t, i) => (
-                      <div key={`${t.id}-${muralIndex}-${i}`} className={cn(layout === 'mural' ? "break-inside-avoid mb-12" : "")}>
+                      <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12 break-inside-avoid">
                         <TestimonialCard t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} />
                       </div>
                     ))

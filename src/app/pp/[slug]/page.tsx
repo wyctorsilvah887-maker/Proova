@@ -171,17 +171,19 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
 
   const TestimonialCard = ({ t, index = 0 }: { t: any, index?: number }) => {
     const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
+    const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
     
     return (
       <Card 
         key={`${t.id}-${muralIndex}`}
         className={cn(
-          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] animate-in fill-both border-none",
-          side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in"
+          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] animate-in fill-both",
+          side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in",
+          !hasSecondary ? "border-none" : ""
         )}
         style={{ 
           boxShadow: `0 20px 40px -20px ${themeColor}25`,
-          border: secondaryColor ? `2px solid ${secondaryColor}` : 'none'
+          border: hasSecondary ? `2px solid ${secondaryColor}` : 'none'
         }}
       >
         <div className="space-y-6">
@@ -337,7 +339,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
               ))}
             </div>
 
-            <main className="px-6 pb-20 space-y-12 flex-1 w-full max-w-[1600px] mx-auto">
+            <main className="px-6 pb-32 space-y-12 flex-1 w-full max-w-[1600px] mx-auto py-8">
               {filteredTestimonials.length === 0 ? (
                 <div className="text-center py-20 opacity-20 flex flex-col items-center gap-4">
                   <MessageSquare className="w-12 h-12" />
@@ -354,10 +356,15 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                       ))}
                     </div>
                   )}
-                  {layout === 'grid' && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
+                  {(layout === 'grid' || layout === 'popup') && (
+                    <div className={cn(
+                      "w-full",
+                      layout === 'popup' ? "max-w-sm mx-auto flex flex-col gap-12" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12"
+                    )}>
                       {visibleDisplayPool.map((t, i) => (
-                        <TestimonialCard key={`${t.id}-${muralIndex}-${i}`} t={t} index={i} />
+                        <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12">
+                          <TestimonialCard t={t} index={i} />
+                        </div>
                       ))}
                     </div>
                   )}
@@ -371,11 +378,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                         ))}
                       </CarouselContent>
                     </Carousel>
-                  )}
-                  {layout === 'popup' && (
-                    <div className="max-w-md mx-auto">
-                      <TestimonialCard t={filteredTestimonials[muralIndex % filteredTestimonials.length]} />
-                    </div>
                   )}
                 </div>
               )}
