@@ -124,6 +124,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
   
   const heroTitle = ppData?.heroTitle || `O que dizem sobre ${companyName || 'nós'}`;
   const heroSubtitle = ppData?.heroSubtitle || '';
+  const testimonialsTitle = ppData?.testimonialsTitle || '';
   const footerText = ppData?.footerText || `${new Date().getFullYear()} ${companyName || ''}`;
   const showProovaBranding = ppData?.showLogo !== false;
 
@@ -282,7 +283,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                   </div>
                 )}
                 <div className="space-y-4">
-                  <div className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.1] max-w-5xl mx-auto" dangerouslySetInnerHTML={{ __html: heroTitle }} />
+                  <div className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.1] max-w-4xl mx-auto" dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${companyName}` }} />
                   {heroSubtitle && <div className="text-muted-foreground text-base sm:text-lg max-w-3xl mx-auto font-medium leading-relaxed italic" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />}
                 </div>
               </div>
@@ -293,6 +294,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                 <section key={section.id} className={cn("py-24 px-6 text-center", section.variant === 'accent' ? "text-white" : (section.variant === 'dark' ? "bg-black text-white" : "bg-muted/5"))} style={{ backgroundColor: section.variant === 'accent' ? themeColor : undefined }}>
                   <div className="max-w-4xl mx-auto space-y-8">
                     <h2 className="text-3xl sm:text-5xl font-black tracking-tight">{section.title}</h2>
+                    {section.subtitle && <div className="text-lg font-bold opacity-80 italic leading-relaxed" dangerouslySetInnerHTML={{ __html: section.subtitle }} />}
                     <p className="text-base sm:text-xl leading-relaxed opacity-90 font-medium">{section.content}</p>
                     {section.buttonText && (
                       <div className="pt-8">
@@ -309,6 +311,12 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
             </div>
 
             <main className="px-6 pb-32 space-y-12 flex-1 w-full max-w-[1600px] mx-auto py-12">
+              {testimonialsTitle && (
+                <div className="text-center pb-12">
+                   <h2 className="text-3xl sm:text-5xl font-black font-headline uppercase tracking-widest" style={{ color: themeColor }}>{testimonialsTitle}</h2>
+                </div>
+              )}
+
               {filteredTestimonials.length === 0 ? (
                 <div className="text-center py-20 opacity-20 flex flex-col items-center gap-4">
                   <Globe className="w-12 h-12" />
@@ -352,7 +360,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
               )}
               <div className="flex flex-col items-center gap-2 opacity-30">
                 <p className="text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-1"><span>©</span> {footerText}</p>
-                {showProovaBranding && <div className="flex items-center justify-center gap-1.5 mt-2"><span className="text-[8px] font-black uppercase tracking-[0.2em]">POWERED BY PROOVA</span></div>}
+                {showProovaBranding && <div className="flex items-center justify-center gap-1.5 mt-2"><span className="text-[8px] font-black uppercase tracking-[0.3em]">POWERED BY PROOVA</span></div>}
               </div>
             </footer>
           </div>

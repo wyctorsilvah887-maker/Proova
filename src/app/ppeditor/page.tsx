@@ -37,7 +37,6 @@ import {
   ChevronDown,
   Handshake,
   X,
-  Bell,
   MessageCircle,
   Link2
 } from 'lucide-react';
@@ -98,6 +97,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from 'next-themes';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type LayoutType = 'grid' | 'mural' | 'carousel' | 'popup';
 
@@ -296,6 +296,7 @@ const PublicPageSettings = ({
   logoUrl, setLogoUrl,
   heroTitle, setHeroTitle,
   heroSubtitle, setHeroSubtitle,
+  testimonialsTitle, setTestimonialsTitle,
   footerText, setFooterText,
   showLogo, setShowLogo,
   whatsappEnabled, setWhatsappEnabled,
@@ -465,6 +466,19 @@ const PublicPageSettings = ({
                                   <div className="space-y-1.5"><Label className="text-[9px] font-bold uppercase opacity-50">Texto Botão</Label><Input value={section.buttonText} onChange={(e) => updateSection(section.id, 'buttonText', e.target.value)} className="h-8 text-[11px]" /></div>
                                   <div className="space-y-1.5"><Label className="text-[9px] font-bold uppercase opacity-50">Link Botão</Label><Input value={section.buttonUrl} onChange={(e) => updateSection(section.id, 'buttonUrl', e.target.value)} className="h-8 text-[11px]" /></div>
                                 </div>
+                                <div className="space-y-1.5">
+                                  <Label className="text-[9px] font-bold uppercase opacity-50">Estilo do Bloco</Label>
+                                  <Select value={section.variant} onValueChange={(val) => updateSection(section.id, 'variant', val as any)}>
+                                    <SelectTrigger className="h-8 text-[11px]">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="light">Fundo Claro</SelectItem>
+                                      <SelectItem value="dark">Fundo Escuro</SelectItem>
+                                      <SelectItem value="accent">Fundo Marca (Primária)</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
                               </AccordionContent>
                             </AccordionItem>
                           </Accordion>
@@ -474,6 +488,15 @@ const PublicPageSettings = ({
                   </div>
 
                   <div className="space-y-6 pt-6 border-t">
+                    <div className="space-y-3">
+                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Título da Seção de Depoimentos</Label>
+                      <Input 
+                        value={testimonialsTitle} 
+                        onChange={(e) => setTestimonialsTitle(e.target.value)} 
+                        placeholder="Ex: O que dizem nossos clientes" 
+                        className="h-10 text-xs font-bold" 
+                      />
+                    </div>
                     <div className="space-y-3">
                       <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Copy do Rodapé</Label>
                       <div className="relative group">
@@ -631,6 +654,7 @@ export default function PPEditorPage() {
   const [logoUrl, setLogoUrl] = useState('');
   const [heroTitle, setHeroTitle] = useState('');
   const [heroSubtitle, setHeroSubtitle] = useState('');
+  const [testimonialsTitle, setTestimonialsTitle] = useState('');
   const [footerText, setFooterText] = useState('');
   const [showLogo, setShowLogo] = useState(true);
   const [whatsappEnabled, setWhatsappEnabled] = useState(false);
@@ -668,6 +692,7 @@ export default function PPEditorPage() {
       setLogoUrl(ppData.logoUrl || '');
       setHeroTitle(ppData.heroTitle || '');
       setHeroSubtitle(ppData.heroSubtitle || '');
+      setTestimonialsTitle(ppData.testimonialsTitle || '');
       setFooterText(ppData.footerText || '');
       setShowLogo(ppData.showLogo !== undefined ? ppData.showLogo : true);
       setWhatsappEnabled(ppData.whatsappEnabled || false);
@@ -719,7 +744,7 @@ export default function PPEditorPage() {
       const targetPPRef = doc(db, 'users', user.uid, 'pp', targetSlug);
       batch.set(targetPPRef, {
         selectedTestimonialIds: selectedIds,
-        themeColor, secondaryColor, layout, logoUrl, heroTitle, heroSubtitle, footerText, showLogo,
+        themeColor, secondaryColor, layout, logoUrl, heroTitle, heroSubtitle, testimonialsTitle, footerText, showLogo,
         whatsappEnabled, whatsappNumber, externalSiteUrl, externalSiteButtonText,
         customSections: customSections || [],
         updatedAt: serverTimestamp()
@@ -846,6 +871,7 @@ export default function PPEditorPage() {
               themeColor={themeColor} setThemeColor={setThemeColor} secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
               layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
               heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
+              testimonialsTitle={testimonialsTitle} setTestimonialsTitle={setTestimonialsTitle}
               footerText={footerText} setFooterText={setFooterText} showLogo={showLogo} setShowLogo={setShowLogo}
               whatsappEnabled={whatsappEnabled} setWhatsappEnabled={setWhatsappEnabled}
               whatsappNumber={whatsappNumber} setWhatsappNumber={setWhatsappNumber}
@@ -893,6 +919,12 @@ export default function PPEditorPage() {
                       </div>
                     ))}
                   </div>
+
+                  {testimonialsTitle && (
+                    <div className="text-center pb-8 px-8">
+                       <h2 className="text-xl sm:text-2xl font-black font-headline uppercase tracking-widest" style={{ color: themeColor }}>{testimonialsTitle}</h2>
+                    </div>
+                  )}
 
                   <div className={cn(
                     "px-6 sm:px-12 w-full max-w-[1400px] mx-auto py-12 pb-32",
@@ -954,6 +986,7 @@ export default function PPEditorPage() {
               themeColor={themeColor} setThemeColor={setThemeColor} secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
               layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
               heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
+              testimonialsTitle={testimonialsTitle} setTestimonialsTitle={setTestimonialsTitle}
               footerText={footerText} setFooterText={setFooterText} showLogo={showLogo} setShowLogo={setShowLogo}
               whatsappEnabled={whatsappEnabled} setWhatsappEnabled={setWhatsappEnabled}
               whatsappNumber={whatsappNumber} setWhatsappNumber={setWhatsappNumber}
