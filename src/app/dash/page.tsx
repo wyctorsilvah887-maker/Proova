@@ -1174,7 +1174,7 @@ export default function DashPage() {
               className="w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 bg-primary hover:bg-primary/90 shadow-xl transition-all active:scale-95 group"
               onClick={() => {
                 const slug = userData?.companySlug || userData?.companyName?.toLowerCase().replace(/\s+/g, '-') || '';
-                router.push(`/pp/${slug}`);
+                router.push(`/pp/${slug}`); // Rota amigável unificada
                 setIsPublicPageChoiceOpen(false);
               }}
             >
@@ -1322,7 +1322,7 @@ export default function DashPage() {
                        </div>
                        
                        <p className={cn(
-                         "text-base sm:text-2xl font-black leading-snug sm:leading-tight line-clamp-6 italic drop-shadow-xl px-2 tracking-tight",
+                         "text-base sm:text-2xl font-black font-headline leading-snug sm:leading-tight line-clamp-6 italic drop-shadow-xl px-2 tracking-tight",
                          cardVariant === 'dark' ? "text-white" : "text-white"
                        )}>
                           "{selectedTestimonialForShare?.text}"

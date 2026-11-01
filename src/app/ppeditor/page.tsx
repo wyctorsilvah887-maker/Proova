@@ -83,7 +83,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/Accordion";
 import { Slider } from '@/components/ui/slider';
 import Cropper from 'react-easy-crop';
 import { 
@@ -212,7 +212,7 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
   return (
     <Card 
       className={cn(
-        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none",
+        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none mb-12",
         "animate-in fade-in duration-700 ease-out fill-both",
         side === 'left' ? "slide-in-from-left-12" : "slide-in-from-right-12"
       )}
@@ -358,9 +358,9 @@ const PublicPageSettings = ({
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Estilo de Exibição</Label>
               <div className="grid grid-cols-1 gap-2">
                 {[
-                  { id: 'grid', icon: Layout, label: 'Grade Padrão', isGold: false },
-                  { id: 'mural', icon: LayoutGrid, label: 'Mural (2 Itens Swap)', isGold: true },
-                  { id: 'carousel', icon: Play, label: 'Carrossel VIP (1 Item)', isGold: true },
+                  { id: 'grid', icon: Layout, label: 'Grade Padrão (Fixo)', isGold: false },
+                  { id: 'mural', icon: LayoutGrid, label: 'Mural (Swap 2 Itens)', isGold: true },
+                  { id: 'carousel', icon: Play, label: 'Carrossel VIP (Loop 1 Item)', isGold: true },
                   { id: 'popup', icon: MessageSquare, label: 'Notificação', isGold: true },
                 ].map((item) => {
                    const isLocked = item.isGold && !isGoldPlan;
@@ -512,7 +512,8 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </div>
+      </Tabs>
+    </div>
   );
 };
 
@@ -532,7 +533,7 @@ export default function PPEditorPage() {
     if (!db || !user || !activeSlug) return null;
     return doc(db, 'users', user.uid, 'pp', activeSlug);
   }, [db, user, activeSlug]);
-  const { data: ppData, loading: ppLoading } = useDoc(ppRef);
+  const { data: ppData } = useDoc(ppRef);
 
   const isEnterprise = userData?.membershipStatus === 'enterprise';
   const isGoldPlan = isEnterprise || userData?.membershipStatus === 'gold' || userData?.membershipStatus === 'trial';
@@ -674,7 +675,7 @@ export default function PPEditorPage() {
     
     if (layout === 'mural') {
       const slice = [];
-      const count = 2; 
+      const count = 2; // Visibilidade de exatamente 2 para Mural (Swap)
       for (let i = 0; i < Math.min(count, currentSelection.length); i++) {
         const idx = (muralIndex + i) % currentSelection.length;
         slice.push(currentSelection[idx]);
@@ -683,6 +684,7 @@ export default function PPEditorPage() {
     }
     
     if (layout === 'carousel' || layout === 'popup') {
+      // Visibilidade de exatamente 1 para Carrossel/Popup (Loop)
       return [currentSelection[muralIndex % currentSelection.length]];
     }
     

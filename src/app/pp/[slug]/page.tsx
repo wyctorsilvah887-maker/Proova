@@ -17,12 +17,6 @@ import { Star, User, Loader2, Globe, ArrowLeft, CheckCircle2, Clock, Play, Arrow
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  type CarouselApi,
-} from "@/components/ui/carousel";
 import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function PublicPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -35,7 +29,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
   const [allTestimonials, setAllTestimonials] = useState<any[]>([]);
   const [targetUserId, setTargetUserId] = useState<string | null>(null);
   const [muralIndex, setMuralIndex] = useState(0);
-  const [api, setApi] = useState<CarouselApi>();
   const [isStandalone, setIsStandalone] = useState(false);
   const [companyName, setCompanyName] = useState('');
 
@@ -144,7 +137,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     
     if (layout === 'mural') {
       const slice = [];
-      const count = 2; // Fixed to 2 items swap
+      const count = 2; // Mural fixo em 2 itens com swap
       for (let i = 0; i < Math.min(count, filteredTestimonials.length); i++) {
         const idx = (muralIndex + i) % filteredTestimonials.length;
         slice.push(filteredTestimonials[idx]);
@@ -153,7 +146,8 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     }
     
     if (layout === 'carousel' || layout === 'popup') {
-      return [filteredTestimonials[muralIndex % filteredTestimonials.length]]; // Fixed to 1 item loop
+      // Carrossel/Popup fixo em 1 item com loop
+      return [filteredTestimonials[muralIndex % filteredTestimonials.length]];
     }
     
     if (layout === 'grid') return filteredTestimonials;
@@ -278,7 +272,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                   </div>
                 )}
                 <div className="space-y-4">
-                  <h1 className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.05] max-w-5xl mx-auto" dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${companyName}` }} />
+                  <h1 className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.1] max-w-5xl mx-auto" dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${companyName}` }} />
                   {heroSubtitle && <div className="text-muted-foreground text-base sm:text-lg max-w-3xl mx-auto font-medium leading-relaxed italic" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />}
                 </div>
               </div>
