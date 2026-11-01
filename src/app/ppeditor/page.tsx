@@ -25,6 +25,7 @@ import {
   Link2,
   Copy,
   ExternalLink,
+  ChevronDown,
   LogOut,
   TrendingUp,
   Inbox,
@@ -35,11 +36,11 @@ import {
   Plus,
   ArrowRight,
   Lock,
+  Sparkles,
   Settings2,
   Handshake,
   X,
-  Pipette,
-  Sparkles
+  Pipette
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
@@ -281,7 +282,7 @@ const PublicPageSettings = ({
         <Link href="/dash" className="w-full">
           <Button variant="ghost" className="w-full justify-start gap-3 h-10 px-2 group">
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-xs font-black uppercase tracking-[0.2em]">Voltar ao Dash</span>
+            <span className="text-xs font-black uppercase tracking-[0.2em]">Painel Principal</span>
           </Button>
         </Link>
         <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm bg-primary text-primary-foreground">
@@ -303,8 +304,8 @@ const PublicPageSettings = ({
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-8 pb-10">
             <TabsContent value="geral" className="mt-0 space-y-8 animate-in fade-in duration-300">
-              <div className="space-y-4">
-                <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Logo Marca</Label>
+              <div className="space-y-4 text-center">
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground block text-left ml-1">Logo Marca</Label>
                 <div 
                   onClick={() => !isUploading && logoInputRef.current?.click()}
                   className="aspect-square w-24 border-2 border-dashed rounded-2xl flex items-center justify-center bg-muted/20 overflow-hidden mx-auto cursor-pointer group transition-all hover:bg-muted/30"
@@ -463,12 +464,15 @@ const PublicPageSettings = ({
                     key={item.id}
                     onClick={() => setLayout(item.id as LayoutType)} 
                     className={cn(
-                      "flex items-center gap-3 p-3 rounded-xl border-2 transition-all", 
+                      "flex items-center justify-between p-3 rounded-xl border-2 transition-all", 
                       layout === item.id ? "border-primary bg-primary/5" : "border-muted hover:border-primary/20"
                     )}
                   >
-                    <item.icon className={cn("w-4 h-4", layout === item.id ? "text-primary" : "text-muted-foreground")} />
-                    <span className="text-xs font-bold">{item.label}</span>
+                    <div className="flex items-center gap-3">
+                       <item.icon className={cn("w-4 h-4", layout === item.id ? "text-primary" : "text-muted-foreground")} />
+                       <span className="text-xs font-bold">{item.label}</span>
+                    </div>
+                    {layout === item.id && <Check className="w-3.5 h-3.5 text-primary" />}
                   </button>
                 ))}
               </div>
@@ -502,6 +506,7 @@ export default function PPEditorPage() {
   const auth = useAuth();
   const storage = useStorage();
   const router = useRouter();
+  const { theme, setTheme } = useTheme();
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
@@ -702,10 +707,19 @@ export default function PPEditorPage() {
     });
   };
 
+  const membershipLabel = isEnterprise ? 'Membro Enterprise' : (isGoldPlan ? 'Membro Gold' : 'Plano Base');
+
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body w-full overflow-hidden text-foreground">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center gap-3 flex-1">
+        <div className="flex items-center gap-2 md:gap-3 flex-1">
+          <Link href="/dash">
+            <Button variant="ghost" size="sm" className="h-10 px-2 gap-2 text-muted-foreground hover:text-primary transition-all rounded-xl border border-transparent hover:border-primary/10">
+               <ArrowLeft className="w-4 h-4" />
+               <span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Voltar</span>
+            </Button>
+          </Link>
+          <div className="h-6 w-px bg-border mx-1 hidden sm:block" />
           <Sheet>
             <SheetTrigger asChild>
               <button className="flex flex-col items-center justify-center gap-1 group transition-all text-primary hover:text-primary/80">
@@ -723,25 +737,88 @@ export default function PPEditorPage() {
               <PublicPageSettings {...sidebarProps} />
             </SheetContent>
           </Sheet>
-          <div className="flex items-center group -ml-2 md:-ml-4">
-            <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px]">
+          <div className="flex items-center group -ml-1 sm:-ml-2">
+            <div className="relative w-[160px] h-[55px] md:w-[320px] md:h-[105px]">
               <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
               <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" priority />
             </div>
           </div>
         </div>
 
-        <div className="ml-auto flex items-center gap-4">
+        <div className="ml-auto flex items-center gap-2 md:gap-4">
           <Button onClick={handleSave} disabled={isSaving || isUploading} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg hover:scale-105 active:scale-95 transition-transform">
             {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar
           </Button>
+          
           <DropdownMenu>
-            <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="rounded-xl border h-10 w-10"><User className="w-5 h-5 text-primary" /></Button></DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl bg-background border">
-               <DropdownMenuLabel className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Administrador</DropdownMenuLabel>
-               <DropdownMenuSeparator className="mx-1" />
-               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold py-2.5 cursor-pointer"><TrendingUp className="mr-2 h-4 w-4 text-primary" />Dash</DropdownMenuItem>
-               <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive font-bold py-2.5 cursor-pointer"><LogOut className="mr-2 h-4 w-4" />Sair</DropdownMenuItem>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-10 md:h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
+                <div className="hidden sm:flex flex-col items-end">
+                  <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
+                    {userData?.companyName || 'Minha Empresa'}
+                  </span>
+                  <span className={cn(
+                    "text-[8px] uppercase tracking-widest font-black leading-tight",
+                    isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground"
+                  )}>
+                    {membershipLabel}
+                  </span>
+                </div>
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
+                  <User className="w-4 h-4" />
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
+              <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
+              <DropdownMenuSeparator className="mx-1" />
+              
+              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <TrendingUp className="mr-2 h-4 w-4 text-primary" />
+                <span>Painel Principal</span>
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Layout className="mr-2 h-4 w-4 text-primary" />
+                <span>Meus Murais</span>
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Inbox className="mr-2 h-4 w-4 text-primary" />
+                <span>Inbox Privado</span>
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Gem className="mr-2 h-4 w-4 text-primary" />
+                <span>Planos de Upgrade</span>
+              </DropdownMenuItem>
+              
+              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70">
+                <Handshake className="mr-2 h-4 w-4 text-primary" />
+                <span>Serviços de Parceiros</span>
+                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator className="mx-1" />
+              
+              <DropdownMenuItem 
+                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+                className="rounded-xl cursor-pointer font-bold py-2.5"
+              >
+                {theme === 'light' ? (
+                  <Moon className="mr-2 h-4 w-4 text-primary" />
+                ) : (
+                  <Sun className="mr-2 h-4 w-4 text-primary" />
+                )}
+                <span>Alternar Tema</span>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator className="mx-1" />
+              
+              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sair</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
