@@ -281,7 +281,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                   </div>
                 )}
                 <div className="space-y-4">
-                  <h1 className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.1] max-w-5xl mx-auto" dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${companyName}` }} />
+                  <div className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.1] max-w-5xl mx-auto" dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${companyName}` }} />
                   {heroSubtitle && <div className="text-muted-foreground text-base sm:text-lg max-w-3xl mx-auto font-medium leading-relaxed italic" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />}
                 </div>
               </div>

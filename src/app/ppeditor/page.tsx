@@ -516,7 +516,8 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </div>
+      </Tabs>
+    </div>
   );
 };
 
@@ -788,7 +789,7 @@ export default function PPEditorPage() {
                       <div className="mx-auto w-20 h-20 relative"><img src={logoUrl} className="w-full h-full object-cover rounded-[2.5rem] shadow-lg border-2 border-background" alt="Logo" /></div>
                     )}
                     <div className="space-y-4">
-                      <h1 className="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] max-w-4xl mx-auto text-foreground" dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${userData?.companyName}` }} />
+                      <div className="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] max-w-4xl mx-auto text-foreground" dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${userData?.companyName}` }} />
                       {heroSubtitle && <div className="text-foreground text-sm font-bold max-w-2xl mx-auto italic leading-relaxed" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />}
                     </div>
                   </div>
