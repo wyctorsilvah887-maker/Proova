@@ -35,7 +35,8 @@ import {
   Pipette,
   Clock,
   ChevronDown,
-  Handshake
+  Handshake,
+  X
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -82,7 +83,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/accordion";
+} from "@/components/ui/accordion";
 import { Slider } from '@/components/ui/slider';
 import Cropper from 'react-easy-crop';
 import { 
@@ -284,7 +285,6 @@ const PublicPageSettings = ({
   logoUrl, setLogoUrl,
   heroTitle, setHeroTitle,
   heroSubtitle, setHeroSubtitle,
-  testimonialsTitle, setTestimonialsTitle,
   footerText, setFooterText,
   showLogo, setShowLogo,
   customSections, setCustomSections,
@@ -399,7 +399,7 @@ const PublicPageSettings = ({
 
             <TabsContent value="conteudo" className="mt-0">
               {!isGoldPlan ? (
-                <div className="py-20 px-4 text-center space-y-6 bg-primary/5 rounded-3xl border border-dashed border-primary/20 animate-in zoom-in duration-500">
+                <div className="py-20 px-4 text-center space-y-6 bg-primary/5 rounded-3xl border border-dashed border-primary/20">
                    <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit">
                      <Gem className="w-10 h-10 text-primary" />
                    </div>
@@ -585,7 +585,6 @@ export default function PPEditorPage() {
   const [logoUrl, setLogoUrl] = useState('');
   const [heroTitle, setHeroTitle] = useState('');
   const [heroSubtitle, setHeroSubtitle] = useState('');
-  const [testimonialsTitle, setTestimonialsTitle] = useState('');
   const [footerText, setFooterText] = useState('');
   const [showLogo, setShowLogo] = useState(true);
   const [customSections, setCustomSections] = useState<CustomSection[]>([]);
@@ -618,7 +617,6 @@ export default function PPEditorPage() {
       setLogoUrl(ppData.logoUrl || '');
       setHeroTitle(ppData.heroTitle || '');
       setHeroSubtitle(ppData.heroSubtitle || '');
-      setTestimonialsTitle(ppData.testimonialsTitle || '');
       setFooterText(ppData.footerText || '');
       setShowLogo(ppData.showLogo !== undefined ? ppData.showLogo : true);
       setCustomSections(ppData.customSections || []);
@@ -629,7 +627,6 @@ export default function PPEditorPage() {
     if (!authLoading && !user) router.replace('/login');
   }, [user, authLoading, router]);
 
-  // Rotação dinâmica apenas para Popup
   useEffect(() => {
     if (layout === 'popup' && selectedIds.length > 1) {
       const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % selectedIds.length), 6000);
@@ -672,7 +669,6 @@ export default function PPEditorPage() {
         logoUrl,
         heroTitle,
         heroSubtitle,
-        testimonialsTitle,
         footerText,
         showLogo,
         customSections: customSections || [],
@@ -733,20 +729,12 @@ export default function PPEditorPage() {
 
   const currentSelection = approvedTestimonials?.filter(t => selectedIds.includes(t.id)) || [];
 
-  // Pool de exibição: Grade e Mural agora são estáticos (mostram todos).
   const visibleTestimonialsPreview = useMemo(() => {
     if (currentSelection.length === 0) return [];
-    
     if (layout === 'grid' || layout === 'mural') return currentSelection;
-
-    if (layout === 'popup') {
-      return [currentSelection[muralIndex % currentSelection.length]];
-    }
-    
+    if (layout === 'popup') return [currentSelection[muralIndex % currentSelection.length]];
     return currentSelection;
   }, [currentSelection, layout, muralIndex]);
-
-  const membershipLabel = isEnterprise ? 'Membro Enterprise' : (isGoldPlan ? 'Membro Gold' : 'Plano Base');
 
   if (authLoading || userDataLoading || testimonialsLoading) {
     return (
@@ -794,7 +782,7 @@ export default function PPEditorPage() {
                     "text-[8px] uppercase tracking-widest font-black leading-tight",
                     isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground"
                   )}>
-                    {membershipLabel}
+                    {isEnterprise ? 'Membro Enterprise' : (isGoldPlan ? 'Membro Gold' : 'Plano Base')}
                   </span>
                 </div>
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
@@ -851,7 +839,6 @@ export default function PPEditorPage() {
             secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
             layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
             heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
-            testimonialsTitle={testimonialsTitle} setTestimonialsTitle={setTestimonialsTitle} 
             footerText={footerText} setFooterText={setFooterText}
             showLogo={showLogo} setShowLogo={setShowLogo} customSections={customSections} setCustomSections={setCustomSections}
             onFileSelect={onFileSelect} isUploading={isUploading} handleSave={handleSave} isSaving={isSaving} isGoldPlan={isGoldPlan}
@@ -878,7 +865,6 @@ export default function PPEditorPage() {
                     secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
                     layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
                     heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
-                    testimonialsTitle={testimonialsTitle} setTestimonialsTitle={setTestimonialsTitle} 
                     footerText={footerText} setFooterText={setFooterText}
                     showLogo={showLogo} setShowLogo={setShowLogo} customSections={customSections} setCustomSections={setCustomSections}
                     onFileSelect={onFileSelect} isUploading={isUploading} handleSave={handleSave} isSaving={isSaving} isGoldPlan={isGoldPlan}
@@ -936,11 +922,11 @@ export default function PPEditorPage() {
                 </div>
 
                 <div className={cn(
-                  "px-4 sm:px-12 w-full max-w-5xl mx-auto py-12",
+                  "px-4 sm:px-12 w-full max-w-[1400px] mx-auto py-12",
                   layout === 'popup' ? "max-w-sm mx-auto flex flex-col gap-12" : (
                     layout === 'mural' 
-                      ? "columns-1 sm:columns-2 lg:columns-3 gap-12" 
-                      : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12"
+                      ? "columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-12" 
+                      : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12"
                   )
                 )}>
                   {visibleTestimonialsPreview.length > 0 ? (
