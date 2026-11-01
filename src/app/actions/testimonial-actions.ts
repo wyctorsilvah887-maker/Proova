@@ -85,7 +85,10 @@ export async function submitTestimonialAction(data: {
   try {
     await checkRateLimit('submit_testimonial');
     const { firestore } = initializeFirebase();
-    const initialStatus = data.destination === 'public' ? 'pending' : 'approved';
+    
+    // Agora todos os depoimentos (públicos e privados) são marcados como aprovados por padrão.
+    // Depoimentos públicos pulam a fila de curadoria conforme solicitação.
+    const initialStatus = 'approved';
 
     const testimonialData = {
       userName: data.userName.trim(),
@@ -115,6 +118,8 @@ export async function submitTestimonialAction(data: {
         if (data.destination === 'private' || data.rating <= 3) {
           await sendCriticalFeedbackAlert(userData.email, testimonialData, userData.companyName);
         } else if (data.destination === 'public' && data.rating >= 4 && data.text.length >= 20) {
+          // Mantemos o alerta de curadoria apenas como informativo de novo elogio, 
+          // já que ele agora entra aprovado.
           await sendCuratorshipAlert(userData.email, testimonialData, userData.companyName);
         }
       }

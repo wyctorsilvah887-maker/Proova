@@ -275,7 +275,6 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
 
     if (videoBlob) {
       try {
-        // Garantindo metadados explícitos para evitar erro de autorização durante negociação de stream
         const videoRef = ref(storage, `users/${targetUserId}/testimonials_videos/video_${Date.now()}.webm`);
         const metadata = { 
           contentType: 'video/webm',
@@ -299,13 +298,14 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
       }
     }
 
+    // Ao clicar em público, o sistema agora leva direto para a tela de agradecimento (Obrigado)
+    // removendo o redirecionamento automático para o Maps.
     if (destination === 'public' && !videoBlob) {
-      if (googleMapsUrl) handleGoogleRedirect(googleMapsUrl);
       try {
         const textToCopy = text.trim();
         if (textToCopy) {
           await navigator.clipboard.writeText(textToCopy);
-          toast({ title: "Feedback Copiado!", description: "Pronto para colar no Google." });
+          toast({ title: "Feedback Copiado!", description: "Sua mensagem foi salva para quando você for ao Google." });
         }
       } catch (err) {}
     }
@@ -326,7 +326,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
       setSelectionPending(false);
       toast({
         title: (destination === 'public' || videoBlob) ? "Enviado com Sucesso!" : "Feedback Enviado Privado",
-        description: (destination === 'public' || videoBlob) ? "Sua avaliação aguarda aprovação interna." : "A gerência recebeu seu feedback sigiloso.",
+        description: (destination === 'public' || videoBlob) ? "Sua avaliação foi publicada com sucesso." : "A gerência recebeu seu feedback sigiloso.",
       });
     } else {
       toast({ variant: "destructive", title: "Falha no Envio", description: result.error || "Erro ao processar depoimento." });
