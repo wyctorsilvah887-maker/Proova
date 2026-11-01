@@ -205,17 +205,13 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
   );
 };
 
-const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0 }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number }) => {
-  const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
+const TestimonialCard = ({ t, themeColor, secondaryColor }: { t: any, themeColor: string, secondaryColor: string }) => {
   const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
   
   return (
     <Card 
-      key={`${t.id}-${muralIndex}`}
       className={cn(
-        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] animate-in fill-both",
-        side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in",
-        !hasSecondary && "border-none"
+        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] border-none"
       )}
       style={{ 
         boxShadow: `0 20px 40px -20px ${themeColor}25`,
@@ -246,7 +242,6 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
         {t.videoUrl && (
           <div className="relative aspect-video rounded-3xl overflow-hidden bg-black shadow-2xl group ring-1 ring-white/10">
              <video src={t.videoUrl} className="w-full h-full object-cover" muted loop playsInline autoPlay />
-             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
              <div className="absolute bottom-3 left-3 flex items-center gap-2">
                <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
                  <p className="text-[8px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
@@ -335,7 +330,7 @@ const PublicPageSettings = ({
             </Button>
           </Link>
           {onClose && (
-            <Button variant="ghost" size="sm" onClick={onClose} className="lg:hidden text-muted-foreground">Fechar</Button>
+            <Button variant="ghost" size="icon" onClick={onClose} className="lg:hidden h-8 w-8 rounded-full"><X className="w-4 h-4" /></Button>
           )}
         </div>
         <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm">
@@ -392,9 +387,7 @@ const PublicPageSettings = ({
                     )}
                   >
                     <div className="absolute inset-0 bg-white dark:bg-zinc-800" />
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-px h-full bg-red-500 rotate-45" />
-                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center"><div className="w-px h-full bg-red-500 rotate-45" /></div>
                   </button>
                   {colors.map((color) => (
                     <button key={color} onClick={() => setSecondaryColor(color)} className={cn("w-7 h-7 rounded-full border-2 transition-transform hover:scale-110", secondaryColor === color ? "border-foreground" : "border-transparent shadow-inner")} style={{ backgroundColor: color }} />
@@ -405,13 +398,13 @@ const PublicPageSettings = ({
 
             <TabsContent value="conteudo" className="mt-0">
               {!isGoldPlan ? (
-                <div className="py-20 px-4 text-center space-y-6 bg-primary/5 rounded-3xl border border-dashed border-primary/20">
-                   <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit"><Gem className="w-10 h-10 text-primary" /></div>
+                <div className="py-16 px-4 text-center space-y-6 bg-primary/5 rounded-3xl border border-dashed border-primary/20 m-2">
+                   <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit"><Gem className="w-8 h-8 text-primary" /></div>
                    <div className="space-y-2">
-                     <h3 className="text-sm font-black uppercase tracking-tight">Recurso Gold</h3>
-                     <p className="text-[10px] text-muted-foreground leading-relaxed max-w-[200px] mx-auto">A edição de conteúdos persuasivos e seções ilimitadas são exclusivas dos planos Gold e Enterprise.</p>
+                     <h3 className="text-sm font-black uppercase tracking-tight">Recurso Premium</h3>
+                     <p className="text-[10px] text-muted-foreground leading-relaxed max-w-[200px] mx-auto">Edição de textos ilimitada e seções no-code exclusivas Gold/Enterprise.</p>
                    </div>
-                   <Button className="w-full font-black uppercase tracking-widest text-[10px] h-12 rounded-xl" onClick={() => router.push('/pricing')}>Upgrade Agora</Button>
+                   <Button className="w-full font-black uppercase tracking-widest text-[10px] h-11 rounded-xl" onClick={() => router.push('/pricing')}>Upgrade Agora</Button>
                 </div>
               ) : (
                 <div className="space-y-8">
@@ -474,11 +467,11 @@ const PublicPageSettings = ({
             </TabsContent>
 
             <TabsContent value="design" className="mt-0 space-y-6">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Layout da Página</Label>
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Estilo de Mural</Label>
               <div className="grid grid-cols-1 gap-2">
                 {[
-                  { id: 'grid', icon: Layout, label: 'Grade Estática (Todos)', isGold: false },
-                  { id: 'mural', icon: LayoutGrid, label: 'Mural Masonry (Todos)', isGold: true },
+                  { id: 'grid', icon: Layout, label: 'Grade Estática (Adaptável)', isGold: false },
+                  { id: 'mural', icon: LayoutGrid, label: 'Mural Masonry (Estático)', isGold: true },
                   { id: 'carousel', icon: Play, label: 'Carrossel Dinâmico', isGold: true },
                   { id: 'popup', icon: MessageSquare, label: 'Notificação VIP', isGold: true },
                 ].map((item) => {
@@ -507,7 +500,7 @@ const PublicPageSettings = ({
 
             <TabsContent value="social" className="mt-0 space-y-6">
               <div className="space-y-4">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 ml-1"><Globe className="w-3 h-3" /> Link Único (Bio)</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 ml-1"><Globe className="w-3 h-3" /> Link da Bio (Slug)</Label>
                 <div className="flex items-center gap-1 bg-muted/20 rounded-xl px-3 border border-transparent focus-within:border-primary/20 transition-all">
                   <span className="text-[10px] font-bold opacity-40">/pp/</span>
                   <input value={currentSlug} onChange={(e) => setSlugEdit(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/\s+/g, '-'))} className="h-10 flex-1 bg-transparent border-none focus:ring-0 text-xs font-mono font-bold" />
@@ -600,7 +593,7 @@ export default function PPEditorPage() {
 
   useEffect(() => {
     if (layout === 'popup' && selectedIds.length > 1) {
-      const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % selectedIds.length), 6000);
+      const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % selectedIds.length), 7000);
       return () => clearInterval(interval);
     }
   }, [layout, selectedIds]);
@@ -625,7 +618,7 @@ export default function PPEditorPage() {
         }
         batch.update(doc(db, 'users', user.uid), { companySlug: newSlug });
       }
-      const targetSlug = isSlugChanging ? newSlug : oldSlug;
+      const targetSlug = isSlugChanging ? newSlug : (oldSlug || 'minha-pagina');
       const targetPPRef = doc(db, 'users', user.uid, 'pp', targetSlug);
       batch.set(targetPPRef, {
         selectedTestimonialIds: selectedIds,
@@ -715,14 +708,7 @@ export default function PPEditorPage() {
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold"><TrendingUp className="mr-2 h-4 w-4 text-primary" />Dash</DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl font-bold"><Gem className="mr-2 h-4 w-4 text-primary" />Upgrade</DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => router.push('/pricing')} 
-                className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
-              >
-                <Handshake className="mr-2 h-4 w-4 text-primary" />
-                <span>Serviços de Parceiros</span>
-                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"><Handshake className="mr-2 h-4 w-4 text-primary" /><span>Parceiros</span><Lock className="ml-auto w-3.5 h-3.5 opacity-60" /></DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl font-bold">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}Tema</DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive font-bold"><LogOut className="mr-2 h-4 w-4" />Sair</DropdownMenuItem>
@@ -749,9 +735,7 @@ export default function PPEditorPage() {
             <div className="max-w-5xl mx-auto space-y-8 pb-32">
               <div className="flex items-center justify-between">
                 <SheetTrigger asChild>
-                  <button className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 hover:text-primary transition-colors animate-pulse outline-none">
-                    <Monitor className="w-4 h-4" /> EDITAR
-                  </button>
+                  <button className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 hover:text-primary transition-colors animate-pulse outline-none"><Monitor className="w-4 h-4" /> EDITAR</button>
                 </SheetTrigger>
                 <div className="flex items-center gap-2 bg-background border px-3 py-1 rounded-full shadow-sm">
                    <span className="text-[10px] font-bold opacity-50 uppercase">Link:</span>
@@ -763,9 +747,7 @@ export default function PPEditorPage() {
                 <div className="flex-1 flex flex-col pt-24 pb-12">
                   <div className="px-8 sm:px-12 text-center space-y-6 mb-12">
                     {logoUrl && (
-                      <div className="mx-auto w-20 h-20 relative">
-                        <img src={logoUrl} className="w-full h-full object-cover rounded-[2.5rem] shadow-lg border-2 border-background" alt="Logo" />
-                      </div>
+                      <div className="mx-auto w-20 h-20 relative"><img src={logoUrl} className="w-full h-full object-cover rounded-[2.5rem] shadow-lg border-2 border-background" alt="Logo" /></div>
                     )}
                     <div className="space-y-4">
                       <h1 className="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] max-w-4xl mx-auto text-foreground" dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${userData?.companyName}` }} />
@@ -796,7 +778,7 @@ export default function PPEditorPage() {
                   )}>
                     {visibleTestimonialsPreview.length > 0 ? visibleTestimonialsPreview.map((t, i) => (
                       <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12 break-inside-avoid">
-                        <TestimonialCard t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} />
+                        <TestimonialCard t={t} themeColor={themeColor} secondaryColor={secondaryColor} />
                       </div>
                     )) : <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos abaixo.</div>}
                   </div>
