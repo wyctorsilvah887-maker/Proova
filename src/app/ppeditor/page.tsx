@@ -25,24 +25,22 @@ import {
   Link2,
   Copy,
   ExternalLink,
-  ChevronDown,
   LogOut,
   TrendingUp,
   Inbox,
   Gem,
-  Shield,
   Sun,
   Moon,
   Type,
   Plus,
   ArrowRight,
   Lock,
-  Sparkles,
   Settings2,
   Handshake,
   X,
   Pipette
 } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -51,7 +49,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useUser, useFirestore, useDoc, useCollection, useStorage, useAuth } from '@/firebase';
-import { doc, updateDoc, collection, query, where, getDocs, limit, serverTimestamp, setDoc, deleteDoc, writeBatch, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, serverTimestamp, getDoc, writeBatch } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from '@/hooks/use-toast';
@@ -67,14 +65,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import {
   Accordion,
   AccordionContent,
@@ -238,7 +228,6 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
 
 const PublicPageSettings = ({ 
   themeColor, setThemeColor,
-  secondaryColor, setSecondaryColor,
   layout, setLayout,
   logoUrl, setLogoUrl,
   heroTitle, setHeroTitle,
@@ -297,24 +286,24 @@ const PublicPageSettings = ({
 
       <Tabs defaultValue="geral" className="w-full flex-1 flex flex-col min-h-0">
         <TabsList className="w-full justify-start rounded-none border-b bg-transparent h-12 px-2 shrink-0">
-          <TabsTrigger value="geral" className="text-xs">Visual</TabsTrigger>
-          <TabsTrigger value="conteudo" className="text-xs flex items-center gap-1.5">
+          <TabsTrigger value="geral" className="text-xs font-bold uppercase tracking-widest">Visual</TabsTrigger>
+          <TabsTrigger value="conteudo" className="text-xs font-bold uppercase tracking-widest flex items-center gap-1.5">
             Conteúdo {!isEnterprise && <Lock className="w-2.5 h-2.5 opacity-40" />}
           </TabsTrigger>
-          <TabsTrigger value="design" className="text-xs">Layout</TabsTrigger>
-          <TabsTrigger value="social" className="text-xs">Bio</TabsTrigger>
+          <TabsTrigger value="design" className="text-xs font-bold uppercase tracking-widest">Layout</TabsTrigger>
+          <TabsTrigger value="social" className="text-xs font-bold uppercase tracking-widest">Bio</TabsTrigger>
         </TabsList>
         
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-8 pb-10">
-            <TabsContent value="geral" className="mt-0 space-y-8">
+            <TabsContent value="geral" className="mt-0 space-y-8 animate-in fade-in duration-300">
               <div className="space-y-4">
                 <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Logo Marca</Label>
                 <div 
                   onClick={() => !isUploading && logoInputRef.current?.click()}
-                  className="aspect-square w-24 border-2 border-dashed rounded-2xl flex items-center justify-center bg-muted/20 overflow-hidden mx-auto cursor-pointer"
+                  className="aspect-square w-24 border-2 border-dashed rounded-2xl flex items-center justify-center bg-muted/20 overflow-hidden mx-auto cursor-pointer group transition-all hover:bg-muted/30"
                 >
-                  {isUploading ? <Loader2 className="animate-spin text-primary" /> : (logoUrl ? <img src={logoUrl} className="w-full h-full object-cover rounded-xl" alt="Logo" /> : <Upload className="text-muted-foreground" />)}
+                  {isUploading ? <Loader2 className="animate-spin text-primary" /> : (logoUrl ? <img src={logoUrl} className="w-full h-full object-cover rounded-xl" alt="Logo" /> : <Upload className="text-muted-foreground group-hover:text-primary transition-colors" />)}
                 </div>
                 <input type="file" ref={logoInputRef} className="hidden" accept="image/*" onChange={(e) => onFileSelect(e, 'logo')} />
               </div>
@@ -325,13 +314,13 @@ const PublicPageSettings = ({
                 </Label>
                 <div className="flex flex-wrap gap-2">
                   {colors.map((color) => (
-                    <button key={color} onClick={() => setThemeColor(color)} className={cn("w-7 h-7 rounded-full border-2", themeColor === color ? "border-foreground" : "border-transparent shadow-inner")} style={{ backgroundColor: color }} />
+                    <button key={color} onClick={() => setThemeColor(color)} className={cn("w-7 h-7 rounded-full border-2 transition-transform hover:scale-110", themeColor === color ? "border-foreground" : "border-transparent shadow-inner")} style={{ backgroundColor: color }} />
                   ))}
                 </div>
               </div>
             </TabsContent>
 
-            <TabsContent value="conteudo" className="mt-0 space-y-8">
+            <TabsContent value="conteudo" className="mt-0 space-y-8 animate-in fade-in duration-300">
               {isEnterprise ? (
                 <div className="space-y-8">
                   <div className="space-y-3">
@@ -411,12 +400,12 @@ const PublicPageSettings = ({
                     <div className="space-y-3">
                       <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Copywriter do Rodapé</Label>
                       <div className="relative group">
-                        <Sparkles className="absolute right-3 top-3 h-3.5 w-3.5 text-primary/30 group-focus-within:text-primary transition-colors pointer-events-none" />
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground select-none">©</span>
                         <Input 
                           value={footerText} 
                           onChange={(e) => setFooterText(e.target.value)} 
-                          placeholder="© 2026 Nome da Sua Empresa" 
-                          className="h-10 text-xs font-medium pr-10"
+                          placeholder="2026 Nome da Sua Empresa" 
+                          className="h-10 text-xs font-medium pl-7"
                         />
                       </div>
                     </div>
@@ -439,7 +428,7 @@ const PublicPageSettings = ({
               )}
             </TabsContent>
 
-            <TabsContent value="design" className="mt-0 space-y-6">
+            <TabsContent value="design" className="mt-0 space-y-6 animate-in fade-in duration-300">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Layout do Mural</Label>
               <div className="grid grid-cols-1 gap-2">
                 {[
@@ -453,7 +442,7 @@ const PublicPageSettings = ({
                     onClick={() => setLayout(item.id as LayoutType)} 
                     className={cn(
                       "flex items-center gap-3 p-3 rounded-xl border-2 transition-all", 
-                      layout === item.id ? "border-primary bg-primary/5" : "border-muted"
+                      layout === item.id ? "border-primary bg-primary/5" : "border-muted hover:border-primary/20"
                     )}
                   >
                     <item.icon className={cn("w-4 h-4", layout === item.id ? "text-primary" : "text-muted-foreground")} />
@@ -463,12 +452,12 @@ const PublicPageSettings = ({
               </div>
             </TabsContent>
 
-            <TabsContent value="social" className="mt-0 space-y-6">
+            <TabsContent value="social" className="mt-0 space-y-6 animate-in fade-in duration-300">
               <div className="space-y-4">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 ml-1">
                   <Globe className="w-3 h-3" /> Link Único (Bio)
                 </Label>
-                <div className="flex items-center gap-1 bg-muted/20 rounded-xl px-3 border border-transparent focus-within:border-primary/20">
+                <div className="flex items-center gap-1 bg-muted/20 rounded-xl px-3 border border-transparent focus-within:border-primary/20 transition-all">
                   <span className="text-[10px] font-bold opacity-40">/pp/</span>
                   <input 
                     value={currentSlug} 
@@ -721,35 +710,37 @@ export default function PPEditorPage() {
         </div>
 
         <div className="ml-auto flex items-center gap-4">
-          <Button onClick={handleSave} disabled={isSaving || isUploading} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2">
+          <Button onClick={handleSave} disabled={isSaving || isUploading} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg hover:scale-105 active:scale-95 transition-transform">
             {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="rounded-xl border h-10 w-10"><User className="w-5 h-5 text-primary" /></Button></DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl">
-               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold py-2.5"><TrendingUp className="mr-2 h-4 w-4 text-primary" />Dash</DropdownMenuItem>
-               <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" />Sair</DropdownMenuItem>
+            <DropdownMenuContent align="end" className="w-56 p-2 rounded-2xl shadow-xl bg-background border">
+               <DropdownMenuLabel className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Administrador</DropdownMenuLabel>
+               <DropdownMenuSeparator className="mx-1" />
+               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold py-2.5 cursor-pointer"><TrendingUp className="mr-2 h-4 w-4 text-primary" />Dash</DropdownMenuItem>
+               <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive font-bold py-2.5 cursor-pointer"><LogOut className="mr-2 h-4 w-4" />Sair</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </header>
 
       <main className="flex-1 flex overflow-hidden relative w-full flex-row">
-        <aside className="hidden lg:flex w-80 bg-background border-r flex-col shrink-0">
+        <aside className="hidden lg:flex w-80 bg-background border-r flex-col shrink-0 h-full">
           <PublicPageSettings {...sidebarProps} />
         </aside>
 
         <div className="flex-1 overflow-y-auto bg-muted/10 p-4 sm:p-8">
           <div className="max-w-5xl mx-auto space-y-8 pb-20">
             <div className="flex items-center justify-between">
-              <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><Eye className="w-4 h-4" /> Preview da Página</h2>
+              <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 animate-pulse"><Eye className="w-4 h-4" /> Preview Dinâmico</h2>
               <div className="flex items-center gap-2 bg-background border px-3 py-1 rounded-full shadow-sm">
                  <span className="text-[10px] font-bold opacity-50 uppercase">Link:</span>
                  <span className="text-[10px] font-mono font-black text-primary">/pp/{activeSlug}</span>
               </div>
             </div>
 
-            <div className="relative bg-background rounded-[2.5rem] shadow-2xl min-h-[600px] flex flex-col overflow-hidden">
+            <div className="relative bg-background rounded-[2.5rem] shadow-2xl min-h-[600px] flex flex-col overflow-hidden ring-1 ring-primary/5">
               <div className="flex-1 flex flex-col pt-24 pb-12">
                 <div className="px-8 sm:px-12 text-center space-y-6 mb-12">
                   {logoUrl && (
@@ -806,7 +797,7 @@ export default function PPEditorPage() {
                       <TestimonialCard key={`${t.id}-${muralIndex}-${i}`} t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} />
                     ))
                   ) : (
-                    <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos.</div>
+                    <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos abaixo.</div>
                   )}
                 </div>
 
@@ -831,17 +822,17 @@ export default function PPEditorPage() {
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="pt-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                       {approvedTestimonials?.map((t: any) => {
                         const isSelected = selectedIds.includes(t.id);
                         return (
-                          <div key={t.id} onClick={() => toggleSelection(t.id)} className={cn("cursor-pointer transition-all rounded-xl border-2 p-4 bg-background", isSelected ? "border-primary bg-primary/5" : "border-transparent shadow-sm")}>
+                          <div key={t.id} onClick={() => toggleSelection(t.id)} className={cn("cursor-pointer transition-all rounded-xl border-2 p-4 bg-background group", isSelected ? "border-primary bg-primary/5" : "border-transparent shadow-sm hover:border-primary/20")}>
                             <div className="flex items-start gap-3">
-                              <div className={cn("mt-1 w-4 h-4 rounded-md border flex items-center justify-center shrink-0", isSelected ? "bg-primary border-primary text-white" : "border-muted-foreground/30")}>
+                              <div className={cn("mt-1 w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors", isSelected ? "bg-primary border-primary text-white" : "border-muted-foreground/30")}>
                                 {isSelected && <Check className="w-2.5 h-2.5" />}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <span className="font-bold text-[11px] block truncate">{t.userName}</span>
+                                <span className="font-bold text-[11px] block truncate group-hover:text-primary transition-colors">{t.userName}</span>
                                 {t.text && t.text !== '(Depoimento em Vídeo)' && <p className="text-[10px] text-muted-foreground italic line-clamp-1 mt-1">"{t.text}"</p>}
                               </div>
                             </div>
@@ -859,18 +850,18 @@ export default function PPEditorPage() {
 
       <Dialog open={!!tempImage} onOpenChange={(open) => !open && setTempImage(null)}>
         <DialogContent className="sm:max-w-2xl h-[70vh] flex flex-col p-0 overflow-hidden rounded-3xl border-none">
-          <DialogHeader className="p-6 bg-background border-b">
+          <DialogHeader className="p-6 bg-background border-b shrink-0">
             <DialogTitle>Recortar Logo</DialogTitle>
             <DialogDescription>Ajuste o enquadramento do seu logotipo.</DialogDescription>
           </DialogHeader>
-          <div className="flex-1 relative bg-background">
+          <div className="flex-1 relative bg-black">
             {tempImage && <Cropper image={tempImage} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onCropComplete={(a, p) => setCroppedAreaPixels(p)} onZoomChange={setZoom} />}
           </div>
           <div className="p-6 border-t bg-background shrink-0 space-y-6">
             <Slider value={[zoom]} min={1} max={3} step={0.1} onValueChange={(vals) => setZoom(vals[0])} />
             <DialogFooter className="gap-2">
               <Button variant="outline" onClick={() => setTempImage(null)}>Cancelar</Button>
-              <Button onClick={handleConfirmCrop} className="font-bold">Salvar Logo</Button>
+              <Button onClick={handleConfirmCrop} className="font-bold">Salvar Logo 4K</Button>
             </DialogFooter>
           </div>
         </DialogContent>
