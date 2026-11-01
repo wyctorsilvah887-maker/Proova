@@ -157,10 +157,6 @@ const RichTextEditor = ({ value, onChange, placeholder, className }: { value: st
     <div className="relative group">
       <input type="color" ref={colorInputRef} className="sr-only" onChange={(e) => applyColor(e.target.value)} />
       
-      <div className="absolute right-4 top-4 z-10 pointer-events-none opacity-30 group-focus-within:opacity-100 transition-opacity">
-        <Sparkles className="w-3.5 h-3.5 text-primary" />
-      </div>
-
       {showToolbar && (
         <div 
           className="fixed z-[999] flex items-center gap-2 p-2 bg-zinc-900 border border-white/10 shadow-2xl rounded-2xl -translate-x-1/2 animate-in fade-in zoom-in duration-200"
@@ -191,7 +187,7 @@ const RichTextEditor = ({ value, onChange, placeholder, className }: { value: st
         onBlur={() => { setIsFocused(false); setShowToolbar(false); }}
         onSelect={handleSelection}
         className={cn(
-          "min-h-[80px] p-4 pr-10 rounded-2xl bg-muted/20 border-2 border-transparent focus:border-primary/30 outline-none text-sm font-bold leading-relaxed transition-all cursor-text",
+          "min-h-[80px] p-4 rounded-2xl bg-muted/20 border-2 border-transparent focus:border-primary/30 outline-none text-sm font-bold leading-relaxed transition-all cursor-text",
           className
         )}
       />
@@ -372,10 +368,7 @@ const PublicPageSettings = ({
                               <AccordionContent className="p-3 space-y-4 pb-4">
                                 <div className="space-y-1.5">
                                   <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Título Bloco</Label>
-                                  <div className="relative group">
-                                     <Sparkles className="absolute right-3 top-2.5 h-3 w-3 text-primary/40 group-focus-within:text-primary transition-colors pointer-events-none" />
-                                     <Input value={section.title} onChange={(e) => updateSection(section.id, 'title', e.target.value)} className="h-8 text-[11px] pr-8" />
-                                  </div>
+                                  <Input value={section.title} onChange={(e) => updateSection(section.id, 'title', e.target.value)} className="h-8 text-[11px]" />
                                 </div>
                                 <div className="space-y-1.5">
                                   <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Subtítulo Bloco (RGB)</Label>
@@ -383,10 +376,7 @@ const PublicPageSettings = ({
                                 </div>
                                 <div className="space-y-1.5">
                                   <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Conteúdo</Label>
-                                  <div className="relative group">
-                                     <Sparkles className="absolute right-3 top-3 h-3.5 w-3.5 text-primary/30 group-focus-within:text-primary transition-colors pointer-events-none" />
-                                     <Textarea value={section.content} onChange={(e) => updateSection(section.id, 'content', e.target.value)} className="text-[11px] min-h-[60px] pr-10" />
-                                  </div>
+                                  <Textarea value={section.content} onChange={(e) => updateSection(section.id, 'content', e.target.value)} className="text-[11px] min-h-[60px]" />
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
                                   <div className="space-y-1.5">
@@ -715,9 +705,9 @@ export default function PPEditorPage() {
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-80 border-none">
-              <SheetHeader className="sr-only">
-                <SheetTitle>Configurações da Página Pública</SheetTitle>
-                <SheetDescription>Ajuste o visual e conteúdo da sua Landing Page.</SheetDescription>
+              <SheetHeader className="p-4 border-b bg-muted/10">
+                <SheetTitle className="sr-only">Configurações da Página Pública</SheetTitle>
+                <SheetDescription className="sr-only">Ajuste o visual e conteúdo da sua Landing Page.</SheetDescription>
               </SheetHeader>
               <PublicPageSettings {...sidebarProps} />
             </SheetContent>
@@ -869,7 +859,7 @@ export default function PPEditorPage() {
 
       <Dialog open={!!tempImage} onOpenChange={(open) => !open && setTempImage(null)}>
         <DialogContent className="sm:max-w-2xl h-[70vh] flex flex-col p-0 overflow-hidden rounded-3xl border-none">
-          <DialogHeader className="sr-only">
+          <DialogHeader className="p-6 bg-background border-b">
             <DialogTitle>Recortar Logo</DialogTitle>
             <DialogDescription>Ajuste o enquadramento do seu logotipo.</DialogDescription>
           </DialogHeader>
