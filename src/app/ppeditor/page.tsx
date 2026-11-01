@@ -106,9 +106,6 @@ interface CustomSection {
   variant: 'light' | 'dark' | 'accent';
 }
 
-/**
- * RichTextEditor - Editor de texto rico estável com seletor RGB.
- */
 const RichTextEditor = ({ value, onChange, placeholder, className }: { value: string, onChange: (val: string) => void, placeholder?: string, className?: string }) => {
   const editorRef = useRef<HTMLDivElement>(null);
   const colorInputRef = useRef<HTMLInputElement>(null);
@@ -208,7 +205,6 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
   const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
   return (
     <Card 
-      key={`${t.id}-${muralIndex}`}
       className={cn(
         "bg-card rounded-xl p-6 shadow-sm animate-in duration-700 ease-out fill-both",
         side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in"
@@ -318,7 +314,7 @@ const PublicPageSettings = ({
                   onClick={() => !isUploading && logoInputRef.current?.click()}
                   className="aspect-square w-24 border-2 border-dashed rounded-2xl flex items-center justify-center bg-muted/20 overflow-hidden mx-auto cursor-pointer"
                 >
-                  {isUploading ? <Loader2 className="animate-spin text-primary" /> : (logoUrl ? <img src={logoUrl} className="w-full h-full object-cover rounded-xl" /> : <Upload className="text-muted-foreground" />)}
+                  {isUploading ? <Loader2 className="animate-spin text-primary" /> : (logoUrl ? <img src={logoUrl} className="w-full h-full object-cover rounded-xl" alt="Logo" /> : <Upload className="text-muted-foreground" />)}
                 </div>
                 <input type="file" ref={logoInputRef} className="hidden" accept="image/*" onChange={(e) => onFileSelect(e, 'logo')} />
               </div>
@@ -344,7 +340,7 @@ const PublicPageSettings = ({
                   </div>
                   
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Subtítulo Hero (Menor e Nítido)</Label>
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Subtítulo Hero (Nítido)</Label>
                     <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} placeholder="Texto de apoio persuasivo..." className="min-h-[60px] text-sm text-foreground" />
                   </div>
 
@@ -666,6 +662,10 @@ export default function PPEditorPage() {
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-80 border-none">
+              <SheetHeader className="sr-only">
+                <SheetTitle>Configurações da Página Pública</SheetTitle>
+                <SheetDescription>Ajuste o visual e conteúdo da sua Landing Page.</SheetDescription>
+              </SheetHeader>
               <PublicPageSettings {...sidebarProps} />
             </SheetContent>
           </Sheet>
@@ -816,6 +816,10 @@ export default function PPEditorPage() {
 
       <Dialog open={!!tempImage} onOpenChange={(open) => !open && setTempImage(null)}>
         <DialogContent className="sm:max-w-2xl h-[70vh] flex flex-col p-0 overflow-hidden rounded-3xl border-none">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Recortar Logo</DialogTitle>
+            <DialogDescription>Ajuste o enquadramento do seu logotipo.</DialogDescription>
+          </DialogHeader>
           <div className="flex-1 relative bg-black">
             {tempImage && <Cropper image={tempImage} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onCropComplete={(a, p) => setCroppedAreaPixels(p)} onZoomChange={setZoom} />}
           </div>
