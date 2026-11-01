@@ -443,12 +443,56 @@ export default function DashPage() {
   const handleDownloadPdf = async () => {
     setIsGeneratingPdf(true);
     try {
-      const pdf = new jsPDF();
-      pdf.text('CARTAZ PROOVA', 105, 20, { align: 'center' });
-      pdf.text(userData?.companyName || 'Sua Empresa', 105, 40, { align: 'center' });
+      const qrElement = document.getElementById('qr-container-print');
+      if (!qrElement) throw new Error("Elemento do QR não encontrado. Certifique-se de que o diálogo está aberto.");
+
+      // Captura a imagem do QR Code do diálogo
+      const qrImage = await toPng(qrElement, { 
+        pixelRatio: 3, 
+        backgroundColor: '#ffffff' 
+      });
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      
+      // Estilização do Cartaz A4
+      pdf.setFillColor(249, 115, 22); // Cor primária Proova (Laranja)
+      pdf.rect(0, 0, pageWidth, 15, 'F'); // Top bar
+
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(32);
+      pdf.setTextColor(17, 24, 39); // Slate-900
+      pdf.text('SUA OPINIÃO É', pageWidth / 2, 45, { align: 'center' });
+      pdf.text('MUITO IMPORTANTE!', pageWidth / 2, 60, { align: 'center' });
+      
+      pdf.setFontSize(18);
+      pdf.setTextColor(107, 114, 128); // Slate-500
+      pdf.text(userData?.companyName || 'Nossa Empresa', pageWidth / 2, 75, { align: 'center' });
+
+      // QR Code centralizado
+      const qrSize = 130;
+      const xPos = (pageWidth - qrSize) / 2;
+      pdf.addImage(qrImage, 'PNG', xPos, 95, qrSize, qrSize);
+
+      // Instruções
+      pdf.setFontSize(14);
+      pdf.setTextColor(31, 41, 55);
+      pdf.text('Escaneie o código acima com a câmera', pageWidth / 2, 240, { align: 'center' });
+      pdf.text('do seu celular para nos avaliar agora.', pageWidth / 2, 248, { align: 'center' });
+
+      // Branding Footer
+      pdf.setFontSize(10);
+      pdf.setTextColor(156, 163, 175);
+      pdf.text('Powered by PROOVA TECHNOLOGY', pageWidth / 2, 280, { align: 'center' });
+
       pdf.save(`cartaz-proova-${userData?.companySlug}.pdf`);
-      toast({ title: "PDF Gerado!" });
-    } catch (err) { toast({ variant: "destructive", title: "Erro no PDF" }); } finally { setIsGeneratingPdf(false); }
+      toast({ title: "PDF Gerado!", description: "Seu cartaz de balcão está pronto para impressão." });
+    } catch (err: any) { 
+      console.error(err);
+      toast({ variant: "destructive", title: "Erro na Impressão", description: err.message }); 
+    } finally { 
+      setIsGeneratingPdf(false); 
+    }
   };
 
   const handleSendWeeklyReport = async () => {
@@ -1146,7 +1190,11 @@ export default function DashPage() {
               }}
             >
               <div className="flex items-center gap-2">
-                <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
+                {isPremiumUser ? (
+                  <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
+                ) : (
+                  <Lock className="w-5 h-5 text-muted-foreground" />
+                )}
                 <span className="text-lg font-black uppercase tracking-tight">Editar / Configurar</span>
               </div>
               <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Personalizar textos, cores e seções</span>
@@ -1485,7 +1533,10 @@ export default function DashPage() {
             <div className="px-6 pb-8 flex flex-col items-center space-y-6">
               <div className="relative group mt-2">
                 <div className="absolute -inset-4 bg-primary/5 rounded-[2.5rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-700" />
-                <div className="relative bg-white p-6 md:p-8 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-8 border-primary/5 flex flex-col items-center space-y-4">
+                <div 
+                  id="qr-container-print"
+                  className="relative bg-white p-6 md:p-8 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-8 border-primary/5 flex flex-col items-center space-y-4"
+                >
                   <QRCodeSVG 
                     value={collectionLink} 
                     size={160} 
