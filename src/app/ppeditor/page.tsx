@@ -117,7 +117,6 @@ const RichTextEditor = ({ value, onChange, placeholder, themeColor }: { value: s
   const [isFocused, setIsFocused] = useState(false);
   const lastHtml = useRef(value);
 
-  // Sincroniza apenas quando não está em foco para evitar saltos do cursor
   useEffect(() => {
     if (editorRef.current && !isFocused && value !== editorRef.current.innerHTML) {
       editorRef.current.innerHTML = value || '';
@@ -517,6 +516,29 @@ const PublicPageSettings = ({
                       ))}
                     </div>
                   </div>
+
+                  <div className="space-y-4 pt-4 border-t">
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Título da Seção de Depoimentos</Label>
+                    <Input value={testimonialsTitle} onChange={(e) => setTestimonialsTitle(e.target.value)} placeholder="Ex: Experiência de quem confia" className="text-xs" />
+                  </div>
+
+                  <div className="space-y-4 pt-4 border-t">
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Texto do Rodapé</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground select-none">©</span>
+                      <Input value={footerText} onChange={(e) => setFooterText(e.target.value)} placeholder="2026 Sua Empresa" className="text-xs pl-7 h-10" />
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 pt-4 border-t">
+                     <div className="flex items-center justify-between p-3 bg-muted/10 rounded-xl">
+                      <div className="space-y-0.5">
+                        <Label className="text-[11px] font-bold">Exibir Marca Proova</Label>
+                        <p className="text-[9px] text-muted-foreground">Ativar rodapé "Powered by Proova"</p>
+                      </div>
+                      <Switch checked={showLogo} onCheckedChange={setShowLogo} />
+                    </div>
+                  </div>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-12 px-4 text-center space-y-4 bg-primary/5 rounded-2xl m-2 border border-primary/10 border-dashed">
@@ -834,7 +856,7 @@ export default function PPEditorPage() {
     currentSlug: slugEdit, setSlugEdit
   };
 
-  const visibleTestimonials = approvedTestimonials?.filter(t => selectedIds.includes(t.id)).slice(0, 5) || [];
+  const visibleTestimonialsPreview = approvedTestimonials?.filter(t => selectedIds.includes(t.id)).slice(0, 5) || [];
 
   const toggleSelection = (id: string) => {
     setSelectedIds(prev => {
@@ -920,32 +942,97 @@ export default function PPEditorPage() {
             </div>
 
             <div className="relative bg-background rounded-[2.5rem] shadow-2xl min-h-[600px] flex flex-col overflow-hidden border border-primary/5">
-              <div className="p-8 sm:p-12 space-y-12 flex-1 flex flex-col pt-24">
-                <div className="text-center space-y-6">
+              <div className="flex-1 flex flex-col pt-24 pb-12">
+                <div className="px-8 sm:px-12 text-center space-y-6 mb-12">
                   {logoUrl && (
                     <div className="mx-auto w-24 h-24 relative">
                       <img src={logoUrl} className="w-full h-full object-cover rounded-[2rem] shadow-lg border-2 border-background" alt="Logo" />
                     </div>
                   )}
-                  <h1 
-                    className="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] max-w-4xl mx-auto"
-                    dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${userData?.companyName}` }}
-                  />
-                  {heroSubtitle && (
-                    <div 
-                      className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium"
-                      dangerouslySetInnerHTML={{ __html: heroSubtitle }}
+                  <div className="space-y-4">
+                    <h1 
+                      className="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] max-w-4xl mx-auto"
+                      dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${userData?.companyName}` }}
                     />
+                    {heroSubtitle && (
+                      <div 
+                        className="text-muted-foreground text-lg max-w-2xl mx-auto font-medium leading-relaxed italic opacity-80"
+                        dangerouslySetInnerHTML={{ __html: heroSubtitle }}
+                      />
+                    )}
+                  </div>
+                </div>
+
+                {/* SEÇÕES CUSTOMIZADAS NO PREVIEW */}
+                <div className="w-full space-y-0">
+                  {customSections.map((section: CustomSection) => (
+                    <div 
+                      key={section.id} 
+                      className={cn(
+                        "py-16 px-8 sm:px-12 text-center space-y-6",
+                        section.variant === 'accent' ? "text-white" : (section.variant === 'dark' ? "bg-black text-white" : "bg-muted/5")
+                      )}
+                      style={{ backgroundColor: section.variant === 'accent' ? themeColor : undefined }}
+                    >
+                      <div className="max-w-3xl mx-auto space-y-4">
+                        <h2 className="text-2xl sm:text-4xl font-black tracking-tight">{section.title}</h2>
+                        {section.subtitle && <p className="text-lg font-bold opacity-80">{section.subtitle}</p>}
+                        <p className="text-sm sm:text-base leading-relaxed opacity-90 font-medium">{section.content}</p>
+                        {section.buttonText && (
+                          <div className="pt-4">
+                            <Button 
+                              size="lg" 
+                              className={cn(
+                                "h-12 px-8 rounded-xl font-bold gap-2 shadow-lg",
+                                section.variant === 'accent' ? "bg-white text-black hover:bg-white/90" : ""
+                              )}
+                              style={{ backgroundColor: section.variant !== 'accent' ? themeColor : undefined }}
+                            >
+                              {section.buttonText} <ArrowRight className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {testimonialsTitle && (
+                  <div className="text-center py-12">
+                    <h2 className="text-2xl sm:text-3xl font-black font-headline uppercase tracking-widest" style={{ color: themeColor }}>
+                      {testimonialsTitle}
+                    </h2>
+                  </div>
+                )}
+
+                <div className={cn(
+                  "px-8 sm:px-12 w-full max-w-5xl mx-auto",
+                  layout === 'popup' ? "max-w-sm mx-auto" : (layout === 'grid' || layout === 'mural' ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" : "flex justify-center")
+                )}>
+                  {visibleTestimonialsPreview.length > 0 ? (
+                    layout === 'popup' ? (
+                      <TestimonialCard t={visibleTestimonialsPreview[0]} themeColor={themeColor} secondaryColor={secondaryColor} />
+                    ) : (
+                      visibleTestimonialsPreview.map((t, i) => (
+                        <TestimonialCard key={`${t.id}-${muralIndex}-${i}`} t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} />
+                      ))
+                    )
+                  ) : (
+                    <div className="col-span-full py-12 text-center opacity-20 italic text-sm">
+                      Selecione depoimentos abaixo para o preview.
+                    </div>
                   )}
                 </div>
 
-                <div className={cn(
-                  "grid gap-4",
-                  layout === 'popup' ? "max-w-sm mx-auto" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-                )}>
-                  {visibleTestimonials.map((t, i) => (
-                    <TestimonialCard key={t.id} t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} />
-                  ))}
+                <div className="mt-auto pt-16 px-8 text-center space-y-4">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground opacity-50 flex items-center justify-center gap-1">
+                    <span>©</span> {footerText || `${new Date().getFullYear()} ${userData?.companyName || 'Sua Empresa'}`}
+                  </p>
+                  {showLogo && (
+                    <div className="flex items-center justify-center gap-1.5 opacity-20">
+                      <span className="text-[8px] font-black uppercase tracking-[0.3em]">POWERED BY PROOVA</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
