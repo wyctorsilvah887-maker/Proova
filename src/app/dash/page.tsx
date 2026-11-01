@@ -1155,7 +1155,7 @@ export default function DashPage() {
           </div>
 
           <DialogFooter className="p-4 bg-muted/30 border-t text-center flex justify-center">
-            <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-60">Dica: Un link curto e amigável converte 40% mais.</p>
+            <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-60">Dica: Envie o link via WhatsApp logo após o atendimento para ter mais elogios.</p>
           </DialogFooter>
         </DialogContent>
       </Dialog>
