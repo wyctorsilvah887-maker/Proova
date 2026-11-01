@@ -122,7 +122,11 @@ const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onCha
     }
   }, [value]);
 
-  const colors = [themeColor, '#000000', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#ffffff'];
+  // Garantindo que as cores sejam únicas para evitar o erro de duplicate keys no React
+  const uniqueColors = useMemo(() => {
+    const defaultColors = ['#000000', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#ffffff'];
+    return Array.from(new Set([themeColor, ...defaultColors]));
+  }, [themeColor]);
 
   const handleSelection = () => {
     const selection = window.getSelection();
@@ -130,7 +134,7 @@ const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onCha
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
       setToolbarPos({
-        top: rect.top - 55,
+        top: rect.top - 60,
         left: rect.left + rect.width / 2
       });
       setShowToolbar(true);
@@ -160,9 +164,9 @@ const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onCha
           className="fixed z-[500] flex gap-1.5 p-2 bg-background border shadow-2xl rounded-full -translate-x-1/2 animate-in fade-in zoom-in duration-200"
           style={{ top: toolbarPos.top, left: toolbarPos.left }}
         >
-          {colors.map(c => (
+          {uniqueColors.map(c => (
             <button 
-              key={c} 
+              key={`color-${c}`} 
               className="w-6 h-6 rounded-full border border-border transition-transform hover:scale-110 active:scale-90" 
               style={{ backgroundColor: c }}
               onMouseDown={(e) => {
@@ -722,6 +726,21 @@ export default function PPEditorPage() {
 
   const visibleTestimonials = approvedTestimonials?.filter(t => selectedIds.includes(t.id)).slice(0, 5) || [];
 
+  const toggleSelection = (id: string) => {
+    setSelectedIds(prev => {
+      const isRemoving = prev.includes(id);
+      if (!isRemoving && prev.length >= SELECTION_LIMIT) {
+        toast({
+          variant: "destructive",
+          title: `Limite de Seleção`,
+          description: `Seu plano atual permite até ${SELECTION_LIMIT} depoimentos ativos por mural.`,
+        });
+        return prev;
+      }
+      return isRemoving ? prev.filter(i => i !== id) : [...prev, id];
+    });
+  };
+
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body w-full overflow-hidden text-foreground">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
@@ -783,7 +802,7 @@ export default function PPEditorPage() {
                 <div className="text-center space-y-6">
                   {logoUrl && (
                     <div className="mx-auto w-24 h-24 relative">
-                      <img src={logoUrl} className="w-full h-full object-cover rounded-[2rem] shadow-lg border-2 border-background" />
+                      <img src={logoUrl} className="w-full h-full object-cover rounded-[2rem] shadow-lg border-2 border-background" alt="Logo" />
                     </div>
                   )}
                   <h1 
