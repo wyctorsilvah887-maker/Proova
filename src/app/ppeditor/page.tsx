@@ -493,7 +493,8 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </div>
+      </Tabs>
+    </div>
   );
 };
 
@@ -727,9 +728,9 @@ export default function PPEditorPage() {
               </button>
             </SheetTrigger>
             <SheetContent side="left" className="p-0 w-80 border-none">
-              <SheetHeader className="p-4 border-b bg-muted/10">
-                <SheetTitle className="sr-only">Configurações da Página Pública</SheetTitle>
-                <SheetDescription className="sr-only">Ajuste o visual e conteúdo da sua Landing Page.</SheetDescription>
+              <SheetHeader className="p-4 border-b bg-muted/10 sr-only">
+                <SheetTitle>Configurações da Página Pública</SheetTitle>
+                <SheetDescription>Ajuste o visual e conteúdo da sua Landing Page.</SheetDescription>
               </SheetHeader>
               <PublicPageSettings {...sidebarProps} />
             </SheetContent>
