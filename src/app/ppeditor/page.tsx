@@ -40,7 +40,8 @@ import {
   Settings2,
   Handshake,
   X,
-  Pipette
+  Pipette,
+  Clock
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -216,32 +217,68 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
   
   return (
     <Card 
+      key={`${t.id}-${muralIndex}`}
       className={cn(
-        "bg-card rounded-xl p-6 shadow-sm animate-in duration-700 ease-out fill-both",
+        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl border-none transition-all duration-500 hover:scale-[1.02] animate-in fill-both",
         side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in"
       )}
       style={{ 
-        borderTopWidth: '4px',
-        borderTopColor: themeColor,
-        backgroundColor: secondaryColor && secondaryColor !== '#ffffff' ? `${secondaryColor}20` : undefined,
-        boxShadow: `0 10px 30px -15px ${themeColor}30`
+        backgroundColor: secondaryColor && secondaryColor !== '#ffffff' ? `${secondaryColor}10` : undefined,
+        boxShadow: `0 20px 40px -20px ${themeColor}25`,
+        border: `1px solid ${themeColor}15`
       }}
     >
-      <div className="space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-full shrink-0" style={{ backgroundColor: secondaryColor && secondaryColor !== '#ffffff' ? `${secondaryColor}30` : `${themeColor}15` }}>
-            <User className="w-4 h-4" style={{ color: themeColor }} />
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-lg rotate-3 shrink-0" style={{ backgroundColor: themeColor }}>
+              {t.userName?.substring(0, 2).toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <p className="font-black text-sm text-foreground tracking-tight truncate max-w-[120px]">{t.userName}</p>
+              <div className="flex items-center gap-1.5">
+                 <CheckCircle2 className="w-2.5 h-2.5 text-green-500 fill-green-500/20" />
+                 <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Verificado</span>
+              </div>
+            </div>
           </div>
-          <span className="font-bold text-sm text-foreground">{t.userName}</span>
+          <div className="flex gap-0.5">
+            {[1, 2, 3, 4, 5].map((s) => (
+              <Star key={s} className={cn("w-3 h-3", s <= (t.rating || 5) ? "fill-current" : "opacity-20")} style={{ color: themeColor }} />
+            ))}
+          </div>
         </div>
-        <div className="flex gap-0.5">
-          {Array.from({ length: t.rating || 5 }).map((_, i) => (
-            <Star key={i} className="w-3 h-3 fill-current" style={{ color: themeColor }} />
-          ))}
-        </div>
-        {t.text && t.text !== '(Depoimento em Vídeo)' && (
-          <p className="text-foreground/80 italic text-sm leading-relaxed">"{t.text}"</p>
+
+        {t.videoUrl && (
+          <div className="relative aspect-video rounded-3xl overflow-hidden bg-black shadow-2xl group ring-1 ring-white/10">
+             <video src={t.videoUrl} className="w-full h-full object-cover" muted loop playsInline autoPlay />
+             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+             <div className="absolute bottom-3 left-3 flex items-center gap-2">
+               <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                 <p className="text-[8px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
+                   <Play className="w-2 h-2 fill-white" /> Vídeo Review
+                 </p>
+               </div>
+             </div>
+          </div>
         )}
+
+        {t.text && t.text !== '(Depoimento em Vídeo)' && (
+          <div className="relative">
+            <span className="absolute -top-3 -left-2 text-5xl opacity-10 font-serif select-none pointer-events-none" style={{ color: themeColor }}>“</span>
+            <p className="text-foreground/90 font-medium text-sm sm:text-base leading-relaxed italic relative z-10 px-2">
+              {t.text}
+            </p>
+          </div>
+        )}
+
+        <div className="pt-5 border-t border-muted-foreground/10 flex items-center justify-between">
+          <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] flex items-center gap-1.5">
+            <Clock className="w-3 h-3" />
+            {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Hoje'}
+          </span>
+          <div className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
+        </div>
       </div>
     </Card>
   );
@@ -695,10 +732,6 @@ export default function PPEditorPage() {
     }
   };
 
-  if (authLoading || ppLoading || userDataLoading || testimonialsLoading || !activeSlug) {
-    return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
-  }
-
   const sidebarProps = { 
     themeColor, setThemeColor, secondaryColor, setSecondaryColor,
     layout, setLayout, logoUrl, setLogoUrl,
@@ -790,27 +823,22 @@ export default function PPEditorPage() {
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
               <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator className="mx-1" />
-              
               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
-                <span>Painel Principal</span>
+                <span>Dash</span>
               </DropdownMenuItem>
-              
               <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Murais</span>
               </DropdownMenuItem>
-              
               <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>
               </DropdownMenuItem>
-              
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Planos de Upgrade</span>
               </DropdownMenuItem>
-              
               <DropdownMenuItem 
                 onClick={() => router.push('/pricing')} 
                 className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
@@ -819,23 +847,12 @@ export default function PPEditorPage() {
                 <span>Serviços de Parceiros</span>
                 <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
               </DropdownMenuItem>
-
               <DropdownMenuSeparator className="mx-1" />
-              
-              <DropdownMenuItem 
-                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-                className="rounded-xl cursor-pointer font-bold py-2.5"
-              >
-                {theme === 'light' ? (
-                  <Moon className="mr-2 h-4 w-4 text-primary" />
-                ) : (
-                  <Sun className="mr-2 h-4 w-4 text-primary" />
-                )}
+              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                {theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}
                 <span>Alternar Tema</span>
               </DropdownMenuItem>
-
               <DropdownMenuSeparator className="mx-1" />
-              
               <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5">
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Sair</span>
@@ -853,7 +870,17 @@ export default function PPEditorPage() {
         <div className="flex-1 overflow-y-auto bg-muted/10 p-4 sm:p-8">
           <div className="max-w-5xl mx-auto space-y-8 pb-20">
             <div className="flex items-center justify-between">
-              <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 animate-pulse"><Eye className="w-4 h-4" /> Preview Dinâmico</h2>
+              <Sheet>
+                <SheetTrigger asChild>
+                  <button className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 hover:text-primary transition-colors animate-pulse outline-none">
+                    <Monitor className="w-4 h-4" /> EDITAR
+                  </button>
+                </SheetTrigger>
+                <SheetContent side="left" className="p-0 w-80 border-none">
+                   <PublicPageSettings {...sidebarProps} />
+                </SheetContent>
+              </Sheet>
+
               <div className="flex items-center gap-2 bg-background border px-3 py-1 rounded-full shadow-sm">
                  <span className="text-[10px] font-bold opacity-50 uppercase">Link:</span>
                  <span className="text-[10px] font-mono font-black text-primary">/pp/{activeSlug}</span>
@@ -948,7 +975,7 @@ export default function PPEditorPage() {
                         return (
                           <div key={t.id} onClick={() => toggleSelection(t.id)} className={cn("cursor-pointer transition-all rounded-xl border-2 p-4 bg-background group", isSelected ? "border-primary bg-primary/5" : "border-transparent shadow-sm hover:border-primary/20")}>
                             <div className="flex items-start gap-3">
-                              <div className={cn("mt-1 w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors", isSelected ? "bg-primary border-primary text-white" : "border-muted-foreground/30")}>
+                              <div className={cn("mt-1 w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors", isSelected ? "bg-primary border-primary" : "border-muted-foreground/30")}>
                                 {isSelected && <Check className="w-2.5 h-2.5" />}
                               </div>
                               <div className="flex-1 min-w-0">
