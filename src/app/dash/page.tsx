@@ -446,50 +446,58 @@ export default function DashPage() {
       const qrElement = document.getElementById('qr-container-print');
       if (!qrElement) throw new Error("Elemento do QR não encontrado. Certifique-se de que o diálogo está aberto.");
 
-      // Captura a imagem do QR Code do diálogo
+      // Captura a imagem do QR Code do diálogo de forma nítida e independente de tela
       const qrImage = await toPng(qrElement, { 
-        pixelRatio: 3, 
-        backgroundColor: '#ffffff' 
+        pixelRatio: 4, 
+        backgroundColor: '#ffffff',
+        style: {
+          transform: 'scale(1)',
+          borderRadius: '0px'
+        }
       });
 
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
       
-      // Estilização do Cartaz A4
+      // Estilização do Cartaz A4 Premium
       pdf.setFillColor(249, 115, 22); // Cor primária Proova (Laranja)
-      pdf.rect(0, 0, pageWidth, 15, 'F'); // Top bar
+      pdf.rect(0, 0, pageWidth, 20, 'F'); // Top bar decorativa
 
       pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(32);
+      pdf.setFontSize(36);
       pdf.setTextColor(17, 24, 39); // Slate-900
-      pdf.text('SUA OPINIÃO É', pageWidth / 2, 45, { align: 'center' });
-      pdf.text('MUITO IMPORTANTE!', pageWidth / 2, 60, { align: 'center' });
+      pdf.text('SUA OPINIÃO É', pageWidth / 2, 50, { align: 'center' });
+      pdf.text('MUITO IMPORTANTE!', pageWidth / 2, 65, { align: 'center' });
       
-      pdf.setFontSize(18);
+      pdf.setFontSize(20);
       pdf.setTextColor(107, 114, 128); // Slate-500
-      pdf.text(userData?.companyName || 'Nossa Empresa', pageWidth / 2, 75, { align: 'center' });
+      pdf.text(userData?.companyName || 'Nossa Empresa', pageWidth / 2, 85, { align: 'center' });
 
-      // QR Code centralizado
+      // QR Code centralizado com proporção preservada
       const qrSize = 130;
       const xPos = (pageWidth - qrSize) / 2;
-      pdf.addImage(qrImage, 'PNG', xPos, 95, qrSize, qrSize);
+      pdf.addImage(qrImage, 'PNG', xPos, 105, qrSize, qrSize);
 
-      // Instruções
-      pdf.setFontSize(14);
+      // Instruções Persuasivas
+      pdf.setFontSize(16);
       pdf.setTextColor(31, 41, 55);
-      pdf.text('Escaneie o código acima com a câmera', pageWidth / 2, 240, { align: 'center' });
-      pdf.text('do seu celular para nos avaliar agora.', pageWidth / 2, 248, { align: 'center' });
-
-      // Branding Footer
-      pdf.setFontSize(10);
+      pdf.text('Escaneie agora com seu celular', pageWidth / 2, 250, { align: 'center' });
+      
+      pdf.setFontSize(14);
       pdf.setTextColor(156, 163, 175);
-      pdf.text('Powered by PROOVA TECHNOLOGY', pageWidth / 2, 280, { align: 'center' });
+      pdf.text('Sua avaliação nos ajuda a crescer!', pageWidth / 2, 260, { align: 'center' });
 
-      pdf.save(`cartaz-proova-${userData?.companySlug}.pdf`);
-      toast({ title: "PDF Gerado!", description: "Seu cartaz de balcão está pronto para impressão." });
+      // Branding Footer Discreto
+      pdf.setFontSize(9);
+      pdf.setTextColor(209, 213, 219);
+      pdf.text('Tecnologia de Prova Social fornecida por PROOVA.com.br', pageWidth / 2, 285, { align: 'center' });
+
+      pdf.save(`cartaz-balcao-${userData?.companySlug}.pdf`);
+      toast({ title: "PDF Pronto!", description: "Seu cartaz de balcão foi gerado com sucesso." });
     } catch (err: any) { 
       console.error(err);
-      toast({ variant: "destructive", title: "Erro na Impressão", description: err.message }); 
+      toast({ variant: "destructive", title: "Erro na Impressão", description: "Tente novamente ou use um computador." }); 
     } finally { 
       setIsGeneratingPdf(false); 
     }
