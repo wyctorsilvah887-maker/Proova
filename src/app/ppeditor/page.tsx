@@ -107,7 +107,7 @@ interface CustomSection {
 }
 
 /**
- * RichTextEditor - Editor de texto rico com seletor RGB e estabilidade de cursor.
+ * RichTextEditor - Editor de texto rico estável com seletor RGB.
  */
 const RichTextEditor = ({ value, onChange, placeholder, className }: { value: string, onChange: (val: string) => void, placeholder?: string, className?: string }) => {
   const editorRef = useRef<HTMLDivElement>(null);
@@ -115,12 +115,10 @@ const RichTextEditor = ({ value, onChange, placeholder, className }: { value: st
   const [showToolbar, setShowToolbar] = useState(false);
   const [toolbarPos, setToolbarPos] = useState({ top: 0, left: 0 });
   const [isFocused, setIsFocused] = useState(false);
-  const lastHtml = useRef(value);
 
   useEffect(() => {
     if (editorRef.current && !isFocused && value !== editorRef.current.innerHTML) {
       editorRef.current.innerHTML = value || '';
-      lastHtml.current = value;
     }
   }, [value, isFocused]);
 
@@ -147,43 +145,27 @@ const RichTextEditor = ({ value, onChange, placeholder, className }: { value: st
     document.execCommand('styleWithCSS', false, 'true');
     document.execCommand('foreColor', false, color);
     if (editorRef.current) {
-      const newHtml = editorRef.current.innerHTML;
-      lastHtml.current = newHtml;
-      onChange(newHtml);
+      onChange(editorRef.current.innerHTML);
     }
   };
 
   const clearFormat = () => {
     document.execCommand('removeFormat');
     if (editorRef.current) {
-      const newHtml = editorRef.current.innerHTML;
-      lastHtml.current = newHtml;
-      onChange(newHtml);
+      onChange(editorRef.current.innerHTML);
     }
-  };
-
-  const handleInput = (e: any) => {
-    const newHtml = e.currentTarget.innerHTML;
-    lastHtml.current = newHtml;
-    onChange(newHtml);
   };
 
   return (
     <div className="relative group">
-      <input 
-        type="color" 
-        ref={colorInputRef} 
-        className="sr-only" 
-        onChange={(e) => applyColor(e.target.value)} 
-      />
+      <input type="color" ref={colorInputRef} className="sr-only" onChange={(e) => applyColor(e.target.value)} />
       
       {showToolbar && (
         <div 
-          className="fixed z-[999] flex items-center gap-2 p-2 bg-zinc-900 border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] rounded-2xl -translate-x-1/2 animate-in fade-in zoom-in duration-200"
+          className="fixed z-[999] flex items-center gap-2 p-2 bg-zinc-900 border border-white/10 shadow-2xl rounded-2xl -translate-x-1/2 animate-in fade-in zoom-in duration-200"
           style={{ top: toolbarPos.top, left: toolbarPos.left }}
         >
           <button 
-            title="Cor RGB"
             className="w-10 h-10 rounded-xl flex items-center justify-center bg-white/10 hover:bg-primary transition-all group"
             onMouseDown={(e) => { e.preventDefault(); colorInputRef.current?.click(); }}
           >
@@ -203,19 +185,19 @@ const RichTextEditor = ({ value, onChange, placeholder, className }: { value: st
         ref={editorRef}
         contentEditable
         suppressContentEditableWarning
-        onInput={handleInput}
+        onInput={(e: any) => onChange(e.currentTarget.innerHTML)}
         onFocus={() => setIsFocused(true)}
         onBlur={() => { setIsFocused(false); setShowToolbar(false); }}
         onSelect={handleSelection}
         className={cn(
-          "min-h-[100px] p-4 rounded-2xl bg-muted/20 border-2 border-transparent focus:border-primary/30 outline-none text-sm font-bold leading-relaxed transition-all cursor-text shadow-inner",
+          "min-h-[80px] p-4 rounded-2xl bg-muted/20 border-2 border-transparent focus:border-primary/30 outline-none text-sm font-bold leading-relaxed transition-all cursor-text",
           className
         )}
       />
       
       {!value && !isFocused && (
         <p className="absolute top-4 left-4 text-muted-foreground opacity-40 pointer-events-none text-xs font-medium italic">
-          {placeholder || 'Digite algo...'}
+          {placeholder || 'Digite aqui...'}
         </p>
       )}
     </div>
@@ -261,9 +243,6 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
 const PublicPageSettings = ({ 
   themeColor, setThemeColor,
   secondaryColor, setSecondaryColor,
-  whatsappEnabled, setWhatsappEnabled,
-  whatsappNumber, setWhatsappNumber,
-  externalSiteUrl, setExternalSiteUrl,
   layout, setLayout,
   logoUrl, setLogoUrl,
   heroTitle, setHeroTitle,
@@ -277,7 +256,6 @@ const PublicPageSettings = ({
   handleSave,
   isSaving,
   isEnterprise,
-  isGoldPlan,
   logoInputRef,
   currentSlug, setSlugEdit
 }: any) => {
@@ -327,7 +305,7 @@ const PublicPageSettings = ({
           <TabsTrigger value="conteudo" className="text-xs flex items-center gap-1.5">
             Conteúdo {!isEnterprise && <Lock className="w-2.5 h-2.5 opacity-40" />}
           </TabsTrigger>
-          <TabsTrigger value="design" className="text-xs">Design</TabsTrigger>
+          <TabsTrigger value="design" className="text-xs">Layout</TabsTrigger>
           <TabsTrigger value="social" className="text-xs">Bio</TabsTrigger>
         </TabsList>
         
@@ -361,18 +339,18 @@ const PublicPageSettings = ({
               {isEnterprise ? (
                 <div className="space-y-8">
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Título Hero</Label>
-                    <RichTextEditor value={heroTitle} onChange={setHeroTitle} placeholder="Dê um título impactante..." />
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Título Hero (RGB)</Label>
+                    <RichTextEditor value={heroTitle} onChange={setHeroTitle} placeholder="O que dizem sobre nós..." />
                   </div>
                   
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Subtítulo Hero</Label>
-                    <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} placeholder="Texto de apoio mais nítido..." className="min-h-[80px] text-sm text-foreground" />
+                    <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Subtítulo Hero (Menor e Nítido)</Label>
+                    <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} placeholder="Texto de apoio persuasivo..." className="min-h-[60px] text-sm text-foreground" />
                   </div>
 
                   <div className="space-y-6 pt-6 border-t">
                     <div className="flex items-center justify-between">
-                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Seções Customizadas</Label>
+                      <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Seções Adicionais</Label>
                       <Button variant="outline" size="sm" onClick={addSection} className="h-7 text-[9px] font-black uppercase gap-1">
                         <Plus className="w-3 h-3" /> Adicionar
                       </Button>
@@ -393,19 +371,19 @@ const PublicPageSettings = ({
                               </div>
                               <AccordionContent className="p-3 space-y-4 pb-4">
                                 <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Título</Label>
+                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Título Bloco</Label>
                                   <Input value={section.title} onChange={(e) => updateSection(section.id, 'title', e.target.value)} className="h-8 text-[11px]" />
                                 </div>
                                 <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Subtítulo (RGB)</Label>
-                                  <RichTextEditor value={section.subtitle} onChange={(val) => updateSection(section.id, 'subtitle', val)} className="min-h-[60px] text-[11px] text-foreground" />
+                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Subtítulo Bloco (RGB)</Label>
+                                  <RichTextEditor value={section.subtitle} onChange={(val) => updateSection(section.id, 'subtitle', val)} className="min-h-[50px] text-[11px] text-foreground" />
                                 </div>
                                 <div className="space-y-1.5">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Texto Principal</Label>
-                                  <Textarea value={section.content} onChange={(e) => updateSection(section.id, 'content', e.target.value)} className="text-[11px] min-h-[80px]" />
+                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Conteúdo</Label>
+                                  <Textarea value={section.content} onChange={(e) => updateSection(section.id, 'content', e.target.value)} className="text-[11px] min-h-[60px]" />
                                 </div>
-                                <div className="space-y-1.5 pt-2 border-t">
-                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Fundo da Seção</Label>
+                                <div className="space-y-1.5">
+                                  <Label className="text-[9px] font-bold uppercase opacity-50 ml-1">Estilo do Bloco</Label>
                                   <Select value={section.variant} onValueChange={(val) => updateSection(section.id, 'variant', val as any)}>
                                     <SelectTrigger className="h-8 text-[10px]"><SelectValue /></SelectTrigger>
                                     <SelectContent>
@@ -426,14 +404,14 @@ const PublicPageSettings = ({
               ) : (
                 <div className="py-12 px-4 text-center space-y-4 bg-primary/5 rounded-2xl m-2 border border-dashed border-primary/20">
                   <Gem className="w-8 h-8 text-primary mx-auto" />
-                  <p className="text-[10px] font-bold uppercase text-muted-foreground">Customização Enterprise</p>
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground">Personalização Enterprise</p>
                   <Button size="sm" className="h-8 text-[9px] font-black" onClick={() => router.push('/pricing')}>Upgrade</Button>
                 </div>
               )}
             </TabsContent>
 
             <TabsContent value="design" className="mt-0 space-y-6">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Layout dos Depoimentos</Label>
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Layout do Mural</Label>
               <div className="grid grid-cols-1 gap-2">
                 {[
                   { id: 'grid', icon: Layout, label: 'Grade' },
@@ -459,7 +437,7 @@ const PublicPageSettings = ({
             <TabsContent value="social" className="mt-0 space-y-6">
               <div className="space-y-4">
                 <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 ml-1">
-                  <Globe className="w-3 h-3" /> Link da Bio (Slug)
+                  <Globe className="w-3 h-3" /> Link Único (Bio)
                 </Label>
                 <div className="flex items-center gap-1 bg-muted/20 rounded-xl px-3 border border-transparent focus-within:border-primary/20">
                   <span className="text-[10px] font-bold opacity-40">/pp/</span>
@@ -473,7 +451,8 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </div>
+      </Tabs>
+    </div>
   );
 };
 
@@ -483,7 +462,6 @@ export default function PPEditorPage() {
   const auth = useAuth();
   const storage = useStorage();
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
@@ -511,9 +489,6 @@ export default function PPEditorPage() {
   const [secondaryColor, setSecondaryColor] = useState('#ffffff');
   const [layout, setLayout] = useState<LayoutType>('grid'); 
   const [logoUrl, setLogoUrl] = useState('');
-  const [whatsappEnabled, setWhatsappEnabled] = useState(false);
-  const [whatsappNumber, setWhatsappNumber] = useState('');
-  const [externalSiteUrl, setExternalSiteUrl] = useState('');
   const [heroTitle, setHeroTitle] = useState('');
   const [heroSubtitle, setHeroSubtitle] = useState('');
   const [testimonialsTitle, setTestimonialsTitle] = useState('');
@@ -525,7 +500,6 @@ export default function PPEditorPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [muralIndex, setMuralIndex] = useState(0);
-  const [baseUrl, setBaseUrl] = useState('');
 
   const [tempImage, setTempImage] = useState<string | null>(null);
   const [cropType, setCropType] = useState<'logo' | null>(null);
@@ -533,10 +507,6 @@ export default function PPEditorPage() {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') setBaseUrl(window.location.origin);
-  }, []);
 
   useEffect(() => {
     if (userData?.companySlug) {
@@ -552,9 +522,6 @@ export default function PPEditorPage() {
       setSecondaryColor(ppData.secondaryColor || '#ffffff');
       setLayout(ppData.layout || 'grid');
       setLogoUrl(ppData.logoUrl || '');
-      setWhatsappEnabled(ppData.whatsappEnabled || false);
-      setWhatsappNumber(ppData.whatsappNumber || '');
-      setExternalSiteUrl(ppData.externalSiteUrl || '');
       setHeroTitle(ppData.heroTitle || '');
       setHeroSubtitle(ppData.heroSubtitle || '');
       setTestimonialsTitle(ppData.testimonialsTitle || '');
@@ -587,9 +554,9 @@ export default function PPEditorPage() {
       const batch = writeBatch(db);
 
       if (isSlugChanging) {
-        if (!newSlug) throw new Error("O link da página não pode ser vazio.");
+        if (!newSlug) throw new Error("Link não pode ser vazio.");
         const slugCheck = await getDoc(doc(db, 'slugs', newSlug));
-        if (slugCheck.exists()) throw new Error("Este link já está em uso.");
+        if (slugCheck.exists()) throw new Error("Link já em uso.");
 
         batch.set(doc(db, 'slugs', newSlug), { userId: user.uid, type: 'pp', createdAt: serverTimestamp() });
         if (oldSlug) {
@@ -608,9 +575,6 @@ export default function PPEditorPage() {
         secondaryColor,
         layout,
         logoUrl,
-        whatsappEnabled,
-        whatsappNumber,
-        externalSiteUrl,
         heroTitle,
         heroSubtitle,
         testimonialsTitle,
@@ -650,8 +614,8 @@ export default function PPEditorPage() {
     try {
       const croppedBlob = await getCroppedImg(tempImage, croppedAreaPixels, cropType);
       const storageRef = ref(storage, `users/${user.uid}/pp/${activeSlug}/${cropType}_${Date.now()}.jpg`);
-      const snapshot = await uploadBytes(storageRef, croppedBlob);
-      const url = await getDownloadURL(snapshot.ref);
+      await uploadBytes(storageRef, croppedBlob);
+      const url = await getDownloadURL(storageRef);
       setLogoUrl(url);
     } catch (err) {
       toast({ variant: "destructive", title: "Erro no upload" });
@@ -667,8 +631,7 @@ export default function PPEditorPage() {
 
   const sidebarProps = { 
     themeColor, setThemeColor, secondaryColor, setSecondaryColor,
-    whatsappEnabled, setWhatsappEnabled, whatsappNumber, setWhatsappNumber,
-    externalSiteUrl, setExternalSiteUrl, layout, setLayout, logoUrl, setLogoUrl,
+    layout, setLayout, logoUrl, setLogoUrl,
     heroTitle, setHeroTitle, heroSubtitle, setHeroSubtitle,
     testimonialsTitle, setTestimonialsTitle, footerText, setFooterText,
     showLogo, setShowLogo, customSections, setCustomSections,
@@ -682,7 +645,7 @@ export default function PPEditorPage() {
     setSelectedIds(prev => {
       const isRemoving = prev.includes(id);
       if (!isRemoving && prev.length >= SELECTION_LIMIT) {
-        toast({ variant: "destructive", title: "Limite de Seleção", description: `Seu plano permite até ${SELECTION_LIMIT} depoimentos ativos.` });
+        toast({ variant: "destructive", title: "Limite de Seleção", description: `Seu plano permite até ${SELECTION_LIMIT} depoimentos.` });
         return prev;
       }
       return isRemoving ? prev.filter(i => i !== id) : [...prev, id];
@@ -748,7 +711,7 @@ export default function PPEditorPage() {
                 <div className="px-8 sm:px-12 text-center space-y-6 mb-12">
                   {logoUrl && (
                     <div className="mx-auto w-20 h-20 relative">
-                      <img src={logoUrl} className="w-full h-full object-cover rounded-[1.5rem] shadow-lg border-2 border-background" />
+                      <img src={logoUrl} className="w-full h-full object-cover rounded-[1.5rem] shadow-lg border-2 border-background" alt="Logo" />
                     </div>
                   )}
                   <div className="space-y-4">
@@ -771,7 +734,7 @@ export default function PPEditorPage() {
                     >
                       <div className="max-w-3xl mx-auto space-y-4">
                         <h2 className="text-2xl sm:text-4xl font-black tracking-tight">{section.title}</h2>
-                        {section.subtitle && <div className="text-xs font-bold leading-relaxed" dangerouslySetInnerHTML={{ __html: section.subtitle }} />}
+                        {section.subtitle && <div className="text-[11px] font-bold leading-relaxed text-foreground" dangerouslySetInnerHTML={{ __html: section.subtitle }} />}
                         <p className="text-xs sm:text-sm leading-relaxed opacity-90 font-medium">{section.content}</p>
                         {section.buttonText && (
                           <div className="pt-4">
@@ -800,7 +763,7 @@ export default function PPEditorPage() {
                       <TestimonialCard key={`${t.id}-${muralIndex}-${i}`} t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} />
                     ))
                   ) : (
-                    <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos para o preview.</div>
+                    <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos.</div>
                   )}
                 </div>
 
