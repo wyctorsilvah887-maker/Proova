@@ -51,7 +51,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useUser, useFirestore, useDoc, useCollection, useStorage, useAuth } from '@/firebase';
-import { doc, updateDoc, collection, query, where, getDocs, limit, serverTimestamp, setDoc, getDoc } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, getDocs, limit, serverTimestamp, setDoc } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from '@/hooks/use-toast';
@@ -201,10 +201,8 @@ const HeroTitleEditor = ({ value, onChange, themeColor }: { value: string, onCha
       <div
         ref={editorRef}
         contentEditable
-        // Estilos para remover menus nativos e callouts
         style={{ WebkitTouchCallout: 'none', WebkitUserSelect: 'text' } as any}
         onContextMenu={(e) => {
-          // Bloqueia menu nativo apenas se houver seleção para favorecer nossa toolbar
           const selection = window.getSelection();
           if (selection && selection.toString().length > 0) {
             e.preventDefault();
@@ -372,7 +370,7 @@ const PublicPageSettings = ({
                 >
                   {isUploading ? <Loader2 className="animate-spin text-primary" /> : (logoUrl ? <img src={logoUrl} className="w-full h-full object-cover rounded-xl" /> : <Upload className="text-muted-foreground" />)}
                 </div>
-                <input type="file" logoInputRef={logoInputRef} className="hidden" accept="image/*" onChange={(e) => onFileSelect(e, 'logo')} />
+                <input type="file" ref={logoInputRef} className="hidden" accept="image/*" onChange={(e) => onFileSelect(e, 'logo')} />
               </div>
 
               <div className="space-y-4 pt-4 border-t">
@@ -405,6 +403,20 @@ const PublicPageSettings = ({
                   <div className="flex flex-wrap gap-2">
                     {colors.map((color) => (
                       <button key={color} onClick={() => setThemeColor(color)} className={cn("w-7 h-7 rounded-full border-2 transition-transform", themeColor === color ? "border-foreground scale-110 shadow-sm" : "border-transparent opacity-80 shadow-inner")} style={{ backgroundColor: color }} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-6 pt-4 border-t">
+                <div className={cn("space-y-4", !isGoldPlan && "opacity-40 grayscale pointer-events-none")}>
+                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                    <Palette className="w-3 h-3 text-primary" /> Cor Secundária (Gold)
+                    {!isGoldPlan && <Lock className="w-2.5 h-2.5" />}
+                  </Label>
+                  <div className="flex flex-wrap gap-2">
+                    {colors.map((color) => (
+                      <button key={color} onClick={() => setSecondaryColor(color)} className={cn("w-7 h-7 rounded-full border-2 transition-transform", secondaryColor === color ? "border-foreground scale-110 shadow-sm" : "border-transparent opacity-80 shadow-inner")} style={{ backgroundColor: color }} />
                     ))}
                   </div>
                 </div>
@@ -574,7 +586,6 @@ export default function PPEditorPage() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
-  // WidgetID Localizado/Único
   const [activeWidgetId, setActiveWidgetId] = useState<string | null>(null);
   
   const widgetRef = useMemo(() => (db && user && activeWidgetId ? doc(db, 'users', user.uid, 'widgets', activeWidgetId) : null), [db, user, activeWidgetId]);
@@ -595,7 +606,6 @@ export default function PPEditorPage() {
 
   const { data: approvedTestimonials, loading: testimonialsLoading } = useCollection(testimonialsQuery);
 
-  // Estados Form
   const [widgetName, setWidgetName] = useState('');
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [themeColor, setThemeColor] = useState('#f97316');
@@ -629,7 +639,6 @@ export default function PPEditorPage() {
     if (typeof window !== 'undefined') setBaseUrl(window.location.origin);
   }, []);
 
-  // Busca ou cria o mural único da Página Pública
   useEffect(() => {
     async function initWidget() {
       if (!db || !user) return;
