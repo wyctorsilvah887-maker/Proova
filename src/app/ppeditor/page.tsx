@@ -219,7 +219,7 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
     <Card 
       key={`${t.id}-${muralIndex}`}
       className={cn(
-        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] animate-in fill-both",
+        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] animate-in fill-both border-none",
         side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in"
       )}
       style={{ 
@@ -897,12 +897,12 @@ export default function PPEditorPage() {
                   </div>
                 </div>
 
-                <div className="w-full">
+                <div className="w-full mb-12">
                   {customSections.map((section: CustomSection) => (
                     <div 
                       key={section.id} 
                       className={cn(
-                        "py-16 px-8 sm:px-12 text-center space-y-4",
+                        "py-16 px-8 sm:px-12 text-center space-y-4 mb-12",
                         section.variant === 'accent' ? "text-white" : (section.variant === 'dark' ? "bg-black text-white" : "bg-muted/5")
                       )}
                       style={{ backgroundColor: section.variant === 'accent' ? themeColor : undefined }}
@@ -925,11 +925,17 @@ export default function PPEditorPage() {
 
                 <div className={cn(
                   "px-8 sm:px-12 w-full max-w-5xl mx-auto mt-12",
-                  layout === 'popup' ? "max-w-sm mx-auto" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10"
+                  layout === 'popup' ? "max-w-sm mx-auto" : (
+                    layout === 'mural' 
+                      ? "columns-1 sm:columns-2 lg:columns-3 gap-12" 
+                      : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12"
+                  )
                 )}>
                   {visibleTestimonialsPreview.length > 0 ? (
                     visibleTestimonialsPreview.map((t, i) => (
-                      <TestimonialCard key={`${t.id}-${muralIndex}-${i}`} t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} />
+                      <div key={`${t.id}-${muralIndex}-${i}`} className={cn(layout === 'mural' ? "break-inside-avoid mb-12" : "")}>
+                        <TestimonialCard t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} />
+                      </div>
                     ))
                   ) : (
                     <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos abaixo.</div>

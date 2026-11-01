@@ -176,7 +176,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
       <Card 
         key={`${t.id}-${muralIndex}`}
         className={cn(
-          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] animate-in fill-both",
+          "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-500 hover:scale-[1.02] animate-in fill-both border-none",
           side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in"
         )}
         style={{ 
@@ -300,12 +300,12 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
               </div>
             </header>
 
-            <div className="w-full">
+            <div className="w-full mb-12">
               {customSections.map((section: any) => (
                 <section 
                   key={section.id} 
                   className={cn(
-                    "py-24 px-6 text-center",
+                    "py-24 px-6 text-center mb-12",
                     section.variant === 'accent' ? "text-white" : (section.variant === 'dark' ? "bg-black text-white" : "bg-muted/5")
                   )}
                   style={{ backgroundColor: section.variant === 'accent' ? themeColor : undefined }}
@@ -346,16 +346,16 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
               ) : (
                 <div className="w-full">
                   {layout === 'mural' && (
-                    <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-10">
+                    <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-12">
                       {visibleDisplayPool.map((t, i) => (
-                        <div key={`${t.id}-${muralIndex}-${i}`} className="break-inside-avoid mb-10">
+                        <div key={`${t.id}-${muralIndex}-${i}`} className="break-inside-avoid mb-12">
                           <TestimonialCard t={t} index={i} />
                         </div>
                       ))}
                     </div>
                   )}
                   {layout === 'grid' && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
                       {visibleDisplayPool.map((t, i) => (
                         <TestimonialCard key={`${t.id}-${muralIndex}-${i}`} t={t} index={i} />
                       ))}
