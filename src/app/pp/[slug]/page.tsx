@@ -10,6 +10,7 @@ import {
   limit, 
   doc, 
   onSnapshot,
+  getDoc
 } from 'firebase/firestore';
 import { Card } from '@/components/ui/card';
 import { Star, User, Loader2, MessageSquare, MessageCircle, Globe, ArrowRight, ArrowLeft } from 'lucide-react';
@@ -53,19 +54,30 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
         setIsLoading(true);
         const slug = decodeURIComponent(rawSlug).toLowerCase().trim();
         
-        // 1. Busca na coleção global de slugs (Cartório)
-        const slugQuery = query(collection(db, 'slugs'), where('__name__', '==', slug), limit(1));
-        const slugSnap = await getDocs(slugQuery);
+        // 1. Busca Direta no Cartório de Slugs
+        const slugRef = doc(db, 'slugs', slug);
+        const slugSnap = await getDoc(slugRef);
         
-        if (!slugSnap.empty) {
-          const sData = slugSnap.docs[0].data();
+        if (slugSnap.exists()) {
+          const sData = slugSnap.data();
           const uid = sData.userId;
           setTargetUserId(uid);
 
-          // 2. Busca o nome da empresa e dados básicos no perfil do usuário
-          const userSnap = await getDocs(query(collection(db, 'users'), where('__name__', '==', uid), limit(1)));
-          if (!userSnap.empty) {
-            setCompanyName(userSnap.docs[0].data().companyName);
+          // Busca dados do usuário para ter o nome da empresa como fallback
+          const userRef = doc(db, 'users', uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            setCompanyName(userSnap.data().companyName);
+          }
+        } else {
+          // 2. Fallback: Busca por Slug no Perfil do Usuário
+          const usersRef = collection(db, 'users');
+          const q = query(usersRef, where('companySlug', '==', slug), limit(1));
+          const userQuerySnap = await getDocs(q);
+          
+          if (!userQuerySnap.empty) {
+            setTargetUserId(userQuerySnap.docs[0].id);
+            setCompanyName(userQuerySnap.docs[0].data().companyName);
           }
         }
       } catch (err) {
@@ -111,7 +123,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     return allTestimonials.filter(t => selectedIds.includes(t.id));
   }, [ppData, allTestimonials]);
 
-  // Extração de variáveis com fallbacks seguros
   const layout = ppData?.layout || 'grid';
   const themeColor = ppData?.themeColor || '#f97316';
   const secondaryColor = ppData?.secondaryColor || '#ffffff';
@@ -127,7 +138,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
   const footerText = ppData?.footerText || `${new Date().getFullYear()} ${companyName || ''}`;
   const showProovaBranding = ppData?.showLogo !== false;
 
-  // Lógica de rotação para layouts estáticos
   useEffect(() => {
     if ((layout === 'mural' || layout === 'grid') && filteredTestimonials.length > 5) {
       const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % filteredTestimonials.length), 7000);
@@ -135,7 +145,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     }
   }, [layout, filteredTestimonials]);
 
-  // Lógica de auto-play para carrossel
   useEffect(() => {
     if (!api || layout !== 'carousel') return;
     const interval = setInterval(() => api.scrollNext(), 5000);
@@ -238,7 +247,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                 {hasValidLogo && (
                   <div className="flex justify-center">
                     <div className="w-24 h-24 sm:w-32 sm:h-32 relative">
-                      <img src={logoUrl} className="w-full h-full object-cover rounded-[2.5rem] shadow-2xl border-4 border-background" alt="Logo Empresa" />
+                      <img src={logoUrl} className="w-full h-full object-cover rounded-[2.5rem] shadow-xl border-4 border-background" alt="Logo" />
                     </div>
                   </div>
                 )}
@@ -257,7 +266,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
               </div>
             </header>
 
-            {/* SEÇÕES CUSTOMIZADAS */}
             <div className="w-full">
               {customSections.map((section: any) => (
                 <section 
@@ -271,7 +279,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
                   <div className="max-w-4xl mx-auto space-y-8">
                     <div className="space-y-4">
                       <h2 className="text-3xl sm:text-5xl font-black tracking-tight">{section.title}</h2>
-                      {section.subtitle && <p className="text-base font-bold">{section.subtitle}</p>}
+                      {section.subtitle && <div className="text-base font-bold" dangerouslySetInnerHTML={{ __html: section.subtitle }} />}
                     </div>
                     <p className="text-base sm:text-xl leading-relaxed opacity-90 font-medium">{section.content}</p>
                     {section.buttonText && (

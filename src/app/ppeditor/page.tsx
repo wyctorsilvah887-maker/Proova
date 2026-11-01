@@ -42,7 +42,14 @@ import {
   X,
   Pipette
 } from 'lucide-react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from '@/components/ui/sheet';
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetTrigger, 
+  SheetDescription 
+} from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -51,7 +58,17 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useUser, useFirestore, useDoc, useCollection, useStorage, useAuth } from '@/firebase';
-import { doc, updateDoc, collection, query, where, serverTimestamp, getDoc, writeBatch } from 'firebase/firestore';
+import { 
+  doc, 
+  updateDoc, 
+  collection, 
+  query, 
+  where, 
+  serverTimestamp, 
+  getDoc, 
+  writeBatch,
+  setDoc 
+} from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from '@/hooks/use-toast';
