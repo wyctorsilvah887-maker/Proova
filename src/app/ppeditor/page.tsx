@@ -327,7 +327,7 @@ const PublicPageSettings = ({
               </div>
             </TabsContent>
 
-            <TabsContent value="conteudo" className="mt-0 space-y-8">
+            <TabsContent value="conteudo" className="mt-0">
               {!isGoldPlan ? (
                 <div className="py-20 px-4 text-center space-y-6 bg-primary/5 rounded-3xl border border-dashed border-primary/20 animate-in zoom-in duration-500">
                    <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit">
@@ -493,8 +493,7 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </Tabs>
-    </div>
+      </div>
   );
 };
 
@@ -722,7 +721,7 @@ export default function PPEditorPage() {
             <SheetTrigger asChild>
               <button className="flex flex-col items-center justify-center gap-1 group transition-all text-primary hover:text-primary/80 outline-none focus:ring-0">
                 <div className="h-10 w-10 flex items-center justify-center rounded-xl transition-all bg-transparent group-hover:bg-primary/5">
-                  <Monitor className="h-6 w-6" />
+                  <Monitor className="h-4 w-4" />
                 </div>
                 <span className="text-[8px] font-black uppercase tracking-widest leading-none">EDITAR</span>
               </button>
