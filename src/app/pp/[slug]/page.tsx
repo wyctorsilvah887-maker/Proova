@@ -137,7 +137,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     
     if (layout === 'mural') {
       const slice = [];
-      const count = 2; // Mural fixo em 2 itens com swap
+      const count = 2; 
       for (let i = 0; i < Math.min(count, filteredTestimonials.length); i++) {
         const idx = (muralIndex + i) % filteredTestimonials.length;
         slice.push(filteredTestimonials[idx]);
@@ -146,7 +146,6 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
     }
     
     if (layout === 'carousel' || layout === 'popup') {
-      // Carrossel/Popup fixo em 1 item com loop
       return [filteredTestimonials[muralIndex % filteredTestimonials.length]];
     }
     

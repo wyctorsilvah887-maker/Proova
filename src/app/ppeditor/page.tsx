@@ -83,7 +83,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/Accordion";
+} from "@/components/ui/accordion";
 import { Slider } from '@/components/ui/slider';
 import Cropper from 'react-easy-crop';
 import { 
@@ -675,7 +675,7 @@ export default function PPEditorPage() {
     
     if (layout === 'mural') {
       const slice = [];
-      const count = 2; // Visibilidade de exatamente 2 para Mural (Swap)
+      const count = 2; 
       for (let i = 0; i < Math.min(count, currentSelection.length); i++) {
         const idx = (muralIndex + i) % currentSelection.length;
         slice.push(currentSelection[idx]);
@@ -684,7 +684,6 @@ export default function PPEditorPage() {
     }
     
     if (layout === 'carousel' || layout === 'popup') {
-      // Visibilidade de exatamente 1 para Carrossel/Popup (Loop)
       return [currentSelection[muralIndex % currentSelection.length]];
     }
     

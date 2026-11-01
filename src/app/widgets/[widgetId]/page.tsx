@@ -11,10 +11,6 @@ import {
   MessageSquare,
   Check,
   User,
-  Monitor,
-  CheckCircle2,
-  Upload,
-  Palette,
   LayoutGrid,
   Play,
   Layout,
@@ -685,7 +681,7 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
   const publicPageLink = useMemo(() => {
     if (!baseUrl || !userData || !widgetId) return '';
     const slug = userData.companySlug || userData.companyName?.toLowerCase().replace(/\s+/g, '-') || '';
-    return `${baseUrl}/pp/${slug}/${widgetId}`;
+    return `${baseUrl}/pp/${slug}`;
   }, [baseUrl, userData, widgetId]);
 
   const copyToClipboard = (text: string, description: string = "Link da Página Pública") => {
@@ -703,17 +699,22 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
   const visibleTestimonials = useMemo(() => {
     if (currentTestimonials.length === 0) return [];
     
-    if (layout === 'mural' || layout === 'grid') {
+    if (layout === 'mural') {
       const slice = [];
-      const count = Math.min(5, currentTestimonials.length);
-      for (let i = 0; i < count; i++) {
+      const count = 2; 
+      for (let i = 0; i < Math.min(count, currentTestimonials.length); i++) {
         const idx = (muralIndex + i) % currentTestimonials.length;
         slice.push(currentTestimonials[idx]);
       }
       return slice;
     }
     
-    return currentTestimonials.slice(0, 5);
+    if (layout === 'carousel' || layout === 'popup') {
+      return [currentTestimonials[muralIndex % currentTestimonials.length]];
+    }
+    
+    if (layout === 'grid') return currentTestimonials;
+    return currentTestimonials;
   }, [currentTestimonials, muralIndex, layout]);
 
   const selectableTestimonials = useMemo(() => {
@@ -997,7 +998,7 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
 
             <div className="flex items-center justify-between">
               <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                <Eye className="w-4 h-4" /> Preview Dinâmico (Máx. 5 Visíveis)
+                <Eye className="w-4 h-4" /> Preview Dinâmico
               </h2>
               <Button variant="link" size="sm" onClick={() => setIsTutorialOpen(true)} className="text-[10px] font-bold gap-1 text-primary p-0 h-auto">
                 <Info className="w-3 h-3" /> Ver Tutorial
@@ -1069,10 +1070,10 @@ export default function PublicPageEditorPage({ params }: { params: Promise<{ wid
 
                 <div className={cn(
                   "w-full max-w-[1400px] mx-auto",
-                  layout === 'popup' ? "flex justify-center" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+                  layout === 'popup' || layout === 'carousel' ? "flex justify-center" : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
                 )}>
                   {visibleTestimonials.length > 0 ? (
-                    layout === 'popup' ? (
+                    layout === 'popup' || layout === 'carousel' ? (
                       <TestimonialCard t={visibleTestimonials[0]} themeColor={themeColor} secondaryColor={secondaryColor} />
                     ) : (
                       visibleTestimonials.map((t, i) => (
