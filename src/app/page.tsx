@@ -122,8 +122,8 @@ export default function Home() {
               
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
                 <Link href="/signup" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto h-16 md:h-20 px-10 rounded-2xl text-lg md:text-xl font-black shadow-[0_20px_50px_-15px_rgba(249,115,22,0.5)] transition-all hover:scale-105 active:scale-95 group">
-                    Ativar Minha Máquina de Vendas <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                  <Button size="lg" className="w-full sm:w-auto h-16 md:h-20 px-6 md:px-10 rounded-2xl text-sm sm:text-lg md:text-xl font-black shadow-[0_20px_50px_-15px_rgba(249,115,22,0.5)] transition-all hover:scale-105 active:scale-95 group whitespace-nowrap">
+                    Ativar Minha Máquina de Vendas <ArrowRight className="ml-2 w-4 h-4 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
               </div>
@@ -308,7 +308,7 @@ export default function Home() {
           <div className="space-y-8">
             <div className="flex flex-wrap justify-center gap-6 md:gap-10">
               <Link href="/pricing" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Preços</Link>
-              <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Login</Link>
+              <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Entrar</Link>
               <Link href="/terms" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2"><Scale className="w-3.5 h-3.5" /> Termos</Link>
               <Link href="/privacy" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2"><Lock className="w-3.5 h-3.5" /> Privacidade</Link>
             </div>
