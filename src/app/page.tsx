@@ -188,15 +188,15 @@ export default function Home() {
         </section>
 
         {/* AGITATION SECTION - O ABISMO */}
-        <section id="agitation-section" ref={agitationRef} className="w-full py-24 bg-zinc-950 text-white overflow-hidden relative border-y border-red-900/30 min-h-[400px]">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-600 to-transparent opacity-50" />
+        <section id="agitation-section" ref={agitationRef} className="w-full py-24 bg-zinc-950 text-white overflow-hidden relative border-y border-zinc-900/30 min-h-[400px]">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
           <div className="container px-4 mx-auto text-center space-y-16">
             <div className={cn(
               "space-y-4 transition-all duration-1000",
               isAgitationVisible ? "animate-in fade-in zoom-in-95 opacity-100" : "opacity-0"
             )}>
               <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">O Abismo Digital</h2>
-              <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">O preço de ser um <span className="text-red-600 italic">Zé Ninguém</span> no Google.</h3>
+              <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">O preço de ser um <span className="text-primary italic">Zé Ninguém</span> no Google.</h3>
             </div>
 
             <div className="grid gap-12 lg:grid-cols-3">
@@ -209,7 +209,7 @@ export default function Home() {
                   "space-y-4 transition-all duration-1000",
                   isAgitationVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-0"
                 )} style={{ transitionDelay: `${(idx + 1) * 200}ms` }}>
-                  <div className="text-red-600 flex justify-center">
+                  <div className="text-primary flex justify-center">
                     <item.icon className={cn("w-12 h-12", item.animate && "animate-pulse")} />
                   </div>
                   <h4 className="text-xl font-bold font-headline">{item.title}</h4>
