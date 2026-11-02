@@ -143,7 +143,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        {/* HERO SECTION - COMPACTA E PERSUASIVA (PRESERVADA) */}
+        {/* HERO SECTION - COMPACTA E PERSUASIVA */}
         <section className="relative w-full py-12 md:py-16 flex items-center justify-center overflow-hidden border-b">
           <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
             <div className="relative w-full h-full max-w-xl opacity-[0.2] dark:opacity-[0.3]">
@@ -260,7 +260,7 @@ export default function Home() {
             
             <div className="grid gap-8 lg:grid-cols-3">
               {[
-                { icon: MapPin, color: 'text-primary', bar: 'bg-primary', title: 'G-Boost: SEO Local', desc: 'Incentivamos seus clientes satisfeitos a inundarem seu Maps com 5 estrelas. Force o Google a te colocar no topo.', from: 'slide-in-from-left-20' },
+                { icon: MapPin, color: 'text-primary', bar: 'bg-primary', title: 'G-Boost: SEO Local', desc: 'Incentivamos seus clientes satisfeitos a inundarem seu Maps com 5 estrelas. Force o Google a aumentar sua chances de aparecer no topo.', from: 'slide-in-from-left-20' },
                 { icon: ShieldCheck, color: 'text-orange-600', bar: 'bg-orange-600', title: 'Reputation Shield', desc: 'Filtre críticas antes que virem um problema. Resolva crises no Inbox Privado e mantenha sua imagem impecável.', from: 'slide-in-from-bottom-20' },
                 { icon: Layout, color: 'text-blue-600', bar: 'bg-blue-600', title: 'Páginas de Elite', desc: 'Widgets hipnóticos que aniquilam dúvidas. Prove que você é a escolha certa em segundos com designs exclusivos.', from: 'slide-in-from-right-20' }
               ].map((pill, idx) => (
