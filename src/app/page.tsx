@@ -57,7 +57,6 @@ export default function Home() {
   }, [user, loading, router]);
 
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-saas');
-  const heroBg = PlaceHolderImages.find(img => img.id === 'hero-bg-photo');
   const ctaBg = PlaceHolderImages.find(img => img.id === 'cta-bg-photo');
   
   const avatars = [
@@ -93,12 +92,14 @@ export default function Home() {
       <main className="flex-1">
         {/* HERO SECTION */}
         <section className="relative w-full py-16 md:py-32 lg:py-48 flex items-center justify-center overflow-hidden">
-          {heroBg && (
-            <div className="absolute inset-0 z-0">
-              <Image src={heroBg.imageUrl} alt="Background" fill priority className="object-cover opacity-10 grayscale" />
-              <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
+          {/* Background Logo dynamic to theme */}
+          <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
+            <div className="relative w-full h-full max-w-5xl opacity-[0.03] dark:opacity-[0.05] grayscale blur-sm">
+              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Background" fill className="dark:hidden object-contain" priority />
+              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Background" fill className="hidden dark:block object-contain" priority />
             </div>
-          )}
+            <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
+          </div>
           
           <div className="container relative z-10 px-4 mx-auto">
             <div className="max-w-4xl mx-auto text-center space-y-8">
@@ -204,7 +205,7 @@ export default function Home() {
               <div className="space-y-10">
                 <div className="space-y-4">
                   <h2 className="text-3xl md:text-6xl font-black font-headline leading-tight tracking-tight">
-                    Para quem vende no <span className="text-primary">balcão</span> ou na <span className="text-primary">nuvem</span>.
+                    Para quem vende no <span className="text-primary">balcão</span> or na <span className="text-primary">nuvem</span>.
                   </h2>
                   <p className="text-lg text-muted-foreground font-medium italic">
                     "O Proova captura autoridade onde seu cliente estiver."
