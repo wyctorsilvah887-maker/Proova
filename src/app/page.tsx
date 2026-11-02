@@ -85,9 +85,9 @@ export default function Home() {
       <main className="flex-1">
         {/* HERO SECTION */}
         <section className="relative w-full py-16 md:py-32 lg:py-48 flex items-center justify-center overflow-hidden">
-          {/* Background Logo dynamic to theme */}
+          {/* Background Logo dynamic to theme with enhanced visibility */}
           <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
-            <div className="relative w-full h-full max-w-5xl opacity-[0.05] dark:opacity-[0.1] grayscale blur-[2px] transition-all duration-700">
+            <div className="relative w-full h-full max-w-5xl opacity-[0.15] dark:opacity-[0.2] grayscale blur-[1px] transition-all duration-700">
               {/* Tema Claro -> Logo White Mode */}
               <Image 
                 src="/Logotipo%20PROOVA%20white%20mode%201.png" 
@@ -114,7 +114,7 @@ export default function Home() {
                 💎 Onde a confiança vira lucro real
               </div>
               <h1 className="text-4xl font-black tracking-tighter sm:text-6xl md:text-8xl font-headline leading-[0.95] md:leading-[0.9]">
-                Transforme elógios em <span className="text-primary italic">Vendas</span>.
+                Transforme elogios em <span className="text-primary italic">Vendas</span>.
               </h1>
               <p className="max-w-2xl mx-auto text-muted-foreground text-base md:text-2xl font-medium leading-relaxed">
                 Domine o <strong>SEO Local no Google</strong>, proteja sua imagem e feche mais negócios com o ecossistema definitivo de prova social.
@@ -155,7 +155,7 @@ export default function Home() {
                   <div className="space-y-2">
                     <h4 className="text-2xl font-black font-headline">G-Boost: SEO Local</h4>
                     <p className="text-muted-foreground text-sm leading-relaxed font-medium">
-                      O sistema detecta elógios 5 estrelas e incentiva o redirecionamento imediato para o seu <strong>Google Maps</strong>. Suba nas buscas organicamente.
+                      O sistema detecta elogios 5 estrelas e incentiva o redirecionamento imediato para o seu <strong>Google Maps</strong>. Suba nas buscas organicamente.
                     </p>
                   </div>
                   <div className="pt-4 flex items-center gap-2 text-[10px] font-black text-primary uppercase tracking-widest">
@@ -212,7 +212,7 @@ export default function Home() {
               <div className="space-y-10">
                 <div className="space-y-4">
                   <h2 className="text-3xl md:text-6xl font-black font-headline leading-tight tracking-tight">
-                    Para quem vende no <span className="text-primary">balcão</span> or na <span className="text-primary">nuvem</span>.
+                    Para quem vende no <span className="text-primary">balcão</span> ou na <span className="text-primary">nuvem</span>.
                   </h2>
                   <p className="text-lg text-muted-foreground font-medium italic">
                     "O Proova captura autoridade onde seu cliente estiver."
