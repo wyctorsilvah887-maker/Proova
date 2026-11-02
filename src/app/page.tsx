@@ -69,11 +69,11 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
       <header className="px-4 lg:px-8 h-20 md:h-28 flex items-center justify-between border-b sticky top-0 bg-background/80 backdrop-blur-md z-[100]">
-        <div className="flex items-center relative w-[180px] h-[50px] md:w-[280px] md:h-[85px]">
+        <div className="flex items-center relative w-[180px] h-[50px] md:w-[280px] md:h-[85px] animate-in fade-in duration-500">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="dark:hidden object-contain" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="hidden dark:block object-contain" priority />
         </div>
-        <div className="flex items-center gap-2 md:gap-6">
+        <div className="flex items-center gap-2 md:gap-6 animate-in fade-in slide-in-from-right-4 duration-500">
           <ThemeToggle />
           <Link href="/login" className="hidden sm:block text-sm font-black uppercase tracking-widest hover:text-primary transition-colors">Entrar</Link>
           <Link href="/signup">
@@ -86,7 +86,7 @@ export default function Home() {
         {/* HERO SECTION */}
         <section className="relative w-full py-16 md:py-32 lg:py-48 flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
-            <div className="relative w-full h-full max-w-5xl opacity-[0.25] dark:opacity-[0.35] transition-all duration-700">
+            <div className="relative w-full h-full max-w-5xl opacity-[0.25] dark:opacity-[0.35] transition-all duration-1000 animate-in fade-in zoom-in-95">
               <Image 
                 src="/Logotipo%20PROOVA%20white%20mode%201.png" 
                 alt="Logo Background Light" 
@@ -106,13 +106,15 @@ export default function Home() {
           </div>
           
           <div className="container relative z-10 px-4 mx-auto">
-            <div className="max-w-4xl mx-auto text-center space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-              <div className="inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-[10px] md:text-xs font-black text-primary border border-primary/20 uppercase tracking-[0.2em] backdrop-blur-sm">
+            <div className="max-w-4xl mx-auto text-center space-y-8">
+              <div className="inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-[10px] md:text-xs font-black text-primary border border-primary/20 uppercase tracking-[0.2em] backdrop-blur-sm animate-in fade-in slide-in-from-bottom-2 duration-700">
                 💎 Onde a confiança vira lucro real
               </div>
-              <h1 className="text-4xl font-black tracking-tighter sm:text-6xl md:text-8xl font-headline leading-[0.95] md:leading-[0.9]">
+              
+              <h1 className="text-4xl font-black tracking-tighter sm:text-6xl md:text-8xl font-headline leading-[0.95] md:leading-[0.9] animate-in fade-in slide-in-from-bottom-4 duration-700 delay-150">
                 Transforme elogios em <span className="text-primary italic">Vendas</span>.
               </h1>
+              
               <p className="max-w-2xl mx-auto text-muted-foreground text-base md:text-2xl font-medium leading-relaxed animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
                 Domine o <strong>SEO Local no Google</strong>, proteja sua imagem e feche mais negócios com o ecossistema definitivo de prova social.
               </p>
@@ -124,6 +126,7 @@ export default function Home() {
                   </Button>
                 </Link>
               </div>
+              
               <div className="flex flex-wrap items-center justify-center gap-6 text-[10px] font-black text-muted-foreground uppercase tracking-widest animate-in fade-in duration-1000 delay-700">
                 <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-primary" /> Setup em 2 Minutos</span>
                 <span className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-primary" /> Sem Cartão de Crédito</span>
@@ -143,7 +146,7 @@ export default function Home() {
             
             <div className="grid gap-8 lg:grid-cols-3">
               {/* Pillar 1: G-BOOST */}
-              <div className="bg-background border-2 border-primary/5 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden animate-in fade-in slide-in-from-left-8 duration-1000 delay-100">
+              <div className="bg-background border-2 border-primary/5 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100">
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-primary" />
                 <div className="space-y-6">
                   <div className="p-4 rounded-2xl bg-primary/10 text-primary w-fit group-hover:bg-primary group-hover:text-black transition-all">
@@ -181,7 +184,7 @@ export default function Home() {
               </div>
 
               {/* Pillar 3: CONVERSION PAGES */}
-              <div className="bg-background border-2 border-blue-500/5 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden animate-in fade-in slide-in-from-right-8 duration-1000 delay-500">
+              <div className="bg-background border-2 border-blue-500/5 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-500">
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-500" />
                 <div className="space-y-6">
                   <div className="p-4 rounded-2xl bg-blue-500/10 text-blue-600 w-fit group-hover:bg-blue-500 group-hover:text-white transition-all">
@@ -209,7 +212,7 @@ export default function Home() {
               <div className="space-y-10 animate-in fade-in slide-in-from-left-8 duration-1000">
                 <div className="space-y-4">
                   <h2 className="text-3xl md:text-6xl font-black font-headline leading-tight tracking-tight">
-                    Para quem vende no <span className="text-primary">balcão</span> or na <span className="text-primary">nuvem</span>.
+                    Para quem vende no <span className="text-primary">balcão</span> ou na <span className="text-primary">nuvem</span>.
                   </h2>
                   <p className="text-lg text-muted-foreground font-medium italic">
                     "O Proova captura autoridade onde seu cliente estiver."
@@ -298,11 +301,11 @@ export default function Home() {
 
       <footer className="py-20 border-t bg-background">
         <div className="container px-4 mx-auto flex flex-col items-center gap-12 text-center">
-          <div className="relative w-[200px] h-[60px] opacity-40 grayscale">
+          <div className="relative w-[200px] h-[60px] opacity-40 grayscale animate-in fade-in duration-1000 delay-500">
              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="dark:hidden object-contain" />
              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="hidden dark:block object-contain" />
           </div>
-          <div className="space-y-8">
+          <div className="space-y-8 animate-in fade-in duration-1000 delay-700">
             <div className="flex flex-wrap justify-center gap-6 md:gap-10">
               <Link href="/pricing" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Preços</Link>
               <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Entrar</Link>
