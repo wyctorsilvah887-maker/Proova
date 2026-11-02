@@ -190,8 +190,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* AGITATION SECTION - O ABISMO (AGRESSIVO E SEGMENTADO) */}
-        <section id="agitation-section" ref={agitationRef} className="w-full py-24 bg-zinc-950 text-white overflow-hidden relative border-y border-zinc-900/30 min-h-[400px]">
+        {/* AGITATION SECTION - O ABISMO (AGRESSIVO E ADAPTÁVEL) */}
+        <section id="agitation-section" ref={agitationRef} className="w-full py-24 bg-muted/30 dark:bg-zinc-950 text-foreground dark:text-white overflow-hidden relative border-y border-border/50 dark:border-zinc-900/30 min-h-[400px]">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
           <div className="container px-4 mx-auto text-center space-y-16">
             <div className={cn(
@@ -200,7 +200,7 @@ export default function Home() {
             )}>
               <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">O Custo do Silêncio</h2>
               <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">O custo mortal de ser um <span className="text-primary italic">Zé Ninguém</span> para o mercado.</h3>
-              <p className="max-w-2xl mx-auto text-zinc-400 text-sm md:text-base font-medium">Cada minuto que você passa sem Prova Social é um cliente que escolhe o seu vizinho.</p>
+              <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">Cada minuto que você passa sem Prova Social é um cliente que escolhe o seu vizinho.</p>
             </div>
 
             <div className="grid gap-12 lg:grid-cols-3">
@@ -232,7 +232,7 @@ export default function Home() {
                     <item.icon className={cn("w-12 h-12", item.animate && "animate-pulse")} />
                   </div>
                   <h4 className="text-xl font-bold font-headline px-4">{item.title}</h4>
-                  <p className="text-zinc-500 text-sm leading-relaxed font-medium px-6">{item.desc}</p>
+                  <p className="text-muted-foreground dark:text-zinc-500 text-sm leading-relaxed font-medium px-6">{item.desc}</p>
                 </div>
               ))}
             </div>
