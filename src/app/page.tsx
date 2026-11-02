@@ -54,10 +54,10 @@ export default function Home() {
     // 1. Ativa Hero imediatamente
     const heroTimer = setTimeout(() => setIsHeroVisible(true), 100);
 
-    // 2. Sensor de visibilidade para o restante da página
+    // 2. Sensor de visibilidade Robusto (Intersection Observer)
     const observerOptions = { 
-      threshold: 0,
-      rootMargin: "0px 0px -50px 0px" // Dispara um pouco antes de entrar totalmente
+      threshold: 0.1,
+      rootMargin: "0px"
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -76,8 +76,16 @@ export default function Home() {
     if (pillarsRef.current) observer.observe(pillarsRef.current);
     if (versatilityRef.current) observer.observe(versatilityRef.current);
 
+    // 3. Gatilho de Segurança: Se após 1.5s algo não apareceu, forçamos a exibição
+    const safetyTimer = setTimeout(() => {
+      setIsAgitationVisible(true);
+      setIsPillarsVisible(true);
+      setIsVersatilityVisible(true);
+    }, 1500);
+
     return () => {
       clearTimeout(heroTimer);
+      clearTimeout(safetyTimer);
       observer.disconnect();
     };
   }, []);
@@ -132,8 +140,8 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        {/* HERO SECTION - COMPACTA (MANTIDA) */}
-        <section className="relative w-full py-8 md:py-16 lg:py-20 flex items-center justify-center overflow-hidden">
+        {/* HERO SECTION - COMPACTA E PERSUASIVA */}
+        <section className="relative w-full py-12 md:py-16 flex items-center justify-center overflow-hidden border-b">
           <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
             <div className="relative w-full h-full max-w-xl opacity-[0.2] dark:opacity-[0.3]">
               <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo BG" fill className="dark:hidden object-contain" priority />
@@ -143,7 +151,7 @@ export default function Home() {
           </div>
           
           <div className="container relative z-10 px-4 mx-auto">
-            <div className="max-w-4xl mx-auto text-center space-y-4 md:space-y-6">
+            <div className="max-w-4xl mx-auto text-center space-y-6">
               <div className={cn(
                 "inline-flex items-center rounded-full bg-primary text-white px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] shadow-xl transition-all duration-1000",
                 isHeroVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
@@ -212,7 +220,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* PILLARS SECTION - A SOLUÇÃO */}
+        {/* PILLARS SECTION - O ECOSSISTEMA */}
         <section id="pillars-section" ref={pillarsRef} className="w-full py-24 md:py-32 bg-muted/20 border-y overflow-hidden min-h-[500px]">
           <div className="container px-4 mx-auto">
             <div className={cn(
@@ -289,7 +297,7 @@ export default function Home() {
                 <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card p-6 ring-1 ring-primary/10">
                   <div className="space-y-4 p-2">
                      {[1, 2, 3].map((i) => (
-                       <div key={i} className="bg-background p-6 rounded-[2rem] border shadow-sm flex flex-col gap-4 animate-pulse" style={{ animationDelay: `${i * 300}ms` }}>
+                       <div key={i} className="bg-background p-6 rounded-[2rem] border shadow-sm flex flex-col gap-4" style={{ animationDelay: `${i * 300}ms` }}>
                           <div className="flex gap-1">
                             {[1, 2, 3, 4, 5].map((s) => <Star key={s} className="w-3 h-3 fill-yellow-400 text-yellow-400" />)}
                           </div>
