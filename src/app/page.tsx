@@ -49,7 +49,6 @@ export default function Home() {
   const pillarsRef = useRef(null);
   const versatilityRef = useRef(null);
 
-  // Efeito isolado para rastreio (precisa do db)
   useEffect(() => {
     if (!db) return;
     const trackVisit = async () => {
@@ -67,9 +66,11 @@ export default function Home() {
     trackVisit();
   }, [db]);
 
-  // Efeito isolado para animações (NÃO depende do db)
   useEffect(() => {
-    const observerOptions = { threshold: 0 };
+    // Forçar visibilidade da Hero no mount
+    setIsHeroVisible(true);
+
+    const observerOptions = { threshold: 0.1 };
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -85,9 +86,6 @@ export default function Home() {
     if (agitationRef.current) observer.observe(agitationRef.current);
     if (pillarsRef.current) observer.observe(pillarsRef.current);
     if (versatilityRef.current) observer.observe(versatilityRef.current);
-
-    // Forçar visibilidade da Hero no mount se já estiver no topo
-    setIsHeroVisible(true);
 
     return () => observer.disconnect();
   }, []);
@@ -145,21 +143,21 @@ export default function Home() {
               </div>
               
               <h1 className={cn(
-                "text-4xl font-black tracking-tighter sm:text-6xl md:text-8xl font-headline leading-[0.95] md:leading-[0.9] transition-all duration-1000 delay-300 fill-mode-both",
+                "text-4xl font-black tracking-tighter sm:text-6xl md:text-8xl font-headline leading-[0.95] md:leading-[0.9] transition-all duration-1000 delay-100",
                 isHeroVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-20"
               )}>
-                Sua empresa é <span className="text-red-600 italic">INVISÍVEL</span>. E isso custa caro.
+                Sua empresa é <span className="text-primary italic">INVISÍVEL</span>. E isso custa caro.
               </h1>
               
               <p className={cn(
-                "max-w-3xl mx-auto text-muted-foreground text-base md:text-2xl font-medium leading-relaxed transition-all duration-1000 delay-500 fill-mode-both",
+                "max-w-3xl mx-auto text-muted-foreground text-base md:text-2xl font-medium leading-relaxed transition-all duration-1000 delay-300",
                 isHeroVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-20"
               )}>
                 92% dos clientes ignoram quem não tem avaliações. Enquanto você espera, seus concorrentes usam <strong className="text-foreground">Prova Social</strong> para roubar suas vendas.
               </p>
               
               <div className={cn(
-                "flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 transition-all duration-1000 delay-700 fill-mode-both",
+                "flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 transition-all duration-1000 delay-500",
                 isHeroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
               )}>
                 <Link href="/signup" className="w-full sm:w-auto">
