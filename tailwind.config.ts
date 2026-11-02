@@ -11,7 +11,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
-        headline: ['Space Grotesk', 'sans-serif'],
+        headline: ['Inter', 'sans-serif'], // Alterado de Space Grotesk para Inter para ter pontos redondos
         code: ['monospace'],
       },
       colors: {
