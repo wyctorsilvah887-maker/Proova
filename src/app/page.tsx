@@ -27,7 +27,10 @@ import {
   TrendingDown,
   Skull,
   ShieldAlert,
-  Ghost
+  Ghost,
+  Target,
+  FileWarning,
+  EyeOff
 } from "lucide-react";
 import { useUser, useFirestore } from "@/firebase";
 import { doc, setDoc, increment } from "firebase/firestore";
@@ -140,7 +143,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        {/* HERO SECTION - COMPACTA E PERSUASIVA */}
+        {/* HERO SECTION - COMPACTA E PERSUASIVA (PRESERVADA) */}
         <section className="relative w-full py-12 md:py-16 flex items-center justify-center overflow-hidden border-b">
           <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
             <div className="relative w-full h-full max-w-xl opacity-[0.2] dark:opacity-[0.3]">
@@ -187,7 +190,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* AGITATION SECTION - O ABISMO */}
+        {/* AGITATION SECTION - O ABISMO (AGRESSIVO E SEGMENTADO) */}
         <section id="agitation-section" ref={agitationRef} className="w-full py-24 bg-zinc-950 text-white overflow-hidden relative border-y border-zinc-900/30 min-h-[400px]">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
           <div className="container px-4 mx-auto text-center space-y-16">
@@ -195,15 +198,31 @@ export default function Home() {
               "space-y-4 transition-all duration-1000",
               isAgitationVisible ? "animate-in fade-in zoom-in-95 opacity-100" : "opacity-0"
             )}>
-              <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">O Abismo Digital</h2>
-              <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">O preço de ser um <span className="text-primary italic">Zé Ninguém</span> no Google.</h3>
+              <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">O Custo do Silêncio</h2>
+              <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">O custo mortal de ser um <span className="text-primary italic">Zé Ninguém</span> para o mercado.</h3>
+              <p className="max-w-2xl mx-auto text-zinc-400 text-sm md:text-base font-medium">Cada minuto que você passa sem Prova Social é um cliente que escolhe o seu vizinho.</p>
             </div>
 
             <div className="grid gap-12 lg:grid-cols-3">
               {[
-                { icon: Ghost, title: "O Fantasma da Página 2", desc: "Sem notas 5 estrelas constantes, o algoritmo te enterra. Você não existe para quem tem dinheiro na mão." },
-                { icon: AlertTriangle, title: "A Fraqueza de uma Crítica", desc: "Um único cliente mal humorado pode destruir sua reputação se você não tiver uma blindagem ativa.", animate: true },
-                { icon: TrendingDown, title: "Hemorragia de Lucro", desc: "O cliente entra, sente medo e corre para o concorrente. Você paga pelo anúncio e ele leva a venda." }
+                { 
+                  icon: Skull, 
+                  title: "Negócios Locais: O Cemitério do Maps", 
+                  desc: "Se o seu concorrente tem 50 avaliações e você tem 5, o Google te enterra. Você não existe para quem pesquisa no celular com dinheiro na mão agora.", 
+                  animate: false 
+                },
+                { 
+                  icon: ShieldAlert, 
+                  title: "Serviços: O Medo do Pix", 
+                  desc: "Prestadores sem depoimentos parecem amadores. O cliente entra, sente insegurança e fecha com a agência que 'parece' mais oficial. O medo dele é o seu prejuízo.", 
+                  animate: true 
+                },
+                { 
+                  icon: TrendingDown, 
+                  title: "Agências: A Fraude da Autoridade", 
+                  desc: "Como vender marketing se a sua própria marca é silenciosa? A falta de casos de sucesso reais mata sua conversão e faz você implorar por cada contrato.", 
+                  animate: false 
+                }
               ].map((item, idx) => (
                 <div key={idx} className={cn(
                   "space-y-4 transition-all duration-1000",
@@ -212,10 +231,17 @@ export default function Home() {
                   <div className="text-primary flex justify-center">
                     <item.icon className={cn("w-12 h-12", item.animate && "animate-pulse")} />
                   </div>
-                  <h4 className="text-xl font-bold font-headline">{item.title}</h4>
-                  <p className="text-zinc-400 text-sm leading-relaxed font-medium">{item.desc}</p>
+                  <h4 className="text-xl font-bold font-headline px-4">{item.title}</h4>
+                  <p className="text-zinc-500 text-sm leading-relaxed font-medium px-6">{item.desc}</p>
                 </div>
               ))}
+            </div>
+            
+            <div className={cn(
+              "pt-10 transition-all duration-1000 delay-700",
+              isAgitationVisible ? "opacity-100" : "opacity-0"
+            )}>
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/40 italic">A omissão é a forma mais rápida de falência digital.</p>
             </div>
           </div>
         </section>
