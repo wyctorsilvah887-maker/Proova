@@ -161,7 +161,10 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
   };
 
   return (
-    <div className="relative group">
+    <div 
+      className="relative group"
+      onContextMenu={(e) => e.preventDefault()}
+    >
       <input type="color" ref={colorInputRef} className="sr-only" onChange={(e) => applyColor(e.target.value)} />
       
       {showToolbar && allowColor && (
@@ -193,13 +196,10 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
         onFocus={() => setIsFocused(true)}
         onBlur={() => { setIsFocused(false); setShowToolbar(false); }}
         onSelect={handleSelection}
-        onContextMenu={(e) => e.preventDefault()}
-        onCopy={(e) => e.preventDefault()}
-        onCut={(e) => e.preventDefault()}
-        onPaste={(e) => {
-          e.preventDefault();
-          const text = e.clipboardData.getData('text/plain');
-          document.execCommand('insertText', false, text);
+        onKeyDown={(e) => {
+          if ((e.ctrlKey || e.metaKey) && ['c', 'v', 'x'].includes(e.key.toLowerCase())) {
+            e.preventDefault();
+          }
         }}
         className={cn(
           "min-h-[80px] p-4 rounded-2xl bg-muted/20 border-2 border-transparent focus:border-primary/30 outline-none text-sm font-bold leading-relaxed transition-all cursor-text",
@@ -614,7 +614,8 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </div>
+      </Tabs>
+    </div>
   );
 };
 
