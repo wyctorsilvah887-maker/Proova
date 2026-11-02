@@ -150,7 +150,7 @@ export default function Home() {
               <div className="bg-background border-2 border-primary/5 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden animate-in fade-in slide-in-from-left-20 duration-1000 delay-200 fill-mode-both">
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-primary" />
                 <div className="space-y-6">
-                  <div className="p-4 rounded-2xl bg-primary/10 text-primary w-fit group-hover:bg-primary group-hover:text-black transition-all">
+                  <div className="text-primary w-fit transition-all mb-6">
                     <MapPin className="w-8 h-8" />
                   </div>
                   <div className="space-y-2">
@@ -169,7 +169,7 @@ export default function Home() {
               <div className="bg-background border-2 border-orange-500/5 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden animate-in fade-in slide-in-from-bottom-20 duration-1000 delay-400 fill-mode-both">
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-orange-500" />
                 <div className="space-y-6">
-                  <div className="p-4 rounded-2xl bg-orange-500/10 text-orange-600 w-fit group-hover:bg-orange-500 group-hover:text-white transition-all">
+                  <div className="text-orange-600 w-fit transition-all mb-6">
                     <ShieldCheck className="w-8 h-8" />
                   </div>
                   <div className="space-y-2">
@@ -188,7 +188,7 @@ export default function Home() {
               <div className="bg-background border-2 border-blue-500/5 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden animate-in fade-in slide-in-from-right-20 duration-1000 delay-600 fill-mode-both">
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-500" />
                 <div className="space-y-6">
-                  <div className="p-4 rounded-2xl bg-blue-500/10 text-blue-600 w-fit group-hover:bg-blue-500 group-hover:text-white transition-all">
+                  <div className="text-blue-600 w-fit transition-all mb-6">
                     <Layout className="w-8 h-8" />
                   </div>
                   <div className="space-y-2">
