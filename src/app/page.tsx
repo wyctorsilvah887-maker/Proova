@@ -39,31 +39,35 @@ export default function Home() {
   const db = useFirestore();
   const router = useRouter();
 
+  // Estados de visibilidade para animação
   const [isHeroVisible, setIsHeroVisible] = useState(false);
   const [isAgitationVisible, setIsAgitationVisible] = useState(false);
   const [isPillarsVisible, setIsPillarsVisible] = useState(false);
   const [isVersatilityVisible, setIsVersatilityVisible] = useState(false);
 
-  const agitationRef = useRef(null);
-  const pillarsRef = useRef(null);
-  const versatilityRef = useRef(null);
+  // Referências para o sensor de scroll
+  const agitationRef = useRef<HTMLElement>(null);
+  const pillarsRef = useRef<HTMLElement>(null);
+  const versatilityRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    // Ativa Hero com pequeno delay para garantir que comece oculta
-    const timer = setTimeout(() => setIsHeroVisible(true), 100);
+    // 1. Ativa Hero imediatamente
+    const heroTimer = setTimeout(() => setIsHeroVisible(true), 100);
 
+    // 2. Sensor de visibilidade para o restante da página
     const observerOptions = { 
-      threshold: 0.1,
-      rootMargin: "0px"
+      threshold: 0,
+      rootMargin: "0px 0px -50px 0px" // Dispara um pouco antes de entrar totalmente
     };
 
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
-          if (entry.target === agitationRef.current) setIsAgitationVisible(true);
-          if (entry.target === pillarsRef.current) setIsPillarsVisible(true);
-          if (entry.target === versatilityRef.current) setIsVersatilityVisible(true);
-          observer.unobserve(entry.target); // Ativa apenas uma vez
+          const id = entry.target.id;
+          if (id === 'agitation-section') setIsAgitationVisible(true);
+          if (id === 'pillars-section') setIsPillarsVisible(true);
+          if (id === 'versatility-section') setIsVersatilityVisible(true);
+          observer.unobserve(entry.target);
         }
       });
     }, observerOptions);
@@ -73,7 +77,7 @@ export default function Home() {
     if (versatilityRef.current) observer.observe(versatilityRef.current);
 
     return () => {
-      clearTimeout(timer);
+      clearTimeout(heroTimer);
       observer.disconnect();
     };
   }, []);
@@ -128,8 +132,8 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        {/* HERO SECTION - COMPACTA E PERSUASIVA */}
-        <section className="relative w-full py-12 md:py-20 lg:py-28 flex items-center justify-center overflow-hidden">
+        {/* HERO SECTION - COMPACTA (MANTIDA) */}
+        <section className="relative w-full py-8 md:py-16 lg:py-20 flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
             <div className="relative w-full h-full max-w-xl opacity-[0.2] dark:opacity-[0.3]">
               <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo BG" fill className="dark:hidden object-contain" priority />
@@ -139,7 +143,7 @@ export default function Home() {
           </div>
           
           <div className="container relative z-10 px-4 mx-auto">
-            <div className="max-w-3xl mx-auto text-center space-y-6">
+            <div className="max-w-4xl mx-auto text-center space-y-4 md:space-y-6">
               <div className={cn(
                 "inline-flex items-center rounded-full bg-primary text-white px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] shadow-xl transition-all duration-1000",
                 isHeroVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
@@ -148,25 +152,25 @@ export default function Home() {
               </div>
               
               <h1 className={cn(
-                "text-3xl font-black tracking-tighter sm:text-5xl md:text-7xl font-headline leading-[1.05] transition-all duration-1000",
+                "text-3xl font-black tracking-tighter sm:text-5xl md:text-6xl font-headline leading-[1.05] transition-all duration-1000",
                 isHeroVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
               )}>
                 Sua empresa é <span className="text-primary italic">INVISÍVEL</span>. <br className="hidden sm:block" /> E isso custa uma fortuna.
               </h1>
               
               <p className={cn(
-                "max-w-xl mx-auto text-muted-foreground text-sm md:text-xl font-medium leading-relaxed transition-all duration-1000 delay-300",
+                "max-w-xl mx-auto text-muted-foreground text-sm md:text-lg font-medium leading-relaxed transition-all duration-1000 delay-300",
                 isHeroVisible ? "animate-in fade-in slide-in-from-right-20 opacity-100" : "opacity-0"
               )}>
                 92% dos clientes ignoram quem não tem avaliações. Enquanto você espera, seus concorrentes usam <strong className="text-foreground">Prova Social</strong> para roubar suas vendas.
               </p>
               
               <div className={cn(
-                "flex flex-col sm:flex-row items-center justify-center gap-4 pt-6 transition-all duration-1000 delay-500",
+                "flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 transition-all duration-1000 delay-500",
                 isHeroVisible ? "animate-in fade-in slide-in-from-bottom-5 opacity-100" : "opacity-0"
               )}>
                 <Link href="/signup" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto h-14 md:h-16 px-10 rounded-2xl text-[10px] sm:text-sm font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90">
+                  <Button size="lg" className="w-full sm:w-auto h-12 md:h-14 px-8 rounded-2xl text-[10px] sm:text-xs font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90">
                     ESTANCAR PERDA DE VENDAS <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                   </Button>
                 </Link>
@@ -176,7 +180,7 @@ export default function Home() {
         </section>
 
         {/* AGITATION SECTION - O ABISMO */}
-        <section ref={agitationRef} className="w-full py-24 bg-zinc-950 text-white overflow-hidden relative border-y border-red-900/30">
+        <section id="agitation-section" ref={agitationRef} className="w-full py-24 bg-zinc-950 text-white overflow-hidden relative border-y border-red-900/30 min-h-[400px]">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-600 to-transparent opacity-50" />
           <div className="container px-4 mx-auto text-center space-y-16">
             <div className={cn(
@@ -195,8 +199,8 @@ export default function Home() {
               ].map((item, idx) => (
                 <div key={idx} className={cn(
                   "space-y-4 transition-all duration-1000",
-                  isAgitationVisible ? `animate-in fade-in slide-in-from-bottom-10 opacity-100 delay-[${(idx+1)*200}ms]` : "opacity-0"
-                )}>
+                  isAgitationVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-0"
+                )} style={{ transitionDelay: `${(idx + 1) * 200}ms` }}>
                   <div className="text-red-600 flex justify-center">
                     <item.icon className={cn("w-12 h-12", item.animate && "animate-pulse")} />
                   </div>
@@ -209,7 +213,7 @@ export default function Home() {
         </section>
 
         {/* PILLARS SECTION - A SOLUÇÃO */}
-        <section ref={pillarsRef} className="w-full py-24 md:py-32 bg-muted/20 border-y overflow-hidden">
+        <section id="pillars-section" ref={pillarsRef} className="w-full py-24 md:py-32 bg-muted/20 border-y overflow-hidden min-h-[500px]">
           <div className="container px-4 mx-auto">
             <div className={cn(
               "text-center space-y-4 mb-20 transition-all duration-1000",
@@ -228,8 +232,8 @@ export default function Home() {
               ].map((pill, idx) => (
                 <div key={idx} className={cn(
                   "bg-card border-2 border-primary/5 rounded-[2.5rem] p-10 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden",
-                  isPillarsVisible ? `animate-in fade-in ${pill.from} duration-1000 opacity-100 delay-[${(idx+1)*200}ms]` : "opacity-0"
-                )}>
+                  isPillarsVisible ? `animate-in fade-in ${pill.from} duration-1000 opacity-100` : "opacity-0"
+                )} style={{ transitionDelay: `${(idx + 1) * 200}ms` }}>
                   <div className={cn("absolute top-0 left-0 w-full h-1.5", pill.bar)} />
                   <div className="space-y-5">
                     <pill.icon className={cn("w-10 h-10 group-hover:scale-110 transition-transform duration-500", pill.color)} />
@@ -245,7 +249,7 @@ export default function Home() {
         </section>
 
         {/* VERSATILITY SECTION */}
-        <section ref={versatilityRef} className="w-full py-24 md:py-32 overflow-hidden bg-background">
+        <section id="versatility-section" ref={versatilityRef} className="w-full py-24 md:py-32 overflow-hidden bg-background min-h-[500px]">
           <div className="container px-4 mx-auto">
             <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-center">
               <div className={cn(
