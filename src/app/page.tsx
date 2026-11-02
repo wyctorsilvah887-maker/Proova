@@ -30,7 +30,12 @@ import {
   Ghost,
   Target,
   FileWarning,
-  EyeOff
+  EyeOff,
+  Search,
+  BaggageClaim,
+  TargetIcon,
+  ShieldHalf,
+  MousePointerClick
 } from "lucide-react";
 import { useUser, useFirestore } from "@/firebase";
 import { doc, setDoc, increment } from "firebase/firestore";
@@ -79,7 +84,7 @@ export default function Home() {
     if (pillarsRef.current) observer.observe(pillarsRef.current);
     if (versatilityRef.current) observer.observe(versatilityRef.current);
 
-    // 3. Gatilho de Segurança: Se após 1.5s algo não apareceu, forçamos a exibição
+    // 3. Gatilho de Segurança
     const safetyTimer = setTimeout(() => {
       setIsAgitationVisible(true);
       setIsPillarsVisible(true);
@@ -143,7 +148,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        {/* HERO SECTION - COMPACTA E PERSUASIVA */}
+        {/* HERO SECTION */}
         <section className="relative w-full py-12 md:py-16 flex items-center justify-center overflow-hidden border-b">
           <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
             <div className="relative w-full h-full max-w-xl opacity-[0.2] dark:opacity-[0.3]">
@@ -190,7 +195,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* AGITATION SECTION - O ABISMO (AGRESSIVO E ADAPTÁVEL) */}
+        {/* AGITATION SECTION */}
         <section id="agitation-section" ref={agitationRef} className="w-full py-24 bg-muted/30 dark:bg-zinc-950 text-foreground dark:text-white overflow-hidden relative border-y border-border/50 dark:border-zinc-900/30 min-h-[400px]">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
           <div className="container px-4 mx-auto text-center space-y-16">
@@ -246,8 +251,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* PILLARS SECTION - O ECOSSISTEMA */}
-        <section id="pillars-section" ref={pillarsRef} className="w-full py-24 md:py-32 bg-muted/20 border-y overflow-hidden min-h-[500px]">
+        {/* PILLARS SECTION - RETOME O CONTROLE (DESIGN MELHORADO) */}
+        <section id="pillars-section" ref={pillarsRef} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
           <div className="container px-4 mx-auto">
             <div className={cn(
               "text-center space-y-4 mb-20 transition-all duration-1000",
@@ -255,35 +260,79 @@ export default function Home() {
             )}>
               <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">A Máquina de Domínio</h2>
               <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">Retome o <span className="italic text-primary">Controle</span>.</h3>
-              <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Tecnologias integradas para aniquilar objeções e forçar a conversão imediata.</p>
+              <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Tecnologias de elite integradas para aniquilar objeções e forçar a conversão imediata.</p>
             </div>
             
-            <div className="grid gap-8 lg:grid-cols-3">
+            <div className="grid gap-10 lg:grid-cols-3 max-w-6xl mx-auto">
               {[
-                { icon: MapPin, color: 'text-primary', bar: 'bg-primary', title: 'G-Boost: SEO Local', desc: 'Incentivamos seus clientes satisfeitos a inundarem seu Maps com 5 estrelas. Force o Google a aumentar sua chances de aparecer no topo.', from: 'slide-in-from-left-20' },
-                { icon: ShieldCheck, color: 'text-orange-600', bar: 'bg-orange-600', title: 'Reputation Shield', desc: 'Filtre críticas antes que virem um problema. Resolva crises no Inbox Privado e mantenha sua imagem impecável.', from: 'slide-in-from-bottom-20' },
-                { icon: Layout, color: 'text-blue-600', bar: 'bg-blue-600', title: 'Páginas de Elite', desc: 'Widgets hipnóticos que aniquilam dúvidas. Prove que você é a escolha certa em segundos com designs exclusivos.', from: 'slide-in-from-right-20' }
+                { 
+                  icon: MapPin, 
+                  color: 'text-primary', 
+                  bg: 'bg-primary/10',
+                  border: 'border-primary/20',
+                  title: 'G-Boost: Domínio Local', 
+                  desc: 'Inundamos seu perfil com avaliações 5 estrelas reais. Force o algoritmo do Google a aumentar suas chances de aparecer no topo e roubar os cliques da concorrência.', 
+                  from: 'slide-in-from-left-20' 
+                },
+                { 
+                  icon: ShieldHalf, 
+                  color: 'text-emerald-500', 
+                  bg: 'bg-emerald-500/10',
+                  border: 'border-emerald-500/20',
+                  title: 'Blindagem de Marca', 
+                  desc: 'Nosso Reputation Shield intercepta o ódio antes dele virar público. Resolva crises no Inbox Privado e mantenha sua imagem impecável perante o mercado.', 
+                  from: 'slide-in-from-bottom-20' 
+                },
+                { 
+                  icon: MousePointerClick, 
+                  color: 'text-blue-500', 
+                  bg: 'bg-blue-500/10',
+                  border: 'border-blue-500/20',
+                  title: 'Vitrines Magnéticas', 
+                  desc: 'Widgets hipnóticos que aniquilam dúvidas em segundos. Prove que você é a única escolha segura através de murais e carrosséis com design de alto nível.', 
+                  from: 'slide-in-from-right-20' 
+                }
               ].map((pill, idx) => (
-                <div key={idx} className={cn(
-                  "bg-card border-2 border-primary/5 rounded-[2.5rem] p-10 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden",
+                <Card key={idx} className={cn(
+                  "group relative p-8 md:p-10 rounded-[2.5rem] border-2 bg-card transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_30px_60px_-15px_rgba(249,115,22,0.1)]",
+                  pill.border,
                   isPillarsVisible ? `animate-in fade-in ${pill.from} duration-1000 opacity-100` : "opacity-0"
-                )} style={{ transitionDelay: `${(idx + 1) * 200}ms` }}>
-                  <div className={cn("absolute top-0 left-0 w-full h-1.5", pill.bar)} />
-                  <div className="space-y-5">
-                    <pill.icon className={cn("w-10 h-10 group-hover:scale-110 transition-transform duration-500", pill.color)} />
-                    <h4 className="text-2xl font-black font-headline">{pill.title}</h4>
-                    <p className="text-muted-foreground text-sm leading-relaxed font-medium">
-                      {pill.desc}
-                    </p>
+                )} style={{ transitionDelay: `${(idx + 1) * 150}ms` }}>
+                  <div className="space-y-6 relative z-10">
+                    <div className={cn(
+                      "w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm",
+                      pill.bg, pill.color
+                    )}>
+                      <pill.icon className="w-8 h-8" />
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <h4 className="text-2xl font-black font-headline tracking-tight">{pill.title}</h4>
+                      <p className="text-muted-foreground text-sm leading-relaxed font-medium">
+                        {pill.desc}
+                      </p>
+                    </div>
+
+                    <div className="pt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                       <span className={cn("text-[9px] font-black uppercase tracking-widest flex items-center gap-2", pill.color)}>
+                         Ativar Tecnologia <ArrowRight className="w-3 h-3" />
+                       </span>
+                    </div>
                   </div>
-                </div>
+                  
+                  {/* Decorative faint glow on hover */}
+                  <div className={cn(
+                    "absolute -bottom-2 -right-2 w-24 h-24 blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 rounded-full",
+                    pill.bg
+                  )} />
+                </Card>
               ))}
             </div>
           </div>
         </section>
 
         {/* VERSATILITY SECTION */}
-        <section id="versatility-section" ref={versatilityRef} className="w-full py-24 md:py-32 overflow-hidden bg-background min-h-[500px]">
+        <section id="versatility-section" ref={versatilityRef} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
           <div className="container px-4 mx-auto">
             <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-center">
               <div className={cn(
