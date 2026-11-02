@@ -212,7 +212,7 @@ export default function Home() {
               <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
                 <div className="space-y-4">
                   <h2 className="text-3xl md:text-6xl font-black font-headline leading-tight tracking-tight">
-                    Para quem vende no <span className="text-primary">balcão</span> ou na <span className="text-primary">nuvem</span>.
+                    Para quem vende no <span className="text-primary">balcão</span> or na <span className="text-primary">nuvem</span>.
                   </h2>
                   <p className="text-lg text-muted-foreground font-medium italic">
                     "O Proova captura autoridade onde seu cliente estiver."
