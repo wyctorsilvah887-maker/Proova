@@ -56,14 +56,7 @@ export default function Home() {
     }
   }, [user, loading, router]);
 
-  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-saas');
   const ctaBg = PlaceHolderImages.find(img => img.id === 'cta-bg-photo');
-  
-  const avatars = [
-    PlaceHolderImages.find(img => img.id === 'avatar-1'),
-    PlaceHolderImages.find(img => img.id === 'avatar-2'),
-    PlaceHolderImages.find(img => img.id === 'avatar-3'),
-  ];
 
   if (loading || user) {
     return (
@@ -94,9 +87,23 @@ export default function Home() {
         <section className="relative w-full py-16 md:py-32 lg:py-48 flex items-center justify-center overflow-hidden">
           {/* Background Logo dynamic to theme */}
           <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
-            <div className="relative w-full h-full max-w-5xl opacity-[0.03] dark:opacity-[0.05] grayscale blur-sm">
-              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Background" fill className="dark:hidden object-contain" priority />
-              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Background" fill className="hidden dark:block object-contain" priority />
+            <div className="relative w-full h-full max-w-5xl opacity-[0.05] dark:opacity-[0.1] grayscale blur-[2px] transition-all duration-700">
+              {/* Tema Claro -> Logo White Mode */}
+              <Image 
+                src="/Logotipo%20PROOVA%20white%20mode%201.png" 
+                alt="Logo Background Light" 
+                fill 
+                className="dark:hidden object-contain" 
+                priority 
+              />
+              {/* Tema Escuro -> Logo Dark Mode */}
+              <Image 
+                src="/Logotipo%20PROOVA%20dark%20mode%201.png" 
+                alt="Logo Background Dark" 
+                fill 
+                className="hidden dark:block object-contain" 
+                priority 
+              />
             </div>
             <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
           </div>
