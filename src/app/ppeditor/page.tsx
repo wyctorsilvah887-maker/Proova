@@ -345,9 +345,9 @@ const PublicPageSettings = ({
     <div className="flex flex-col w-full h-full overflow-hidden bg-background">
       <div className="p-4 border-b bg-muted/10 shrink-0 space-y-4">
         <div className="flex items-center justify-between">
-          <Link href="/dash" className="group">
+          <Link href="/dash">
             <Button variant="ghost" size="sm" className="gap-2 px-0 text-muted-foreground hover:text-primary hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 transition-all h-8">
-              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+              <ArrowLeft className="w-4 h-4" />
               <span className="text-[10px] font-black uppercase tracking-widest">Dash</span>
             </Button>
           </Link>
