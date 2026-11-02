@@ -50,6 +50,28 @@ export default function Home() {
   const versatilityRef = useRef(null);
 
   useEffect(() => {
+    // Forçar visibilidade da Hero no mount para garantir que a animação lateral ocorra imediatamente
+    setIsHeroVisible(true);
+
+    const observerOptions = { threshold: 0 };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          if (entry.target === agitationRef.current) setIsAgitationVisible(true);
+          if (entry.target === pillarsRef.current) setIsPillarsVisible(true);
+          if (entry.target === versatilityRef.current) setIsVersatilityVisible(true);
+        }
+      });
+    }, observerOptions);
+
+    if (agitationRef.current) observer.observe(agitationRef.current);
+    if (pillarsRef.current) observer.observe(pillarsRef.current);
+    if (versatilityRef.current) observer.observe(versatilityRef.current);
+
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     if (!db) return;
     const trackVisit = async () => {
       try {
@@ -65,30 +87,6 @@ export default function Home() {
     };
     trackVisit();
   }, [db]);
-
-  useEffect(() => {
-    // Forçar visibilidade da Hero no mount
-    setIsHeroVisible(true);
-
-    const observerOptions = { threshold: 0.1 };
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          if (entry.target === heroRef.current) setIsHeroVisible(true);
-          if (entry.target === agitationRef.current) setIsAgitationVisible(true);
-          if (entry.target === pillarsRef.current) setIsPillarsVisible(true);
-          if (entry.target === versatilityRef.current) setIsVersatilityVisible(true);
-        }
-      });
-    }, observerOptions);
-
-    if (heroRef.current) observer.observe(heroRef.current);
-    if (agitationRef.current) observer.observe(agitationRef.current);
-    if (pillarsRef.current) observer.observe(pillarsRef.current);
-    if (versatilityRef.current) observer.observe(versatilityRef.current);
-
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     if (!loading && user) {
@@ -123,7 +121,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        {/* HERO SECTION - A DOR AGUDA */}
+        {/* HERO SECTION - A DOR AGUDA (PAS: PROBLEMA) */}
         <section ref={heroRef} className="relative w-full py-16 md:py-32 lg:py-48 flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
             <div className="relative w-full h-full max-w-5xl opacity-[0.25] dark:opacity-[0.35]">
@@ -136,33 +134,33 @@ export default function Home() {
           <div className="container relative z-10 px-4 mx-auto">
             <div className="max-w-5xl mx-auto text-center space-y-8">
               <div className={cn(
-                "inline-flex items-center rounded-full bg-red-600 text-white px-4 py-1.5 text-[9px] md:text-xs font-black uppercase tracking-[0.2em] shadow-xl transition-all duration-1000",
+                "inline-flex items-center rounded-full bg-primary text-white px-4 py-1.5 text-[9px] md:text-xs font-black uppercase tracking-[0.2em] shadow-xl transition-all duration-1000",
                 isHeroVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
               )}>
                 <ShieldAlert className="w-3 h-3 mr-2 animate-pulse" /> Atenção: Sua invisibilidade está drenando seu lucro
               </div>
               
               <h1 className={cn(
-                "text-4xl font-black tracking-tighter sm:text-6xl md:text-8xl font-headline leading-[0.95] md:leading-[0.9] transition-all duration-1000 delay-100",
-                isHeroVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-20"
+                "text-4xl font-black tracking-tighter sm:text-6xl md:text-8xl font-headline leading-[0.95] md:leading-[0.9] fill-mode-both",
+                isHeroVisible ? "animate-in fade-in slide-in-from-left-20 duration-1000" : "opacity-0"
               )}>
                 Sua empresa é <span className="text-primary italic">INVISÍVEL</span>. E isso custa caro.
               </h1>
               
               <p className={cn(
-                "max-w-3xl mx-auto text-muted-foreground text-base md:text-2xl font-medium leading-relaxed transition-all duration-1000 delay-300",
-                isHeroVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-20"
+                "max-w-3xl mx-auto text-muted-foreground text-base md:text-2xl font-medium leading-relaxed fill-mode-both",
+                isHeroVisible ? "animate-in fade-in slide-in-from-right-20 duration-1000 delay-300" : "opacity-0"
               )}>
                 92% dos clientes ignoram quem não tem avaliações. Enquanto você espera, seus concorrentes usam <strong className="text-foreground">Prova Social</strong> para roubar suas vendas.
               </p>
               
               <div className={cn(
-                "flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 transition-all duration-1000 delay-500",
-                isHeroVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+                "flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 fill-mode-both",
+                isHeroVisible ? "animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-500" : "opacity-0"
               )}>
                 <Link href="/signup" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto h-12 sm:h-20 px-6 sm:px-10 rounded-2xl text-[12px] sm:text-lg md:text-xl font-black shadow-[0_20px_50px_-15px_rgba(249,115,22,0.5)] transition-all hover:scale-105 active:scale-95 group">
-                    ESTANCAR PERDA DE VENDAS AGORA <ArrowRight className="ml-2 w-4 h-4 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform" />
+                  <Button size="lg" className="w-full sm:w-auto h-auto min-h-[3.5rem] md:h-20 px-6 sm:px-10 rounded-2xl text-[10px] sm:text-lg md:text-xl font-black shadow-[0_20px_50px_-15px_rgba(249,115,22,0.5)] transition-all hover:scale-105 active:scale-95 group leading-tight py-4">
+                    ESTANCAR PERDA DE VENDAS AGORA <ArrowRight className="ml-2 w-4 h-4 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform shrink-0" />
                   </Button>
                 </Link>
               </div>
@@ -170,30 +168,30 @@ export default function Home() {
           </div>
         </section>
 
-        {/* AGITATION SECTION - CUTUCANDO A FERIDA */}
+        {/* AGITATION SECTION - CUTUCANDO A FERIDA (PAS: AGITAÇÃO) */}
         <section ref={agitationRef} className="w-full py-24 bg-zinc-950 text-white overflow-hidden relative border-y border-red-900/30">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-red-600 to-transparent opacity-50" />
           <div className="container px-4 mx-auto text-center space-y-16">
             <div className={cn(
-              "space-y-4 transition-all duration-1000",
-              isAgitationVisible ? "opacity-100 scale-100" : "opacity-0 scale-95"
+              "space-y-4 transition-all duration-1000 fill-mode-both",
+              isAgitationVisible ? "animate-in fade-in zoom-in-95" : "opacity-0"
             )}>
               <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px] md:text-xs">O Abismo Digital</h2>
               <h3 className="text-3xl md:text-6xl font-black font-headline tracking-tighter">O preço de ser um <span className="text-red-600 italic">Zé Ninguém</span> no Google.</h3>
             </div>
 
             <div className="grid gap-12 lg:grid-cols-3">
-              <div className={cn("space-y-6 transition-all duration-1000 delay-300", isAgitationVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10")}>
+              <div className={cn("space-y-6 transition-all duration-1000 fill-mode-both", isAgitationVisible ? "animate-in fade-in slide-in-from-left-10 delay-300" : "opacity-0")}>
                 <div className="text-red-600 flex justify-center"><Ghost className="w-12 h-12" /></div>
                 <h4 className="text-xl font-bold font-headline">O Fantasma da Página 2</h4>
                 <p className="text-zinc-400 text-sm leading-relaxed font-medium">Sem notas 5 estrelas constantes, o algoritmo te enterra. Você não existe para quem tem dinheiro na mão e quer comprar agora.</p>
               </div>
-              <div className={cn("space-y-6 transition-all duration-1000 delay-500", isAgitationVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10")}>
+              <div className={cn("space-y-6 transition-all duration-1000 fill-mode-both", isAgitationVisible ? "animate-in fade-in slide-in-from-bottom-10 delay-500" : "opacity-0")}>
                 <div className="text-red-600 flex justify-center"><AlertTriangle className="w-12 h-12 animate-pulse" /></div>
                 <h4 className="text-xl font-bold font-headline">A Fraqueza de uma Crítica</h4>
                 <p className="text-zinc-400 text-sm leading-relaxed font-medium">Um único cliente mal humorado pode destruir sua reputação se você não tiver uma blindagem. Você está à mercê do acaso.</p>
               </div>
-              <div className={cn("space-y-6 transition-all duration-1000 delay-700", isAgitationVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10")}>
+              <div className={cn("space-y-6 transition-all duration-1000 fill-mode-both", isAgitationVisible ? "animate-in fade-in slide-in-from-right-10 delay-700" : "opacity-0")}>
                 <div className="text-red-600 flex justify-center"><TrendingDown className="w-12 h-12" /></div>
                 <h4 className="text-xl font-bold font-headline">Hemorragia de Lucro</h4>
                 <p className="text-zinc-400 text-sm leading-relaxed font-medium">O cliente entra no seu site, sente medo e corre para o concorrente "mais confiável". Você paga pelo tráfego e ele leva a venda.</p>
@@ -202,12 +200,12 @@ export default function Home() {
           </div>
         </section>
 
-        {/* PILLARS SECTION - A ÚNICA SOLUÇÃO REAL */}
+        {/* PILLARS SECTION - A ÚNICA SOLUÇÃO REAL (PAS: SOLUÇÃO) */}
         <section ref={pillarsRef} className="w-full py-24 md:py-32 bg-muted/20 border-y overflow-hidden">
           <div className="container px-4 mx-auto">
             <div className={cn(
-              "text-center space-y-4 mb-20 transition-all duration-1000",
-              isPillarsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+              "text-center space-y-4 mb-20 transition-all duration-1000 fill-mode-both",
+              isPillarsVisible ? "animate-in fade-in slide-in-from-bottom-10" : "opacity-0"
             )}>
               <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">A Máquina de Domínio</h2>
               <h3 className="text-3xl md:text-6xl font-black font-headline tracking-tighter">Retome o <span className="italic text-primary">Controle</span>.</h3>
@@ -217,8 +215,8 @@ export default function Home() {
             <div className="grid gap-8 lg:grid-cols-3">
               {/* Pillar 1: G-BOOST */}
               <div className={cn(
-                "bg-background border-2 border-primary/5 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden duration-1000 delay-300",
-                isPillarsVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-20"
+                "bg-background border-2 border-primary/5 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden fill-mode-both",
+                isPillarsVisible ? "animate-in fade-in slide-in-from-left-20 duration-1000 delay-300" : "opacity-0"
               )}>
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-primary" />
                 <div className="space-y-6">
@@ -239,8 +237,8 @@ export default function Home() {
 
               {/* Pillar 2: REPUTATION SHIELD */}
               <div className={cn(
-                "bg-background border-2 border-orange-500/5 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden duration-1000 delay-500",
-                isPillarsVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"
+                "bg-background border-2 border-orange-500/5 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden fill-mode-both",
+                isPillarsVisible ? "animate-in fade-in slide-in-from-bottom-20 duration-1000 delay-500" : "opacity-0"
               )}>
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-orange-600" />
                 <div className="space-y-6">
@@ -261,8 +259,8 @@ export default function Home() {
 
               {/* Pillar 3: CONVERSION PAGES */}
               <div className={cn(
-                "bg-background border-2 border-blue-500/5 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden duration-1000 delay-700",
-                isPillarsVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-20"
+                "bg-background border-2 border-blue-500/5 rounded-[2.5rem] p-8 md:p-12 shadow-sm hover:shadow-2xl transition-all group relative overflow-hidden fill-mode-both",
+                isPillarsVisible ? "animate-in fade-in slide-in-from-right-20 duration-1000 delay-700" : "opacity-0"
               )}>
                 <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-600" />
                 <div className="space-y-6">
@@ -288,7 +286,7 @@ export default function Home() {
         <section ref={versatilityRef} className="w-full py-24 md:py-48 overflow-hidden bg-background">
           <div className="container px-4 mx-auto">
             <div className="grid lg:grid-cols-2 gap-20 items-center">
-              <div className={cn("space-y-10 transition-all duration-1000", isVersatilityVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-20")}>
+              <div className={cn("space-y-10 transition-all duration-1000 fill-mode-both", isVersatilityVisible ? "animate-in fade-in slide-in-from-left-20" : "opacity-0")}>
                 <div className="space-y-4">
                   <h2 className="text-3xl md:text-6xl font-black font-headline leading-tight tracking-tight">
                     Trabalhamos duro para você ser a <span className="text-primary italic">Única Opção</span>.
@@ -316,7 +314,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className={cn("relative transition-all duration-1000 delay-500", isVersatilityVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-20")}>
+              <div className={cn("relative transition-all duration-1000 delay-500 fill-mode-both", isVersatilityVisible ? "animate-in fade-in slide-in-from-right-20" : "opacity-0")}>
                 <div className="absolute -inset-4 bg-primary/20 rounded-[3rem] blur-3xl opacity-30 animate-pulse" />
                 <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card p-2 md:p-4 ring-1 ring-primary/10">
                   <div className="space-y-3 p-4">
