@@ -121,10 +121,10 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        {/* HERO SECTION - A DOR AGUDA (PAS: PROBLEMA) */}
-        <section ref={heroRef} className="relative w-full py-16 md:py-32 lg:py-48 flex items-center justify-center overflow-hidden">
+        {/* HERO SECTION - COMPACTA E EQUILIBRADA */}
+        <section ref={heroRef} className="relative w-full py-12 md:py-20 lg:py-32 flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
-            <div className="relative w-full h-full max-w-5xl opacity-[0.25] dark:opacity-[0.35]">
+            <div className="relative w-full h-full max-w-4xl opacity-[0.2] dark:opacity-[0.3]">
               <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo BG" fill className="dark:hidden object-contain" priority />
               <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo BG" fill className="hidden dark:block object-contain" priority />
             </div>
@@ -132,23 +132,23 @@ export default function Home() {
           </div>
           
           <div className="container relative z-10 px-4 mx-auto">
-            <div className="max-w-5xl mx-auto text-center space-y-8">
+            <div className="max-w-4xl mx-auto text-center space-y-6">
               <div className={cn(
-                "inline-flex items-center rounded-full bg-primary text-white px-4 py-1.5 text-[9px] md:text-xs font-black uppercase tracking-[0.2em] shadow-xl transition-all duration-1000",
+                "inline-flex items-center rounded-full bg-primary text-white px-4 py-1.5 text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] shadow-xl transition-all duration-1000",
                 isHeroVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
               )}>
-                <ShieldAlert className="w-3 h-3 mr-2 animate-pulse" /> Atenção: Sua invisibilidade está drenando seu lucro
+                <ShieldAlert className="w-3.5 h-3.5 mr-2 animate-pulse" /> Atenção: Sua invisibilidade está drenando seu lucro
               </div>
               
               <h1 className={cn(
-                "text-4xl font-black tracking-tighter sm:text-6xl md:text-8xl font-headline leading-[0.95] md:leading-[0.9] fill-mode-both",
+                "text-3xl font-black tracking-tighter sm:text-5xl md:text-7xl font-headline leading-[1.1] md:leading-[1.05] fill-mode-both",
                 isHeroVisible ? "animate-in fade-in slide-in-from-left-20 duration-1000" : "opacity-0"
               )}>
                 Sua empresa é <span className="text-primary italic">INVISÍVEL</span>. E isso custa caro.
               </h1>
               
               <p className={cn(
-                "max-w-3xl mx-auto text-muted-foreground text-base md:text-2xl font-medium leading-relaxed fill-mode-both",
+                "max-w-2xl mx-auto text-muted-foreground text-sm md:text-xl font-medium leading-relaxed fill-mode-both",
                 isHeroVisible ? "animate-in fade-in slide-in-from-right-20 duration-1000 delay-300" : "opacity-0"
               )}>
                 92% dos clientes ignoram quem não tem avaliações. Enquanto você espera, seus concorrentes usam <strong className="text-foreground">Prova Social</strong> para roubar suas vendas.
@@ -159,8 +159,8 @@ export default function Home() {
                 isHeroVisible ? "animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-500" : "opacity-0"
               )}>
                 <Link href="/signup" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto h-auto min-h-[3.5rem] md:h-20 px-6 sm:px-10 rounded-2xl text-[10px] sm:text-lg md:text-xl font-black shadow-[0_20px_50px_-15px_rgba(249,115,22,0.5)] transition-all hover:scale-105 active:scale-95 group leading-tight py-4">
-                    ESTANCAR PERDA DE VENDAS AGORA <ArrowRight className="ml-2 w-4 h-4 sm:w-6 sm:h-6 group-hover:translate-x-1 transition-transform shrink-0" />
+                  <Button size="lg" className="w-full sm:w-auto h-auto min-h-[3.5rem] md:h-16 px-6 sm:px-10 rounded-2xl text-[10px] sm:text-base md:text-lg font-black shadow-[0_20px_50px_-15px_rgba(249,115,22,0.5)] transition-all hover:scale-105 active:scale-95 group leading-tight py-4">
+                    ESTANCAR PERDA DE VENDAS AGORA <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform shrink-0" />
                   </Button>
                 </Link>
               </div>
