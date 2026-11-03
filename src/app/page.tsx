@@ -47,22 +47,18 @@ export default function Home() {
   const db = useFirestore();
   const router = useRouter();
 
-  // Estados de visibilidade para animação
   const [isHeroVisible, setIsHeroVisible] = useState(false);
   const [isAgitationVisible, setIsAgitationVisible] = useState(false);
   const [isPillarsVisible, setIsPillarsVisible] = useState(false);
   const [isVersatilityVisible, setIsVersatilityVisible] = useState(false);
 
-  // Referências para o sensor de scroll
   const agitationRef = useRef<HTMLElement>(null);
   const pillarsRef = useRef<HTMLElement>(null);
   const versatilityRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    // 1. Ativa Hero imediatamente
     const heroTimer = setTimeout(() => setIsHeroVisible(true), 100);
 
-    // 2. Sensor de visibilidade Robusto (Intersection Observer)
     const observerOptions = { 
       threshold: 0.1,
       rootMargin: "0px"
@@ -84,7 +80,6 @@ export default function Home() {
     if (pillarsRef.current) observer.observe(pillarsRef.current);
     if (versatilityRef.current) observer.observe(versatilityRef.current);
 
-    // 3. Gatilho de Segurança
     const safetyTimer = setTimeout(() => {
       setIsAgitationVisible(true);
       setIsPillarsVisible(true);
@@ -148,7 +143,6 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        {/* HERO SECTION */}
         <section className="relative w-full py-12 md:py-16 flex items-center justify-center overflow-hidden border-b">
           <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
             <div className="relative w-full h-full max-w-xl opacity-[0.2] dark:opacity-[0.3]">
@@ -195,7 +189,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* AGITATION SECTION */}
         <section id="agitation-section" ref={agitationRef} className="w-full py-24 bg-muted/30 dark:bg-zinc-950 text-foreground dark:text-white overflow-hidden relative border-y border-border/50 dark:border-zinc-900/30 min-h-[400px]">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
           <div className="container px-4 mx-auto text-center space-y-16">
@@ -251,7 +244,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* PILLARS SECTION - RETOME O CONTROLE (DESIGN MELHORADO) */}
         <section id="pillars-section" ref={pillarsRef} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
           <div className="container px-4 mx-auto">
             <div className={cn(
@@ -271,7 +263,7 @@ export default function Home() {
                   bg: 'bg-primary/10',
                   border: 'border-primary/20',
                   title: 'G-Boost: Domínio Local', 
-                  desc: 'Inundamos seu perfil com avaliações 5 estrelas reais. Force o algoritmo do Google a aumentar suas chances de aparecer no topo e roubar os cliques da concorrência.', 
+                  desc: 'Inundamos seu perfil com avaliações 5 estrelas reais. Force o algoritmo do Google a aumentar sua chances de aparecer no topo e roubar os cliques da concorrência.', 
                   from: 'slide-in-from-left-20' 
                 },
                 { 
@@ -320,7 +312,6 @@ export default function Home() {
                     </div>
                   </div>
                   
-                  {/* Decorative faint glow on hover */}
                   <div className={cn(
                     "absolute -bottom-2 -right-2 w-24 h-24 blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 rounded-full",
                     pill.bg
@@ -331,7 +322,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* VERSATILITY SECTION */}
         <section id="versatility-section" ref={versatilityRef} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
           <div className="container px-4 mx-auto">
             <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-center">
@@ -390,7 +380,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* FINAL CTA */}
         <section className="relative w-full py-24 md:py-36 bg-black text-white overflow-hidden">
           {ctaBg && (
             <Image src={ctaBg.imageUrl} alt="CTA Bg" fill className="object-cover opacity-20 grayscale brightness-50" />
