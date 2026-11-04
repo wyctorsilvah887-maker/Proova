@@ -67,12 +67,18 @@ export default function Home() {
   const [isAgitationVisible, setIsAgitationVisible] = useState(false);
   const [isPillarsVisible, setIsPillarsVisible] = useState(false);
   const [isVersatilityVisible, setIsVersatilityVisible] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const agitationRef = useRef<HTMLElement>(null);
   const pillarsRef = useRef<HTMLElement>(null);
   const versatilityRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener("scroll", handleScroll);
     const heroTimer = setTimeout(() => setIsHeroVisible(true), 100);
 
     const observerOptions = { 
@@ -103,6 +109,7 @@ export default function Home() {
     }, 1500);
 
     return () => {
+      window.removeEventListener("scroll", handleScroll);
       clearTimeout(heroTimer);
       clearTimeout(safetyTimer);
       observer.disconnect();
@@ -145,14 +152,26 @@ export default function Home() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      const headerOffset = 80;
+      const elementPosition = element.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
-      <header className="px-4 lg:px-8 h-20 flex items-center justify-between border-b sticky top-0 bg-background/80 backdrop-blur-md z-[100]">
-        <div className="flex items-center relative w-[160px] h-[45px] md:w-[220px] md:h-[220px]">
+      <header className={cn(
+        "px-4 lg:px-8 h-20 flex items-center justify-between sticky top-0 z-[100] transition-all duration-300",
+        isScrolled 
+          ? "bg-background/80 backdrop-blur-md border-b" 
+          : "bg-transparent border-b-transparent"
+      )}>
+        <div className="flex items-center relative w-[200px] h-[55px] md:w-[280px] md:h-[280px]">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="dark:hidden object-contain" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="hidden dark:block object-contain" priority />
         </div>
@@ -180,7 +199,7 @@ export default function Home() {
                 </SheetHeader>
                 <div className="flex flex-col h-full">
                   <div className="p-6 border-b flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Menu Navegação</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Navegação</span>
                   </div>
                   <div className="flex-1 p-6 space-y-2">
                     {[
