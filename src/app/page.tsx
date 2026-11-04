@@ -165,7 +165,10 @@ export default function Home() {
                 "text-3xl font-black tracking-tighter sm:text-5xl md:text-6xl font-headline leading-[1.05] transition-all duration-1000",
                 isHeroVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
               )}>
-                Sua empresa é <span className="text-primary italic">INVISÍVEL</span>. <br className="hidden sm:block" /> E isso custa uma fortuna.
+                Sua empresa é <span className="relative inline-block text-primary italic overflow-hidden px-1 rounded-sm">
+                  INVISÍVEL
+                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-shine pointer-events-none" />
+                </span>. <br className="hidden sm:block" /> E isso custa uma fortuna.
               </h1>
               
               <p className={cn(
