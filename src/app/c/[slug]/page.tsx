@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, Shield, ArrowLeft, Globe, Copy, X, Camera, Square, RefreshCcw, SwitchCamera, FlipHorizontal, Gem, User, Clock, Play } from 'lucide-react';
+import { Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, Shield, ArrowLeft, Globe, X, Camera, Square, RefreshCcw, SwitchCamera, Play, Clock } from 'lucide-react';
 import { useFirestore, useStorage } from '@/firebase';
 import { collection, query, where, getDocs, limit, doc, updateDoc, increment } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -13,7 +13,7 @@ import { toast } from '@/hooks/use-toast';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
 import { submitTestimonialAction } from '@/app/actions/testimonial-actions';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 export default function CollectionPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug: rawSlug } = use(params);
@@ -294,16 +294,6 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
       }
     }
 
-    if (destination === 'public' && !videoBlob) {
-      try {
-        const textToCopy = text.trim();
-        if (textToCopy) {
-          await navigator.clipboard.writeText(textToCopy);
-          toast({ title: "Feedback Copiado!", description: "Sua mensagem foi salva para quando você for ao Google." });
-        }
-      } catch (err) {}
-    }
-
     const result = await submitTestimonialAction({
       targetUserId,
       destination,
@@ -460,7 +450,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
                 
                 <div className="grid gap-4">
                   <Button disabled={isSubmitting} onClick={() => handleFinalSubmit('public')} className="h-auto min-h-24 py-5 rounded-2xl flex flex-col gap-1 bg-[#4285F4] hover:bg-[#357ae8] shadow-lg transition-all active:scale-95">
-                    <div className="flex items-center gap-2"><Globe className="w-5 h-5" /><span className="font-bold text-lg">Público no Google & Site</span></div>
+                    <div className="flex items-center gap-2"><Globe className="w-5 h-5" /><span className="font-bold text-lg">Público</span></div>
                     <span className="text-[9px] opacity-70 uppercase font-black tracking-widest text-center">Injetar autoridade imediata na marca</span>
                   </Button>
                   
