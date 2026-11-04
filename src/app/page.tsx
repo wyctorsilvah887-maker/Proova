@@ -167,7 +167,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
       <header className={cn(
         "px-4 lg:px-8 h-20 flex items-center justify-between absolute top-0 w-full z-[100] transition-all duration-300",
-        isScrolled 
+        (isScrolled || isMenuOpen)
           ? "bg-background/80 backdrop-blur-md border-b" 
           : "bg-transparent border-b-transparent"
       )}>
@@ -244,7 +244,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        <section className="relative w-full py-12 md:py-24 flex items-center justify-center overflow-hidden border-b min-h-[70vh]">
+        <section className="relative w-full pt-32 pb-12 md:pt-48 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh]">
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
             <div className="absolute top-[15%] left-[8%] animate-float opacity-35 text-primary">
               <MessageSquare className="w-16 h-16 md:w-24 md:h-24" />
@@ -308,7 +308,7 @@ export default function Home() {
             )}>
               <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">O Custo do Silêncio</h2>
               <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
-                O custo mortal de ser um <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
+                O custo mortal de ser um <span className="inline-block relative px-2 bg-gradient-to-r from-white via-white to-white bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
                   Zé Ninguém
                 </span> para o mercado.
               </h3>
