@@ -39,7 +39,8 @@ import {
   MessageCircle,
   Users,
   Quote,
-  UserCheck
+  UserCheck,
+  AlertCircle
 } from "lucide-react";
 import { useUser, useFirestore } from "@/firebase";
 import { doc, setDoc, increment } from "firebase/firestore";
@@ -148,7 +149,7 @@ export default function Home() {
 
       <main className="flex-1">
         <section className="relative w-full py-12 md:py-24 flex items-center justify-center overflow-hidden border-b min-h-[70vh]">
-          {/* Decorative Floating Icons */}
+          {/* Decorative Floating Icons - Higher Opacity for clarity */}
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
             <div className="absolute top-[15%] left-[8%] animate-float opacity-[0.08] dark:opacity-[0.15] text-primary">
               <MessageSquare className="w-16 h-16 md:w-24 md:h-24" />
@@ -176,7 +177,7 @@ export default function Home() {
                 "inline-flex items-center rounded-full text-primary px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-1000",
                 isHeroVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
               )}>
-                Sua invisibilidade drena seu lucro
+                <AlertCircle className="w-3 h-3 mr-2 animate-pulse" /> Sua invisibilidade drena seu lucro
               </div>
               
               <h1 className={cn(
@@ -217,7 +218,11 @@ export default function Home() {
               isAgitationVisible ? "animate-in fade-in zoom-in-95 opacity-100" : "opacity-0"
             )}>
               <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">O Custo do Silêncio</h2>
-              <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">O custo mortal de ser um <span className="text-primary italic">Zé Ninguém</span> para o mercado.</h3>
+              <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
+                O custo mortal de ser um <span className="inline-block relative text-transparent bg-clip-text bg-gradient-to-r from-primary via-white/70 via-primary to-primary bg-[length:200%_auto] animate-text-shine italic">
+                  Zé Ninguém
+                </span> para o mercado.
+              </h3>
               <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">Cada minuto que você passa sem Prova Social é um cliente que escolhe o seu vizinho.</p>
             </div>
 
