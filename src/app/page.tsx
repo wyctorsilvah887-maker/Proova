@@ -34,7 +34,12 @@ import {
   BaggageClaim,
   TargetIcon,
   ShieldHalf,
-  MousePointerClick
+  MousePointerClick,
+  MessageSquare,
+  MessageCircle,
+  Users,
+  Quote,
+  UserCheck
 } from "lucide-react";
 import { useUser, useFirestore } from "@/firebase";
 import { doc, setDoc, increment } from "firebase/firestore";
@@ -142,13 +147,27 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        <section className="relative w-full py-12 md:py-16 flex items-center justify-center overflow-hidden border-b">
-          <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none">
-            <div className="relative w-full h-full max-w-xl opacity-[0.2] dark:opacity-[0.3]">
-              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo BG" fill className="dark:hidden object-contain" priority />
-              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo BG" fill className="hidden dark:block object-contain" priority />
+        <section className="relative w-full py-12 md:py-24 flex items-center justify-center overflow-hidden border-b min-h-[70vh]">
+          {/* Decorative Floating Icons */}
+          <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+            <div className="absolute top-[15%] left-[8%] animate-float opacity-[0.08] dark:opacity-[0.15] text-primary">
+              <MessageSquare className="w-16 h-16 md:w-24 md:h-24" />
             </div>
-            <div className="absolute inset-0 bg-gradient-to-b from-background via-transparent to-background" />
+            <div className="absolute top-[20%] right-[12%] animate-float-delayed opacity-[0.08] dark:opacity-[0.15] text-primary">
+              <Star className="w-12 h-12 md:w-20 md:h-20 fill-current" />
+            </div>
+            <div className="absolute bottom-[20%] left-[15%] animate-float-delayed opacity-[0.06] dark:opacity-[0.12] text-primary">
+              <Users className="w-20 h-20 md:w-32 md:h-32" />
+            </div>
+            <div className="absolute bottom-[25%] right-[10%] animate-float opacity-[0.07] dark:opacity-[0.14] text-primary">
+              <MessageCircle className="w-14 h-14 md:w-28 md:h-28" />
+            </div>
+            <div className="absolute top-[50%] left-[5%] animate-float-delayed opacity-[0.05] dark:opacity-[0.1] text-primary hidden md:block">
+              <Quote className="w-16 h-16" />
+            </div>
+            <div className="absolute top-[45%] right-[5%] animate-float opacity-[0.05] dark:opacity-[0.1] text-primary hidden md:block">
+              <UserCheck className="w-16 h-16" />
+            </div>
           </div>
           
           <div className="container relative z-10 px-4 mx-auto">
@@ -161,7 +180,7 @@ export default function Home() {
               </div>
               
               <h1 className={cn(
-                "text-3xl font-black tracking-tighter sm:text-5xl md:text-6xl font-headline leading-[1.05] transition-all duration-1000",
+                "text-3xl font-black tracking-tighter sm:text-5xl md:text-7xl font-headline leading-[1] transition-all duration-1000",
                 isHeroVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
               )}>
                 Sua empresa é <span className="inline-block relative text-transparent bg-clip-text bg-gradient-to-r from-primary via-white/70 via-primary to-primary bg-[length:200%_auto] animate-text-shine italic">
@@ -170,18 +189,18 @@ export default function Home() {
               </h1>
               
               <p className={cn(
-                "max-w-xl mx-auto text-muted-foreground text-sm md:text-lg font-medium leading-relaxed transition-all duration-1000 delay-300",
+                "max-w-xl mx-auto text-muted-foreground text-sm md:text-xl font-medium leading-relaxed transition-all duration-1000 delay-300",
                 isHeroVisible ? "animate-in fade-in slide-in-from-right-20 opacity-100" : "opacity-0"
               )}>
                 92% dos clientes ignoram quem não tem avaliações. Enquanto você espera, seus concorrentes usam <strong className="text-foreground">Prova Social</strong> para roubar suas vendas.
               </p>
               
               <div className={cn(
-                "flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 transition-all duration-1000 delay-500",
+                "flex flex-col sm:flex-row items-center justify-center gap-4 pt-6 transition-all duration-1000 delay-500",
                 isHeroVisible ? "animate-in fade-in slide-in-from-bottom-5 opacity-100" : "opacity-0"
               )}>
                 <Link href="/signup" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto h-12 md:h-14 px-8 rounded-2xl text-[10px] sm:text-xs font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90">
+                  <Button size="lg" className="w-full sm:w-auto h-12 md:h-16 px-10 rounded-2xl text-[10px] sm:text-xs font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90">
                     ESTANCAR PERDA DE VENDAS <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                   </Button>
                 </Link>

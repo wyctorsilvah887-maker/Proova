@@ -78,6 +78,10 @@ export default {
         'text-shine': {
           '0%': { 'background-position': '-200% center' },
           '100%': { 'background-position': '200% center' },
+        },
+        'float': {
+          '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+          '50%': { transform: 'translateY(-20px) rotate(5deg)' },
         }
       },
       animation: {
@@ -87,6 +91,8 @@ export default {
         'marquee': 'marquee 12s linear infinite',
         'shine': 'shine 2s infinite linear',
         'text-shine': 'text-shine 3s linear infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'float-delayed': 'float 8s ease-in-out 2s infinite',
       },
     },
   },
