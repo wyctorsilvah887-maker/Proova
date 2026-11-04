@@ -40,8 +40,15 @@ import {
   Users,
   Quote,
   UserCheck,
-  AlertCircle
+  AlertCircle,
+  Menu,
+  X
 } from "lucide-react";
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetTrigger 
+} from "@/components/ui/sheet";
 import { useUser, useFirestore } from "@/firebase";
 import { doc, setDoc, increment } from "firebase/firestore";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -140,10 +147,52 @@ export default function Home() {
         </div>
         <div className="flex items-center gap-2 md:gap-6">
           <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" />
-          <Link href="/login" className="hidden sm:block text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Entrar</Link>
-          <Link href="/signup">
-            <Button className="font-black uppercase tracking-widest shadow-lg px-4 h-9 text-[9px] rounded-xl">Começar Agora</Button>
-          </Link>
+          
+          {/* Desktop Nav */}
+          <div className="hidden sm:flex items-center gap-6">
+            <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Entrar</Link>
+            <Link href="/signup">
+              <Button className="font-black uppercase tracking-widest shadow-lg px-4 h-9 text-[9px] rounded-xl">Começar Agora</Button>
+            </Link>
+          </div>
+
+          {/* Mobile Hamburger Menu */}
+          <div className="sm:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/5">
+                  <Menu className="w-5 h-5 text-primary" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[80vw] p-0 border-none bg-background">
+                <div className="flex flex-col h-full">
+                  <div className="p-6 border-b flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Menu de Acesso</span>
+                  </div>
+                  <div className="flex-1 p-6 space-y-6">
+                    <Link href="/login" className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors py-2">
+                      <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                        <UserCheck className="w-5 h-5" />
+                      </div>
+                      Entrar no Painel
+                    </Link>
+                    <Link href="/signup" className="block pt-4">
+                      <Button className="w-full h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl gap-2">
+                        Começar Agora Grátis <ArrowRight className="w-4 h-4" />
+                      </Button>
+                    </Link>
+                  </div>
+                  <div className="p-10 border-t mt-auto flex flex-col items-center gap-4">
+                    <div className="relative w-32 h-10 opacity-30 grayscale">
+                      <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="dark:hidden object-contain" />
+                      <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="hidden dark:block object-contain" />
+                    </div>
+                    <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">© 2026 PROOVA TECHNOLOGY</p>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </header>
 
@@ -151,16 +200,16 @@ export default function Home() {
         <section className="relative w-full py-12 md:py-24 flex items-center justify-center overflow-hidden border-b min-h-[70vh]">
           {/* Decorative Floating Icons */}
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-[15%] left-[8%] animate-float opacity-15 dark:opacity-25 text-primary">
+            <div className="absolute top-[15%] left-[8%] animate-float opacity-25 md:opacity-15 dark:opacity-25 text-primary">
               <MessageSquare className="w-16 h-16 md:w-24 md:h-24" />
             </div>
-            <div className="absolute top-[20%] right-[12%] animate-float-delayed opacity-15 dark:opacity-25 text-primary">
+            <div className="absolute top-[20%] right-[12%] animate-float-delayed opacity-25 md:opacity-15 dark:opacity-25 text-primary">
               <Star className="w-12 h-12 md:w-20 md:h-20 fill-current" />
             </div>
-            <div className="absolute bottom-[20%] left-[15%] animate-float-delayed opacity-12 dark:opacity-20 text-primary">
+            <div className="absolute bottom-[20%] left-[15%] animate-float-delayed opacity-22 md:opacity-12 dark:opacity-20 text-primary">
               <Users className="w-20 h-20 md:w-32 md:h-32" />
             </div>
-            <div className="absolute bottom-[25%] right-[10%] animate-float opacity-14 dark:opacity-22 text-primary">
+            <div className="absolute bottom-[25%] right-[10%] animate-float opacity-24 md:opacity-14 dark:opacity-22 text-primary">
               <MessageCircle className="w-14 h-14 md:w-28 md:h-28" />
             </div>
           </div>
