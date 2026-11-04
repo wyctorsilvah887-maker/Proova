@@ -47,7 +47,7 @@ import {
 import { 
   Sheet, 
   SheetContent, 
-  SheetTrigger,
+  SheetTrigger, 
   SheetClose,
   SheetHeader,
   SheetTitle,
@@ -68,6 +68,7 @@ export default function Home() {
   const [isPillarsVisible, setIsPillarsVisible] = useState(false);
   const [isVersatilityVisible, setIsVersatilityVisible] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const agitationRef = useRef<HTMLElement>(null);
   const pillarsRef = useRef<HTMLElement>(null);
@@ -185,10 +186,14 @@ export default function Home() {
           </div>
 
           <div className="sm:hidden">
-            <Sheet>
+            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/5">
-                  <Menu className="w-5 h-5 text-primary" />
+                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/5 transition-all">
+                  {isMenuOpen ? (
+                    <X className="w-5 h-5 text-primary rotate-12 transition-transform duration-300" />
+                  ) : (
+                    <Menu className="w-5 h-5 text-primary transition-transform duration-300" />
+                  )}
                 </Button>
               </SheetTrigger>
               <SheetContent 
@@ -212,7 +217,7 @@ export default function Home() {
                       <SheetClose asChild key={item.id}>
                         <button 
                           onClick={() => scrollToSection(item.id)}
-                          className="w-full flex items-center gap-4 text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors py-5 border-b border-border/50 last:border-0"
+                          className="w-full flex items-center gap-4 text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors py-5 border-b border-border/50 last:border-0 text-left"
                         >
                           <div className="p-2.5 rounded-xl bg-primary/5 text-primary">
                             <item.icon className="w-5 h-5" />
@@ -223,10 +228,10 @@ export default function Home() {
                     ))}
                     
                     <div className="pt-8 space-y-4">
-                      <Link href="/login" className="block">
+                      <Link href="/login" className="block" onClick={() => setIsMenuOpen(false)}>
                         <Button variant="outline" className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px]">Entrar no Painel</Button>
                       </Link>
-                      <Link href="/signup">
+                      <Link href="/signup" className="block" onClick={() => setIsMenuOpen(false)}>
                         <Button className="w-full h-14 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-2xl">Começar Grátis</Button>
                       </Link>
                     </div>
