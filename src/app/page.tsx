@@ -226,7 +226,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
       <div className="container px-4 mx-auto text-center space-y-16">
         <div className={cn(
           "space-y-4 transition-all duration-1000",
-          isVisible ? "animate-in fade-in zoom-in-95 opacity-100" : "opacity-0"
+          isVisible ? "animate-in fade-in zoom-in-95 opacity-100" : "opacity-100 sm:opacity-0"
         )}>
           <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">O Custo do Silêncio</h2>
           <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
@@ -260,7 +260,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
           ].map((item, idx) => (
             <div key={idx} className={cn(
               "space-y-4 transition-all duration-1000",
-              isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-0"
+              isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-100 sm:opacity-0"
             )} style={{ transitionDelay: `${(idx + 1) * 200}ms` }}>
               <div className="text-primary flex justify-center">
                 <item.icon className={cn("w-12 h-12", item.animate && "animate-pulse")} />
@@ -285,7 +285,7 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
       <div className="container px-4 mx-auto">
         <div className={cn(
           "text-center space-y-4 mb-20 transition-all duration-1000",
-          isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-0"
+          isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-100 sm:opacity-0"
         )}>
           <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">A Máquina de Domínio</h2>
           <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">Retome o <span className="italic text-primary">Controle</span>.</h3>
@@ -301,7 +301,7 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
             <Card key={idx} className={cn(
               "group relative p-8 md:p-10 rounded-[2.5rem] border-2 bg-card transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_30px_60px_-15px_rgba(249,115,22,0.1)]",
               pill.border,
-              isVisible ? `animate-in fade-in ${pill.from} duration-1000 opacity-100` : "opacity-0"
+              isVisible ? `animate-in fade-in ${pill.from} duration-1000 opacity-100` : "opacity-100 sm:opacity-0"
             )} style={{ transitionDelay: `${(idx + 1) * 150}ms` }}>
               <div className="space-y-6 relative z-10">
                 <div className={cn(
@@ -348,7 +348,7 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
         <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-center">
           <div className={cn(
             "space-y-8 transition-all duration-1000",
-            isVisible ? "animate-in fade-in slide-in-from-left-10 opacity-100" : "opacity-0"
+            isVisible ? "animate-in fade-in slide-in-from-left-10 opacity-100" : "opacity-100 sm:opacity-0"
           )}>
             <div className="space-y-4">
               <h2 className="text-3xl md:text-5xl font-black font-headline leading-tight tracking-tight">
@@ -377,7 +377,7 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
 
           <div className={cn(
             "relative transition-all duration-1000 delay-500",
-            isVisible ? "animate-in fade-in slide-in-from-right-10 opacity-100" : "opacity-0"
+            isVisible ? "animate-in fade-in slide-in-from-right-10 opacity-100" : "opacity-100 sm:opacity-0"
           )}>
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
             <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card p-6 ring-1 ring-primary/10">
@@ -498,8 +498,8 @@ export default function Home() {
     const heroTimer = setTimeout(() => setIsHeroVisible(true), 100);
 
     const observerOptions = { 
-      threshold: 0,
-      rootMargin: "0px 0px -10% 0px"
+      threshold: 0.05, // Aumenta levemente a detecção
+      rootMargin: "100px 0px 100px 0px" // Carrega 100px antes de entrar na tela
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -509,7 +509,6 @@ export default function Home() {
           if (id === 'ocusto-do-silencio') setIsAgitationVisible(true);
           if (id === 'maquina-de-dominio') setIsPillarsVisible(true);
           if (id === 'setores-atendidos') setIsVersatilityVisible(true);
-          observer.unobserve(entry.target);
         }
       });
     }, observerOptions);
