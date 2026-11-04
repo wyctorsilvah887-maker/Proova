@@ -92,9 +92,9 @@ export default function Home() {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const id = entry.target.id;
-          if (id === 'agitation-section') setIsAgitationVisible(true);
-          if (id === 'pillars-section') setIsPillarsVisible(true);
-          if (id === 'versatility-section') setIsVersatilityVisible(true);
+          if (id === 'ocusto-do-silencio') setIsAgitationVisible(true);
+          if (id === 'maquina-de-dominio') setIsPillarsVisible(true);
+          if (id === 'setores-atendidos') setIsVersatilityVisible(true);
           observer.unobserve(entry.target);
         }
       });
@@ -154,11 +154,12 @@ export default function Home() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      // Pequeno timeout para garantir que o menu fechou
       setTimeout(() => {
         const yOffset = -80; // Offset para o cabeçalho
         const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
         window.scrollTo({ top: y, behavior: 'smooth' });
+        // Atualiza a URL com a hashtag
+        window.history.pushState(null, '', `#${id}`);
       }, 100);
     }
   };
@@ -210,9 +211,9 @@ export default function Home() {
                   </div>
                   <div className="flex-1 p-4 space-y-1 overflow-y-auto">
                     {[
-                      { id: 'agitation-section', label: 'O Custo do Silêncio', icon: Skull },
-                      { id: 'pillars-section', label: 'Máquina de Domínio', icon: ShieldHalf },
-                      { id: 'versatility-section', label: 'Setores Atendidos', icon: Target },
+                      { id: 'ocusto-do-silencio', label: 'O Custo do Silêncio', icon: Skull },
+                      { id: 'maquina-de-dominio', label: 'Máquina de Domínio', icon: ShieldHalf },
+                      { id: 'setores-atendidos', label: 'Setores Atendidos', icon: Target },
                     ].map((item) => (
                       <SheetClose asChild key={item.id}>
                         <button 
@@ -302,7 +303,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="agitation-section" ref={agitationRef} className="w-full py-24 bg-muted/30 dark:bg-zinc-950 text-foreground dark:text-white overflow-hidden relative border-y border-border/50 dark:border-zinc-900/30 min-h-[400px]">
+        <section id="ocusto-do-silencio" ref={agitationRef} className="w-full py-24 bg-muted/30 dark:bg-zinc-950 text-foreground dark:text-white overflow-hidden relative border-y border-border/50 dark:border-zinc-900/30 min-h-[400px]">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
           <div className="container px-4 mx-auto text-center space-y-16">
             <div className={cn(
@@ -354,7 +355,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="pillars-section" ref={pillarsRef} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
+        <section id="maquina-de-dominio" ref={pillarsRef} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
           <div className="container px-4 mx-auto">
             <div className={cn(
               "text-center space-y-4 mb-20 transition-all duration-1000",
@@ -408,7 +409,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="versatility-section" ref={versatilityRef} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
+        <section id="setores-atendidos" ref={versatilityRef} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
           <div className="container px-4 mx-auto">
             <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-center">
               <div className={cn(
