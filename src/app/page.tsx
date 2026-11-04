@@ -10,7 +10,6 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { 
   Star, 
   CheckCircle2, 
-  ShieldCheck, 
   Zap, 
   Loader2, 
   ArrowRight, 
@@ -134,7 +133,7 @@ export default function Home() {
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="hidden dark:block object-contain" priority />
         </div>
         <div className="flex items-center gap-2 md:gap-6">
-          <ThemeToggle />
+          <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" />
           <Link href="/login" className="hidden sm:block text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Entrar</Link>
           <Link href="/signup">
             <Button className="font-black uppercase tracking-widest shadow-lg px-4 h-9 text-[9px] rounded-xl">Começar Agora</Button>
@@ -155,17 +154,17 @@ export default function Home() {
           <div className="container relative z-10 px-4 mx-auto">
             <div className="max-w-4xl mx-auto text-center space-y-6">
               <div className={cn(
-                "inline-flex items-center rounded-full text-primary border border-primary/20 px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-1000",
+                "inline-flex items-center rounded-full text-primary px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-1000",
                 isHeroVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
               )}>
-                <ShieldAlert className="w-3.5 h-3.5 mr-2 animate-pulse" /> Sua invisibilidade drena seu lucro
+                Sua invisibilidade drena seu lucro
               </div>
               
               <h1 className={cn(
                 "text-3xl font-black tracking-tighter sm:text-5xl md:text-6xl font-headline leading-[1.05] transition-all duration-1000",
                 isHeroVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
               )}>
-                Sua empresa é <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary via-white/80 via-primary to-primary bg-[length:200%_auto] animate-text-shine italic">
+                Sua empresa é <span className="inline-block relative text-transparent bg-clip-text bg-gradient-to-r from-primary via-white/70 via-primary to-primary bg-[length:200%_auto] animate-text-shine italic">
                   INVISÍVEL
                 </span>. <br className="hidden sm:block" /> E isso custa uma fortuna.
               </h1>
