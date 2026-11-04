@@ -152,7 +152,7 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-background font-body text-foreground flex flex-col">
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[100] shadow-sm backdrop-blur-md bg-background/95">
+      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[100] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2 md:gap-4">
           <Link href={user ? "/dash" : "/"}>
             <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-primary transition-colors h-8 px-2 font-bold uppercase tracking-widest text-[10px]">
@@ -205,7 +205,7 @@ export default function PricingPage() {
                   <span>Inbox Privado</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
-                  <Gem className="mr-2 h-4 w-4" />
+                  <Gem className="mr-2 h-4 w-4 text-primary" />
                   <span>Planos de Upgrade</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem 
@@ -253,7 +253,7 @@ export default function PricingPage() {
         </div>
       </header>
 
-      <main className="flex-1">
+      <main className="flex-1 pt-24 md:pt-32">
         <section className="py-12 md:py-24 px-4 container mx-auto text-center space-y-6">
           <div className="inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-[10px] sm:text-xs font-bold text-primary border border-primary/20 backdrop-blur-sm">
             💎 Oferta especial: 50% OFF vitalício nos planos pagos

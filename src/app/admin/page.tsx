@@ -390,7 +390,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-muted/30 font-body text-foreground overflow-x-hidden flex flex-col">
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
+      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center">
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
@@ -461,7 +461,7 @@ export default function AdminPage() {
         </div>
       </header>
 
-      <main className="container mx-auto p-4 md:p-6 space-y-8 flex-1 max-w-7xl overflow-x-hidden">
+      <main className="container mx-auto p-4 md:p-6 space-y-8 flex-1 max-w-7xl overflow-x-hidden pt-24 md:pt-32">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
             <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Gestão Global</h1>
@@ -673,7 +673,7 @@ export default function AdminPage() {
                               <span className="text-[9px] text-muted-foreground font-mono opacity-60">ID: {evt.externalId}</span>
                             </div>
                           </TableCell>
-                          <TableCell className="text-[11px] font-bold whitespace-nowrap">{evt.productName}</TableCell>
+                          <TableCell className="text-11px font-bold whitespace-nowrap">{evt.productName}</TableCell>
                           <TableCell className="text-muted-foreground text-[10px] whitespace-nowrap">
                             {evt.createdAt?.toDate ? evt.createdAt.toDate().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 'Agora'}
                           </TableCell>

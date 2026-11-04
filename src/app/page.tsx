@@ -166,7 +166,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
       <header className={cn(
-        "px-4 lg:px-8 h-20 flex items-center justify-between sticky top-0 w-full z-[100] transition-all duration-300",
+        "px-4 lg:px-8 h-20 flex items-center justify-between fixed top-0 w-full z-[100] transition-all duration-300",
         (isScrolled || isMenuOpen)
           ? "bg-background/95 backdrop-blur-md border-b shadow-sm" 
           : "bg-transparent border-b-transparent"
@@ -268,7 +268,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        <section className="relative w-full pt-24 pb-12 md:pt-40 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh]">
+        <section className="relative w-full pt-24 pb-12 md:pt-48 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh]">
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
             <div className="absolute top-[15%] left-[8%] animate-float opacity-35 text-primary">
               <MessageSquareQuote className="w-16 h-16 md:w-24 md:h-24" />

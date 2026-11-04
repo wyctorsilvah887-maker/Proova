@@ -714,7 +714,7 @@ export default function DashPage() {
         </div>
       )}
 
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
+      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center">
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
@@ -784,7 +784,7 @@ export default function DashPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden">
+      <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-24 md:pt-32">
         {!isSetupComplete && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="flex items-center justify-between">

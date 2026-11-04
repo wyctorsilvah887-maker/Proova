@@ -815,7 +815,7 @@ export default function PPEditorPage() {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body w-full overflow-hidden text-foreground">
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
+      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-3 flex-1">
           <Link href="/dash">
             <Button variant="ghost" size="sm" className="h-10 px-2 gap-2 text-muted-foreground hover:text-primary hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 transition-all rounded-xl shadow-none">
@@ -865,7 +865,7 @@ export default function PPEditorPage() {
         </div>
       </header>
 
-      <main className="flex-1 flex overflow-hidden relative w-full flex-row">
+      <main className="flex-1 flex overflow-hidden relative w-full flex-row pt-24 md:pt-32">
         <Sheet>
           <aside className="hidden lg:flex w-80 bg-background border-r flex-col shrink-0 h-full">
             <PublicPageSettings 
