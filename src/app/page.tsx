@@ -251,10 +251,10 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
             <stop offset="0%" stopColor="hsl(var(--primary))" />
             <stop offset="100%" stopColor="hsl(var(--destructive))" />
           </linearGradient>
-          <linearGradient id="agency-fraud-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+          <linearGradient id="agency-fraud-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="white" />
-            <stop offset="15%" stopColor="#22c55e" /> {/* Green */}
-            <stop offset="75%" stopColor="#ef4444" /> {/* Red */}
+            <stop offset="25%" stopColor="#22c55e" /> {/* Green */}
+            <stop offset="85%" stopColor="#ef4444" /> {/* Red */}
             <stop offset="100%" stopColor="#b91c1c" /> {/* Dark Red */}
           </linearGradient>
         </defs>
@@ -635,7 +635,7 @@ export default function Home() {
         scrollToSection={scrollToSection} 
       />
 
-      <main className="flex-1">
+      <main className="flex-1 pt-20">
         <HeroSection isVisible={isHeroVisible} />
         
         <AgitationSection 
