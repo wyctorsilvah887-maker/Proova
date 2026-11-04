@@ -171,7 +171,7 @@ export default function Home() {
           ? "bg-background/80 backdrop-blur-md border-b" 
           : "bg-transparent border-b-transparent"
       )}>
-        <div className="flex items-center relative w-[250px] h-[80px] md:w-[350px] md:h-[120px]">
+        <div className="flex items-center relative w-[250px] h-[80px] md:w-[430px] md:h-[150px]">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="dark:hidden object-contain" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="hidden dark:block object-contain" priority />
         </div>
@@ -236,13 +236,6 @@ export default function Home() {
                       </Link>
                     </div>
                   </div>
-                  <div className="p-10 border-t mt-auto flex flex-col items-center gap-4 bg-muted/5">
-                    <div className="relative w-32 h-10 opacity-30 grayscale">
-                      <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="dark:hidden object-contain" />
-                      <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="hidden dark:block object-contain" />
-                    </div>
-                    <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground">© 2026 PROOVA TECHNOLOGY</p>
-                  </div>
                 </div>
               </SheetContent>
             </Sheet>
@@ -297,7 +290,7 @@ export default function Home() {
                 isHeroVisible ? "animate-in fade-in slide-in-from-bottom-5 opacity-100" : "opacity-0"
               )}>
                 <Link href="/signup" className="w-full sm:w-auto">
-                  <Button className="w-full sm:w-auto h-11 md:h-12 px-6 rounded-xl text-[10px] sm:text-xs font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
+                  <Button className="w-full sm:w-auto h-11 md:h-12 px-6 rounded-xl text-[10px] font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
                     ESTANCAR PERDA DE VENDAS <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                   </Button>
                 </Link>
