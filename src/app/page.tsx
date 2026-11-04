@@ -232,15 +232,7 @@ export default function Home() {
                     ))}
                     
                     <div className="pt-8 space-y-6">
-                      <div className="space-y-3">
-                        <Link href="/login" className="block" onClick={() => setIsMenuOpen(false)}>
-                          <Button variant="outline" className="w-full h-11 rounded-xl font-black uppercase tracking-widest text-[8px]">Acessar Painel</Button>
-                        </Link>
-                        <Link href="/signup" className="block" onClick={() => setIsMenuOpen(false)}>
-                          <Button className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-2xl">Cadastrar Grátis</Button>
-                        </Link>
-                      </div>
-
+                      {/* Institutional Links moved up with separator */}
                       <div className="grid grid-cols-2 gap-2 pt-4 border-t border-border/10">
                         {[
                           { href: '/pricing', label: 'Planos' },
@@ -258,6 +250,16 @@ export default function Home() {
                           </Link>
                         ))}
                       </div>
+
+                      {/* Action Buttons */}
+                      <div className="space-y-3">
+                        <Link href="/login" className="block" onClick={() => setIsMenuOpen(false)}>
+                          <Button variant="outline" className="w-full h-11 rounded-xl font-black uppercase tracking-widest text-[8px]">Acessar Painel</Button>
+                        </Link>
+                        <Link href="/signup" className="block" onClick={() => setIsMenuOpen(false)}>
+                          <Button className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-2xl">Cadastrar Grátis</Button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -267,8 +269,8 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-1">
-        <section className="relative w-full pt-24 pb-12 md:pt-48 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh]">
+      <main className="flex-1 pt-24 md:pt-32">
+        <section className="relative w-full pb-12 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh]">
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
             <div className="absolute top-[15%] left-[8%] animate-float opacity-35 text-primary">
               <MessageSquareQuote className="w-16 h-16 md:w-24 md:h-24" />
@@ -285,7 +287,7 @@ export default function Home() {
           </div>
           
           <div className="container relative z-10 px-4 mx-auto">
-            <div className="max-w-4xl mx-auto text-center space-y-6">
+            <div className="max-w-4xl mx-auto text-center space-y-6 pt-12">
               <div className={cn(
                 "inline-flex items-center text-primary px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-1000",
                 isHeroVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
@@ -314,7 +316,7 @@ export default function Home() {
                 isHeroVisible ? "animate-in fade-in slide-in-from-bottom-5 opacity-100" : "opacity-0"
               )}>
                 <Link href="/signup" className="w-full sm:w-auto">
-                  <Button className="w-full sm:w-auto h-11 px-6 rounded-xl text-[10px] font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
+                  <Button className="w-full sm:w-auto h-11 px-6 rounded-xl text-[9px] font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
                     ESTANCAR PERDA DE VENDAS <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                   </Button>
                 </Link>
