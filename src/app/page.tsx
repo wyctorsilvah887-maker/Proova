@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useRef, forwardRef } from "react";
@@ -338,7 +337,14 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
           isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-100"
         )}>
           <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">A Máquina de Domínio</h2>
-          <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">Retome o <span className="italic text-primary">Controle</span>.</h3>
+          <h3 className={cn(
+            "text-3xl md:text-5xl font-black font-headline tracking-tighter",
+            isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-100"
+          )}>
+            Retome o <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
+              Controle
+            </span>.
+          </h3>
           <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Tecnologias de elite integradas para aniquilar objeções e forçar a conversão imediata.</p>
         </div>
         
