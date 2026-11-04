@@ -42,7 +42,8 @@ import {
   UserCheck,
   AlertCircle,
   Menu,
-  X
+  X,
+  MessageSquareQuote
 } from "lucide-react";
 import { 
   Sheet, 
@@ -153,13 +154,12 @@ export default function Home() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
+      setTimeout(() => {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
     }
   };
 
@@ -206,7 +206,7 @@ export default function Home() {
                 </SheetHeader>
                 <div className="flex flex-col h-full bg-background">
                   <div className="p-6 border-b flex items-center justify-between shrink-0">
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Navegação</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Navegação Digital</span>
                   </div>
                   <div className="flex-1 p-6 space-y-2 overflow-y-auto">
                     {[
@@ -217,22 +217,25 @@ export default function Home() {
                       <SheetClose asChild key={item.id}>
                         <button 
                           onClick={() => scrollToSection(item.id)}
-                          className="w-full flex items-center gap-4 text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors py-5 border-b border-border/50 last:border-0 text-left"
+                          className="w-full flex items-center gap-4 text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors py-5 text-left"
                         >
                           <div className="p-2.5 rounded-xl bg-primary/5 text-primary">
                             <item.icon className="w-5 h-5" />
                           </div>
-                          {item.label}
+                          <span className="flex items-center gap-1.5">
+                            <span className="text-primary font-black opacity-60">#</span>
+                            {item.label}
+                          </span>
                         </button>
                       </SheetClose>
                     ))}
                     
                     <div className="pt-8 space-y-4">
                       <Link href="/login" className="block" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="outline" className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px]">Entrar no Painel</Button>
+                        <Button variant="outline" className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px]">Acessar Painel</Button>
                       </Link>
                       <Link href="/signup" className="block" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full h-14 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-2xl">Começar Grátis</Button>
+                        <Button className="w-full h-14 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-2xl">Cadastrar Grátis</Button>
                       </Link>
                     </div>
                   </div>
@@ -244,10 +247,10 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        <section className="relative w-full pt-32 pb-12 md:pt-48 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh]">
+        <section className="relative w-full pt-40 pb-12 md:pt-60 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh]">
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
             <div className="absolute top-[15%] left-[8%] animate-float opacity-35 text-primary">
-              <MessageSquare className="w-16 h-16 md:w-24 md:h-24" />
+              <MessageSquareQuote className="w-16 h-16 md:w-24 md:h-24" />
             </div>
             <div className="absolute top-[20%] right-[12%] animate-float-delayed opacity-35 text-primary">
               <Star className="w-12 h-12 md:w-20 md:h-20 fill-current" />
@@ -290,7 +293,7 @@ export default function Home() {
                 isHeroVisible ? "animate-in fade-in slide-in-from-bottom-5 opacity-100" : "opacity-0"
               )}>
                 <Link href="/signup" className="w-full sm:w-auto">
-                  <Button className="w-full sm:w-auto h-11 md:h-12 px-6 rounded-xl text-[10px] font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
+                  <Button className="w-full sm:w-auto h-11 px-6 rounded-xl text-[10px] font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
                     ESTANCAR PERDA DE VENDAS <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                   </Button>
                 </Link>
@@ -308,7 +311,7 @@ export default function Home() {
             )}>
               <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">O Custo do Silêncio</h2>
               <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
-                O custo mortal de ser um <span className="inline-block relative px-2 bg-gradient-to-r from-white via-white to-white bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
+                O custo mortal de ser um <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
                   Zé Ninguém
                 </span> para o mercado.
               </h3>
