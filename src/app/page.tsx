@@ -243,6 +243,17 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
   return (
     <section id="ocusto-do-silencio" ref={ref} className="w-full py-24 bg-muted/30 dark:bg-zinc-950 text-foreground dark:text-white overflow-hidden relative border-y border-border/50 dark:border-zinc-900/30 min-h-[400px]">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
+      
+      {/* Definição de Degradê para o Ícone de Caveira */}
+      <svg width="0" height="0" className="absolute invisible">
+        <defs>
+          <linearGradient id="skull-bleeding-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="hsl(var(--primary))" />
+            <stop offset="100%" stopColor="hsl(var(--destructive))" />
+          </linearGradient>
+        </defs>
+      </svg>
+
       <div className="container px-4 mx-auto text-center space-y-16">
         <div className={cn(
           "space-y-4 transition-all duration-1000",
@@ -263,7 +274,8 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
               icon: Skull, 
               title: "Negócios Locais: O Cemitério do Maps", 
               desc: "Se o seu concorrente tem 50 avaliações e você tem 5, o Google te enterra. Você não existe para quem pesquisa no celular com dinheiro na mão agora.", 
-              animate: false 
+              animate: true,
+              isSkull: true 
             },
             { 
               icon: ShieldAlert, 
@@ -282,8 +294,15 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
               "space-y-4 transition-all duration-1000",
               isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-100"
             )} style={{ transitionDelay: `${(idx + 1) * 200}ms` }}>
-              <div className="text-primary flex justify-center">
-                <item.icon className={cn("w-12 h-12", item.animate && "animate-pulse")} />
+              <div className="flex justify-center">
+                <item.icon 
+                  className={cn(
+                    "w-12 h-12", 
+                    item.animate && "animate-pulse",
+                    !item.isSkull && "text-primary"
+                  )} 
+                  style={item.isSkull ? { stroke: "url(#skull-bleeding-gradient)", strokeWidth: 2.5 } : {}}
+                />
               </div>
               <h4 className="text-xl font-bold font-headline px-4">{item.title}</h4>
               <p className="text-muted-foreground dark:text-zinc-500 text-sm leading-relaxed font-medium px-6">{item.desc}</p>
@@ -443,7 +462,7 @@ const CTASection = () => {
               Vai aceitar ser a <span className="text-primary italic">Segunda Opção</span>?
             </h2>
             <p className="max-w-lg mx-auto text-base md:text-2xl font-medium text-white/80 animate-in fade-in duration-1000 delay-300">
-              A cada minuto sem Prova Social, um cliente desiste de você. Retome o controle agora.
+              A cada minute sem Prova Social, um cliente desiste de você. Retome o controle agora.
             </p>
           </div>
           <div className="flex flex-col items-center gap-5 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-500">
