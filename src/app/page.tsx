@@ -244,12 +244,18 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
     <section id="ocusto-do-silencio" ref={ref} className="w-full py-24 bg-muted/30 dark:bg-zinc-950 text-foreground dark:text-white overflow-hidden relative border-y border-border/50 dark:border-zinc-900/30 min-h-[400px]">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
       
-      {/* Definição de Degradê para o Ícone de Caveira */}
+      {/* Definições de Degradê para os Ícones */}
       <svg width="0" height="0" className="absolute invisible">
         <defs>
           <linearGradient id="skull-bleeding-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
             <stop offset="0%" stopColor="hsl(var(--primary))" />
             <stop offset="100%" stopColor="hsl(var(--destructive))" />
+          </linearGradient>
+          <linearGradient id="agency-fraud-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="white" />
+            <stop offset="15%" stopColor="#22c55e" /> {/* Green */}
+            <stop offset="75%" stopColor="#ef4444" /> {/* Red */}
+            <stop offset="100%" stopColor="#b91c1c" /> {/* Dark Red */}
           </linearGradient>
         </defs>
       </svg>
@@ -288,7 +294,8 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
               icon: TrendingDown, 
               title: "Agências: A Fraude da Autoridade", 
               desc: "Como vender marketing se a sua própria marca é silenciosa? A falta de casos de sucesso reais mata sua conversão e faz você implorar por cada contrato.", 
-              animate: false 
+              animate: false,
+              isAgency: true 
             }
           ].map((item, idx) => (
             <div key={idx} className={cn(
@@ -300,9 +307,12 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
                   className={cn(
                     "w-12 h-12", 
                     item.animate && "animate-pulse",
-                    !item.isSkull && (item.color || "text-primary")
+                    !item.isSkull && !item.isAgency && (item.color || "text-primary")
                   )} 
-                  style={item.isSkull ? { stroke: "url(#skull-bleeding-gradient)", strokeWidth: 2.5 } : {}}
+                  style={
+                    item.isSkull ? { stroke: "url(#skull-bleeding-gradient)", strokeWidth: 2.5 } : 
+                    item.isAgency ? { stroke: "url(#agency-fraud-gradient)", strokeWidth: 2.5 } : {}
+                  }
                 />
               </div>
               <h4 className="text-xl font-bold font-headline px-4">{item.title}</h4>
