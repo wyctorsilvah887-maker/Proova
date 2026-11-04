@@ -1,3 +1,4 @@
+
 'use server';
 
 import { headers } from 'next/headers';
@@ -36,7 +37,6 @@ async function checkRateLimit(actionName: string) {
 
 /**
  * Consulta detalhes técnicos de um local no Google Maps para o Consultor Proova.
- * Otimizado para detectar fotos de usuários e horários com maior precisão.
  */
 export async function getGooglePlaceDetails(placeId: string) {
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
@@ -59,7 +59,7 @@ export async function getGooglePlaceDetails(placeId: string) {
         'X-Goog-Api-Key': apiKey,
         'X-Goog-FieldMask': 'photos,regularOpeningHours,types,editorialSummary,displayName,currentOpeningHours',
       },
-      next: { revalidate: 300 } // Cache reduzido para 5 minutos para auditoria mais fresca
+      next: { revalidate: 300 }
     });
 
     if (!response.ok) return null;
@@ -67,7 +67,6 @@ export async function getGooglePlaceDetails(placeId: string) {
     const data = await response.json();
 
     return {
-      // Verifica múltiplas fontes de fotos e horários que o Google pode retornar
       hasPhotos: !!(data.photos && data.photos.length > 0),
       hasHours: !!(data.regularOpeningHours || data.currentOpeningHours),
       hasCategory: !!(data.types && data.types.length > 0),
@@ -81,13 +80,13 @@ export async function getGooglePlaceDetails(placeId: string) {
 }
 
 /**
- * @fileOverview Server Actions para integração com Google Maps API.
+ * Busca empresas no Google Places.
+ * Otimizado para encontrar "Service Area Businesses" (SABs) - perfis sem endereço físico visível.
  */
-export async function searchGooglePlaces(queryStr: string, city: string, state: string) {
+export async function searchGooglePlaces(queryStr: string, city?: string, state?: string) {
   try {
     await checkRateLimit('google_maps_search');
   } catch (e: any) {
-    console.warn("Rate Limit atingido:", e.message);
     throw new Error(e.message);
   }
 
@@ -97,7 +96,7 @@ export async function searchGooglePlaces(queryStr: string, city: string, state: 
     return [
       { 
         name: `${queryStr}`, 
-        address: `Exemplo: Rua das Flores, 123 - ${city || 'Cidade'}, ${state || 'UF'}`, 
+        address: `Exemplo: Atendimento em ${city || 'Sua Região'}, ${state || 'UF'}`, 
         place_id: "ChIJN1t_tDeuEmsRUsoyG83frY4",
         isMock: true 
       }
@@ -105,6 +104,7 @@ export async function searchGooglePlaces(queryStr: string, city: string, state: 
   }
 
   try {
+    // Para SABs (perfis ocultos), a busca textual com contexto geográfico é a mais eficaz.
     let textQuery = queryStr;
     if (city && state) {
       textQuery = `${queryStr} em ${city} ${state}`;
@@ -117,17 +117,20 @@ export async function searchGooglePlaces(queryStr: string, city: string, state: 
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': apiKey,
-        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress',
+        // Adicionamos 'types' e 'addressComponents' para ajudar o Google a identificar negócios de serviço
+        'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.types',
       },
       body: JSON.stringify({
         textQuery: textQuery,
         languageCode: 'pt-BR',
+        maxResultCount: 10,
       }),
       next: { revalidate: 0 }
     });
 
     const data = await response.json();
 
+    // Fallback: Se não encontrou com a cidade, tenta a busca global/exata pelo nome
     if ((!data.places || data.places.length === 0) && textQuery !== queryStr) {
       const fallbackRes = await fetch('https://places.googleapis.com/v1/places:searchText', {
         method: 'POST',
@@ -144,7 +147,7 @@ export async function searchGooglePlaces(queryStr: string, city: string, state: 
       const fallbackData = await fallbackRes.json();
       return (fallbackData.places || []).map((p: any) => ({
         name: p.displayName?.text || 'Nome não disponível',
-        address: p.formattedAddress,
+        address: p.formattedAddress || 'Área de Serviço (Endereço Oculto)',
         place_id: p.id,
         isMock: false
       }));
@@ -152,7 +155,7 @@ export async function searchGooglePlaces(queryStr: string, city: string, state: 
 
     return (data.places || []).map((p: any) => ({
       name: p.displayName?.text || 'Nome não disponível',
-      address: p.formattedAddress,
+      address: p.formattedAddress || 'Área de Serviço (Endereço Oculto)',
       place_id: p.id,
       isMock: false
     }));
