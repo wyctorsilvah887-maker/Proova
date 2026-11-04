@@ -388,28 +388,28 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
 
         {/* Google Redirect Instruction Dialog */}
         <Dialog open={isGoogleRedirectDialogOpen} onOpenChange={setIsGoogleRedirectDialogOpen}>
-          <DialogContent className="rounded-[2rem] sm:max-w-md border-none shadow-2xl overflow-hidden bg-background">
+          <DialogContent className="rounded-[2.5rem] w-[95vw] max-w-md border-none shadow-2xl overflow-hidden bg-background p-0">
             <div className="h-2 bg-[#4285F4] w-full" />
-            <DialogHeader className="p-8 pb-4 text-center">
+            <DialogHeader className="p-6 sm:p-8 pb-4 text-center">
               <div className="mx-auto bg-blue-50 dark:bg-blue-900/30 p-4 rounded-full w-fit mb-4">
-                <Globe className="w-10 h-10 text-[#4285F4]" />
+                <Globe className="w-8 h-8 sm:w-10 sm:h-10 text-[#4285F4]" />
               </div>
-              <DialogTitle className="text-2xl font-black font-headline tracking-tight uppercase">Quase lá!</DialogTitle>
-              <DialogDescription className="text-sm font-medium leading-relaxed">
+              <DialogTitle className="text-xl sm:text-2xl font-black font-headline tracking-tight uppercase">Quase lá!</DialogTitle>
+              <DialogDescription className="text-xs sm:text-sm font-medium leading-relaxed">
                 Para facilitar, vamos copiar seu depoimento agora. <br />
                 Ao chegar no Google, basta <strong>colar</strong> o texto na caixa de comentários e selecionar as <strong>5 estrelas</strong>.
               </DialogDescription>
             </DialogHeader>
-            <div className="px-8 pb-8">
+            <div className="px-6 sm:px-8 pb-8">
               <Button 
                 onClick={handleFinalGoogleRedirect} 
-                className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-xl bg-[#4285F4] hover:bg-[#357ae8] text-white gap-2 transition-all active:scale-95"
+                className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-xl bg-[#4285F4] hover:bg-[#357ae8] text-white gap-2 transition-all active:scale-95 text-xs sm:text-sm"
               >
                 Confirmar e Abrir Google <ArrowLeft className="w-4 h-4 rotate-180" />
               </Button>
             </div>
             <DialogFooter className="p-4 bg-muted/30 border-t text-center flex justify-center">
-              <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-60 flex items-center gap-2">
+              <p className="text-[9px] sm:text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-60 flex items-center gap-2">
                 <CheckCircle2 className="w-3 h-3 text-green-500" /> Seu feedback ajuda nossa reputação local
               </p>
             </DialogFooter>
@@ -678,4 +678,3 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     </div>
   );
 }
-
