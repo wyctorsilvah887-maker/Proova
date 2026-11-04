@@ -152,9 +152,8 @@ export default function Home() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      const headerOffset = 80;
       const elementPosition = element.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+      const offsetPosition = elementPosition + window.pageYOffset;
 
       window.scrollTo({
         top: offsetPosition,
@@ -166,12 +165,12 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
       <header className={cn(
-        "px-4 lg:px-8 h-20 flex items-center justify-between sticky top-0 z-[100] transition-all duration-300",
+        "px-4 lg:px-8 h-20 flex items-center justify-between absolute top-0 w-full z-[100] transition-all duration-300",
         isScrolled 
           ? "bg-background/80 backdrop-blur-md border-b" 
           : "bg-transparent border-b-transparent"
       )}>
-        <div className="flex items-center relative w-[200px] h-[55px] md:w-[280px] md:h-[280px]">
+        <div className="flex items-center relative w-[250px] h-[80px] md:w-[350px] md:h-[120px]">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="dark:hidden object-contain" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="hidden dark:block object-contain" priority />
         </div>
@@ -192,16 +191,16 @@ export default function Home() {
                   <Menu className="w-5 h-5 text-primary" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[80vw] p-0 border-none bg-background">
+              <SheetContent side="right" className="w-screen p-0 border-none bg-background">
                 <SheetHeader className="sr-only">
                   <SheetTitle>Menu de Navegação</SheetTitle>
                   <SheetDescription>Acesse as seções principais da plataforma Proova.</SheetDescription>
                 </SheetHeader>
-                <div className="flex flex-col h-full">
-                  <div className="p-6 border-b flex items-center justify-between">
+                <div className="flex flex-col h-full bg-background">
+                  <div className="p-6 border-b flex items-center justify-between shrink-0">
                     <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Navegação</span>
                   </div>
-                  <div className="flex-1 p-6 space-y-2">
+                  <div className="flex-1 p-6 space-y-2 overflow-y-auto">
                     {[
                       { id: 'agitation-section', label: 'O Custo do Silêncio', icon: Skull },
                       { id: 'pillars-section', label: 'Máquina de Domínio', icon: ShieldHalf },
@@ -210,10 +209,10 @@ export default function Home() {
                       <SheetClose asChild key={item.id}>
                         <button 
                           onClick={() => scrollToSection(item.id)}
-                          className="w-full flex items-center gap-4 text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors py-4 border-b border-border/50 last:border-0"
+                          className="w-full flex items-center gap-4 text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors py-5 border-b border-border/50 last:border-0"
                         >
-                          <div className="p-2 rounded-lg bg-primary/5 text-primary">
-                            <item.icon className="w-4 h-4" />
+                          <div className="p-2.5 rounded-xl bg-primary/5 text-primary">
+                            <item.icon className="w-5 h-5" />
                           </div>
                           {item.label}
                         </button>
@@ -229,7 +228,7 @@ export default function Home() {
                       </Link>
                     </div>
                   </div>
-                  <div className="p-10 border-t mt-auto flex flex-col items-center gap-4">
+                  <div className="p-10 border-t mt-auto flex flex-col items-center gap-4 bg-muted/5">
                     <div className="relative w-32 h-10 opacity-30 grayscale">
                       <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="dark:hidden object-contain" />
                       <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="hidden dark:block object-contain" />
@@ -273,7 +272,7 @@ export default function Home() {
                 "text-3xl font-black tracking-tighter sm:text-5xl md:text-7xl font-headline leading-[1] transition-all duration-1000",
                 isHeroVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
               )}>
-                Sua empresa é <span className="inline-block relative text-transparent bg-clip-text bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] animate-text-shine italic px-2">
+                Sua empresa é <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
                   INVISÍVEL
                 </span>. <br className="hidden sm:block" /> E isso custa uma fortuna.
               </h1>
@@ -290,7 +289,7 @@ export default function Home() {
                 isHeroVisible ? "animate-in fade-in slide-in-from-bottom-5 opacity-100" : "opacity-0"
               )}>
                 <Link href="/signup" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto h-12 md:h-16 px-10 rounded-2xl text-[10px] sm:text-xs font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
+                  <Button size="lg" className="w-full sm:w-auto h-12 md:h-14 px-8 rounded-2xl text-[10px] sm:text-xs font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
                     ESTANCAR PERDA DE VENDAS <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                   </Button>
                 </Link>
@@ -308,7 +307,7 @@ export default function Home() {
             )}>
               <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">O Custo do Silêncio</h2>
               <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
-                O custo mortal de ser um <span className="inline-block relative text-transparent bg-clip-text bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] animate-text-shine italic px-2">
+                O custo mortal de ser um <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
                   Zé Ninguém
                 </span> para o mercado.
               </h3>
