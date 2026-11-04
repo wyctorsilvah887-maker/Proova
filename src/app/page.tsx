@@ -48,7 +48,10 @@ import {
   Sheet, 
   SheetContent, 
   SheetTrigger,
-  SheetClose
+  SheetClose,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription
 } from "@/components/ui/sheet";
 import { useUser, useFirestore } from "@/firebase";
 import { doc, setDoc, increment } from "firebase/firestore";
@@ -171,6 +174,10 @@ export default function Home() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[80vw] p-0 border-none bg-background">
+                <SheetHeader className="sr-only">
+                  <SheetTitle>Menu de Navegação</SheetTitle>
+                  <SheetDescription>Acesse as seções principais da plataforma Proova.</SheetDescription>
+                </SheetHeader>
                 <div className="flex flex-col h-full">
                   <div className="p-6 border-b flex items-center justify-between">
                     <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Menu Navegação</span>
@@ -264,7 +271,7 @@ export default function Home() {
                 isHeroVisible ? "animate-in fade-in slide-in-from-bottom-5 opacity-100" : "opacity-0"
               )}>
                 <Link href="/signup" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto h-12 md:h-16 px-10 rounded-2xl text-[10px] sm:text-xs font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90">
+                  <Button size="lg" className="w-full sm:w-auto h-12 md:h-16 px-10 rounded-2xl text-[10px] sm:text-xs font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
                     ESTANCAR PERDA DE VENDAS <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                   </Button>
                 </Link>
