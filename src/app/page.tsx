@@ -154,13 +154,14 @@ export default function Home() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
+      // Pequeno atraso para permitir que o menu feche sem interferir no scroll
       setTimeout(() => {
-        const yOffset = -80; // Offset para o cabeçalho
+        const yOffset = -20; // Pequeno offset para não colar no topo
         const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
         window.scrollTo({ top: y, behavior: 'smooth' });
-        // Atualiza a URL com a hashtag
+        // Atualiza a URL sem causar recarregamento
         window.history.pushState(null, '', `#${id}`);
-      }, 100);
+      }, 300);
     }
   };
 
@@ -199,6 +200,7 @@ export default function Home() {
               </SheetTrigger>
               <SheetContent 
                 side="right" 
+                onCloseAutoFocus={(e) => e.preventDefault()}
                 className="fixed inset-0 top-20 h-[calc(100vh-5rem)] w-screen p-0 border-none bg-background z-[90] translate-x-0 translate-y-0 left-0 [&>button]:hidden"
               >
                 <SheetHeader className="sr-only">
