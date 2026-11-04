@@ -154,11 +154,11 @@ export default function Home() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
+      // Pequeno timeout para garantir que o menu fechou
       setTimeout(() => {
-        element.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start'
-        });
+        const yOffset = -80; // Offset para o cabeçalho
+        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: y, behavior: 'smooth' });
       }, 100);
     }
   };
@@ -205,10 +205,10 @@ export default function Home() {
                   <SheetDescription>Acesse as seções principais da plataforma Proova.</SheetDescription>
                 </SheetHeader>
                 <div className="flex flex-col h-full bg-background">
-                  <div className="p-6 border-b flex items-center justify-between shrink-0">
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Navegação Digital</span>
+                  <div className="p-4 flex items-center justify-between shrink-0">
+                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/60">Navegação Digital</span>
                   </div>
-                  <div className="flex-1 p-6 space-y-2 overflow-y-auto">
+                  <div className="flex-1 p-4 space-y-1 overflow-y-auto">
                     {[
                       { id: 'agitation-section', label: 'O Custo do Silêncio', icon: Skull },
                       { id: 'pillars-section', label: 'Máquina de Domínio', icon: ShieldHalf },
@@ -217,25 +217,25 @@ export default function Home() {
                       <SheetClose asChild key={item.id}>
                         <button 
                           onClick={() => scrollToSection(item.id)}
-                          className="w-full flex items-center gap-4 text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors py-5 text-left"
+                          className="w-full flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest hover:text-primary transition-colors py-3.5 text-left"
                         >
-                          <div className="p-2.5 rounded-xl bg-primary/5 text-primary">
-                            <item.icon className="w-5 h-5" />
+                          <div className="p-2 rounded-lg bg-primary/5 text-primary">
+                            <item.icon className="w-4 h-4" />
                           </div>
-                          <span className="flex items-center gap-1.5">
-                            <span className="text-primary font-black opacity-60">#</span>
+                          <span className="flex items-center gap-1">
+                            <span className="text-primary font-black opacity-40">#</span>
                             {item.label}
                           </span>
                         </button>
                       </SheetClose>
                     ))}
                     
-                    <div className="pt-8 space-y-4">
+                    <div className="pt-8 space-y-3">
                       <Link href="/login" className="block" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="outline" className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px]">Acessar Painel</Button>
+                        <Button variant="outline" className="w-full h-11 rounded-xl font-black uppercase tracking-widest text-[8px]">Acessar Painel</Button>
                       </Link>
                       <Link href="/signup" className="block" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full h-14 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-2xl">Cadastrar Grátis</Button>
+                        <Button className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-2xl">Cadastrar Grátis</Button>
                       </Link>
                     </div>
                   </div>
@@ -247,7 +247,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        <section className="relative w-full pt-40 pb-12 md:pt-60 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh]">
+        <section className="relative w-full pt-48 pb-12 md:pt-60 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh]">
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
             <div className="absolute top-[15%] left-[8%] animate-float opacity-35 text-primary">
               <MessageSquareQuote className="w-16 h-16 md:w-24 md:h-24" />
@@ -269,7 +269,7 @@ export default function Home() {
                 "inline-flex items-center text-primary px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-1000",
                 isHeroVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
               )}>
-                <AlertCircle className="w-3 h-3 mr-2 animate-pulse" /> Sua invisibilidade drena seu lucro
+                Sua invisibilidade drena seu lucro
               </div>
               
               <h1 className={cn(
@@ -367,33 +367,9 @@ export default function Home() {
             
             <div className="grid gap-10 lg:grid-cols-3 max-w-6xl mx-auto">
               {[
-                { 
-                  icon: MapPin, 
-                  color: 'text-primary', 
-                  bg: 'bg-primary/10',
-                  border: 'border-primary/20',
-                  title: 'G-Boost: Domínio Local', 
-                  desc: 'Inundamos seu perfil com avaliações 5 estrelas reais. Force o algoritmo do Google a aumentar sua chances de aparecer no topo e roubar os cliques da concorrência.', 
-                  from: 'slide-in-from-left-20' 
-                },
-                { 
-                  icon: ShieldHalf, 
-                  color: 'text-emerald-500', 
-                  bg: 'bg-emerald-500/10',
-                  border: 'border-emerald-500/20',
-                  title: 'Blindagem de Marca', 
-                  desc: 'Nosso Reputation Shield intercepta o ódio antes dele virar público. Resolva crises no Inbox Privado e mantenha sua imagem impecável perante o mercado.', 
-                  from: 'slide-in-from-bottom-20' 
-                },
-                { 
-                  icon: MousePointerClick, 
-                  color: 'text-blue-500', 
-                  bg: 'bg-blue-500/10',
-                  border: 'border-blue-500/20',
-                  title: 'Vitrines Magnéticas', 
-                  desc: 'Widgets hipnóticos que aniquilam dúvidas em segundos. Prove que você é a única escolha segura através de murais e carrosséis com design de alto nível.', 
-                  from: 'slide-in-from-right-20' 
-                }
+                { icon: MapPin, color: 'text-primary', bg: 'bg-primary/10', border: 'border-primary/20', title: 'G-Boost: Domínio Local', desc: 'Inundamos seu perfil com avaliações 5 estrelas reais. Force o algoritmo do Google a aumentar sua chances de aparecer no topo e roubar os cliques da concorrência.', from: 'slide-in-from-left-20' },
+                { icon: ShieldHalf, color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', title: 'Blindagem de Marca', desc: 'Nosso Reputation Shield intercepta o ódio antes dele virar público. Resolva crises no Inbox Privado e mantenha sua imagem impecável perante o mercado.', from: 'slide-in-from-bottom-20' },
+                { icon: MousePointerClick, color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/20', title: 'Vitrines Magnéticas', desc: 'Widgets hipnóticos que aniquilam dúvidas em segundos. Prove que você é a única escolha segura através de murais e carrosséis com design de alto nível.', from: 'slide-in-from-right-20' }
               ].map((pill, idx) => (
                 <Card key={idx} className={cn(
                   "group relative p-8 md:p-10 rounded-[2.5rem] border-2 bg-card transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_30px_60px_-15px_rgba(249,115,22,0.1)]",
