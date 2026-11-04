@@ -155,7 +155,7 @@ export default function Home() {
     const element = document.getElementById(id);
     if (element) {
       setTimeout(() => {
-        const yOffset = -100; // Offset ajustado para considerar o cabeçalho sticky
+        const yOffset = -100;
         const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
         window.scrollTo({ top: y, behavior: 'smooth' });
         window.history.pushState(null, '', `#${id}`);
@@ -231,13 +231,33 @@ export default function Home() {
                       </SheetClose>
                     ))}
                     
-                    <div className="pt-8 space-y-3">
-                      <Link href="/login" className="block" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="outline" className="w-full h-11 rounded-xl font-black uppercase tracking-widest text-[8px]">Acessar Painel</Button>
-                      </Link>
-                      <Link href="/signup" className="block" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-2xl">Cadastrar Grátis</Button>
-                      </Link>
+                    <div className="pt-8 space-y-6">
+                      <div className="space-y-3">
+                        <Link href="/login" className="block" onClick={() => setIsMenuOpen(false)}>
+                          <Button variant="outline" className="w-full h-11 rounded-xl font-black uppercase tracking-widest text-[8px]">Acessar Painel</Button>
+                        </Link>
+                        <Link href="/signup" className="block" onClick={() => setIsMenuOpen(false)}>
+                          <Button className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-2xl">Cadastrar Grátis</Button>
+                        </Link>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 pt-4 border-t border-border/10">
+                        {[
+                          { href: '/pricing', label: 'Planos' },
+                          { href: '/login', label: 'Entrar' },
+                          { href: '/terms', label: 'Termos' },
+                          { href: '/privacy', label: 'Privacidade' },
+                        ].map((link) => (
+                          <Link 
+                            key={link.href}
+                            href={link.href}
+                            onClick={() => setIsMenuOpen(false)}
+                            className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-colors py-2 px-1"
+                          >
+                            {link.label}
+                          </Link>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -506,7 +526,7 @@ export default function Home() {
           </div>
           <div className="space-y-8">
             <div className="flex flex-wrap justify-center gap-8 md:gap-12">
-              <Link href="/pricing" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Preços</Link>
+              <Link href="/pricing" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Planos</Link>
               <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Entrar</Link>
               <Link href="/terms" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2"><Scale className="w-4 h-4" /> Termos</Link>
               <Link href="/privacy" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2"><Lock className="w-4 h-4" /> Privacidade</Link>
