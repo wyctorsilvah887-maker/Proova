@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, Shield, ArrowLeft, Globe, Copy, X, Camera, Square, RefreshCcw, SwitchCamera, FlipHorizontal, Gem } from 'lucide-react';
+import { Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, Shield, ArrowLeft, Globe, Copy, X, Camera, Square, RefreshCcw, SwitchCamera, FlipHorizontal, Gem, User, Clock, Play } from 'lucide-react';
 import { useFirestore, useStorage } from '@/firebase';
 import { collection, query, where, getDocs, limit, doc, updateDoc, increment } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -259,11 +259,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
       return;
     }
 
-    if (videoBlob) {
-      handleFinalSubmit('public');
-    } else {
-      setSelectionPending(true);
-    }
+    setSelectionPending(true);
   };
 
   const handleFinalSubmit = async (destination: 'public' | 'private') => {
@@ -298,8 +294,6 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
       }
     }
 
-    // Ao clicar em público, o sistema agora leva direto para a tela de agradecimento (Obrigado)
-    // removendo o redirecionamento automático para o Maps.
     if (destination === 'public' && !videoBlob) {
       try {
         const textToCopy = text.trim();
@@ -403,26 +397,76 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
           <div className="h-2 bg-primary w-full" />
           <CardHeader className="text-center pt-8">
             <CardTitle className="text-2xl font-headline flex items-center justify-center gap-2">
-              <MessageSquare className="w-6 h-6 text-primary" /> Deixe seu Depoimento
+              <MessageSquare className="w-6 h-6 text-primary" /> 
+              {selectionPending ? "Revise seu Depoimento" : "Deixe seu Depoimento"}
             </CardTitle>
           </CardHeader>
           <CardContent className="px-6 md:px-10 pb-10">
             {selectionPending ? (
-              <div className="space-y-8 animate-in fade-in zoom-in duration-500 py-4">
+              <div className="space-y-8 animate-in fade-in zoom-in duration-500 py-2">
+                
+                {/* PREVIEW CARD */}
+                <div className="space-y-3">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground text-center">Como seu elogio será exibido:</p>
+                  <Card className="bg-muted/30 border-2 border-primary/10 rounded-[2rem] overflow-hidden shadow-sm">
+                    <CardContent className="p-6 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-xs shrink-0">
+                            {userName?.substring(0, 2).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-bold text-sm truncate">{userName}</p>
+                            <div className="flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3 text-green-500" />
+                              <span className="text-[8px] font-bold uppercase tracking-widest opacity-60">Verificado</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex gap-0.5">
+                          {[1, 2, 3, 4, 5].map((s) => (
+                            <Star key={s} className={cn("w-3 h-3", s <= rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20")} />
+                          ))}
+                        </div>
+                      </div>
+
+                      {recordedVideoUrl && (
+                        <div className="relative aspect-video rounded-2xl overflow-hidden bg-black shadow-lg">
+                          <video src={recordedVideoUrl} className="w-full h-full object-cover" muted autoPlay loop playsInline />
+                          <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-full border border-white/10">
+                            <p className="text-[7px] text-white font-black uppercase tracking-widest flex items-center gap-1">
+                              <Play className="w-2 h-2 fill-white" /> Video Review
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {text && (
+                        <p className="text-sm italic leading-relaxed text-foreground/90">"{text}"</p>
+                      )}
+
+                      <div className="pt-2 border-t border-muted-foreground/10 flex items-center justify-between opacity-50">
+                        <span className="text-[8px] font-black uppercase tracking-widest flex items-center gap-1"><Clock className="w-2.5 h-2.5" /> Agora</span>
+                        <div className="h-1 w-1 rounded-full bg-primary" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
                 <div className="text-center space-y-2">
-                  <h3 className="text-xl font-black font-headline">Como deseja prosseguir?</h3>
-                  <p className="text-sm text-muted-foreground font-medium">Escolha como quer compartilhar sua experiênica.</p>
+                  <h3 className="text-xl font-black font-headline">Onde deseja publicar?</h3>
+                  <p className="text-sm text-muted-foreground font-medium">Escolha como quer compartilhar sua experiência.</p>
                 </div>
                 
                 <div className="grid gap-4">
-                  <Button disabled={isSubmitting} onClick={() => handleFinalSubmit('public')} className="h-auto min-h-24 py-5 rounded-2xl flex flex-col gap-1 bg-[#4285F4] hover:bg-[#357ae8]">
+                  <Button disabled={isSubmitting} onClick={() => handleFinalSubmit('public')} className="h-auto min-h-24 py-5 rounded-2xl flex flex-col gap-1 bg-[#4285F4] hover:bg-[#357ae8] shadow-lg transition-all active:scale-95">
                     <div className="flex items-center gap-2"><Globe className="w-5 h-5" /><span className="font-bold text-lg">Público no Google & Site</span></div>
-                    <span className="text-[9px] opacity-70 uppercase font-black tracking-widest text-center">Aumente nossa autoridade local</span>
+                    <span className="text-[9px] opacity-70 uppercase font-black tracking-widest text-center">Injetar autoridade imediata na marca</span>
                   </Button>
                   
-                  <Button disabled={isSubmitting} variant="outline" onClick={() => handleFinalSubmit('private')} className="h-auto min-h-24 py-5 rounded-2xl flex flex-col gap-1 border-primary/20 text-primary">
+                  <Button disabled={isSubmitting} variant="outline" onClick={() => handleFinalSubmit('private')} className="h-auto min-h-24 py-5 rounded-2xl flex flex-col gap-1 border-primary/20 text-primary transition-all active:scale-95">
                     <div className="flex items-center gap-2"><Shield className="w-5 h-5" /><span className="font-bold text-lg">Privado para a Empresa</span></div>
-                    <span className="text-[9px] opacity-70 uppercase font-black tracking-widest text-center">Sugestão sigilosa direta para a gerência</span>
+                    <span className="text-[9px] opacity-70 uppercase font-black tracking-widest text-center">Feedback sigiloso direto para a gerência</span>
                   </Button>
                 </div>
 
@@ -449,13 +493,13 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-2">
-                  <Input placeholder="Seu Nome" value={userName} onChange={(e) => setUserName(e.target.value)} required className="h-11" />
-                  <Input type="email" placeholder="E-mail (opcional)" value={userEmail} onChange={(e) => setUserEmail(e.target.value)} className="h-11" />
+                  <Input placeholder="Seu Nome" value={userName} onChange={(e) => setUserName(e.target.value)} required className="h-11 rounded-xl" />
+                  <Input type="email" placeholder="E-mail (opcional)" value={userEmail} onChange={(e) => setUserEmail(e.target.value)} className="h-11 rounded-xl" />
                 </div>
 
                 <Textarea 
-                  placeholder={videoBlob ? "Escreva algo (opcional)" : "Conte-nos o que achou da nossa empresa..."}
-                  className="min-h-[120px] resize-none" 
+                  placeholder={recordedVideoUrl ? "Escreva algo sobre o vídeo (opcional)" : "Conte-nos o que achou da nossa empresa..."}
+                  className="min-h-[120px] resize-none rounded-xl" 
                   value={text} 
                   onChange={(e) => setText(e.target.value)} 
                 />
@@ -465,20 +509,29 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
                     onClick={() => { setIsVideoDialogOpen(true); startCamera(); }}
                     className={cn(
                       "p-4 rounded-xl border-2 border-dashed transition-all cursor-pointer text-center space-y-2 group",
-                      videoBlob ? "border-green-500 bg-green-50" : "border-primary/20 bg-primary/5 hover:bg-primary/10"
+                      recordedVideoUrl ? "border-green-500 bg-green-50/50" : "border-primary/20 bg-primary/5 hover:bg-primary/10"
                     )}
                   >
-                    <Video className={cn("w-6 h-6 mx-auto", videoBlob ? "text-green-600" : "text-primary")} />
-                    <p className={cn("text-xs font-semibold", videoBlob ? "text-green-700" : "text-primary")}>
-                      {videoBlob ? "Vídeo Gravado com Sucesso!" : "Gravar Depoimento em Vídeo 4K"}
-                    </p>
-                    <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black">Recurso Exclusivo Enterprise</p>
+                    {recordedVideoUrl ? (
+                      <div className="flex flex-col items-center gap-2">
+                         <div className="relative w-16 aspect-video rounded-lg overflow-hidden border border-green-500/30">
+                           <video src={recordedVideoUrl} className="w-full h-full object-cover" muted autoPlay loop playsInline />
+                         </div>
+                         <p className="text-[10px] font-black uppercase text-green-700">Vídeo Gravado! Clique para refazer.</p>
+                      </div>
+                    ) : (
+                      <>
+                        <Video className="w-6 h-6 mx-auto text-primary group-hover:scale-110 transition-transform" />
+                        <p className="text-xs font-bold text-primary">Gravar Depoimento em Vídeo 4K</p>
+                        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black">Recurso VIP Enterprise</p>
+                      </>
+                    )}
                   </div>
                 )}
 
-                <Button type="submit" disabled={isSubmitting} className="w-full h-14 text-lg font-bold shadow-xl">
+                <Button type="submit" disabled={isSubmitting} className="w-full h-14 text-lg font-bold shadow-xl rounded-2xl">
                   {isSubmitting ? (
-                    <><Loader2 className="animate-spin mr-2 h-5 w-5" /> Enviando...</>
+                    <><Loader2 className="animate-spin mr-2 h-5 w-5" /> Processando...</>
                   ) : (
                     <><Send className="mr-2 w-5 h-5" /> Revisar e Enviar</>
                   )}
