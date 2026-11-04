@@ -343,7 +343,9 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
   if (submitted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-muted/20 px-4 font-body text-foreground">
-        <div className="fixed top-8 right-8"><ThemeToggle /></div>
+        <div className="fixed top-4 right-4 md:top-8 md:right-8 z-50">
+          <ThemeToggle className="border-none bg-transparent backdrop-blur-0 shadow-none" />
+        </div>
         <Card className="w-full max-w-md text-center shadow-2xl border-none">
           <CardContent className="pt-10 pb-10 space-y-8">
             <div className="mx-auto bg-green-100 dark:bg-green-900/30 p-4 rounded-full w-fit">
@@ -376,7 +378,9 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col items-center justify-center p-4 font-body text-foreground">
-      <div className="fixed top-8 right-8"><ThemeToggle /></div>
+      <div className="fixed top-4 right-4 md:top-8 md:right-8 z-50">
+        <ThemeToggle className="border-none bg-transparent backdrop-blur-0 shadow-none" />
+      </div>
       <div className="w-full max-w-xl space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold font-headline tracking-tight">{companyNameDisplay}</h1>
