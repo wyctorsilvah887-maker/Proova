@@ -47,7 +47,8 @@ import {
 import { 
   Sheet, 
   SheetContent, 
-  SheetTrigger 
+  SheetTrigger,
+  SheetClose
 } from "@/components/ui/sheet";
 import { useUser, useFirestore } from "@/firebase";
 import { doc, setDoc, increment } from "firebase/firestore";
@@ -138,6 +139,13 @@ export default function Home() {
     );
   }
 
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
       <header className="px-4 lg:px-8 h-20 flex items-center justify-between border-b sticky top-0 bg-background/80 backdrop-blur-md z-[100]">
@@ -148,7 +156,6 @@ export default function Home() {
         <div className="flex items-center gap-2 md:gap-6">
           <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" />
           
-          {/* Desktop Nav */}
           <div className="hidden sm:flex items-center gap-6">
             <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Entrar</Link>
             <Link href="/signup">
@@ -156,7 +163,6 @@ export default function Home() {
             </Link>
           </div>
 
-          {/* Mobile Hamburger Menu */}
           <div className="sm:hidden">
             <Sheet>
               <SheetTrigger asChild>
@@ -167,20 +173,35 @@ export default function Home() {
               <SheetContent side="right" className="w-[80vw] p-0 border-none bg-background">
                 <div className="flex flex-col h-full">
                   <div className="p-6 border-b flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Menu de Acesso</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Menu Navegação</span>
                   </div>
-                  <div className="flex-1 p-6 space-y-6">
-                    <Link href="/login" className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors py-2">
-                      <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                        <UserCheck className="w-5 h-5" />
-                      </div>
-                      Entrar no Painel
-                    </Link>
-                    <Link href="/signup" className="block pt-4">
-                      <Button className="w-full h-14 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-2xl gap-2">
-                        Começar Agora Grátis <ArrowRight className="w-4 h-4" />
-                      </Button>
-                    </Link>
+                  <div className="flex-1 p-6 space-y-2">
+                    {[
+                      { id: 'agitation-section', label: 'O Custo do Silêncio', icon: Skull },
+                      { id: 'pillars-section', label: 'Máquina de Domínio', icon: ShieldHalf },
+                      { id: 'versatility-section', label: 'Setores Atendidos', icon: Target },
+                    ].map((item) => (
+                      <SheetClose asChild key={item.id}>
+                        <button 
+                          onClick={() => scrollToSection(item.id)}
+                          className="w-full flex items-center gap-4 text-xs font-bold uppercase tracking-widest hover:text-primary transition-colors py-4 border-b border-border/50 last:border-0"
+                        >
+                          <div className="p-2 rounded-lg bg-primary/5 text-primary">
+                            <item.icon className="w-4 h-4" />
+                          </div>
+                          {item.label}
+                        </button>
+                      </SheetClose>
+                    ))}
+                    
+                    <div className="pt-8 space-y-4">
+                      <Link href="/login" className="block">
+                        <Button variant="outline" className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px]">Entrar no Painel</Button>
+                      </Link>
+                      <Link href="/signup">
+                        <Button className="w-full h-14 rounded-xl font-black uppercase tracking-widest text-[10px] shadow-2xl">Começar Grátis</Button>
+                      </Link>
+                    </div>
                   </div>
                   <div className="p-10 border-t mt-auto flex flex-col items-center gap-4">
                     <div className="relative w-32 h-10 opacity-30 grayscale">
@@ -198,18 +219,17 @@ export default function Home() {
 
       <main className="flex-1">
         <section className="relative w-full py-12 md:py-24 flex items-center justify-center overflow-hidden border-b min-h-[70vh]">
-          {/* Decorative Floating Icons */}
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-[15%] left-[8%] animate-float opacity-25 md:opacity-15 dark:opacity-25 text-primary">
+            <div className="absolute top-[15%] left-[8%] animate-float opacity-35 text-primary">
               <MessageSquare className="w-16 h-16 md:w-24 md:h-24" />
             </div>
-            <div className="absolute top-[20%] right-[12%] animate-float-delayed opacity-25 md:opacity-15 dark:opacity-25 text-primary">
+            <div className="absolute top-[20%] right-[12%] animate-float-delayed opacity-35 text-primary">
               <Star className="w-12 h-12 md:w-20 md:h-20 fill-current" />
             </div>
-            <div className="absolute bottom-[20%] left-[15%] animate-float-delayed opacity-22 md:opacity-12 dark:opacity-20 text-primary">
+            <div className="absolute bottom-[20%] left-[15%] animate-float-delayed opacity-35 text-primary">
               <Users className="w-20 h-20 md:w-32 md:h-32" />
             </div>
-            <div className="absolute bottom-[25%] right-[10%] animate-float opacity-24 md:opacity-14 dark:opacity-22 text-primary">
+            <div className="absolute bottom-[25%] right-[10%] animate-float opacity-35 text-primary">
               <MessageCircle className="w-14 h-14 md:w-28 md:h-28" />
             </div>
           </div>
