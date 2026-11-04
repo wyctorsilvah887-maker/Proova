@@ -191,7 +191,10 @@ export default function Home() {
                   <Menu className="w-5 h-5 text-primary" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-screen p-0 border-none bg-background">
+              <SheetContent 
+                side="right" 
+                className="fixed inset-0 top-20 h-[calc(100vh-5rem)] w-screen p-0 border-none bg-background z-[90] translate-x-0 translate-y-0 left-0 [&>button]:hidden"
+              >
                 <SheetHeader className="sr-only">
                   <SheetTitle>Menu de Navegação</SheetTitle>
                   <SheetDescription>Acesse as seções principais da plataforma Proova.</SheetDescription>
@@ -289,7 +292,7 @@ export default function Home() {
                 isHeroVisible ? "animate-in fade-in slide-in-from-bottom-5 opacity-100" : "opacity-0"
               )}>
                 <Link href="/signup" className="w-full sm:w-auto">
-                  <Button size="lg" className="w-full sm:w-auto h-12 md:h-14 px-8 rounded-2xl text-[10px] sm:text-xs font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
+                  <Button className="w-full sm:w-auto h-11 md:h-12 px-6 rounded-xl text-[10px] sm:text-xs font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
                     ESTANCAR PERDA DE VENDAS <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
                   </Button>
                 </Link>
