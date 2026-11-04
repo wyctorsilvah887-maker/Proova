@@ -254,7 +254,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
           <linearGradient id="agency-fraud-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="white" />
             <stop offset="25%" stopColor="#22c55e" /> {/* Green */}
-            <stop offset="85%" stopColor="#ef4444" /> {/* Red */}
+            <stop offset="85%" stopColor="#ef4444" /> {/* Red - Pushed up to cover the first bend */}
             <stop offset="100%" stopColor="#b91c1c" /> {/* Dark Red */}
           </linearGradient>
         </defs>
