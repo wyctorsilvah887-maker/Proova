@@ -149,32 +149,26 @@ export default function Home() {
 
       <main className="flex-1">
         <section className="relative w-full py-12 md:py-24 flex items-center justify-center overflow-hidden border-b min-h-[70vh]">
-          {/* Decorative Floating Icons - Higher Opacity for clarity */}
+          {/* Decorative Floating Icons */}
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-[15%] left-[8%] animate-float opacity-[0.08] dark:opacity-[0.15] text-primary">
+            <div className="absolute top-[15%] left-[8%] animate-float opacity-15 dark:opacity-25 text-primary">
               <MessageSquare className="w-16 h-16 md:w-24 md:h-24" />
             </div>
-            <div className="absolute top-[20%] right-[12%] animate-float-delayed opacity-[0.08] dark:opacity-[0.15] text-primary">
+            <div className="absolute top-[20%] right-[12%] animate-float-delayed opacity-15 dark:opacity-25 text-primary">
               <Star className="w-12 h-12 md:w-20 md:h-20 fill-current" />
             </div>
-            <div className="absolute bottom-[20%] left-[15%] animate-float-delayed opacity-[0.06] dark:opacity-[0.12] text-primary">
+            <div className="absolute bottom-[20%] left-[15%] animate-float-delayed opacity-12 dark:opacity-20 text-primary">
               <Users className="w-20 h-20 md:w-32 md:h-32" />
             </div>
-            <div className="absolute bottom-[25%] right-[10%] animate-float opacity-[0.07] dark:opacity-[0.14] text-primary">
+            <div className="absolute bottom-[25%] right-[10%] animate-float opacity-14 dark:opacity-22 text-primary">
               <MessageCircle className="w-14 h-14 md:w-28 md:h-28" />
-            </div>
-            <div className="absolute top-[50%] left-[5%] animate-float-delayed opacity-[0.05] dark:opacity-[0.1] text-primary hidden md:block">
-              <Quote className="w-16 h-16" />
-            </div>
-            <div className="absolute top-[45%] right-[5%] animate-float opacity-[0.05] dark:opacity-[0.1] text-primary hidden md:block">
-              <UserCheck className="w-16 h-16" />
             </div>
           </div>
           
           <div className="container relative z-10 px-4 mx-auto">
             <div className="max-w-4xl mx-auto text-center space-y-6">
               <div className={cn(
-                "inline-flex items-center rounded-full text-primary px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-1000",
+                "inline-flex items-center text-primary px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-1000",
                 isHeroVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
               )}>
                 <AlertCircle className="w-3 h-3 mr-2 animate-pulse" /> Sua invisibilidade drena seu lucro
@@ -184,7 +178,7 @@ export default function Home() {
                 "text-3xl font-black tracking-tighter sm:text-5xl md:text-7xl font-headline leading-[1] transition-all duration-1000",
                 isHeroVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
               )}>
-                Sua empresa é <span className="inline-block relative text-transparent bg-clip-text bg-gradient-to-r from-primary via-white/70 via-primary to-primary bg-[length:200%_auto] animate-text-shine italic">
+                Sua empresa é <span className="inline-block relative text-transparent bg-clip-text bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] animate-text-shine italic px-2">
                   INVISÍVEL
                 </span>. <br className="hidden sm:block" /> E isso custa uma fortuna.
               </h1>
@@ -219,7 +213,7 @@ export default function Home() {
             )}>
               <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">O Custo do Silêncio</h2>
               <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
-                O custo mortal de ser um <span className="inline-block relative text-transparent bg-clip-text bg-gradient-to-r from-primary via-white/70 via-primary to-primary bg-[length:200%_auto] animate-text-shine italic">
+                O custo mortal de ser um <span className="inline-block relative text-transparent bg-clip-text bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] animate-text-shine italic px-2">
                   Zé Ninguém
                 </span> para o mercado.
               </h3>
@@ -258,13 +252,6 @@ export default function Home() {
                   <p className="text-muted-foreground dark:text-zinc-500 text-sm leading-relaxed font-medium px-6">{item.desc}</p>
                 </div>
               ))}
-            </div>
-            
-            <div className={cn(
-              "pt-10 transition-all duration-1000 delay-700",
-              isAgitationVisible ? "opacity-100" : "opacity-0"
-            )}>
-              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary/40 italic">A omissão é a forma mais rápida de falência digital.</p>
             </div>
           </div>
         </section>
