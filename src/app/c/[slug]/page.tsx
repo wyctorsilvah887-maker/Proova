@@ -397,7 +397,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
               <DialogTitle className="text-xl sm:text-2xl font-black font-headline tracking-tight uppercase">Quase lá!</DialogTitle>
               <DialogDescription className="text-xs sm:text-sm font-medium leading-relaxed">
                 Para facilitar, vamos copiar seu depoimento agora. <br />
-                Ao chegar no Google, basta <strong>colar</strong> o texto na caixa de comentários e selecionar as <strong>5 estrelas</strong>.
+                Ao chegar no Google, basta <strong>colar</strong> o texto na caixa de comentários e selecionar as <strong>{rating} {rating === 1 ? 'estrela' : 'estrelas'}</strong>.
               </DialogDescription>
             </DialogHeader>
             <div className="px-6 sm:px-8 pb-8">
@@ -473,7 +473,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
                         <div className="relative aspect-video rounded-2xl overflow-hidden bg-black shadow-lg">
                           <video src={recordedVideoUrl} className="w-full h-full object-cover" muted autoPlay loop playsInline />
                           <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-full border border-white/10">
-                            <p className="text-[7px] text-white font-black uppercase tracking-widest flex items-center gap-1">
+                            <p className="text-[7px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
                               <Play className="w-2 h-2 fill-white" /> Video Review
                             </p>
                           </div>
