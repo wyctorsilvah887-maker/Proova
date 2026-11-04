@@ -165,9 +165,8 @@ export default function Home() {
                 "text-3xl font-black tracking-tighter sm:text-5xl md:text-6xl font-headline leading-[1.05] transition-all duration-1000",
                 isHeroVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
               )}>
-                Sua empresa é <span className="relative inline-block text-primary italic overflow-hidden px-1 rounded-sm">
+                Sua empresa é <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] animate-text-shine italic">
                   INVISÍVEL
-                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/60 to-transparent -translate-x-full animate-shine pointer-events-none" />
                 </span>. <br className="hidden sm:block" /> E isso custa uma fortuna.
               </h1>
               
@@ -396,7 +395,7 @@ export default function Home() {
                   Vai aceitar ser a <span className="text-primary italic">Segunda Opção</span>?
                 </h2>
                 <p className="max-w-lg mx-auto text-base md:text-2xl font-medium text-white/80 animate-in fade-in duration-1000 delay-300">
-                  A cada minuto sem Prova Social, um cliente desiste de você. Retome o controle agora.
+                  A cada minute sem Prova Social, um cliente desiste de você. Retome o controle agora.
                 </p>
               </div>
               <div className="flex flex-col items-center gap-5 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-500">

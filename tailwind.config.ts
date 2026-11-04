@@ -11,7 +11,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['Inter', 'sans-serif'],
-        headline: ['Inter', 'sans-serif'], // Alterado de Space Grotesk para Inter para ter pontos redondos
+        headline: ['Inter', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
@@ -74,6 +74,10 @@ export default {
         'shine': {
           '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(100%)' },
+        },
+        'text-shine': {
+          '0%': { 'background-position': '-200% center' },
+          '100%': { 'background-position': '200% center' },
         }
       },
       animation: {
@@ -82,6 +86,7 @@ export default {
         'ripple': 'ripple 2s cubic-bezier(0, 0, 0.2, 1) infinite',
         'marquee': 'marquee 12s linear infinite',
         'shine': 'shine 2s infinite linear',
+        'text-shine': 'text-shine 3s linear infinite',
       },
     },
   },
