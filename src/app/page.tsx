@@ -129,7 +129,7 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
       <header className="px-4 lg:px-8 h-20 flex items-center justify-between border-b sticky top-0 bg-background/80 backdrop-blur-md z-[100]">
-        <div className="flex items-center relative w-[160px] h-[45px] md:w-[220px] md:h-[65px]">
+        <div className="flex items-center relative w-[160px] h-[45px] md:w-[220px] md:h-[220px]">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="dark:hidden object-contain" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="hidden dark:block object-contain" priority />
         </div>
@@ -155,17 +155,17 @@ export default function Home() {
           <div className="container relative z-10 px-4 mx-auto">
             <div className="max-w-4xl mx-auto text-center space-y-6">
               <div className={cn(
-                "inline-flex items-center rounded-full bg-primary text-white px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] shadow-xl transition-all duration-1000",
+                "inline-flex items-center rounded-full text-primary border border-primary/20 px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-1000",
                 isHeroVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
               )}>
-                <ShieldAlert className="w-3.5 h-3.5 mr-2 animate-pulse" /> Atenção: Sua invisibilidade drena seu lucro
+                <ShieldAlert className="w-3.5 h-3.5 mr-2 animate-pulse" /> Sua invisibilidade drena seu lucro
               </div>
               
               <h1 className={cn(
                 "text-3xl font-black tracking-tighter sm:text-5xl md:text-6xl font-headline leading-[1.05] transition-all duration-1000",
                 isHeroVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
               )}>
-                Sua empresa é <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] animate-text-shine italic">
+                Sua empresa é <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary via-white/80 via-primary to-primary bg-[length:200%_auto] animate-text-shine italic">
                   INVISÍVEL
                 </span>. <br className="hidden sm:block" /> E isso custa uma fortuna.
               </h1>
