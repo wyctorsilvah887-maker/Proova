@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, Shield, ArrowLeft, Globe, X, Camera, Square, RefreshCcw, SwitchCamera, Play, Clock } from 'lucide-react';
+import { Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, Shield, ArrowLeft, Globe, X, Camera, Square, RefreshCcw, SwitchCamera, Play, Clock, Copy, ExternalLink } from 'lucide-react';
 import { useFirestore, useStorage } from '@/firebase';
 import { collection, query, where, getDocs, limit, doc, updateDoc, increment } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -13,7 +13,7 @@ import { toast } from '@/hooks/use-toast';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
 import { submitTestimonialAction } from '@/app/actions/testimonial-actions';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 
 export default function CollectionPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug: rawSlug } = use(params);
@@ -35,6 +35,9 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
   const [membershipStatus, setMembershipStatus] = useState<string | null>(null);
   const [finalDest, setFinalDest] = useState<'public' | 'private' | null>(null);
   
+  // Google Redirect Dialog State
+  const [isGoogleRedirectDialogOpen, setIsGoogleRedirectDialogOpen] = useState(false);
+
   // Video Recording State
   const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
@@ -208,17 +211,29 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     startCamera();
   };
 
-  const handleGoogleRedirect = (url: string) => {
-    if (!url) return;
+  const handleFinalGoogleRedirect = () => {
+    if (!googleMapsUrl) return;
+
+    // 1. Copiar texto para o clipboard
+    if (text.trim()) {
+      navigator.clipboard.writeText(text.trim());
+      toast({ title: "Copiado!", description: "Seu depoimento está na área de transferência." });
+    }
+
+    // 2. Incrementar contador no Firestore
     if (db && targetUserId) {
       const userRef = doc(db, 'users', targetUserId);
       updateDoc(userRef, { googleRedirectCount: increment(1) }).catch(err => console.error(err));
     }
-    let finalUrl = url.trim();
+
+    // 3. Preparar URL e Redirecionar
+    let finalUrl = googleMapsUrl.trim();
     const utmParams = 'utm_source=proova&utm_medium=testimonial_success&utm_campaign=google_maps_boost';
     finalUrl += finalUrl.includes('?') ? `&${utmParams}` : `?${utmParams}`;
     const secureUrl = finalUrl.startsWith('http') ? finalUrl : `https://${finalUrl}`;
+    
     window.open(secureUrl, '_blank');
+    setIsGoogleRedirectDialogOpen(false);
   };
 
   const handleResetForm = () => {
@@ -360,7 +375,7 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
             {googleMapsUrl && (finalDest === 'public' || videoBlob) && rating >= 4 && (
               <div className="pt-6 border-t space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <p className="text-xs font-bold text-muted-foreground">Que tal nos ajudar ainda mais?</p>
-                <Button onClick={() => handleGoogleRedirect(googleMapsUrl)} className="w-full h-14 rounded-xl gap-3 text-sm font-bold bg-[#4285F4] hover:bg-[#357ae8]">
+                <Button onClick={() => setIsGoogleRedirectDialogOpen(true)} className="w-full h-14 rounded-xl gap-3 text-sm font-bold bg-[#4285F4] hover:bg-[#357ae8]">
                   <MapPin className="w-5 h-5" /> Avaliar também no Google
                 </Button>
                 <p className="text-[9px] opacity-60">Sua nota ajuda nossa empresa a brilhar nas buscas!</p>
@@ -370,6 +385,36 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
             <Button variant="ghost" onClick={handleResetForm} className="text-xs">Enviar outro depoimento</Button>
           </CardContent>
         </Card>
+
+        {/* Google Redirect Instruction Dialog */}
+        <Dialog open={isGoogleRedirectDialogOpen} onOpenChange={setIsGoogleRedirectDialogOpen}>
+          <DialogContent className="rounded-[2rem] sm:max-w-md border-none shadow-2xl overflow-hidden bg-background">
+            <div className="h-2 bg-[#4285F4] w-full" />
+            <DialogHeader className="p-8 pb-4 text-center">
+              <div className="mx-auto bg-blue-50 dark:bg-blue-900/30 p-4 rounded-full w-fit mb-4">
+                <Globe className="w-10 h-10 text-[#4285F4]" />
+              </div>
+              <DialogTitle className="text-2xl font-black font-headline tracking-tight uppercase">Quase lá!</DialogTitle>
+              <DialogDescription className="text-sm font-medium leading-relaxed">
+                Para facilitar, vamos copiar seu depoimento agora. <br />
+                Ao chegar no Google, basta <strong>colar</strong> o texto na caixa de comentários e selecionar as <strong>5 estrelas</strong>.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="px-8 pb-8">
+              <Button 
+                onClick={handleFinalGoogleRedirect} 
+                className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-xl bg-[#4285F4] hover:bg-[#357ae8] text-white gap-2 transition-all active:scale-95"
+              >
+                Confirmar e Abrir Google <ArrowLeft className="w-4 h-4 rotate-180" />
+              </Button>
+            </div>
+            <DialogFooter className="p-4 bg-muted/30 border-t text-center flex justify-center">
+              <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-60 flex items-center gap-2">
+                <CheckCircle2 className="w-3 h-3 text-green-500" /> Seu feedback ajuda nossa reputação local
+              </p>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     );
   }
@@ -633,3 +678,4 @@ export default function CollectionPage({ params }: { params: Promise<{ slug: str
     </div>
   );
 }
+
