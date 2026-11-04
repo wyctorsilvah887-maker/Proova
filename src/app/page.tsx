@@ -278,10 +278,11 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
               isSkull: true 
             },
             { 
-              icon: ShieldAlert, 
+              icon: X, 
               title: "Serviços: O Medo do Pix", 
               desc: "Prestadores sem depoimentos parecem amadores. O cliente entra, sente insegurança e fecha com a agência que 'parece' mais oficial. O medo dele é o seu prejuízo.", 
-              animate: true 
+              animate: true,
+              color: "text-red-600" 
             },
             { 
               icon: TrendingDown, 
@@ -299,7 +300,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
                   className={cn(
                     "w-12 h-12", 
                     item.animate && "animate-pulse",
-                    !item.isSkull && "text-primary"
+                    !item.isSkull && (item.color || "text-primary")
                   )} 
                   style={item.isSkull ? { stroke: "url(#skull-bleeding-gradient)", strokeWidth: 2.5 } : {}}
                 />
