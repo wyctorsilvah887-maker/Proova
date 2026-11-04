@@ -1,21 +1,26 @@
+
 'use client';
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, ShieldCheck, Lock, Eye, FileText, Database, ShieldAlert, Gavel } from 'lucide-react';
 import Image from 'next/image';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-muted/30 font-body text-foreground pb-20">
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-4 md:px-8 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
-        <Link href="/" className="flex items-center group -ml-2 md:-ml-4">
-          <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
-            <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
-            <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" priority />
-          </div>
-        </Link>
-        <div className="ml-auto">
+      <header className="bg-background border-b h-20 md:h-28 flex items-center px-4 md:px-8 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
+        <div className="flex items-center">
+          <Link href="/" className="flex items-center group -ml-2 md:-ml-4">
+            <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
+              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
+              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+            </div>
+          </Link>
+        </div>
+        <div className="ml-auto flex items-center gap-4">
+          <ThemeToggle />
           <Link href="/">
             <Button variant="ghost" className="text-xs font-bold uppercase tracking-widest gap-2">
               <ArrowLeft className="w-4 h-4" /> Voltar ao Início
@@ -24,7 +29,7 @@ export default function PrivacyPage() {
         </div>
       </header>
 
-      <main className="container max-w-5xl mx-auto px-6 py-12 space-y-12">
+      <main className="container max-w-5xl mx-auto px-6 pt-32 pb-12 space-y-12">
         <div className="text-center space-y-4">
           <div className="mx-auto bg-primary/10 p-5 rounded-full w-fit text-primary animate-in zoom-in duration-500">
             <Lock className="w-12 h-12" />
