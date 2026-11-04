@@ -167,7 +167,7 @@ export default function Home() {
               )}>
                 Sua empresa é <span className="relative inline-block text-primary italic overflow-hidden px-1 rounded-sm">
                   INVISÍVEL
-                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full animate-shine pointer-events-none" />
+                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/60 to-transparent -translate-x-full animate-shine pointer-events-none" />
                 </span>. <br className="hidden sm:block" /> E isso custa uma fortuna.
               </h1>
               

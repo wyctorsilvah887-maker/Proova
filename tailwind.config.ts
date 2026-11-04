@@ -70,6 +70,10 @@ export default {
         'marquee': {
           '0%': { transform: 'translateX(0%)' },
           '100%': { transform: 'translateX(-100%)' },
+        },
+        'shine': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
         }
       },
       animation: {
@@ -77,6 +81,7 @@ export default {
         'accordion-up': 'accordion-up 0.2s ease-out',
         'ripple': 'ripple 2s cubic-bezier(0, 0, 0.2, 1) infinite',
         'marquee': 'marquee 12s linear infinite',
+        'shine': 'shine 2s infinite linear',
       },
     },
   },
