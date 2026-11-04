@@ -326,14 +326,32 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
 AgitationSection.displayName = "AgitationSection";
 
 /**
- * Seção de Pilares (A Máquina de Domínio)
+ * Seção de Pilares (A Máquina de Domínio) - Redesign Step-by-Step
  */
 const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
+  const steps = [
+    { 
+      number: '01', 
+      title: 'G-Boost: Domínio Local', 
+      desc: 'Inundamos seu perfil com avaliações 5 estrelas reais. Force o algoritmo do Google a aumentar sua chances de aparecer no topo e roubar os cliques da concorrência.' 
+    },
+    { 
+      number: '02', 
+      title: 'Blindagem de Marca', 
+      desc: 'Nosso Reputation Shield intercepta o ódio antes dele virar público. Resolva crises no Inbox Privado e mantenha sua imagem impecável perante o mercado.' 
+    },
+    { 
+      number: '03', 
+      title: 'Vitrines Magnéticas', 
+      desc: 'Widgets hipnóticos que aniquilam dúvidas em segundos. Prove que você é a única escolha segura através de murais e carrosséis com design de alto nível.' 
+    }
+  ];
+
   return (
     <section id="maquina-de-dominio" ref={ref} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
       <div className="container px-4 mx-auto">
         <div className={cn(
-          "text-center space-y-4 mb-20 transition-all duration-1000",
+          "text-center space-y-4 mb-24 transition-all duration-1000",
           isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-100"
         )}>
           <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">A Máquina de Domínio</h2>
@@ -348,45 +366,40 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
           <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Tecnologias de elite integradas para aniquilar objeções e forçar a conversão imediata.</p>
         </div>
         
-        <div className="grid gap-10 lg:grid-cols-3 max-w-6xl mx-auto">
-          {[
-            { icon: MapPin, color: 'text-primary', bg: 'bg-primary/10', border: 'border-primary/20', title: 'G-Boost: Domínio Local', desc: 'Inundamos seu perfil com avaliações 5 estrelas reais. Force o algoritmo do Google a aumentar sua chances de aparecer no topo e roubar os cliques da concorrência.', from: 'slide-in-from-left-20' },
-            { icon: ShieldHalf, color: 'text-emerald-500', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20', title: 'Blindagem de Marca', desc: 'Nosso Reputation Shield intercepta o ódio antes dele virar público. Resolva crises no Inbox Privado e mantenha sua imagem impecável perante o mercado.', from: 'slide-in-from-bottom-20' },
-            { icon: MousePointerClick, color: 'text-blue-500', bg: 'bg-blue-500/10', border: 'border-blue-500/20', title: 'Vitrines Magnéticas', desc: 'Widgets hipnóticos que aniquilam dúvidas em segundos. Prove que você é a única escolha segura através de murais e carrosséis com design de alto nível.', from: 'slide-in-from-right-20' }
-          ].map((pill, idx) => (
-            <Card key={idx} className={cn(
-              "group relative p-8 md:p-10 rounded-[2.5rem] border-2 bg-card transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] dark:hover:shadow-[0_30px_60px_-15px_rgba(249,115,22,0.1)]",
-              pill.border,
-              isVisible ? `animate-in fade-in ${pill.from} duration-1000 opacity-100` : "opacity-100"
-            )} style={{ transitionDelay: `${(idx + 1) * 150}ms` }}>
-              <div className="space-y-6 relative z-10">
-                <div className={cn(
-                  "w-16 h-16 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-sm",
-                  pill.bg, pill.color
-                )}>
-                  <pill.icon className="w-8 h-8" />
-                </div>
-                
-                <div className="space-y-3">
-                  <h4 className="text-2xl font-black font-headline tracking-tight">{pill.title}</h4>
-                  <p className="text-muted-foreground text-sm leading-relaxed font-medium">
-                    {pill.desc}
-                  </p>
+        <div className="max-w-4xl mx-auto relative px-4 md:px-0">
+          {/* Vertical Connecting Line */}
+          <div className="absolute left-[26px] md:left-[45px] top-10 bottom-10 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-transparent hidden sm:block" />
+
+          <div className="space-y-16 md:space-y-24">
+            {steps.map((step, idx) => (
+              <div 
+                key={idx} 
+                className={cn(
+                  "flex items-start gap-6 md:gap-16 relative transition-all duration-1000",
+                  isVisible ? "animate-in fade-in slide-in-from-bottom-20 opacity-100" : "opacity-100"
+                )}
+                style={{ transitionDelay: `${(idx + 1) * 200}ms` }}
+              >
+                {/* Step Number with Dot */}
+                <div className="flex flex-col items-center shrink-0">
+                  <div className="text-3xl md:text-5xl font-black font-headline text-foreground/20 group-hover:text-primary transition-colors duration-500 mb-2">
+                    {step.number}
+                  </div>
+                  <div className="w-3 h-3 rounded-full bg-primary ring-4 ring-primary/20 z-10" />
                 </div>
 
-                <div className="pt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                   <span className={cn("text-[9px] font-black uppercase tracking-widest flex items-center gap-2", pill.color)}>
-                     Ativar Tecnologia <ArrowRight className="w-3 h-3" />
-                   </span>
+                {/* Content */}
+                <div className="space-y-3 pt-1 md:pt-2">
+                  <h4 className="text-2xl md:text-4xl font-black font-headline tracking-tight text-foreground">
+                    {step.title}
+                  </h4>
+                  <p className="text-muted-foreground text-sm md:text-xl leading-relaxed font-medium max-w-2xl">
+                    {step.desc}
+                  </p>
                 </div>
               </div>
-              
-              <div className={cn(
-                "absolute -bottom-2 -right-2 w-24 h-24 blur-3xl opacity-0 group-hover:opacity-20 transition-opacity duration-500 rounded-full",
-                pill.bg
-              )} />
-            </Card>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>
