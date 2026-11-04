@@ -45,7 +45,9 @@ import { cn } from "@/lib/utils";
 
 // --- SUB-COMPONENTS ---
 
-// CÓDIGO DO CABEÇALHO E MENU LATERAL
+/**
+ * Componente de Navegação Superior e Menu Mobile
+ */
 const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: any) => {
   return (
     <header className={cn(
@@ -152,7 +154,9 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
   );
 };
 
-// CÓDIGO DA SESSÃO HERO
+/**
+ * Seção Principal (Hero)
+ */
 const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
   return (
     <section className="relative w-full pb-12 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh] pt-32">
@@ -212,7 +216,9 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
   );
 };
 
-// CÓDIGO DA SESSÃO "O CUSTO DO SILÊNCIO"
+/**
+ * Seção de Agitação (O Custo do Silêncio)
+ */
 const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   return (
     <section id="ocusto-do-silencio" ref={ref} className="w-full py-24 bg-muted/30 dark:bg-zinc-950 text-foreground dark:text-white overflow-hidden relative border-y border-border/50 dark:border-zinc-900/30 min-h-[400px]">
@@ -270,7 +276,9 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
 });
 AgitationSection.displayName = "AgitationSection";
 
-// CÓDIGO DA SESSÃO "MÁQUINA DE DOMÍNIO"
+/**
+ * Seção de Pilares (A Máquina de Domínio)
+ */
 const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   return (
     <section id="maquina-de-dominio" ref={ref} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
@@ -330,7 +338,9 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 });
 PillarsSection.displayName = "PillarsSection";
 
-// CÓDIGO DA SESSÃO "SETORES ATENDIDOS"
+/**
+ * Seção de Versatilidade (Setores Atendidos)
+ */
 const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   return (
     <section id="setores-atendidos" ref={ref} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
@@ -394,7 +404,9 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
 });
 VersatilitySection.displayName = "VersatilitySection";
 
-// CÓDIGO DA SESSÃO DE CHAMADA FINAL (CTA)
+/**
+ * Seção de Chamada Final (CTA)
+ */
 const CTASection = () => {
   const ctaBg = PlaceHolderImages.find(img => img.id === 'cta-bg-photo');
   return (
@@ -430,7 +442,9 @@ const CTASection = () => {
   );
 };
 
-// CÓDIGO DO RODAPÉ
+/**
+ * Rodapé Institucional
+ */
 const Footer = () => {
   return (
     <footer className="py-20 border-t bg-background">
@@ -484,8 +498,8 @@ export default function Home() {
     const heroTimer = setTimeout(() => setIsHeroVisible(true), 100);
 
     const observerOptions = { 
-      threshold: 0.1,
-      rootMargin: "0px"
+      threshold: 0,
+      rootMargin: "0px 0px -10% 0px"
     };
 
     const observer = new IntersectionObserver((entries) => {
