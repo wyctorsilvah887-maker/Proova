@@ -154,12 +154,10 @@ export default function Home() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
-      // Pequeno atraso para permitir que o menu feche sem interferir no scroll
       setTimeout(() => {
-        const yOffset = -20; // Pequeno offset para não colar no topo
+        const yOffset = -100; // Offset ajustado para considerar o cabeçalho sticky
         const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
         window.scrollTo({ top: y, behavior: 'smooth' });
-        // Atualiza a URL sem causar recarregamento
         window.history.pushState(null, '', `#${id}`);
       }, 300);
     }
@@ -168,9 +166,9 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
       <header className={cn(
-        "px-4 lg:px-8 h-20 flex items-center justify-between absolute top-0 w-full z-[100] transition-all duration-300",
+        "px-4 lg:px-8 h-20 flex items-center justify-between sticky top-0 w-full z-[100] transition-all duration-300",
         (isScrolled || isMenuOpen)
-          ? "bg-background/80 backdrop-blur-md border-b" 
+          ? "bg-background/95 backdrop-blur-md border-b shadow-sm" 
           : "bg-transparent border-b-transparent"
       )}>
         <div className="flex items-center relative w-[250px] h-[80px] md:w-[430px] md:h-[150px]">
@@ -250,7 +248,7 @@ export default function Home() {
       </header>
 
       <main className="flex-1">
-        <section className="relative w-full pt-48 pb-12 md:pt-60 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh]">
+        <section className="relative w-full pt-24 pb-12 md:pt-40 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh]">
           <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
             <div className="absolute top-[15%] left-[8%] animate-float opacity-35 text-primary">
               <MessageSquareQuote className="w-16 h-16 md:w-24 md:h-24" />

@@ -248,7 +248,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string 
   return (
     <div className="min-h-screen bg-background font-body flex flex-col relative overflow-x-hidden text-foreground">
       {!isStandalone && (
-        <nav className="h-16 border-b flex items-center px-6 justify-between bg-background/50 backdrop-blur-md sticky top-0 z-50">
+        <nav className="h-16 border-b flex items-center px-6 justify-between bg-background/95 backdrop-blur-md sticky top-0 z-[60] shadow-sm">
           <div className="flex items-center gap-3">
             {showProovaBranding && (
               <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">PROOVA</span>
