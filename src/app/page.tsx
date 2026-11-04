@@ -34,10 +34,10 @@ import {
   Sheet, 
   SheetContent, 
   SheetTrigger, 
-  SheetClose,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription
+  SheetClose, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetDescription 
 } from "@/components/ui/sheet";
 import { useUser, useFirestore } from "@/firebase";
 import { doc, setDoc, increment } from "firebase/firestore";
@@ -253,8 +253,8 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
           </linearGradient>
           <linearGradient id="agency-fraud-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="white" />
-            <stop offset="25%" stopColor="#22c55e" /> {/* Green */}
-            <stop offset="60%" stopColor="#ef4444" /> {/* Red - Pushed up further to cover more area */}
+            <stop offset="15%" stopColor="#22c55e" /> {/* Green - reduced space */}
+            <stop offset="40%" stopColor="#ef4444" /> {/* Red - Pushed up significantly to dominate */}
             <stop offset="100%" stopColor="#b91c1c" /> {/* Dark Red */}
           </linearGradient>
         </defs>
