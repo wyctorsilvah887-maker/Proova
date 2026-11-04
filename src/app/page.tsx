@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useRef, forwardRef } from "react";
@@ -56,11 +57,30 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
         ? "bg-background/95 backdrop-blur-md border-b shadow-sm" 
         : "bg-transparent border-b-transparent"
     )}>
-      <div className="flex items-center relative w-[250px] h-[80px] md:w-[430px] md:h-[150px]">
-        <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="dark:hidden object-contain" priority />
-        <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="hidden dark:block object-contain" priority />
+      {/* Logotipo na Extrema Esquerda */}
+      <div className="flex items-center">
+        <Link href="/" className="flex items-center group -ml-2 md:-ml-4">
+          <div className="relative w-[180px] h-[60px] md:w-[280px] md:h-[90px] transition-transform group-hover:scale-105">
+            <Image 
+              src="/Logotipo%20PROOVA%20white%20mode%201.png" 
+              alt="Logo" 
+              fill 
+              className="dark:hidden object-contain object-left" 
+              priority 
+            />
+            <Image 
+              src="/Logotipo%20PROOVA%20dark%20mode%201.png" 
+              alt="Logo" 
+              fill 
+              className="hidden dark:block object-contain object-left" 
+              priority 
+            />
+          </div>
+        </Link>
       </div>
+
       <div className="flex items-center gap-2 md:gap-6">
+        {/* Alternador de Tema movido para a direita */}
         <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" />
         
         <div className="hidden sm:flex items-center gap-6">
