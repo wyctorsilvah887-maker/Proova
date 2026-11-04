@@ -26,7 +26,8 @@ import {
   Menu,
   X,
   MessageSquareQuote,
-  Check
+  Check,
+  Target
 } from "lucide-react";
 import { 
   Sheet, 
@@ -44,6 +45,7 @@ import { cn } from "@/lib/utils";
 
 // --- SUB-COMPONENTS ---
 
+// CÓDIGO DO CABEÇALHO E MENU LATERAL
 const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: any) => {
   return (
     <header className={cn(
@@ -150,9 +152,10 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
   );
 };
 
+// CÓDIGO DA SESSÃO HERO
 const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
   return (
-    <section className="relative w-full pb-12 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh]">
+    <section className="relative w-full pb-12 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh] pt-32">
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[15%] left-[8%] animate-float opacity-35 text-primary">
           <MessageSquareQuote className="w-16 h-16 md:w-24 md:h-24" />
@@ -169,7 +172,7 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
       </div>
       
       <div className="container relative z-10 px-4 mx-auto">
-        <div className="max-w-4xl mx-auto text-center space-y-6 pt-12">
+        <div className="max-w-4xl mx-auto text-center space-y-6">
           <div className={cn(
             "inline-flex items-center text-primary px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-1000",
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
@@ -209,6 +212,7 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
   );
 };
 
+// CÓDIGO DA SESSÃO "O CUSTO DO SILÊNCIO"
 const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   return (
     <section id="ocusto-do-silencio" ref={ref} className="w-full py-24 bg-muted/30 dark:bg-zinc-950 text-foreground dark:text-white overflow-hidden relative border-y border-border/50 dark:border-zinc-900/30 min-h-[400px]">
@@ -266,6 +270,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
 });
 AgitationSection.displayName = "AgitationSection";
 
+// CÓDIGO DA SESSÃO "MÁQUINA DE DOMÍNIO"
 const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   return (
     <section id="maquina-de-dominio" ref={ref} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
@@ -325,6 +330,7 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 });
 PillarsSection.displayName = "PillarsSection";
 
+// CÓDIGO DA SESSÃO "SETORES ATENDIDOS"
 const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   return (
     <section id="setores-atendidos" ref={ref} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
@@ -388,6 +394,7 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
 });
 VersatilitySection.displayName = "VersatilitySection";
 
+// CÓDIGO DA SESSÃO DE CHAMADA FINAL (CTA)
 const CTASection = () => {
   const ctaBg = PlaceHolderImages.find(img => img.id === 'cta-bg-photo');
   return (
@@ -423,6 +430,7 @@ const CTASection = () => {
   );
 };
 
+// CÓDIGO DO RODAPÉ
 const Footer = () => {
   return (
     <footer className="py-20 border-t bg-background">
@@ -555,7 +563,7 @@ export default function Home() {
         scrollToSection={scrollToSection} 
       />
 
-      <main className="flex-1 pt-24 md:pt-32">
+      <main className="flex-1">
         <HeroSection isVisible={isHeroVisible} />
         
         <AgitationSection 
