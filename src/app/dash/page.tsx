@@ -920,8 +920,14 @@ export default function DashPage() {
           </div>
           <div className="w-full sm:w-48">
             <Select value={period} onValueChange={(val: any) => setPeriod(val)}>
-              <SelectTrigger className="h-11 rounded-xl bg-background border-primary/20 text-[11px] font-bold uppercase tracking-wider focus:ring-primary/20"><SelectValue placeholder="Período" /></SelectTrigger>
-              <SelectContent align="end" className="rounded-xl"><SelectItem value="7" className="text-xs font-medium">Últimos 7 dias</SelectItem><SelectItem value="30" className="text-xs font-medium">Últimos 30 dias</SelectItem><SelectItem value="all" className="text-xs font-medium">Todo o período</SelectItem></SelectContent>
+              <SelectTrigger className="h-11 rounded-xl bg-background border-primary/20 text-[11px] font-bold uppercase tracking-wider focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
+                <SelectValue placeholder="Período" />
+              </SelectTrigger>
+              <SelectContent align="end" className="rounded-xl">
+                <SelectItem value="7" className="text-xs font-medium">Últimos 7 dias</SelectItem>
+                <SelectItem value="30" className="text-xs font-medium">Últimos 30 dias</SelectItem>
+                <SelectItem value="all" className="text-xs font-medium">Todo o período</SelectItem>
+              </SelectContent>
             </Select>
           </div>
         </header>
@@ -935,7 +941,7 @@ export default function DashPage() {
               <div className="space-y-0.5">
                 <CardTitle className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Resumo {period !== 'all' ? `(${period}d)` : ''}</CardTitle>
               </div>
-              <div className="flex items-center gap-1.5 text-primary">
+              <div className="flex items-center gap-1.5 text-primary select-none">
                 <span className="text-[10px] font-black uppercase tracking-widest">Ver Métricas</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </div>

@@ -262,7 +262,7 @@ export default function MetricsPage() {
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
-                <span>Upgrade</span>
+                <span>Planos de Upgrade</span>
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => router.push('/pricing')} 
@@ -311,7 +311,7 @@ export default function MetricsPage() {
           <div className="flex flex-col items-end gap-3 w-full sm:w-auto">
             <div className="w-full sm:w-48">
               <Select value={period} onValueChange={(val: any) => setPeriod(val)}>
-                <SelectTrigger className="h-11 rounded-xl bg-background border-primary/20 text-[11px] font-bold uppercase tracking-wider focus:ring-primary/20">
+                <SelectTrigger className="h-11 rounded-xl bg-background border-primary/20 text-[11px] font-bold uppercase tracking-wider focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
                   <SelectValue placeholder="Período" />
                 </SelectTrigger>
                 <SelectContent align="end" className="rounded-xl">
