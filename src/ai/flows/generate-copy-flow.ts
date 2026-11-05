@@ -4,7 +4,7 @@
  * @fileOverview Flow para geração de copy persuasiva via Gemini no Vertex AI.
  */
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'kit';
 
 const CopyInputSchema = z.object({
   type: z.string().describe('Tipo do campo: hero_title, hero_subtitle, section_title, section_content'),
