@@ -45,7 +45,6 @@ import { doc, collection, query, orderBy, deleteDoc, updateDoc, getDocs, limit, 
 import Link from 'next/link';
 import { signOut } from 'firebase/auth';
 import { toast } from '@/hooks/use-toast';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
 
@@ -201,7 +200,6 @@ export default function PrivateInboxPage() {
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
@@ -320,14 +318,14 @@ export default function PrivateInboxPage() {
                 </div>
                 {pendingTestimonials.map((t: any) => (
                   <Card key={t.id} className="border-none shadow-sm overflow-hidden rounded-2xl group transition-all hover:shadow-md">
-                    <CardContent className="p-5 sm:p-6 flex flex-col md:flex-row gap-6">
+                    <CardContent className="p-4 sm:p-6 flex flex-col md:flex-row gap-6">
                       <div className="flex-1 space-y-4">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                           <div className="flex items-center gap-3">
                             <div className="bg-primary/5 p-2.5 rounded-xl"><User className="w-4 h-4 text-primary" /></div>
-                            <div className="flex flex-col">
-                              <span className="font-bold text-sm">{t.userName}</span>
-                              <span className="text-[10px] text-muted-foreground flex items-center gap-1"><Mail className="w-3 h-3" /> {t.userEmail || 'Não informado'}</span>
+                            <div className="flex flex-col min-w-0">
+                              <span className="font-bold text-sm truncate">{t.userName}</span>
+                              <span className="text-[10px] text-muted-foreground flex items-center gap-1 truncate"><Mail className="w-3 h-3 shrink-0" /> {t.userEmail || 'Não informado'}</span>
                             </div>
                           </div>
                           <div className="flex gap-0.5">{Array.from({ length: 5 }).map((_, i) => (<Star key={i} className={cn("w-3.5 h-3.5", i < (t.rating || 5) ? "fill-primary text-primary" : "text-muted-foreground/20")} />))}</div>
@@ -337,21 +335,21 @@ export default function PrivateInboxPage() {
                         )}
                         <div className="flex items-center gap-4 text-[10px] text-muted-foreground font-bold uppercase tracking-widest"><span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleString('pt-BR') : 'Hoje'}</span></div>
                       </div>
-                      <div className="flex md:flex-col items-center justify-end gap-2 shrink-0">
+                      <div className="flex flex-row md:flex-col items-center justify-center gap-2 shrink-0 w-full md:w-auto">
                         <Button 
-                          className="w-full md:w-32 h-12 rounded-xl font-bold gap-2 shadow-lg"
+                          className="flex-1 md:w-32 h-12 rounded-xl font-bold gap-2 shadow-lg"
                           disabled={!!isProcessing}
                           onClick={() => handleApproveTestimonial(t.id)}
                         >
-                          {isProcessing === t.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />} Publicar
+                          {isProcessing === t.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />} <span className="md:inline">Publicar</span>
                         </Button>
                         <Button 
                           variant="outline"
-                          className="w-full md:w-32 h-12 rounded-xl font-bold gap-2"
+                          className="flex-1 md:w-32 h-12 rounded-xl font-bold gap-2"
                           disabled={!!isProcessing}
                           onClick={() => handleArchiveTestimonial(t.id)}
                         >
-                          <EyeOff className="w-4 h-4" /> Ocultar
+                          <EyeOff className="w-4 h-4" /> <span className="md:inline">Ocultar</span>
                         </Button>
                       </div>
                     </CardContent>
@@ -375,14 +373,14 @@ export default function PrivateInboxPage() {
             ) : privateFeedbacks && privateFeedbacks.length > 0 ? (
               privateFeedbacks.map((f: any) => (
                 <Card key={f.id} className="border-none shadow-sm overflow-hidden rounded-2xl group transition-all hover:shadow-md">
-                  <CardContent className="p-5 sm:p-6 flex flex-col md:flex-row gap-6">
+                  <CardContent className="p-4 sm:p-6 flex flex-col md:flex-row gap-6">
                     <div className="flex-1 space-y-4">
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="flex items-center gap-3">
                           <div className="bg-primary/5 p-2.5 rounded-xl"><User className="w-4 h-4 text-primary" /></div>
-                          <div className="flex flex-col">
-                            <span className="font-bold text-sm">{f.userName}</span>
-                            <span className="text-[10px] text-muted-foreground flex items-center gap-1"><Mail className="w-3 h-3" /> {f.userEmail || 'Não informado'}</span>
+                          <div className="flex flex-col min-w-0">
+                            <span className="font-bold text-sm truncate">{f.userName}</span>
+                            <span className="text-[10px] text-muted-foreground flex items-center gap-1 truncate"><Mail className="w-3 h-3 shrink-0" /> {f.userEmail || 'Não informado'}</span>
                           </div>
                         </div>
                         <div className="flex gap-0.5">{Array.from({ length: 5 }).map((_, i) => (<Star key={i} className={cn("w-3.5 h-3.5", i < f.rating ? "fill-orange-400 text-orange-400" : "text-muted-foreground/20")} />))}</div>
