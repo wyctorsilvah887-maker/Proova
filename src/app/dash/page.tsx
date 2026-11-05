@@ -113,7 +113,7 @@ import { cn } from '@/lib/utils';
 import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-actions';
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { optimizeCard } from '@/ai/flows/optimize-card-flow';
+import { optimizeCard, type OptimizeCardOutput } from '@/ai/flows/optimize-card-flow';
 import { generateCardBackground } from '@/ai/flows/generate-card-bg-flow';
 
 interface AuditItem {
@@ -153,7 +153,7 @@ export default function DashPage() {
   const [isExportingCard, setIsExportingCard] = useState(false);
   const [cardVariant, setCardVariant] = useState<'dark' | 'orange' | 'ai'>('dark');
   const [isAIProcessing, setIsAIProcessing] = useState(false);
-  const [aiRefinedText, setAiRefinedText] = useState('');
+  const [aiData, setAiData] = useState<OptimizeCardOutput | null>(null);
   const [aiBgUrl, setAiBgUrl] = useState('');
   
   const shareCardRef = useRef<HTMLDivElement>(null);
@@ -393,7 +393,7 @@ export default function DashPage() {
         googlePlaceId: place.place_id,
         googleMapsUrl: reviewLink,
         city: city || userData?.city || '',
-        state: state || userData?.state || ''
+        state: userData?.state || ''
       });
       toast({ title: "Empresa Vinculada!", description: "Seu G-Boost está ativo." });
       setIsGoogleMapsDialogOpen(false);
@@ -409,7 +409,7 @@ export default function DashPage() {
     if (!db || !user || !city || !state) return;
     setIsUpdatingUrl(true);
     try {
-      await updateDoc(db, 'users', user.uid, { city, state });
+      await updateDoc(doc(db, 'users', user.uid), { city, state });
       toast({ title: "Localização Salva" });
       setIsGoogleMapsDialogOpen(false); 
       setSearchQuery('');
@@ -694,20 +694,20 @@ export default function DashPage() {
     try {
       toast({ title: "🧠 Inteligência Proova Iniciada", description: "Otimizando para Story e gerando arte 9:16..." });
       
-      const { refinedText, bgPrompt } = await optimizeCard({
+      const storyData = await optimizeCard({
         text: selectedTestimonialForShare.text,
         businessType: userData?.businessType
       });
       
-      setAiRefinedText(refinedText);
+      setAiData(storyData);
 
-      const bgUrl = await generateCardBackground(bgPrompt);
+      const bgUrl = await generateCardBackground(storyData.bgPrompt);
       setAiBgUrl(bgUrl);
       
       toast({ title: "✨ Story Concluído!", description: "Sua arte vertical de elite está pronta." });
     } catch (err: any) {
       console.error(err);
-      toast({ variant: "destructive", title: "Erro na Mágica IA", description: "Não foi possível completar o design agora." });
+      toast({ variant: "destructive", title: "Erro na Mágica IA", description: err.message || "Não foi possível completar o design agora." });
       setCardVariant('dark');
     } finally {
       setIsAIProcessing(false);
@@ -717,7 +717,7 @@ export default function DashPage() {
   const openShareDialog = (testimonial: any) => {
     setSelectedTestimonialForShare(testimonial);
     setCardVariant('dark');
-    setAiRefinedText('');
+    setAiData(null);
     setAiBgUrl('');
     setIsShareDialogOpen(true);
   };
@@ -1338,7 +1338,7 @@ export default function DashPage() {
                        "text-[9px] sm:text-[11px] font-black uppercase tracking-[0.3em] drop-shadow-md",
                        cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white"
                      )}>
-                       {cardVariant === 'ai' ? 'AUTORIDADE REAL' : 'Veja o que falam sobre nós'}
+                       {cardVariant === 'ai' ? (aiData?.headline || 'AUTORIDADE REAL') : 'Veja o que falam sobre nós'}
                      </p>
                    </div>
 
@@ -1400,16 +1400,16 @@ export default function DashPage() {
                        
                        <p className={cn(
                          "font-black font-headline leading-snug sm:leading-tight italic drop-shadow-xl px-2 tracking-tight",
-                         cardVariant === 'ai' ? "text-3xl sm:text-5xl line-clamp-none uppercase" : "text-base sm:text-2xl line-clamp-6",
+                         cardVariant === 'ai' ? "text-2xl sm:text-4xl line-clamp-none uppercase" : "text-base sm:text-2xl line-clamp-6",
                          "text-white"
                        )}>
-                          "{cardVariant === 'ai' && aiRefinedText ? aiRefinedText : selectedTestimonialForShare?.text}"
+                          "{cardVariant === 'ai' && aiData ? aiData.bodyText : selectedTestimonialForShare?.text}"
                        </p>
 
                        {cardVariant === 'ai' && (
                          <div id="card-ai-badge" className="bg-primary/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-primary/30 animate-in fade-in zoom-in duration-500 mt-4">
                            <p className="text-[8px] sm:text-[10px] text-primary font-black uppercase tracking-widest flex items-center gap-2">
-                             <Sparkles className="w-3 h-3" /> IA Story Design
+                             <Sparkles className="w-3 h-3" /> {aiData?.tagline || 'IA Story Design'}
                            </p>
                          </div>
                        )}
@@ -1420,7 +1420,7 @@ export default function DashPage() {
                       <div className="flex flex-col items-center gap-2 sm:gap-3">
                         <div className="space-y-0.5 sm:space-y-1">
                           <p className="text-white font-black text-[10px] sm:text-sm uppercase tracking-[0.2em] drop-shadow-sm">
-                            {selectedTestimonialForShare?.userName}
+                            {cardVariant === 'ai' && aiData ? aiData.author : selectedTestimonialForShare?.userName}
                           </p>
                           <div className="bg-white/5 backdrop-blur-xl px-3 sm:px-4 py-1 sm:py-1.5 rounded-full border border-white/10 inline-flex items-center gap-2 shadow-sm">
                              <CheckCircle2 className={cn("w-2.5 h-2.5 sm:w-3 sm:h-3", cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white")} />
