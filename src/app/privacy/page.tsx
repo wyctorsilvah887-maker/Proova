@@ -21,7 +21,11 @@ export default function PrivacyPage() {
         <div className="ml-auto flex items-center gap-2 md:gap-4">
           <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" />
           <Link href="/">
-            <Button variant="ghost" size="sm" className="text-[10px] font-bold uppercase tracking-widest gap-1.5 h-8 px-2 text-muted-foreground hover:text-primary transition-colors">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-[10px] font-black uppercase tracking-widest gap-1.5 h-8 px-2 text-muted-foreground hover:text-primary hover:bg-transparent active:text-primary transition-all focus-visible:ring-0 shadow-none border-none"
+            >
               <ArrowLeft className="w-3 h-3" /> Voltar
             </Button>
           </Link>
