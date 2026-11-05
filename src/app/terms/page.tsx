@@ -1,4 +1,3 @@
-
 'use client';
 
 import Link from 'next/link';
@@ -20,7 +19,7 @@ export default function TermsPage() {
           </Link>
         </div>
         <div className="ml-auto flex items-center gap-4">
-          <ThemeToggle />
+          <ThemeToggle className="border-none bg-transparent shadow-none" />
           <Link href="/">
             <Button variant="ghost" className="text-xs font-bold uppercase tracking-widest gap-2">
               <ArrowLeft className="w-4 h-4" /> Voltar

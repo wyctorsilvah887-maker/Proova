@@ -14,6 +14,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useFirestore, useAuth, useUser } from "@/firebase";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function SignupPage() {
   const db = useFirestore();
@@ -148,6 +149,10 @@ export default function SignupPage() {
         <Link href="/" className="flex items-center gap-1.5 text-[10px] md:text-sm font-bold text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest bg-background/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-border/20">
           <ArrowLeft className="w-3 h-3 md:w-4 md:h-4" /> Início
         </Link>
+      </div>
+
+      <div className="fixed top-4 md:top-8 right-4 md:right-8 z-50">
+        <ThemeToggle className="border-none bg-transparent shadow-none" />
       </div>
 
       <div className="w-full max-w-xl space-y-6 md:space-y-8 mt-8 md:mt-0">

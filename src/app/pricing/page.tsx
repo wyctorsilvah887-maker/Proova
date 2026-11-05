@@ -42,6 +42,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function PricingPage() {
   const { user, loading: authLoading } = useUser();
@@ -167,6 +168,8 @@ export default function PricingPage() {
           </Link>
         </div>
         <div className="flex items-center gap-2 sm:gap-4 ml-auto">
+          <ThemeToggle className="border-none bg-transparent shadow-none" />
+          
           {!authLoading && user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

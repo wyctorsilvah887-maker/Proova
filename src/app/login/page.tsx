@@ -69,7 +69,7 @@ export default function LoginPage() {
       </div>
 
       <div className="fixed top-4 md:top-8 right-4 md:right-8 z-50">
-        <ThemeToggle />
+        <ThemeToggle className="border-none bg-transparent shadow-none" />
       </div>
 
       <div className="w-full max-w-md space-y-6 md:space-y-8 animate-in fade-in zoom-in duration-500 mt-8 md:mt-0">

@@ -61,7 +61,7 @@ export default function ForgotPasswordPage() {
       </div>
 
       <div className="fixed top-8 right-8">
-        <ThemeToggle />
+        <ThemeToggle className="border-none bg-transparent shadow-none" />
       </div>
 
       <Card className="w-full max-w-md shadow-2xl border-none overflow-hidden bg-card">
