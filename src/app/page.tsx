@@ -329,6 +329,9 @@ AgitationSection.displayName = "AgitationSection";
  * Seção de Pilares (A Máquina de Domínio) - Redesign Step-by-Step
  */
 const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
   const steps = [
     { 
       number: '01', 
@@ -347,8 +350,27 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
     }
   ];
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      const windowHeight = window.innerHeight;
+      
+      // Começamos a contar o progresso quando a seção entra na tela (offset de 30%)
+      // E terminamos quando a seção sai
+      const triggerPoint = windowHeight * 0.7;
+      const progress = (triggerPoint - rect.top) / (rect.height);
+      const clampedProgress = Math.max(0, Math.min(1, progress));
+      
+      setScrollProgress(clampedProgress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <section id="maquina-de-dominio" ref={ref} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
+    <section id="maquina-de-dominio" ref={sectionRef} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
       <div className="container px-4 mx-auto">
         <div className={cn(
           "text-center space-y-4 mb-24 transition-all duration-1000",
@@ -367,38 +389,61 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
         </div>
         
         <div className="max-w-4xl mx-auto relative px-4 md:px-0">
-          {/* Vertical Connecting Line */}
-          <div className="absolute left-[26px] md:left-[45px] top-10 bottom-10 w-0.5 bg-gradient-to-b from-primary via-primary/50 to-transparent hidden sm:block" />
+          {/* Track (Fundo da Linha) */}
+          <div className="absolute left-[26px] md:left-[45px] top-10 bottom-10 w-0.5 bg-muted/40 hidden sm:block rounded-full overflow-hidden">
+            {/* Active Progress Line */}
+            <div 
+              className="absolute top-0 left-0 w-full bg-primary transition-all duration-150 ease-out"
+              style={{ height: `${scrollProgress * 100}%` }}
+            />
+          </div>
 
           <div className="space-y-16 md:space-y-24">
-            {steps.map((step, idx) => (
-              <div 
-                key={idx} 
-                className={cn(
-                  "flex items-start gap-6 md:gap-16 relative transition-all duration-1000",
-                  isVisible ? "animate-in fade-in slide-in-from-bottom-20 opacity-100" : "opacity-100"
-                )}
-                style={{ transitionDelay: `${(idx + 1) * 200}ms` }}
-              >
-                {/* Step Number with Dot */}
-                <div className="flex flex-col items-center shrink-0">
-                  <div className="text-3xl md:text-5xl font-black font-headline text-foreground/20 group-hover:text-primary transition-colors duration-500 mb-2">
-                    {step.number}
-                  </div>
-                  <div className="w-3 h-3 rounded-full bg-primary ring-4 ring-primary/20 z-10" />
-                </div>
+            {steps.map((step, idx) => {
+              // Verifica se o progresso atingiu este passo específico
+              const stepTrigger = idx / (steps.length - 1);
+              const isActive = scrollProgress >= stepTrigger;
 
-                {/* Content */}
-                <div className="space-y-3 pt-1 md:pt-2">
-                  <h4 className="text-2xl md:text-4xl font-black font-headline tracking-tight text-foreground">
-                    {step.title}
-                  </h4>
-                  <p className="text-muted-foreground text-sm md:text-xl leading-relaxed font-medium max-w-2xl">
-                    {step.desc}
-                  </p>
+              return (
+                <div 
+                  key={idx} 
+                  className={cn(
+                    "flex items-start gap-6 md:gap-16 relative transition-all duration-700",
+                    isVisible ? "animate-in fade-in slide-in-from-bottom-20 opacity-100" : "opacity-100"
+                  )}
+                  style={{ transitionDelay: `${(idx + 1) * 100}ms` }}
+                >
+                  {/* Step Number with Dynamic Dot */}
+                  <div className="flex flex-col items-center shrink-0">
+                    <div className={cn(
+                      "text-3xl md:text-5xl font-black font-headline transition-colors duration-500 mb-2",
+                      isActive ? "text-primary" : "text-foreground/10"
+                    )}>
+                      {step.number}
+                    </div>
+                    <div className={cn(
+                      "w-3 h-3 rounded-full z-10 transition-all duration-500",
+                      isActive 
+                        ? "bg-primary scale-125 shadow-[0_0_15px_rgba(249,115,22,0.6)]" 
+                        : "bg-muted"
+                    )} />
+                  </div>
+
+                  {/* Content */}
+                  <div className={cn(
+                    "space-y-3 pt-1 md:pt-2 transition-all duration-700",
+                    isActive ? "translate-x-0 opacity-100" : "translate-x-2 opacity-50"
+                  )}>
+                    <h4 className="text-2xl md:text-4xl font-black font-headline tracking-tight text-foreground">
+                      {step.title}
+                    </h4>
+                    <p className="text-muted-foreground text-sm md:text-xl leading-relaxed font-medium max-w-2xl">
+                      {step.desc}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
