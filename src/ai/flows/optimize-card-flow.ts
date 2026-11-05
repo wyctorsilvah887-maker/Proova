@@ -40,6 +40,12 @@ export async function optimizeCard(input: z.infer<typeof OptimizeCardInputSchema
     return output;
   } catch (err: any) {
     console.error("ERRO CRÍTICO GEMINI:", err);
-    throw new Error(`Falha na IA: ${err.message || 'Erro de conexão'}. Verifique se GOOGLE_GENAI_API_KEY está no seu arquivo .env`);
+    
+    // Tratamento específico para erro de créditos/faturamento (402)
+    if (err.message?.includes('402') || err.message?.includes('credits are depleted')) {
+      throw new Error("Créditos de IA Esgotados: Acesse o Google AI Studio para recarregar ou verificar seu plano gratuito.");
+    }
+
+    throw new Error(`Falha na IA: ${err.message || 'Erro de conexão'}. Verifique se GOOGLE_GENAI_API_KEY está correta.`);
   }
 }
