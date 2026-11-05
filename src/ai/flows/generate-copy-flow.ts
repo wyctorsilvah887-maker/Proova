@@ -3,7 +3,7 @@
  * @fileOverview Flow para geração de copy persuasiva via Gemini 1.5 Flash no Vertex AI.
  */
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'kit';
 
 const CopyInputSchema = z.object({
   type: z.string().describe('Tipo do campo: hero_title, hero_subtitle, section_title, section_content'),
@@ -20,7 +20,7 @@ export const generateCopyFlow = ai.defineFlow(
   async (input) => {
     try {
       const { text } = await ai.generate({
-        model: 'vertexai/gemini-1.5-flash-002',
+        model: 'vertexai/gemini-1.5-flash',
         prompt: `Você é um copywriter de elite especialista em prova social. 
         Gere um texto curto, matador e altamente persuasivo para o campo: ${input.type}.
         Empresa: ${input.companyName || 'Nossa Empresa'}.
