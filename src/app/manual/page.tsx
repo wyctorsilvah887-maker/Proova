@@ -39,7 +39,7 @@ export default function ManualPage() {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="rounded-full hover:bg-transparent text-muted-foreground hover:text-primary transition-all active:bg-transparent focus:bg-transparent focus-visible:ring-0 border-none shadow-none h-10 w-10"
+              className="rounded-full text-muted-foreground hover:text-primary transition-all bg-transparent hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 border-none shadow-none h-10 w-10 select-none"
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
@@ -52,7 +52,7 @@ export default function ManualPage() {
           </div>
         </div>
         <div className="ml-auto flex items-center gap-4">
-          <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" />
+          <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent focus:bg-transparent active:bg-transparent" />
           <Badge variant="secondary" className="hidden sm:flex items-center gap-1.5 h-7 font-black text-[10px] uppercase tracking-widest bg-primary/10 text-primary border-none">
             <BookOpen className="w-3 h-3" /> Central de Inteligência
           </Badge>

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState } from 'react';
@@ -202,7 +201,7 @@ export default function PrivateInboxPage() {
         <div className="ml-auto flex items-center gap-2 md:gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
+              <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 focus-visible:ring-0 shadow-none">
                 <div className="flex flex-col items-end">
                   <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] md:max-w-[200px] group-hover:text-primary transition-colors leading-tight">
                     {userData?.companyName || 'Minha Empresa'}
@@ -284,7 +283,11 @@ export default function PrivateInboxPage() {
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <Link href="/dash">
-              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="rounded-full h-10 w-10 text-muted-foreground hover:text-primary transition-all bg-transparent hover:bg-transparent active:bg-transparent focus:bg-transparent shadow-none border-none select-none"
+              >
                 <ArrowLeft className="w-5 h-5" />
               </Button>
             </Link>
