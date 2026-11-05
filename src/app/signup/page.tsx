@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Mail, User, Building2, Lock, Loader2, Eye, EyeOff, CheckCircle2, ShieldCheck, Sparkles, ChevronRight } from "lucide-react";
+import { ArrowLeft, Mail, User, Building2, Lock, Loader2, Eye, EyeOff, CheckCircle2, ShieldCheck, Briefcase, ChevronRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -179,7 +179,7 @@ export default function SignupPage() {
           )}>
             <div className="mx-auto w-fit animate-in zoom-in duration-700">
               {step === 0 ? (
-                <Sparkles className="w-12 h-12 text-primary" />
+                <Briefcase className="w-12 h-12 text-primary" />
               ) : (
                 <User className="w-12 h-12 text-primary" />
               )}
