@@ -4,7 +4,6 @@
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import { gemini15Flash } from '@genkit-ai/google-genai';
 
 const CopyInputSchema = z.object({
   type: z.string().describe('Tipo do campo: hero_title, hero_subtitle, section_title, section_content'),
@@ -15,7 +14,7 @@ const CopyInputSchema = z.object({
 export async function generateCopy(input: z.infer<typeof CopyInputSchema>) {
   try {
     const { text } = await ai.generate({
-      model: gemini15Flash,
+      model: 'googleai/gemini-1.5-flash',
       prompt: `Você é um copywriter de elite especialista em prova social. 
       Gere um texto curto, matador e altamente persuasivo para o campo: ${input.type}.
       Empresa: ${input.companyName || 'Nossa Empresa'}.
