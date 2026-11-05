@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview Flow para criação de roteiro de design para Instagram Story via Gemini 2.0 Flash no Vertex AI.
+ * @fileOverview Flow para criação de roteiro de design para Instagram Story via Gemini 1.5 Flash no Vertex AI.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -17,7 +17,7 @@ const OptimizeCardOutputSchema = z.object({
 
 const optimizeCardPrompt = ai.definePrompt({
   name: 'optimizeCardPrompt',
-  model: 'vertexai/gemini-2.0-flash',
+  model: 'vertexai/gemini-1.5-flash',
   input: { schema: OptimizeCardInputSchema },
   output: { schema: OptimizeCardOutputSchema },
   config: {

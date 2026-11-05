@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview Flow para geração de backgrounds via Gemini 2.0 Flash no Vertex AI.
+ * @fileOverview Flow para geração de backgrounds via Imagen 3 no Vertex AI.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -18,11 +18,8 @@ export const generateCardBackgroundFlow = ai.defineFlow(
   async (input) => {
     try {
       const { media } = await ai.generate({
-        model: 'vertexai/gemini-2.0-flash',
+        model: 'vertexai/imagen-3',
         prompt: `Generate a Vertical 9:16 background image for an Instagram Story. Visual style: ${input.bgPrompt}. Minimalist luxury, high-end commercial photography, 8k resolution, clean composition, bokeh background.`,
-        config: {
-          responseModalities: ['IMAGE'],
-        }
       });
 
       if (!media || !media.url) {
@@ -31,7 +28,7 @@ export const generateCardBackgroundFlow = ai.defineFlow(
 
       return media.url;
     } catch (err: any) {
-      console.error("ERRO VERTEX AI (Imagen via Gemini):", err);
+      console.error("ERRO VERTEX AI (Imagen 3):", err);
       throw new Error(`Falha ao gerar arte via Vertex AI: ${err.message}`);
     }
   }
