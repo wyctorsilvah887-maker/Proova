@@ -18,7 +18,7 @@ export const generateCardBackgroundFlow = ai.defineFlow(
   async (input) => {
     try {
       const { media } = await ai.generate({
-        model: 'vertexai/gemini-2.0-flash-001',
+        model: 'vertexai/gemini-2.0-flash',
         prompt: `Generate a Vertical 9:16 background image for an Instagram Story. Visual style: ${input.bgPrompt}. Minimalist luxury, high-end commercial photography, 8k resolution, clean composition, bokeh background.`,
         config: {
           responseModalities: ['IMAGE'],

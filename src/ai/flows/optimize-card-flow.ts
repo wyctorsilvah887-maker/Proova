@@ -17,7 +17,7 @@ const OptimizeCardOutputSchema = z.object({
 
 const optimizeCardPrompt = ai.definePrompt({
   name: 'optimizeCardPrompt',
-  model: 'vertexai/gemini-2.0-flash-001',
+  model: 'vertexai/gemini-2.0-flash',
   input: { schema: OptimizeCardInputSchema },
   output: { schema: OptimizeCardOutputSchema },
   config: {
