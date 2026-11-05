@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Mail, User, Building2, Lock, Loader2, Eye, EyeOff, CheckCircle2, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Mail, User, Building2, Lock, Loader2, Eye, EyeOff, CheckCircle2, ShieldCheck, Sparkles, ChevronRight } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -15,6 +15,7 @@ import { useFirestore, useAuth, useUser } from "@/firebase";
 import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { cn } from "@/lib/utils";
 
 export default function SignupPage() {
   const db = useFirestore();
@@ -22,6 +23,7 @@ export default function SignupPage() {
   const { user, loading: authLoading } = useUser();
   const router = useRouter();
   
+  const [step, setStep] = useState(0); // 0: Quiz/Business Type, 1: Account Details
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
@@ -37,6 +39,18 @@ export default function SignupPage() {
     }
   }, [user, authLoading, router]);
 
+  const handleNextStep = () => {
+    if (!businessType) {
+      toast({
+        variant: "destructive",
+        title: "Seleção Obrigatória",
+        description: "Selecione o tipo do seu negócio para prosseguir.",
+      });
+      return;
+    }
+    setStep(1);
+  };
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -44,16 +58,7 @@ export default function SignupPage() {
       toast({
         variant: "destructive",
         title: "Termos Obrigatórios",
-        description: "Você deve aceitar os termos de uso e política de privacidade para continuar.",
-      });
-      return;
-    }
-
-    if (!businessType) {
-      toast({
-        variant: "destructive",
-        title: "Tipo de Negócio",
-        description: "Por favor, selecione o tipo do seu negócio.",
+        description: "Você deve aceitar os termos de uso e política de privacidade.",
       });
       return;
     }
@@ -69,11 +74,10 @@ export default function SignupPage() {
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-');
 
-      // 1. Verifica se o slug já existe globalmente
       const slugRef = doc(db, 'slugs', slug);
       const slugCheck = await getDoc(slugRef);
       if (slugCheck.exists()) {
-        throw new Error("Este nome de empresa/link já está em uso. Tente uma variação.");
+        throw new Error("Este nome de empresa já está em uso. Tente uma pequena variação.");
       }
 
       let userIp = 'Não capturado';
@@ -82,7 +86,7 @@ export default function SignupPage() {
         const ipData = await ipRes.json();
         userIp = ipData.ip;
       } catch (e) {
-        console.error("Falha ao capturar IP para log jurídico", e);
+        console.error("Falha ao capturar IP", e);
       }
 
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -90,14 +94,12 @@ export default function SignupPage() {
       
       const batch = writeBatch(db);
 
-      // Reserva o slug no cartório global
       batch.set(slugRef, {
         userId: newUser.uid,
         type: 'account',
         createdAt: serverTimestamp()
       });
 
-      // Cria o perfil do usuário
       const userData = {
         name: name.trim(),
         companyName: company.trim(),
@@ -121,7 +123,7 @@ export default function SignupPage() {
       
       toast({
         title: "Conta Criada!",
-        description: "Seu cadastro foi validado com sucesso.",
+        description: "Bem-vindo à nova era da prova social.",
       });
       router.push('/dash');
 
@@ -145,170 +147,204 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-muted/30 px-4 py-8 md:py-12 relative font-body text-foreground overflow-y-auto">
-      <div className="fixed top-4 md:top-8 left-4 md:left-8 z-50">
-        <Link href="/" className="flex items-center gap-1.5 text-[10px] md:text-sm font-bold text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest bg-background/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-border/20">
-          <ArrowLeft className="w-3 h-3 md:w-4 md:h-4" /> Início
+      {/* Navigation Minimalista */}
+      <div className="fixed top-8 left-8 z-50">
+        <Link 
+          href="/" 
+          className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary active:text-primary transition-all focus:outline-none select-none"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" /> Início
         </Link>
       </div>
 
-      <div className="fixed top-4 md:top-8 right-4 md:right-8 z-50">
-        <ThemeToggle className="border-none bg-transparent shadow-none" />
+      {/* Theme Toggle Clean */}
+      <div className="fixed top-8 right-8 z-50">
+        <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" />
       </div>
 
-      <div className="w-full max-w-xl space-y-6 md:space-y-8 mt-8 md:mt-0">
-        <div className="flex flex-col items-center text-center space-y-1.5 md:space-y-2">
-          <h1 className="text-3xl md:text-4xl font-black font-headline tracking-tighter">Crie sua Conta</h1>
-          <p className="text-muted-foreground text-sm md:text-lg font-medium">A primeira máquina de prova social inteligente.</p>
+      <div className="w-full max-w-xl space-y-6 md:space-y-8 mt-8 md:mt-0 animate-in fade-in duration-700">
+        <div className="flex flex-col items-center text-center space-y-2">
+          <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">Criar Conta</h1>
+          <p className="text-muted-foreground text-xs md:text-sm font-medium tracking-tight">
+            {step === 0 ? "Comece definindo sua atuação no mercado." : "Agora, informe seus dados de acesso."}
+          </p>
         </div>
 
-        <Card className="border-none shadow-2xl overflow-hidden bg-card">
-          <div className="h-2 bg-primary w-full" />
-          <CardHeader className="pt-6 md:pt-8 text-center space-y-1">
-            <CardTitle className="text-xl md:text-2xl font-black font-headline">Configuração do Perfil</CardTitle>
-            <CardDescription className="text-xs md:text-sm">Preencha os dados abaixo para começar a coletar elogios.</CardDescription>
+        <Card className="border-none shadow-2xl overflow-hidden bg-card rounded-[2rem] ring-1 ring-border/50">
+          <div className="h-1.5 bg-primary w-full" />
+          
+          <CardHeader className={cn(
+            "pt-10 text-center space-y-4",
+            step === 1 && "pb-2"
+          )}>
+            <div className="mx-auto w-fit animate-in zoom-in duration-700">
+              {step === 0 ? (
+                <Sparkles className="w-12 h-12 text-primary" />
+              ) : (
+                <User className="w-12 h-12 text-primary" />
+              )}
+            </div>
+            <CardTitle className="text-xl md:text-2xl font-black font-headline tracking-tight">
+              {step === 0 ? "Passo 1: Seu Negócio" : "Passo 2: Identificação"}
+            </CardTitle>
           </CardHeader>
-          <CardContent className="px-5 sm:px-10 pb-8 md:pb-10">
-            <form onSubmit={handleSignup} className="space-y-6">
-              
-              <div className="space-y-2">
-                <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Qual é o seu tipo de negócio?</label>
-                <Select value={businessType} onValueChange={setBusinessType}>
-                  <SelectTrigger className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20">
-                    <SelectValue placeholder="Selecione uma categoria..." />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-64">
-                    <SelectItem value="academia">Academia/ Studio de musculação</SelectItem>
-                    <SelectItem value="artes_marciais">Artes marciais/ Lutas</SelectItem>
-                    <SelectItem value="clinica">Clinica/ Consultório</SelectItem>
-                    <SelectItem value="estetica">Estética/ Salão de Beleza</SelectItem>
-                    <SelectItem value="barbearia">Barbearia</SelectItem>
-                    <SelectItem value="restaurante">Restaurante/ Lanchonete</SelectItem>
-                    <SelectItem value="oficina">Oficina/ Serviços automotivos</SelectItem>
-                    <SelectItem value="petshop">Pet shop</SelectItem>
-                    <SelectItem value="agencia">Agência (Marketing/ Publicidade)</SelectItem>
-                    <SelectItem value="servicos_digitais">Prestador de Serviços Digitais/ Freelancer</SelectItem>
-                    <SelectItem value="outros">Outros</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Seu Nome/Responsável</label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground/50" />
-                      <Input
-                        placeholder="Nome do Responsável"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="h-10 md:h-11 pl-10 bg-muted/20 border-transparent focus:ring-primary/20 font-medium text-sm"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Nome da Empresa</label>
-                    <div className="relative">
-                      <Building2 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground/50" />
-                      <Input
-                        placeholder="Ex: Tech Soluções"
-                        value={company}
-                        onChange={(e) => setCompany(e.target.value)}
-                        className="h-10 md:h-11 pl-10 bg-muted/20 border-transparent focus:ring-primary/20 font-medium text-sm"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">E-mail de Acesso</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground/50" />
-                    <Input
-                      type="email"
-                      placeholder="seu@melhoremail.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="h-10 md:h-11 pl-10 bg-muted/20 border-transparent focus:ring-primary/20 font-medium text-sm"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Senha Segura</label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground/50" />
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Mínimo 6 caracteres"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="h-10 md:h-11 pl-10 pr-10 bg-muted/20 border-transparent focus:ring-primary/20 font-medium text-sm"
-                      required
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-3 text-muted-foreground hover:text-primary transition-colors"
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-start space-x-3 bg-primary/5 p-4 rounded-2xl border border-primary/10">
-                  <Checkbox 
-                    id="terms" 
-                    checked={termsAccepted} 
-                    onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
-                    className="mt-1"
-                  />
-                  <div className="grid gap-1.5 leading-none">
-                    <Label 
-                      htmlFor="terms" 
-                      className="text-[10px] sm:text-xs font-bold leading-relaxed cursor-pointer"
-                    >
-                      Li e concordo com os <Link href="/terms" className="text-primary hover:underline underline-offset-4">Termos de Uso</Link> e a <Link href="/privacy" className="text-primary hover:underline underline-offset-4">Política de Privacidade</Link>.
-                    </Label>
-                    <p className="text-[9px] text-muted-foreground">
-                      Ao clicar em "Começar Agora", seu IP e timestamp serão registrados como prova de aceite.
-                    </p>
-                  </div>
+          <CardContent className="px-6 sm:px-10 pb-10 md:pb-12">
+            {step === 0 ? (
+              <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="space-y-4">
+                  <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Em qual setor você atua?</label>
+                  <Select value={businessType} onValueChange={setBusinessType}>
+                    <SelectTrigger className="h-14 rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm">
+                      <SelectValue placeholder="Selecione sua categoria..." />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-64 rounded-2xl">
+                      <SelectItem value="academia">Academia / Studio / Crossfit</SelectItem>
+                      <SelectItem value="artes_marciais">Artes marciais / Lutas</SelectItem>
+                      <SelectItem value="clinica">Clínica / Consultório Médico</SelectItem>
+                      <SelectItem value="estetica">Estética / Salão / Spa</SelectItem>
+                      <SelectItem value="barbearia">Barbearia</SelectItem>
+                      <SelectItem value="restaurante">Restaurante / Gastronomia</SelectItem>
+                      <SelectItem value="oficina">Oficina / Estética Automotiva</SelectItem>
+                      <SelectItem value="petshop">Pet shop / Veterinária</SelectItem>
+                      <SelectItem value="agencia">Agência de Marketing</SelectItem>
+                      <SelectItem value="servicos_digitais">Freelancer / Infoprodutor</SelectItem>
+                      <SelectItem value="outros">Outros Setores</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <Button 
-                  type="submit" 
-                  className="w-full h-12 md:h-14 text-base md:text-lg font-black shadow-xl hover:scale-102 active:scale-95 transition-all rounded-xl md:rounded-2xl gap-2"
-                  disabled={isSubmitting || !termsAccepted}
+                  onClick={handleNextStep}
+                  className="w-full h-14 text-base font-black shadow-xl hover:scale-[1.02] active:scale-95 transition-all rounded-2xl gap-3 bg-primary hover:bg-primary/90 text-white"
                 >
-                  {isSubmitting ? (
-                    <><Loader2 className="animate-spin h-5 w-5" /> Validando...</>
-                  ) : (
-                    <>Começar Agora <CheckCircle2 className="w-5 h-5" /></>
-                  )}
+                  Próximo Passo <ChevronRight className="w-5 h-5" />
                 </Button>
               </div>
+            ) : (
+              <form onSubmit={handleSignup} className="space-y-6 animate-in fade-in slide-in-from-left-4 duration-500">
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Seu Nome</label>
+                      <div className="relative group">
+                        <User className="absolute left-4 top-3.5 h-4 w-4 text-muted-foreground/40 transition-colors group-focus-within:text-primary" />
+                        <Input
+                          placeholder="Nome Completo"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          className="h-11 pl-11 bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm rounded-xl"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Sua Empresa</label>
+                      <div className="relative group">
+                        <Building2 className="absolute left-4 top-3.5 h-4 w-4 text-muted-foreground/40 transition-colors group-focus-within:text-primary" />
+                        <Input
+                          placeholder="Nome Comercial"
+                          value={company}
+                          onChange={(e) => setCompany(e.target.value)}
+                          className="h-11 pl-11 bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm rounded-xl"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
 
-              <div className="text-center pt-4 border-t">
-                <p className="text-xs md:text-sm text-muted-foreground font-medium">
-                  Já possui uma conta?{' '}
-                  <Link href="/login" className="text-primary font-black hover:underline tracking-tight">
-                    Fazer Login
-                  </Link>
-                </p>
-              </div>
-            </form>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">E-mail Corporativo</label>
+                    <div className="relative group">
+                      <Mail className="absolute left-4 top-3.5 h-4 w-4 text-muted-foreground/40 transition-colors group-focus-within:text-primary" />
+                      <Input
+                        type="email"
+                        placeholder="seu@melhoremail.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="h-11 pl-11 bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm rounded-xl"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Senha de Acesso</label>
+                    <div className="relative group">
+                      <Lock className="absolute left-4 top-3.5 h-4 w-4 text-muted-foreground/40 transition-colors group-focus-within:text-primary" />
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Mínimo 6 caracteres"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="h-11 pl-11 pr-11 bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm rounded-xl"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-3.5 text-muted-foreground/40 hover:text-primary transition-colors"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="flex items-start space-x-3 bg-primary/5 p-4 rounded-2xl border border-primary/10">
+                    <Checkbox 
+                      id="terms" 
+                      checked={termsAccepted} 
+                      onCheckedChange={(checked) => setTermsAccepted(checked as boolean)}
+                      className="mt-1"
+                    />
+                    <div className="grid gap-1.5 leading-none">
+                      <Label htmlFor="terms" className="text-[10px] font-bold leading-relaxed cursor-pointer">
+                        Li e concordo com os <Link href="/terms" className="text-primary hover:underline underline-offset-4">Termos de Uso</Link> e a <Link href="/privacy" className="text-primary hover:underline underline-offset-4">Política de Privacidade</Link>.
+                      </Label>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3">
+                    <Button 
+                      type="submit" 
+                      className="w-full h-14 text-base font-black shadow-xl hover:scale-[1.02] active:scale-95 transition-all rounded-2xl gap-3 bg-primary hover:bg-primary/90 text-white"
+                      disabled={isSubmitting || !termsAccepted}
+                    >
+                      {isSubmitting ? (
+                        <><Loader2 className="animate-spin h-5 w-5" /> Validando...</>
+                      ) : (
+                        <>Finalizar Cadastro <CheckCircle2 className="w-5 h-5" /></>
+                      )}
+                    </Button>
+                    
+                    <button 
+                      type="button"
+                      onClick={() => setStep(0)}
+                      className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors py-2 flex items-center justify-center gap-1.5"
+                    >
+                      <ArrowLeft className="w-3 h-3" /> Alterar Tipo de Negócio
+                    </button>
+                  </div>
+                </div>
+              </form>
+            )}
+
+            <div className="text-center pt-6 border-t border-border/50 mt-6">
+              <p className="text-xs text-muted-foreground font-medium">
+                Já tem uma conta?{' '}
+                <Link href="/login" className="text-primary font-black hover:underline tracking-tight">
+                  Entrar Agora
+                </Link>
+              </p>
+            </div>
           </CardContent>
         </Card>
         
         <div className="flex flex-col items-center gap-4 opacity-40 pb-8 md:pb-0">
-           <p className="text-[8px] md:text-[10px] text-center uppercase tracking-[0.2em] md:tracking-[0.3em] font-black flex items-center gap-2">
-             <ShieldCheck className="w-3 h-3 md:w-4 md:h-4" /> Compliance e Auditoria Proova
+           <p className="text-[8px] md:text-[10px] text-center uppercase tracking-[0.3em] font-black flex items-center gap-2">
+             <ShieldCheck className="w-3 h-3 md:w-4 md:h-4" /> Compliance e Auditoria de Dados Proova
            </p>
         </div>
       </div>
