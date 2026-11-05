@@ -114,7 +114,6 @@ import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-ac
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { optimizeCard, type OptimizeCardOutput } from '@/ai/flows/optimize-card-flow';
-import { generateCardBackground } from '@/ai/flows/generate-card-bg-flow';
 
 interface AuditItem {
   id: string;
@@ -154,7 +153,6 @@ export default function DashPage() {
   const [cardVariant, setCardVariant] = useState<'dark' | 'orange' | 'ai'>('dark');
   const [isAIProcessing, setIsAIProcessing] = useState(false);
   const [aiData, setAiData] = useState<OptimizeCardOutput | null>(null);
-  const [aiBgUrl, setAiBgUrl] = useState('');
   
   const shareCardRef = useRef<HTMLDivElement>(null);
   const dialogVideoRef = useRef<HTMLVideoElement>(null);
@@ -294,7 +292,6 @@ export default function DashPage() {
 
     const allSteps = [s0, s1, s2, s3];
     
-    // Se for negócio digital, removemos a tarefa do Google Maps
     if (isDigitalBusiness) {
       return allSteps.filter(s => s.id !== 'google');
     }
@@ -329,7 +326,6 @@ export default function DashPage() {
         });
       }
 
-      // Auditoria de Maps apenas se não for negócio digital
       if (!isDigitalBusiness) {
         const mapsUrl = (userData.googleMapsUrl || '').toLowerCase().trim();
         const isReviewLink = mapsUrl.includes('review') || mapsUrl.includes('writereview');
@@ -506,19 +502,6 @@ export default function DashPage() {
     }
   };
 
-  const handleSendWeeklyReport = async () => {
-    if (!user) return;
-    if (!isPremiumUser) {
-      router.push('/pricing');
-      return;
-    }
-    setIsSendingReport(true);
-    try {
-      const result = await sendWeeklyPerformanceReport(user.uid);
-      if (result.success) toast({ title: "Relatório Enviado!" }); else throw new Error(result.error);
-    } catch (e: any) { toast({ variant: "destructive", title: "Erro", description: e.message }); } finally { setIsSendingReport(false); }
-  };
-
   const handleDownloadComposedVideo = async () => {
     if (!selectedTestimonialForShare || !dialogVideoRef.current || !shareCardRef.current) return;
 
@@ -659,15 +642,15 @@ export default function DashPage() {
         pixelRatio: 3, 
         backgroundColor: 'rgba(0,0,0,0)', 
         style: {
-          borderRadius: cardVariant === 'ai' ? '0px' : '2.5rem',
+          borderRadius: '2.5rem',
         }
       });
       
       const link = document.createElement('a');
-      link.download = `proova-story-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
+      link.download = `proova-social-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
       link.href = dataUrl;
       link.click();
-      toast({ title: "Story Gerado!", description: "Sua arte está pronta para as redes sociais." });
+      toast({ title: "Card Gerado!", description: "Sua arte está pronta para as redes sociais." });
     } catch (err) {
       console.error("Erro fatal ao exportar:", err);
       toast({ variant: "destructive", title: "Erro ao exportar conteúdo" });
@@ -692,7 +675,7 @@ export default function DashPage() {
     setCardVariant('ai');
     
     try {
-      toast({ title: "🧠 Inteligência Proova Iniciada", description: "Otimizando para Story e gerando arte 9:16..." });
+      toast({ title: "🧠 Inteligência Proova Iniciada", description: "Otimizando copywriting e gerando layout de elite..." });
       
       const storyData = await optimizeCard({
         text: selectedTestimonialForShare.text,
@@ -700,11 +683,7 @@ export default function DashPage() {
       });
       
       setAiData(storyData);
-
-      const bgUrl = await generateCardBackground(storyData.bgPrompt);
-      setAiBgUrl(bgUrl);
-      
-      toast({ title: "✨ Story Concluído!", description: "Sua arte vertical de elite está pronta." });
+      toast({ title: "✨ Design Concluído!", description: "Seu card premium está pronto." });
     } catch (err: any) {
       console.error(err);
       toast({ variant: "destructive", title: "Erro na Mágica IA", description: err.message || "Não foi possível completar o design agora." });
@@ -718,7 +697,6 @@ export default function DashPage() {
     setSelectedTestimonialForShare(testimonial);
     setCardVariant('dark');
     setAiData(null);
-    setAiBgUrl('');
     setIsShareDialogOpen(true);
   };
 
@@ -1139,14 +1117,12 @@ export default function DashPage() {
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
 
-      {/* COLLECT LINK CHOICE DIALOG */}
       <Dialog open={isCollectLinkChoiceOpen} onOpenChange={setIsCollectLinkChoiceOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background">
           <DialogHeader className="p-8 pb-4 text-center shrink-0">
             <DialogTitle className="text-2xl font-black font-headline tracking-tight uppercase">Link de Coleta</DialogTitle>
             <DialogDescription className="text-sm">Gerencie como você captura novos elogios.</DialogDescription>
           </DialogHeader>
-
           <div className="px-8 pb-8 space-y-4">
             <Button 
               className="w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 bg-primary hover:bg-primary/90 shadow-xl transition-all active:scale-95 group"
@@ -1161,7 +1137,6 @@ export default function DashPage() {
               </div>
               <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Pronto para enviar aos clientes</span>
             </Button>
-
             <Button 
               variant="outline"
               className={cn(
@@ -1191,21 +1166,18 @@ export default function DashPage() {
               </span>
             </Button>
           </div>
-
           <DialogFooter className="p-4 bg-muted/30 border-t text-center flex justify-center">
             <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-60">Dica: Envie o link via WhatsApp logo após o atendimento para ter mais elogios.</p>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* PUBLIC PAGE CHOICE DIALOG */}
       <Dialog open={isPublicPageChoiceOpen} onOpenChange={setIsPublicPageChoiceOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background">
           <DialogHeader className="p-8 pb-4 text-center shrink-0">
             <DialogTitle className="text-2xl font-black font-headline tracking-tight uppercase">Página de Autoridade</DialogTitle>
             <DialogDescription className="text-sm">Escolha como deseja prosseguir com seu link da bio.</DialogDescription>
           </DialogHeader>
-
           <div className="px-8 pb-8 space-y-4">
             <Button 
               className="w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 bg-primary hover:bg-primary/90 shadow-xl transition-all active:scale-95 group"
@@ -1221,7 +1193,6 @@ export default function DashPage() {
               </div>
               <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Ver como seu cliente enxerga</span>
             </Button>
-
             <Button 
               variant="outline"
               className="w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 border-primary/20 text-primary hover:bg-primary/5 transition-all active:scale-95 group"
@@ -1240,7 +1211,6 @@ export default function DashPage() {
               </div>
               <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Personalizar textos, cores e seções</span>
             </Button>
-
             <Button 
               variant="link" 
               className="w-full text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary/70 h-auto p-0"
@@ -1251,14 +1221,12 @@ export default function DashPage() {
               <Copy className="w-3 h-3 mr-1" /> Copiar Link da Página
             </Button>
           </div>
-
           <DialogFooter className="p-4 bg-muted/30 border-t text-center flex justify-center">
             <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-60">Dica: Use seu link da bio no Instagram para converter mais.</p>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* SHARE DIALOG (SOCIAL CARDS) */}
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[96vh] flex flex-col">
           <DialogHeader className="p-6 sm:p-8 pb-2 text-center shrink-0">
@@ -1266,11 +1234,10 @@ export default function DashPage() {
                <Share2 className="w-4 h-4 text-primary" />
                <DialogTitle className="text-lg sm:text-xl font-black font-headline uppercase tracking-tight">Story Post Premium</DialogTitle>
             </div>
-            <DialogDescription className="text-xs">Gere um post vertical profissional para seu Instagram.</DialogDescription>
+            <DialogDescription className="text-xs">Gere uma arte profissional para seu Instagram.</DialogDescription>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6 flex flex-col items-center gap-6 scrollbar-hide">
-            {/* Visual variants toggle */}
             <div className="flex gap-2 p-1 bg-muted/50 rounded-xl w-fit">
                <button onClick={() => setCardVariant('dark')} className={cn("px-4 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all", cardVariant === 'dark' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground")}>Dark</button>
                <button onClick={() => setCardVariant('orange')} className={cn("px-4 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all", cardVariant === 'orange' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground")}>Orange</button>
@@ -1293,21 +1260,25 @@ export default function DashPage() {
                 ref={shareCardRef}
                 className={cn(
                   "relative overflow-hidden shadow-2xl flex flex-col items-center text-center transition-all duration-700",
-                  cardVariant === 'ai' ? "w-[min(80vw,360px)] aspect-[9/16] rounded-none" : "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] p-6 sm:p-10"
+                  "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] p-6 sm:p-10"
                 )}
                 style={{ 
-                  backgroundImage: cardVariant === 'ai' && aiBgUrl 
-                    ? `url(${aiBgUrl})` 
-                    : (cardVariant === 'dark' 
-                      ? 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)'
+                  backgroundImage: cardVariant === 'dark' 
+                    ? 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)'
+                    : (cardVariant === 'ai' 
+                      ? 'linear-gradient(135deg, #000000 0%, #1a1a1a 100%)' 
                       : 'linear-gradient(160deg, #f97316 0%, #ea580c 60%, #ffffff 180%)'),
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat',
-                  backgroundColor: cardVariant === 'dark' ? '#000000' : '#f97316'
+                  backgroundColor: cardVariant === 'dark' || cardVariant === 'ai' ? '#000000' : '#f97316'
                 }}
               >
-                 {/* Decorative elements for standard variants */}
+                 {cardVariant === 'ai' && (
+                   <>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16" />
+                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -ml-16 -mb-16" />
+                    <div className="absolute inset-0 border-[10px] border-white/5 m-4 rounded-[2rem] pointer-events-none" />
+                   </>
+                 )}
+                 
                  {cardVariant !== 'ai' && (
                    <>
                     <div className={cn(
@@ -1318,19 +1289,13 @@ export default function DashPage() {
                     <Quote className={cn("absolute top-6 left-6 w-10 h-10 -rotate-12", cardVariant === 'dark' ? "text-white/5" : "text-black/5")} />
                    </>
                  )}
-                 
-                 {/* Pattern overlay for AI variant to ensure legibility */}
-                 {cardVariant === 'ai' && (
-                   <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
-                 )}
 
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-5 pointer-events-none" 
                    style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }} 
                  />
                  
                  <div className={cn(
-                   "relative z-10 w-full flex flex-col h-full justify-between items-center",
-                   cardVariant === 'ai' && "p-8 sm:p-10"
+                   "relative z-10 w-full flex flex-col h-full justify-between items-center"
                  )}>
                    
                    <div id="card-header-cta" className="mb-2">
@@ -1361,80 +1326,51 @@ export default function DashPage() {
                                 <Play className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white" />
                              </div>
                           </div>
-                          <div id="video-overlay-badge" className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                            <p className="text-[7px] sm:text-[8px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
-                              <Video className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-primary" /> Video Review
-                            </p>
-                          </div>
                         </div>
-                        
                         <div className="space-y-2 sm:space-y-3">
                           <div className="flex justify-center gap-1">
                             {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                              <Star key={i} className={cn(
-                                "w-3.5 h-3.5 sm:w-4 h-4 fill-current",
-                                cardVariant === 'dark' ? "text-primary drop-shadow-[0_2px_4px_rgba(249,115,22,0.4)]" : "text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]"
-                              )} />
+                              <Star key={i} className={cn("w-3.5 h-3.5 sm:w-4 h-4 fill-current", cardVariant === 'dark' ? "text-primary" : "text-white")} />
                             ))}
                           </div>
-                          <p className={cn(
-                            "text-xs sm:text-base font-bold leading-tight italic line-clamp-3 px-4 drop-shadow-md",
-                            "text-white"
-                          )}>
-                             {selectedTestimonialForShare?.text && selectedTestimonialForShare?.text !== '(Depoimento em Vídeo)' 
-                               ? `"${selectedTestimonialForShare.text}"` 
-                               : '"Incrível experiência!"'}
+                          <p className="text-xs sm:text-base font-bold leading-tight italic text-white line-clamp-3 px-4">
+                             {selectedTestimonialForShare?.text && selectedTestimonialForShare?.text !== '(Depoimento em Vídeo)' ? `"${selectedTestimonialForShare.text}"` : '"Incrível experiência!"'}
                           </p>
                         </div>
                      </div>
                    ) : (
-                     <div className="flex-1 flex flex-col justify-center items-center space-y-6 sm:space-y-10 py-4 sm:py-6">
-                       {/* Stars for AI variant */}
+                     <div className="flex-1 flex flex-col justify-center items-center space-y-4 sm:space-y-6 py-4">
                        <div className="flex justify-center gap-1.5 animate-in fade-in slide-in-from-top-4 duration-1000">
                           {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                            <Star key={i} className={cn(
-                              "w-5 h-5 sm:w-6 h-6 fill-current",
-                              cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary drop-shadow-[0_4px_10px_rgba(249,115,22,0.5)]" : "text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.1)]"
-                            )} />
+                            <Star key={i} className={cn("w-4 h-4 sm:w-6 h-6 fill-current", cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white")} />
                           ))}
                        </div>
                        
                        <div className="space-y-4">
                          <p className={cn(
-                           "font-black font-headline leading-snug sm:leading-tight italic drop-shadow-xl px-2 tracking-tight transition-all duration-1000",
-                           cardVariant === 'ai' ? "text-2xl sm:text-4xl line-clamp-none uppercase" : "text-base sm:text-2xl line-clamp-6",
+                           "font-black font-headline leading-tight sm:leading-tight italic drop-shadow-xl px-2 tracking-tight transition-all duration-1000",
+                           cardVariant === 'ai' ? "text-lg sm:text-2xl uppercase" : "text-base sm:text-xl",
                            "text-white"
                          )}>
                             "{cardVariant === 'ai' && aiData ? aiData.bodyText : selectedTestimonialForShare?.text}"
                          </p>
-
                          {cardVariant === 'ai' && (
-                           <div id="card-ai-badge" className="bg-primary/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-primary/30 animate-in fade-in zoom-in duration-1000 mt-6 inline-block">
-                             <p className="text-[8px] sm:text-[10px] text-primary font-black uppercase tracking-widest flex items-center gap-2">
-                               <Sparkles className="w-3 h-3" /> {aiData?.tagline || 'IA Story Design'}
-                             </p>
-                           </div>
+                           <p className="text-[8px] sm:text-[10px] text-primary font-black uppercase tracking-[0.3em] animate-in fade-in zoom-in duration-1000 flex items-center justify-center gap-2">
+                             <Sparkles className="w-3 h-3" /> {aiData?.tagline || 'IA Story Design'}
+                           </p>
                          )}
                        </div>
                      </div>
                    )}
 
-                   <div className="w-full pt-4 sm:pt-6 border-t border-white/10 mt-2 sm:mt-4">
-                      <div className="flex flex-col items-center gap-2 sm:gap-3">
-                        <div className="space-y-0.5 sm:space-y-1">
-                          <p className="text-white font-black text-[10px] sm:text-sm uppercase tracking-[0.2em] drop-shadow-sm">
-                            {cardVariant === 'ai' && aiData ? aiData.author : selectedTestimonialForShare?.userName}
-                          </p>
-                          <div className="bg-white/5 backdrop-blur-xl px-3 sm:px-4 py-1 sm:py-1.5 rounded-full border border-white/10 inline-flex items-center gap-2 shadow-sm">
-                             <CheckCircle2 className={cn("w-2.5 h-2.5 sm:w-3 sm:h-3", cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white")} />
-                             <p className="text-[7px] sm:text-[9px] text-white/80 font-bold uppercase tracking-widest">
-                               Avaliado via Proova
-                             </p>
-                          </div>
-                        </div>
-
-                        <div className="w-full flex justify-center items-center pt-2 sm:pt-4 opacity-40">
-                          <span className="text-[7px] sm:text-[8px] text-white font-black uppercase tracking-[0.2em] truncate max-w-[200px] sm:max-w-[250px]">{userData?.companyName}</span>
+                   <div className="w-full pt-4 border-t border-white/10 mt-2 sm:mt-4">
+                      <div className="flex flex-col items-center gap-2">
+                        <p className="text-white font-black text-[10px] sm:text-xs uppercase tracking-[0.2em]">
+                          {cardVariant === 'ai' && aiData ? aiData.author : selectedTestimonialForShare?.userName}
+                        </p>
+                        <div className="bg-white/5 px-3 py-1 rounded-full border border-white/10 inline-flex items-center gap-2">
+                             <CheckCircle2 className={cn("w-2.5 h-2.5", cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white")} />
+                             <p className="text-[7px] sm:text-[8px] text-white/80 font-bold uppercase tracking-widest">Avaliado via Proova</p>
                         </div>
                       </div>
                    </div>
@@ -1448,13 +1384,13 @@ export default function DashPage() {
               disabled={isExportingCard || isAIProcessing}
             >
               {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-5 h-5" />}
-              {selectedTestimonialForShare?.videoUrl && cardVariant !== 'ai' ? 'Renderizar Vídeo Story' : 'Baixar Arte Story 9:16'}
+              {selectedTestimonialForShare?.videoUrl && cardVariant !== 'ai' ? 'Renderizar Vídeo' : 'Baixar Card Social'}
             </Button>
           </div>
           
           <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
             <p className="text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
-              <Zap className="w-3 h-3 text-primary" /> Dica: Stories reais aumentam o engajamento em até 400%
+              <Zap className="w-3 h-3 text-primary" /> Dica: Posts quadrados performam melhor no feed do Instagram.
             </p>
           </DialogFooter>
         </DialogContent>
@@ -1471,223 +1407,90 @@ export default function DashPage() {
               {configMode === 'location' ? 'Defina a cidade onde seu negócio opera.' : (configMode === 'business' ? 'Personalize o nome e o link da sua página.' : 'Conecte sua empresa ao Google Business.')}
             </DialogDescription>
           </DialogHeader>
-
           <div className="flex-1 overflow-y-auto px-6 pb-6 space-y-6 scrollbar-hide">
             {configMode === 'location' && (
               <section className="space-y-4 pt-2 animate-in fade-in zoom-in duration-300">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <Label className="text-[9px] font-black uppercase opacity-60 ml-1">Cidade</Label>
-                    <Input 
-                      placeholder="Ex: São Paulo" 
-                      value={city} 
-                      onChange={(e) => setCity(e.target.value)} 
-                      className="h-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs"
-                    />
+                    <Input placeholder="Ex: São Paulo" value={city} onChange={(e) => setCity(e.target.value)} className="h-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs" />
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-[9px] font-black uppercase opacity-60 ml-1">Estado (UF)</Label>
-                    <Input 
-                      placeholder="Ex: SP" 
-                      value={state} 
-                      maxLength={2}
-                      onChange={(e) => setState(e.target.value.toUpperCase())} 
-                      className="h-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs uppercase"
-                    />
+                    <Input placeholder="Ex: SP" value={state} maxLength={2} onChange={(e) => setState(e.target.value.toUpperCase())} className="h-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs uppercase" />
                   </div>
                 </div>
-                <Button 
-                  onClick={handleUpdateLocation} 
-                  disabled={!city || !state || isUpdatingUrl}
-                  className="w-full h-12 rounded-xl font-bold text-sm shadow-md gap-2"
-                >
-                  {isUpdatingUrl ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="h-4 w-4" />}
-                  Confirmar e Salvar
-                </Button>
+                <Button onClick={handleUpdateLocation} disabled={!city || !state || isUpdatingUrl} className="w-full h-12 rounded-xl font-bold text-sm shadow-md gap-2">{isUpdatingUrl ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="h-4 w-4" />} Confirmar e Salvar</Button>
               </section>
             )}
-
             {configMode === 'business' && (
               <section className="space-y-4 pt-2 animate-in fade-in zoom-in duration-300">
                 <div className="space-y-3">
                   <div className="space-y-1.5">
                     <Label className="text-[9px] font-black uppercase opacity-60 ml-1">Nome da Empresa</Label>
-                    <Input 
-                      placeholder="Ex: Minha Empresa" 
-                      value={companyNameEdit} 
-                      onChange={(e) => setCompanyNameEdit(e.target.value)} 
-                      className="h-11 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs font-bold"
-                    />
+                    <Input placeholder="Ex: Minha Empresa" value={companyNameEdit} onChange={(e) => setCompanyNameEdit(e.target.value)} className="h-11 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs font-bold" />
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-[9px] font-black uppercase opacity-60 ml-1">Slug do Link (URL Personalizada)</Label>
                     <div className="flex items-center gap-1 bg-muted/20 rounded-xl px-3 border border-transparent focus-within:ring-2 focus-within:ring-primary/20 transition-all">
                       <span className="text-[10px] font-bold opacity-40">/c/</span>
-                      <input 
-                        placeholder="nome-da-sua-empresa"
-                        value={companySlugEdit} 
-                        onChange={(e) => setCompanySlugEdit(e.target.value.toLowerCase().replace(/\s+/g, '-'))} 
-                        className="h-11 flex-1 bg-transparent border-none focus:ring-0 text-xs font-mono"
-                      />
+                      <input placeholder="nome-da-sua-empresa" value={companySlugEdit} onChange={(e) => setCompanySlugEdit(e.target.value.toLowerCase().replace(/\s+/g, '-'))} className="h-11 flex-1 bg-transparent border-none focus:ring-0 text-xs font-mono" />
                     </div>
                   </div>
                 </div>
-                <Button 
-                  onClick={handleUpdateBusinessInfo} 
-                  disabled={!companyNameEdit || !companySlugEdit || isUpdatingUrl}
-                  className="w-full h-12 rounded-xl font-bold text-sm shadow-md gap-2"
-                >
-                  {isUpdatingUrl ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="h-4 w-4" />}
-                  Salvar Nova Identidade
-                </Button>
+                <Button onClick={handleUpdateBusinessInfo} disabled={!companyNameEdit || !companySlugEdit || isUpdatingUrl} className="w-full h-12 rounded-xl font-bold text-sm shadow-md gap-2">{isUpdatingUrl ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="h-4 w-4" />} Salvar Nova Identidade</Button>
               </section>
             )}
-
             {configMode === 'maps' && (
               <section className="space-y-4 pt-2 animate-in fade-in zoom-in duration-300">
                 <div className="space-y-2">
                   <div className="relative group">
                     <Search className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground/50 group-focus-within:text-primary transition-colors" />
-                    <Input 
-                      placeholder="Nome da sua empresa no Google" 
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSearchPlaces()}
-                      className="h-11 pl-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs"
-                    />
-                    <Button 
-                      size="sm" 
-                      variant="ghost" 
-                      onClick={handleSearchPlaces}
-                      disabled={isSearchingPlaces || !searchQuery}
-                      className="absolute right-1 top-1 h-9 rounded-lg hover:bg-primary/10 text-primary"
-                    >
-                      {isSearchingPlaces ? <Loader2 className="animate-spin w-4 h-4" /> : <Navigation className="w-4 h-4" />}
-                    </Button>
+                    <Input placeholder="Nome da sua empresa no Google" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSearchPlaces()} className="h-11 pl-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs" />
+                    <Button size="sm" variant="ghost" onClick={handleSearchPlaces} disabled={isSearchingPlaces || !searchQuery} className="absolute right-1 top-1 h-9 rounded-lg hover:bg-primary/10 text-primary">{isSearchingPlaces ? <Loader2 className="animate-spin w-4 h-4" /> : <Navigation className="w-4 h-4" />}</Button>
                   </div>
                 </div>
-
                 <div className="space-y-2">
                   {searchResults.map((place) => (
-                    <Card 
-                      key={place.place_id}
-                      className="border-2 border-transparent hover:border-primary/20 cursor-pointer transition-all bg-muted/10 group"
-                      onClick={() => handleSelectPlace(place)}
-                    >
+                    <Card key={place.place_id} className="border-2 border-transparent hover:border-primary/20 cursor-pointer transition-all bg-muted/10 group" onClick={() => handleSelectPlace(place)}>
                       <div className="p-3 flex items-center gap-3">
-                        <div className="p-2 rounded-xl bg-background group-hover:bg-primary/10 transition-colors">
-                          <MapPin className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-xs font-black truncate">{place.name}</p>
-                          <p className="text-[10px] text-muted-foreground truncate opacity-70">{place.address}</p>
-                        </div>
+                        <div className="p-2 rounded-xl bg-background group-hover:bg-primary/10 transition-colors"><MapPin className="w-4 h-4 text-muted-foreground group-hover:text-primary" /></div>
+                        <div className="min-w-0 flex-1"><p className="text-xs font-black truncate">{place.name}</p><p className="text-[10px] text-muted-foreground truncate opacity-70">{place.address}</p></div>
                         <ChevronRight className="w-4 h-4 text-muted-foreground opacity-30 group-hover:translate-x-1 transition-all" />
                       </div>
                     </Card>
                   ))}
-                  
-                  {isSearchingPlaces && (
-                    <div className="py-8 text-center">
-                      <Loader2 className="animate-spin w-6 h-6 text-primary mx-auto mb-2" />
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase">Consultando Satélite...</p>
-                    </div>
-                  )}
-                  
-                  {searchResults.length === 0 && !isSearchingPlaces && searchQuery && (
-                    <div className="py-6 text-center border-2 border-dashed rounded-2xl bg-muted/5">
-                      <p className="text-[10px] font-medium text-muted-foreground">Empresa não listada? Refine o nome.</p>
-                    </div>
-                  )}
+                  {isSearchingPlaces && <div className="py-8 text-center"><Loader2 className="animate-spin w-6 h-6 text-primary mx-auto mb-2" /><p className="text-[10px] font-bold text-muted-foreground uppercase">Consultando Satélite...</p></div>}
                 </div>
-
-                <section className="space-y-3 pt-4 border-t opacity-60">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-3.5 h-3.5 text-primary" />
-                    <h4 className="text-[10px] font-black uppercase tracking-widest">Como funciona o G-Boost?</h4>
-                  </div>
-                  <p className="text-[10px] text-muted-foreground leading-relaxed">
-                    O Proova detecta elogios 5 estrelas e redireciona o cliente para este local no Google. Isso sobe sua posição nas buscas e atrai novos clientes organicamente.
-                  </p>
-                </section>
+                <section className="space-y-3 pt-4 border-t opacity-60"><div className="flex items-center gap-2"><ShieldCheck className="w-3.5 h-3.5 text-primary" /><h4 className="text-[10px] font-black uppercase tracking-widest">Como funciona o G-Boost?</h4></div><p className="text-[10px] text-muted-foreground leading-relaxed">O Proova detecta elogios 5 estrelas e redireciona o cliente para este local no Google. Isso sobe sua posição nas buscas.</p></section>
               </section>
             )}
           </div>
-
-          <div className="p-6 bg-background border-t shrink-0">
-            <Button variant="ghost" className="w-full text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setIsGoogleMapsDialogOpen(false)}>
-              Fechar Configurações
-            </Button>
-          </div>
+          <div className="p-6 bg-background border-t shrink-0"><Button variant="ghost" className="w-full text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setIsGoogleMapsDialogOpen(false)}>Fechar Configurações</Button></div>
         </DialogContent>
       </Dialog>
       
       <Dialog open={isQrDialogOpenManual} onOpenChange={setIsQrDialogOpenManual}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-[420px] border-none shadow-2xl p-0 overflow-hidden bg-background flex flex-col max-h-[90vh]">
           <div className="h-2 bg-primary w-full shrink-0" />
-          
           <div className="flex-1 overflow-y-auto scrollbar-hide">
             <DialogHeader className="p-6 pb-2 text-center shrink-0">
               <DialogTitle className="text-xl md:text-2xl font-black font-headline tracking-tight uppercase">Cartaz de Balcão</DialogTitle>
               <DialogDescription className="text-xs md:text-sm font-medium">Capture elogios reais diretamente no ponto de venda.</DialogDescription>
             </DialogHeader>
-
             <div className="px-6 pb-8 flex flex-col items-center space-y-6">
               <div className="relative group mt-2">
                 <div className="absolute -inset-4 bg-primary/5 rounded-[2.5rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-700" />
-                <div 
-                  id="qr-container-print"
-                  className="relative bg-white p-6 md:p-8 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-8 border-primary/5 flex flex-col items-center space-y-4"
-                >
-                  <QRCodeSVG 
-                    value={collectionLink} 
-                    size={160} 
-                    level="H" 
-                    includeMargin={false}
-                    imageSettings={{
-                      src: "/maskable_icon_x192 (6).png",
-                      x: undefined,
-                      y: undefined,
-                      height: 36,
-                      width: 36,
-                      excavate: true,
-                    }}
-                  />
-                  <div className="pt-2 text-center space-y-1">
-                     <p className="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-[0.2em]">Escaneie para Avaliar</p>
-                     <p className="text-[7px] md:text-[8px] font-bold text-muted-foreground uppercase">{userData?.companyName}</p>
-                  </div>
+                <div id="qr-container-print" className="relative bg-white p-6 md:p-8 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-8 border-primary/5 flex flex-col items-center space-y-4">
+                  <QRCodeSVG value={collectionLink} size={160} level="H" includeMargin={false} imageSettings={{ src: "/maskable_icon_x192 (6).png", x: undefined, y: undefined, height: 36, width: 36, excavate: true }} />
+                  <div className="pt-2 text-center space-y-1"><p className="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-[0.2em]">Escaneie para Avaliar</p><p className="text-[7px] md:text-[8px] font-bold text-muted-foreground uppercase">{userData?.companyName}</p></div>
                 </div>
               </div>
-
               <div className="w-full space-y-4">
-                <Button 
-                  className="w-full h-12 md:h-14 rounded-2xl text-base md:text-lg font-black shadow-xl gap-3 transition-all hover:scale-[1.02] active:scale-95" 
-                  onClick={handleDownloadPdf} 
-                  disabled={isGeneratingPdf}
-                >
-                  {isGeneratingPdf ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="h-5 w-5" />}
-                  Baixar PDF de Impressão
-                </Button>
-                
-                <div className="flex flex-col items-center gap-2 opacity-80">
-                   <div className="flex items-center gap-2">
-                     <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-muted-foreground">Powered by</span>
-                     <div className="relative w-32 h-10 md:w-36 md:h-12 transition-transform hover:scale-105">
-                        <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Proova" fill className="object-contain dark:hidden" />
-                        <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" />
-                     </div>
-                   </div>
-                </div>
+                <Button className="w-full h-12 md:h-14 rounded-2xl text-base md:text-lg font-black shadow-xl gap-3 transition-all hover:scale-[1.02] active:scale-95" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>{isGeneratingPdf ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="h-5 w-5" />} Baixar PDF de Impressão</Button>
               </div>
             </div>
           </div>
-
-          <DialogFooter className="p-4 bg-muted/30 border-t flex justify-center text-center shrink-0">
-            <p className="text-[8px] md:text-[9px] font-black uppercase text-muted-foreground tracking-widest flex items-center gap-2">
-              <Zap className="w-3 h-3 text-primary" /> Dica: Coloque o QR Code perto do caixa ou na recepção.
-            </p>
-          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
