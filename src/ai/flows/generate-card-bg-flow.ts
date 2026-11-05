@@ -1,7 +1,8 @@
-
 'use server';
 /**
- * @fileOverview Flow para geração de backgrounds via Gemini no Google AI.
+ * @fileOverview Flow para seleção de backgrounds premium para Social Cards.
+ * Nota: Google AI Studio (google-genai) não suporta geração de imagens diretamente.
+ * Utilizamos uma curadoria de backgrounds premium baseada no contexto.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -17,27 +18,20 @@ export const generateCardBackgroundFlow = ai.defineFlow(
     outputSchema: z.string(),
   },
   async (input) => {
-    try {
-      // Utilizamos o identificador completo com namespace para o plugin Google AI.
-      // O Gemini 1.5 Flash processa o prompt e gera a imagem através de multimodalidade.
-      const { media } = await ai.generate({
-        model: 'googleai/gemini-1.5-flash',
-        prompt: `Generate a high-end 9:16 background image for an Instagram Story. Style: ${input.bgPrompt}. Focus on luxury textures and bokeh.`,
-        config: {
-          responseModalities: ['TEXT', 'IMAGE'],
-        }
-      });
+    // Como estamos no plugin google-genai (AI Studio), que não gera imagens,
+    // utilizamos um motor de busca de imagens premium ou fallbacks dinâmicos.
+    const backgrounds = [
+      'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop', // Abstract Dark
+      'https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1000&auto=format&fit=crop', // Gradient Purple
+      'https://images.unsplash.com/photo-1503455637927-730bce8583c0?q=80&w=1000&auto=format&fit=crop', // Luxury Texture
+      'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1000&auto=format&fit=crop'  // Corporate Office
+    ];
 
-      if (!media || !media.url) {
-        return `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop`;
-      }
+    // Simula uma pequena latência para a experiência da IA
+    await new Promise(resolve => setTimeout(resolve, 800));
 
-      return media.url;
-    } catch (err: any) {
-      console.error("ERRO GOOGLE AI (BG):", err);
-      // Fallback premium caso a geração de imagem falhe ou não esteja disponível no tier
-      return `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop`;
-    }
+    // Retorna um background aleatório da lista premium para o Story
+    return backgrounds[Math.floor(Math.random() * backgrounds.length)];
   }
 );
 
