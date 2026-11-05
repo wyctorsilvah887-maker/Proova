@@ -353,7 +353,8 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
       const rect = sectionRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
       
-      const triggerPoint = windowHeight * 0.7;
+      // Gatilho de início e fim da seção
+      const triggerPoint = windowHeight * 0.5;
       const progress = (triggerPoint - rect.top) / (rect.height);
       const clampedProgress = Math.max(0, Math.min(1, progress));
       
@@ -382,51 +383,55 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
           <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Tecnologias de elite integradas para aniquilar objeções e forçar a conversão imediata.</p>
         </div>
         
-        <div className="max-w-4xl mx-auto relative px-4 md:px-0">
-          <div className="absolute left-[26px] md:left-[45px] top-8 bottom-8 w-0.5 bg-muted/40 rounded-full overflow-hidden">
+        <div className="max-w-4xl mx-auto relative">
+          {/* TRACKER LINE - Centralizado com os números */}
+          <div className="absolute left-[13px] md:left-[21px] top-6 bottom-6 w-[2px] bg-muted/30 rounded-full overflow-hidden">
             <div 
-              className="absolute top-0 left-0 w-full bg-primary transition-all duration-150 ease-out"
+              className="absolute top-0 left-0 w-full bg-primary transition-all duration-100 ease-linear"
               style={{ height: `${scrollProgress * 100}%` }}
             />
+            {/* MOVING BALL - Rastreia o scroll progress */}
             <div 
-              className="absolute w-3 h-3 bg-primary rounded-full -left-[5px] transition-all duration-150 ease-out shadow-[0_0_15px_rgba(249,115,22,0.8)] z-20"
+              className="absolute w-3 h-3 md:w-4 md:h-4 bg-primary rounded-full -left-[5px] md:-left-[7px] transition-all duration-100 ease-linear shadow-[0_0_15px_rgba(249,115,22,0.8)] z-30"
               style={{ top: `${scrollProgress * 100}%`, transform: 'translateY(-50%)' }}
             />
           </div>
 
           <div className="space-y-16 md:space-y-24">
             {steps.map((step, idx) => {
+              // Cálculo de ativação baseado na posição real no trilho
               const stepTrigger = idx / (steps.length - 1);
-              // Sincronização milimétrica: ativa quando o scrollProgress passa o ponto do step
               const isActive = scrollProgress >= stepTrigger;
 
               return (
                 <div 
                   key={idx} 
                   className={cn(
-                    "flex items-start gap-6 md:gap-16 relative transition-all duration-200",
+                    "flex items-start gap-6 md:gap-12 relative transition-all duration-300",
                     isVisible ? "animate-in fade-in slide-in-from-bottom-20 opacity-100" : "opacity-0"
                   )}
                   style={{ transitionDelay: `${(idx + 1) * 100}ms` }}
                 >
-                  <div className="flex flex-col items-center shrink-0">
+                  {/* STEP INDICATOR - Vertical Column */}
+                  <div className="flex flex-col items-center shrink-0 w-7 md:w-11">
                     <div className={cn(
-                      "text-xl md:text-3xl font-black font-headline transition-colors duration-200 mb-1",
-                      isActive ? "text-primary" : "text-foreground/10"
+                      "text-sm md:text-2xl font-black font-headline transition-all duration-200 mb-1",
+                      isActive ? "text-primary scale-110" : "text-foreground/10"
                     )}>
                       {step.number}
                     </div>
+                    {/* FIXED MARKER - Sincronizado com o trilho */}
                     <div className={cn(
-                      "w-2.5 h-2.5 rounded-full z-10 transition-all duration-200 border-2",
+                      "w-2.5 h-2.5 rounded-full z-10 transition-all duration-300 border-2",
                       isActive 
-                        ? "bg-primary border-primary scale-110 shadow-[0_0_10px_rgba(249,115,22,0.5)]" 
-                        : "bg-transparent border-muted"
+                        ? "bg-primary border-primary scale-125 shadow-[0_0_10px_rgba(249,115,22,0.4)]" 
+                        : "bg-transparent border-muted/50"
                     )} />
                   </div>
 
                   <div className={cn(
-                    "space-y-3 pt-0.5 md:pt-1 transition-all duration-200",
-                    isActive ? "translate-x-0 opacity-100" : "translate-x-2 opacity-30"
+                    "space-y-2 md:space-y-3 pt-0.5 md:pt-1 transition-all duration-300 flex-1",
+                    isActive ? "translate-x-0 opacity-100" : "translate-x-3 opacity-20"
                   )}>
                     <h4 className="text-xl md:text-3xl font-black font-headline tracking-tight text-foreground">
                       {step.title}
