@@ -1330,7 +1330,7 @@ export default function DashPage() {
                  
                  <div className={cn(
                    "relative z-10 w-full flex flex-col h-full justify-between items-center",
-                   cardVariant === 'ai' && "p-10 sm:p-12"
+                   cardVariant === 'ai' && "p-8 sm:p-10"
                  )}>
                    
                    <div id="card-header-cta" className="mb-2">
@@ -1388,8 +1388,9 @@ export default function DashPage() {
                         </div>
                      </div>
                    ) : (
-                     <div className="flex-1 flex flex-col justify-center items-center space-y-4 sm:space-y-8 py-2 sm:py-4">
-                       <div className="flex justify-center gap-1.5">
+                     <div className="flex-1 flex flex-col justify-center items-center space-y-6 sm:space-y-10 py-4 sm:py-6">
+                       {/* Stars for AI variant */}
+                       <div className="flex justify-center gap-1.5 animate-in fade-in slide-in-from-top-4 duration-1000">
                           {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
                             <Star key={i} className={cn(
                               "w-5 h-5 sm:w-6 h-6 fill-current",
@@ -1398,21 +1399,23 @@ export default function DashPage() {
                           ))}
                        </div>
                        
-                       <p className={cn(
-                         "font-black font-headline leading-snug sm:leading-tight italic drop-shadow-xl px-2 tracking-tight",
-                         cardVariant === 'ai' ? "text-2xl sm:text-4xl line-clamp-none uppercase" : "text-base sm:text-2xl line-clamp-6",
-                         "text-white"
-                       )}>
-                          "{cardVariant === 'ai' && aiData ? aiData.bodyText : selectedTestimonialForShare?.text}"
-                       </p>
+                       <div className="space-y-4">
+                         <p className={cn(
+                           "font-black font-headline leading-snug sm:leading-tight italic drop-shadow-xl px-2 tracking-tight transition-all duration-1000",
+                           cardVariant === 'ai' ? "text-2xl sm:text-4xl line-clamp-none uppercase" : "text-base sm:text-2xl line-clamp-6",
+                           "text-white"
+                         )}>
+                            "{cardVariant === 'ai' && aiData ? aiData.bodyText : selectedTestimonialForShare?.text}"
+                         </p>
 
-                       {cardVariant === 'ai' && (
-                         <div id="card-ai-badge" className="bg-primary/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-primary/30 animate-in fade-in zoom-in duration-500 mt-4">
-                           <p className="text-[8px] sm:text-[10px] text-primary font-black uppercase tracking-widest flex items-center gap-2">
-                             <Sparkles className="w-3 h-3" /> {aiData?.tagline || 'IA Story Design'}
-                           </p>
-                         </div>
-                       )}
+                         {cardVariant === 'ai' && (
+                           <div id="card-ai-badge" className="bg-primary/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-primary/30 animate-in fade-in zoom-in duration-1000 mt-6 inline-block">
+                             <p className="text-[8px] sm:text-[10px] text-primary font-black uppercase tracking-widest flex items-center gap-2">
+                               <Sparkles className="w-3 h-3" /> {aiData?.tagline || 'IA Story Design'}
+                             </p>
+                           </div>
+                         )}
+                       </div>
                      </div>
                    )}
 
