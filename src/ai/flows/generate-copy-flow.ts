@@ -4,7 +4,6 @@
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import { googleAI } from '@genkit-ai/google-genai';
 
 const CopyInputSchema = z.object({
   type: z.string().describe('Tipo do campo: hero_title, hero_subtitle, section_title, section_content'),
@@ -14,10 +13,8 @@ const CopyInputSchema = z.object({
 
 export async function generateCopy(input: z.infer<typeof CopyInputSchema>) {
   try {
-    const modelRef = googleAI.model('gemini-1.5-flash');
-    
     const { text } = await ai.generate({
-      model: modelRef,
+      model: 'googleai/gemini-1.5-flash',
       prompt: `Você é um copywriter de elite especialista em prova social. 
       Gere um texto curto, matador e altamente persuasivo para o campo: ${input.type}.
       Empresa: ${input.companyName || 'Nossa Empresa'}.
@@ -28,6 +25,7 @@ export async function generateCopy(input: z.infer<typeof CopyInputSchema>) {
       2. Sem aspas, sem explicações.
       3. Máximo de 2 frases.`,
     });
+    
     return text || 'Transforme sua autoridade em lucro real hoje.';
   } catch (err: any) {
     console.error("ERRO GOOGLE AI (Copy):", err);
