@@ -1,9 +1,14 @@
 'use server';
 /**
  * @fileOverview Flow para criação de roteiro de design para Instagram Story via Gemini no Google AI.
+ * 
+ * - optimizeCard - Transforma um depoimento em headline e prompt visual.
+ * - OptimizeCardInput - Schema de entrada.
+ * - OptimizeCardOutput - Schema de saída.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
+import { googleAI } from '@genkit-ai/google-genai';
 
 const OptimizeCardInputSchema = z.object({
   text: z.string(),
@@ -15,9 +20,12 @@ const OptimizeCardOutputSchema = z.object({
   bgPrompt: z.string().describe('Um prompt visual em inglês para o motor de imagem.'),
 });
 
+// Utilizamos a referência direta do modelo para evitar erros de "Unknown action type"
+const modelRef = googleAI.model('gemini-1.5-flash');
+
 const optimizeCardPrompt = ai.definePrompt({
   name: 'optimizeCardPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: modelRef,
   input: { schema: OptimizeCardInputSchema },
   output: { schema: OptimizeCardOutputSchema },
   config: {
