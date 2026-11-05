@@ -325,11 +325,11 @@ export default function DashPage() {
 
       // Auditoria de Maps apenas se não for negócio digital
       if (!isDigitalBusiness) {
-        const mapsUrl = userData.googleMapsUrl || '';
-        // Atualizado para reconhecer tanto o formato padrão quanto o formato curto /review do g.page
-        const isReviewLink = mapsUrl.includes('writereview') || mapsUrl.includes('local/writereview') || mapsUrl.includes('/review');
+        const mapsUrl = (userData.googleMapsUrl || '').toLowerCase().trim();
+        // Verificação robusta: Aceita links com writereview ou links curtos g.page que terminam/contêm review
+        const isReviewLink = mapsUrl.includes('writereview') || mapsUrl.includes('local/writereview') || mapsUrl.includes('/review') || mapsUrl.includes('.review');
         
-        if (!mapsUrl) {
+        if (!userData.googleMapsUrl) {
           results.push({ id: 'maps-unlinked', label: 'Google Maps Desconectado', status: 'critical', description: 'Sua empresa não está recebendo redirecionamentos.', actionLabel: 'Vincular Agora', action: () => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }, icon: MapPin });
         } else if (!isReviewLink) {
           results.push({ id: 'maps-invalid', label: 'Link de Avaliação Indireto', status: 'attention', description: 'Seu link atual não abre direto na caixa de texto do Google.', actionLabel: 'Corrigir Link', action: () => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }, icon: ShieldAlert });
@@ -621,7 +621,7 @@ export default function DashPage() {
         ctx.arcTo(vX + vWidth, vY + vHeight, vX, vY + vHeight, radius);
         ctx.arcTo(vX, vY + vHeight, vX, vY, radius);
         ctx.arcTo(vX, vY, vX + vWidth, vY, radius);
-        ctx.closePath();
+        closePath();
         ctx.clip();
         
         ctx.drawImage(videoEl, vX, vY, vWidth, vHeight);
