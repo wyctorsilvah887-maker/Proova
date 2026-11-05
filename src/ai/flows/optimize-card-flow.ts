@@ -2,12 +2,13 @@
 'use server';
 
 import { genkit, z } from 'genkit';
-import { googleAI, gemini25Flash } from '@genkit-ai/googleai';
+import { googleAI, gemini20Flash } from '@genkit-ai/googleai';
 
 // 1. Inicializa o Genkit configurando o plugin do Google AI Studio
+// Utilizamos gemini20Flash conforme sugerido pelo compilador para resolver o Build Error
 const ai = genkit({
   plugins: [googleAI()],
-  model: gemini25Flash, // Define o modelo estável padrão
+  model: gemini20Flash,
 });
 
 const OptimizeCardOutputSchema = z.object({
@@ -37,9 +38,9 @@ export const optimizeCardFlow = ai.defineFlow(
   async (input) => {
     try {
       // 3. Executa a chamada de geração usando a sintaxe simplificada
-      // Mantemos o esquema de saída para não quebrar a UI do Dashboard
+      // Mantemos o output schema para não quebrar a UI do Story Post
       const response = await ai.generate({
-        model: gemini25Flash,
+        model: gemini20Flash,
         prompt: `Você é um Diretor de Arte de marcas de luxo. 
         Sua tarefa é transformar um depoimento de cliente em um Story de Instagram de alto impacto.
         
