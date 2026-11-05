@@ -1,17 +1,17 @@
+
 'use server';
 /**
- * @fileOverview Flow para geração de backgrounds verticais (Stories) via Imagen 3.
- * Trocado para Imagen 3 por ser mais estável em chaves gratuitas/novas.
+ * @fileOverview Flow para geração de backgrounds verticais (Stories) via Imagen 3 no Vertex AI.
  */
 import { ai } from '@/ai/genkit';
 
 export async function generateCardBackground(bgPrompt: string) {
   try {
     const { media } = await ai.generate({
-      model: 'googleai/imagen-3-fast-generate-001',
-      prompt: `Masterpiece, professional 9:16 vertical background for Instagram Story. Minimalist luxury. ${bgPrompt}. High quality.`,
+      model: 'vertexai/imagen-3.0-fast-generate-001',
+      prompt: `Masterpiece, professional 9:16 vertical background for Instagram Story. Minimalist luxury. ${bgPrompt}. High quality, cinematic lighting.`,
       config: {
-        // @ts-ignore - Configuração para Stories
+        // @ts-ignore - Configuração para Stories no Vertex
         aspectRatio: '9:16'
       }
     });
@@ -22,12 +22,12 @@ export async function generateCardBackground(bgPrompt: string) {
 
     return media.url;
   } catch (err: any) {
-    console.error("ERRO CRÍTICO IMAGEN:", err);
+    console.error("ERRO CRÍTICO IMAGEN (Vertex):", err);
 
-    if (err.message?.includes('402') || err.message?.includes('credits are depleted')) {
-      throw new Error("Créditos para Geração de Imagem Esgotados.");
+    if (err.message?.includes('403')) {
+      throw new Error("Acesso negado ao Imagen no Vertex AI. Verifique as permissões do seu projeto no GCP.");
     }
 
-    throw new Error(`Falha ao gerar arte visual: ${err.message}`);
+    throw new Error(`Falha ao gerar arte visual no Vertex: ${err.message}`);
   }
 }
