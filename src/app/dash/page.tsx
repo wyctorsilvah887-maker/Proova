@@ -74,7 +74,8 @@ import {
   VideoIcon,
   Eye,
   Settings,
-  BookOpen
+  BookOpen,
+  Wand2
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -112,6 +113,8 @@ import { cn } from '@/lib/utils';
 import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-actions';
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { optimizeCard } from '@/ai/flows/optimize-card-flow';
+import { generateCardBackground } from '@/ai/flows/generate-card-bg-flow';
 
 interface AuditItem {
   id: string;
@@ -148,7 +151,11 @@ export default function DashPage() {
   const [selectedTestimonialForShare, setSelectedTestimonialForShare] = useState<any>(null);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isExportingCard, setIsExportingCard] = useState(false);
-  const [cardVariant, setCardVariant] = useState<'dark' | 'orange'>('dark');
+  const [cardVariant, setCardVariant] = useState<'dark' | 'orange' | 'ai'>('dark');
+  const [isAIProcessing, setIsAIProcessing] = useState(false);
+  const [aiRefinedText, setAiRefinedText] = useState('');
+  const [aiBgUrl, setAiBgUrl] = useState('');
+  
   const shareCardRef = useRef<HTMLDivElement>(null);
   const dialogVideoRef = useRef<HTMLVideoElement>(null);
 
@@ -563,7 +570,7 @@ export default function DashPage() {
         backgroundColor: 'rgba(0,0,0,0)',
         filter: (node) => {
           const el = node as HTMLElement;
-          return el.tagName !== 'VIDEO' && el.id !== 'video-overlay-badge' && el.id !== 'card-header-cta';
+          return el.tagName !== 'VIDEO' && el.id !== 'video-overlay-badge' && el.id !== 'card-header-cta' && el.id !== 'card-ai-badge';
         }
       });
       
@@ -611,7 +618,7 @@ export default function DashPage() {
         ctx.arcTo(vX + vWidth, vY + vHeight, vX, vY + vHeight, radius);
         ctx.arcTo(vX, vY + vHeight, vX, vY, radius);
         ctx.arcTo(vX, vY, vX + vWidth, vY, radius);
-        ctx.closePath();
+        closePath();
         ctx.clip();
         
         ctx.drawImage(videoEl, vX, vY, vWidth, vHeight);
@@ -669,9 +676,41 @@ export default function DashPage() {
     }
   };
 
+  const handleAIDesignMagic = async () => {
+    if (!selectedTestimonialForShare || isAIProcessing) return;
+    setIsAIProcessing(true);
+    setCardVariant('ai');
+    
+    try {
+      toast({ title: "🧠 Inteligência Proova Iniciada", description: "Otimizando copy e gerando arte generativa única..." });
+      
+      // 1. Otimizar Texto e criar prompt visual
+      const { refinedText, bgPrompt } = await optimizeCard({
+        text: selectedTestimonialForShare.text,
+        businessType: userData?.businessType
+      });
+      
+      setAiRefinedText(refinedText);
+
+      // 2. Gerar Fundo com Imagen
+      const bgUrl = await generateCardBackground(bgPrompt);
+      setAiBgUrl(bgUrl);
+      
+      toast({ title: "✨ Design Concluído!", description: "Seu card foi transformado em uma peça de elite." });
+    } catch (err: any) {
+      console.error(err);
+      toast({ variant: "destructive", title: "Erro na Mágica IA", description: "Não foi possível completar o design agora." });
+      setCardVariant('dark');
+    } finally {
+      setIsAIProcessing(false);
+    }
+  };
+
   const openShareDialog = (testimonial: any) => {
     setSelectedTestimonialForShare(testimonial);
-    setCardVariant(Math.random() > 0.5 ? 'dark' : 'orange');
+    setCardVariant('dark');
+    setAiRefinedText('');
+    setAiBgUrl('');
     setIsShareDialogOpen(true);
   };
 
@@ -748,7 +787,7 @@ export default function DashPage() {
               >
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>
-                {!isSetupComplete && <Lock className="ml-auto w-3 h-3 opacity-60" />}
+                {!isSetupComplete && <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
@@ -1215,27 +1254,61 @@ export default function DashPage() {
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[96vh] flex flex-col">
           <DialogHeader className="p-6 sm:p-8 pb-2 text-center shrink-0">
-            <DialogTitle className="text-lg sm:text-xl font-black font-headline uppercase tracking-tight">Social Card Premium</DialogTitle>
+            <div className="flex items-center justify-center gap-2 mb-1">
+               <Share2 className="w-4 h-4 text-primary" />
+               <DialogTitle className="text-lg sm:text-xl font-black font-headline uppercase tracking-tight">Social Card Premium</DialogTitle>
+            </div>
             <DialogDescription className="text-xs">Gere um post profissional para suas redes sociais.</DialogDescription>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6 flex flex-col items-center gap-6 scrollbar-hide">
+            {/* Visual variants toggle */}
+            <div className="flex gap-2 p-1 bg-muted/50 rounded-xl w-fit">
+               <button onClick={() => setCardVariant('dark')} className={cn("px-4 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all", cardVariant === 'dark' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground")}>Dark</button>
+               <button onClick={() => setCardVariant('orange')} className={cn("px-4 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all", cardVariant === 'orange' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground")}>Orange</button>
+               <button 
+                onClick={handleAIDesignMagic} 
+                disabled={isAIProcessing}
+                className={cn(
+                  "px-4 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all flex items-center gap-1.5", 
+                  cardVariant === 'ai' ? "bg-primary text-white shadow-lg" : "bg-primary/10 text-primary hover:bg-primary/20",
+                  isAIProcessing && "animate-pulse"
+                )}
+               >
+                 {isAIProcessing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
+                 AI Design
+               </button>
+            </div>
+
             <div className="w-full flex justify-center py-2 shrink-0">
               <div 
                 ref={shareCardRef}
-                className="w-[min(88vw,400px)] aspect-square relative overflow-hidden rounded-[2.5rem] shadow-2xl flex flex-col items-center p-6 sm:p-10 text-center transition-all duration-500"
+                className="w-[min(88vw,400px)] aspect-square relative overflow-hidden rounded-[2.5rem] shadow-2xl flex flex-col items-center p-6 sm:p-10 text-center transition-all duration-700"
                 style={{ 
-                  background: cardVariant === 'dark' 
-                    ? 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)'
-                    : 'linear-gradient(160deg, #f97316 0%, #ea580c 60%, #ffffff 180%)',
+                  background: cardVariant === 'ai' && aiBgUrl 
+                    ? `url(${aiBgUrl}) center/cover no-repeat` 
+                    : (cardVariant === 'dark' 
+                      ? 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)'
+                      : 'linear-gradient(160deg, #f97316 0%, #ea580c 60%, #ffffff 180%)'),
                   backgroundColor: cardVariant === 'dark' ? '#000000' : '#f97316'
                 }}
               >
-                 <div className={cn(
-                   "absolute -top-20 -right-20 w-64 h-64 rounded-full blur-[80px] opacity-40",
-                   cardVariant === 'dark' ? "bg-primary/20" : "bg-white/20"
-                 )} />
-                 <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-black/40 rounded-full blur-[80px]" />
+                 {/* Decorative elements for standard variants */}
+                 {cardVariant !== 'ai' && (
+                   <>
+                    <div className={cn(
+                      "absolute -top-20 -right-20 w-64 h-64 rounded-full blur-[80px] opacity-40",
+                      cardVariant === 'dark' ? "bg-primary/20" : "bg-white/20"
+                    )} />
+                    <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-black/40 rounded-full blur-[80px]" />
+                   </>
+                 )}
+                 
+                 {/* Pattern overlay for AI variant to ensure legibility */}
+                 {cardVariant === 'ai' && (
+                   <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+                 )}
+
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-5 pointer-events-none" 
                    style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }} 
                  />
@@ -1247,13 +1320,13 @@ export default function DashPage() {
                    <div id="card-header-cta" className="mb-2">
                      <p className={cn(
                        "text-[9px] sm:text-[11px] font-black uppercase tracking-[0.3em] drop-shadow-md",
-                       cardVariant === 'dark' ? "text-primary" : "text-white"
+                       cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white"
                      )}>
-                       Veja o que falam sobre nós
+                       {cardVariant === 'ai' ? 'Insights de Satisfação' : 'Veja o que falam sobre nós'}
                      </p>
                    </div>
 
-                   {selectedTestimonialForShare?.videoUrl ? (
+                   {selectedTestimonialForShare?.videoUrl && cardVariant !== 'ai' ? (
                      <div className="w-full flex flex-col items-center gap-4 mt-1 sm:mt-2">
                         <div className="w-full aspect-video rounded-[1.5rem] overflow-hidden bg-black/40 relative border-4 border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] group">
                           <video 
@@ -1303,18 +1376,27 @@ export default function DashPage() {
                        <div className="flex justify-center gap-1.5">
                           {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
                             <Star key={i} className={cn(
-                              "w-5 h-5 sm:w-6 sm:h-6 fill-current",
-                              cardVariant === 'dark' ? "text-primary drop-shadow-[0_4px_10px_rgba(249,115,22,0.5)]" : "text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.1)]"
+                              "w-5 h-5 sm:w-6 h-6 fill-current",
+                              cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary drop-shadow-[0_4px_10px_rgba(249,115,22,0.5)]" : "text-white drop-shadow-[0_4px_10px_rgba(0,0,0,0.1)]"
                             )} />
                           ))}
                        </div>
                        
                        <p className={cn(
-                         "text-base sm:text-2xl font-black font-headline leading-snug sm:leading-tight line-clamp-6 italic drop-shadow-xl px-2 tracking-tight",
+                         "font-black font-headline leading-snug sm:leading-tight line-clamp-6 italic drop-shadow-xl px-2 tracking-tight",
+                         cardVariant === 'ai' ? "text-2xl sm:text-3xl" : "text-base sm:text-2xl",
                          "text-white"
                        )}>
-                          "{selectedTestimonialForShare?.text}"
+                          "{cardVariant === 'ai' && aiRefinedText ? aiRefinedText : selectedTestimonialForShare?.text}"
                        </p>
+
+                       {cardVariant === 'ai' && (
+                         <div id="card-ai-badge" className="bg-primary/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-primary/30 animate-in fade-in zoom-in duration-500">
+                           <p className="text-[8px] sm:text-[10px] text-primary font-black uppercase tracking-widest flex items-center gap-2">
+                             <Sparkles className="w-3 h-3" /> Design Generativo Ativo
+                           </p>
+                         </div>
+                       )}
                      </div>
                    )}
 
@@ -1325,7 +1407,7 @@ export default function DashPage() {
                             {selectedTestimonialForShare?.userName}
                           </p>
                           <div className="bg-white/5 backdrop-blur-xl px-3 sm:px-4 py-1 sm:py-1.5 rounded-full border border-white/10 inline-flex items-center gap-2 shadow-sm">
-                             <CheckCircle2 className={cn("w-2.5 h-2.5 sm:w-3 sm:h-3", cardVariant === 'dark' ? "text-primary" : "text-white")} />
+                             <CheckCircle2 className={cn("w-2.5 h-2.5 sm:w-3 sm:h-3", cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white")} />
                              <p className="text-[7px] sm:text-[9px] text-white/80 font-bold uppercase tracking-widest">
                                Avaliado via Proova
                              </p>
@@ -1344,10 +1426,10 @@ export default function DashPage() {
             <Button 
               className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-xs bg-primary hover:bg-primary/90 text-white"
               onClick={handleDownloadContent}
-              disabled={isExportingCard}
+              disabled={isExportingCard || isAIProcessing}
             >
               {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-5 h-5" />}
-              {selectedTestimonialForShare?.videoUrl ? 'Renderizar Vídeo Premium' : 'Baixar Card de Alta'}
+              {selectedTestimonialForShare?.videoUrl && cardVariant !== 'ai' ? 'Renderizar Vídeo Premium' : 'Baixar Card de Alta'}
             </Button>
           </div>
           
