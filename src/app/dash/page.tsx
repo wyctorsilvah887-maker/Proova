@@ -326,7 +326,8 @@ export default function DashPage() {
       // Auditoria de Maps apenas se não for negócio digital
       if (!isDigitalBusiness) {
         const mapsUrl = userData.googleMapsUrl || '';
-        const isReviewLink = mapsUrl.includes('writereview') || mapsUrl.includes('local/writereview');
+        // Atualizado para reconhecer tanto o formato padrão quanto o formato curto /review do g.page
+        const isReviewLink = mapsUrl.includes('writereview') || mapsUrl.includes('local/writereview') || mapsUrl.includes('/review');
         
         if (!mapsUrl) {
           results.push({ id: 'maps-unlinked', label: 'Google Maps Desconectado', status: 'critical', description: 'Sua empresa não está recebendo redirecionamentos.', actionLabel: 'Vincular Agora', action: () => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }, icon: MapPin });
