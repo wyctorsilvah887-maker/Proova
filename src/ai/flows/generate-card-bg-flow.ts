@@ -21,7 +21,7 @@ export const generateCardBackgroundFlow = ai.defineFlow(
   async (input) => {
     try {
       const { media } = await ai.generate({
-        model: 'vertexai/imagen-3.0-generate-001',
+        model: 'vertexai/imagen-3',
         prompt: `Vertical 9:16 portrait orientation for Instagram Story, ${input.bgPrompt}, high-end commercial photography, minimalist luxury style, 8k resolution, clean composition, space for text overlay.`,
       });
 
