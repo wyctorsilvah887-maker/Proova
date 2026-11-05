@@ -1,12 +1,13 @@
+
 'use server';
 /**
- * @fileOverview Flow para geração de copy persuasiva via Gemini no Google AI Studio.
+ * @fileOverview Flow para geração de copy persuasiva via Google AI.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
 
 const CopyInputSchema = z.object({
-  type: z.string().describe('Tipo do campo: hero_title, hero_subtitle, section_title, section_content'),
+  type: z.string(),
   companyName: z.string().optional(),
   context: z.string().optional(),
 });
@@ -15,15 +16,15 @@ export async function generateCopy(input: z.infer<typeof CopyInputSchema>) {
   try {
     const { text } = await ai.generate({
       model: 'googleai/gemini-1.5-flash',
-      prompt: `Você é um copywriter de elite especialista em prova social. 
-      Gere um texto curto, matador e altamente persuasivo para o campo: ${input.type}.
+      prompt: `Você é um copywriter especialista em prova social. 
+      Gere um texto matador para o campo: ${input.type}.
       Empresa: ${input.companyName || 'Nossa Empresa'}.
-      Contexto: ${input.context || 'Focar em autoridade e confiança.'}.
+      Contexto: ${input.context || 'Focar em autoridade'}.
       
       REGRAS:
-      1. Retorne APENAS o texto sugerido.
-      2. Sem aspas, sem explicações.
-      3. Máximo de 2 frases.`,
+      1. Apenas o texto sugerido.
+      2. Sem aspas.
+      3. Máximo 2 frases.`,
     });
     
     return text || 'Transforme sua autoridade em lucro real hoje.';
