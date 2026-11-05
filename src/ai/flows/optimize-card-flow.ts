@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Flow para criação de roteiro de design para Instagram Story Posts via Vertex AI.
@@ -20,20 +21,19 @@ const optimizeCardPrompt = ai.definePrompt({
   model: 'vertexai/gemini-1.5-flash',
   input: { schema: OptimizeCardInputSchema },
   output: { schema: OptimizeCardOutputSchema },
-  prompt: `Você é um Diretor de Arte de uma agência de publicidade de luxo. 
-  Sua especialidade é criar posts de Instagram Stories (Social Proof) que convertem visualizações em desejo de compra.
+  prompt: `Você é um Diretor de Arte de uma agência de publicidade de luxo especializada em Prova Social. 
   
-  O objetivo é criar um Story impactante baseado neste depoimento real: "{{{text}}}"
-  Setor do negócio: {{#if businessType}}{{{businessType}}}{{else}}Geral{{/if}}
+  O objetivo é criar um Instagram Story impactante baseado neste depoimento: "{{{text}}}"
+  Setor do negócio: {{#if businessType}}{{{businessType}}}{{else}}Premium Business{{/if}}
   
-  INSTRUÇÕES DE DESIGN:
-  1. Headline (refinedText): Transforme o depoimento em uma frase curta, poderosa e "matadora" (máximo 8 palavras). Deve soar como uma declaração de autoridade. Use exclamações se necessário.
-  2. Background (bgPrompt): Crie um prompt detalhado em INGLÊS para o Imagen 3. 
-     - Estilo: "Abstract Minimalist Luxury" ou "High-end Interior/Product Shot".
-     - Composição: Espaço negativo para texto, iluminação dramática (cinematic lighting).
-     - Cores: Use tons que combinem com o setor {{#if businessType}}{{{businessType}}}{{else}}Geral{{/if}}.
+  INSTRUÇÕES DE CRIAÇÃO:
+  1. Headline (refinedText): Extraia a essência do elogio em uma frase poderosa, curta e inspiradora (máximo 8 palavras). Deve soar como um slogan de marca de luxo.
+  2. Visual (bgPrompt): Crie um prompt detalhado em INGLÊS para o Imagen 3 gerar uma imagem 9:16.
+     - Estilo: "High-end commercial photography, minimalist luxury, shallow depth of field".
+     - Cenário: Algo que remeta ao setor {{#if businessType}}{{{businessType}}}{{else}}Geral{{/if}} de forma abstrata ou sofisticada (ex: texturas de mármore, iluminação de estúdio, design de interiores moderno).
+     - Composição: Espaço negativo amplo para que o texto não cubra elementos importantes.
   
-  Retorne exatamente no formato JSON solicitado.`,
+  Retorne rigorosamente no formato JSON.`,
 });
 
 export const optimizeCardFlow = ai.defineFlow(
@@ -45,16 +45,16 @@ export const optimizeCardFlow = ai.defineFlow(
   async (input) => {
     try {
       const { output } = await optimizeCardPrompt(input);
-      if (!output) throw new Error("Erro na resposta estruturada da IA.");
+      if (!output) throw new Error("A IA não conseguiu estruturar os dados do card.");
       return output;
     } catch (err: any) {
-      console.error("ERRO NO VERTEX AI (optimizeCard):", err);
+      console.error("ERRO VERTEX AI (Optimize):", err);
       
-      if (err.message?.includes('403') || err.message?.includes('permission denied')) {
-        throw new Error("Erro de Permissão: Ative a Vertex AI API no seu console e verifique se o faturamento está ativo.");
+      if (err.message?.includes('403') || err.message?.includes('permission')) {
+        throw new Error("Erro de Permissão: Verifique se a conta de serviço tem o papel 'roles/aiplatform.user' no projeto proova-513814.");
       }
 
-      throw new Error(`Falha na IA (Vertex): ${err.message || 'Erro de conexão'}.`);
+      throw new Error(`Falha na IA (Vertex): ${err.message || 'Erro de comunicação'}.`);
     }
   }
 );

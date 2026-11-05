@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Flow para geração de backgrounds verticais (Stories) via Imagen 3 no Vertex AI.
@@ -19,19 +20,20 @@ export const generateCardBackgroundFlow = ai.defineFlow(
   },
   async (input) => {
     try {
+      // Imagen 3 no Vertex AI exige Project ID configurado e API ativa.
       const { media } = await ai.generate({
         model: 'vertexai/imagen-3.0-fast-generate-001',
-        prompt: `9:16 vertical smartphone wallpaper, high-end professional commercial photography, minimalist luxury style, ${input.bgPrompt}, cinematic lighting, shallow depth of field, 8k resolution, clean composition for text overlay.`,
+        prompt: `Vertical 9:16 composition for smartphone screen, ${input.bgPrompt}, ultra-high definition, cinematic color grading, clean and professional look.`,
       });
 
       if (!media || !media.url) {
-        throw new Error('O modelo Imagen não retornou mídia.');
+        throw new Error('O motor de arte visual (Imagen) não retornou dados.');
       }
 
       return media.url;
     } catch (err: any) {
       console.error("ERRO CRÍTICO IMAGEN (Vertex):", err);
-      throw new Error(`Falha ao gerar arte visual no Vertex: ${err.message}`);
+      throw new Error(`Falha ao gerar background no Vertex: ${err.message}`);
     }
   }
 );
