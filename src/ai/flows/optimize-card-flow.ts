@@ -1,7 +1,7 @@
 'use server';
 
 import { ai, geminiModel } from '@/ai/genkit';
-import { z } from 'kit';
+import { z } from 'genkit';
 
 /**
  * @fileOverview Fluxo para criação de Social Cards Premium.

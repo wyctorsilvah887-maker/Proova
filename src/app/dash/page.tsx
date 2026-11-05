@@ -1266,16 +1266,17 @@ export default function DashPage() {
                   backgroundImage: cardVariant === 'dark' 
                     ? 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)'
                     : (cardVariant === 'ai' 
-                      ? 'linear-gradient(135deg, #000000 0%, #1a1a1a 100%)' 
+                      ? 'linear-gradient(135deg, #0f0f0f 0%, #262626 50%, #1a1a1a 100%)' 
                       : 'linear-gradient(160deg, #f97316 0%, #ea580c 60%, #ffffff 180%)'),
                   backgroundColor: cardVariant === 'dark' || cardVariant === 'ai' ? '#000000' : '#f97316'
                 }}
               >
                  {cardVariant === 'ai' && (
                    <>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16" />
-                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -ml-16 -mb-16" />
-                    <div className="absolute inset-0 border-[10px] border-white/5 m-4 rounded-[2rem] pointer-events-none" />
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-16 -mt-16" />
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/10 rounded-full blur-3xl -ml-24 -mb-24" />
+                    <div className="absolute inset-0 border-[4px] border-primary/20 m-2 rounded-[2.2rem] pointer-events-none" />
+                    <div className="absolute inset-0 border-[1px] border-white/10 m-4 rounded-[2rem] pointer-events-none" />
                    </>
                  )}
                  
@@ -1286,12 +1287,13 @@ export default function DashPage() {
                       cardVariant === 'dark' ? "bg-primary/20" : "bg-white/20"
                     )} />
                     <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-black/40 rounded-full blur-[80px]" />
-                    <Quote className={cn("absolute top-6 left-6 w-10 h-10 -rotate-12", cardVariant === 'dark' ? "text-white/5" : "text-black/5")} />
                    </>
                  )}
 
-                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-5 pointer-events-none" 
-                   style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }} 
+                 <Quote className={cn("absolute top-8 left-8 w-12 h-12 -rotate-12", cardVariant === 'ai' ? "text-primary/10" : (cardVariant === 'dark' ? "text-white/5" : "text-black/5"))} />
+
+                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-[0.03] pointer-events-none" 
+                   style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} 
                  />
                  
                  <div className={cn(
@@ -1300,10 +1302,10 @@ export default function DashPage() {
                    
                    <div id="card-header-cta" className="mb-2">
                      <p className={cn(
-                       "text-[9px] sm:text-[11px] font-black uppercase tracking-[0.3em] drop-shadow-md",
+                       "text-[9px] sm:text-[11px] font-black uppercase tracking-[0.4em] drop-shadow-lg",
                        cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white"
                      )}>
-                       {cardVariant === 'ai' ? (aiData?.headline || 'AUTORIDADE REAL') : 'Veja o que falam sobre nós'}
+                       {cardVariant === 'ai' ? (aiData?.headline || 'AUTORIDADE MÁXIMA') : 'Veja o que falam sobre nós'}
                      </p>
                    </div>
 
@@ -1339,38 +1341,41 @@ export default function DashPage() {
                         </div>
                      </div>
                    ) : (
-                     <div className="flex-1 flex flex-col justify-center items-center space-y-4 sm:space-y-6 py-4">
-                       <div className="flex justify-center gap-1.5 animate-in fade-in slide-in-from-top-4 duration-1000">
+                     <div className="flex-1 flex flex-col justify-center items-center space-y-6 sm:space-y-8 py-4">
+                       <div className="flex justify-center gap-2 animate-in fade-in slide-in-from-top-4 duration-1000">
                           {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                            <Star key={i} className={cn("w-4 h-4 sm:w-6 h-6 fill-current", cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white")} />
+                            <Star key={i} className={cn("w-5 h-5 sm:w-7 h-7 fill-current", cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white")} />
                           ))}
                        </div>
                        
-                       <div className="space-y-4">
+                       <div className="space-y-6">
                          <p className={cn(
-                           "font-black font-headline leading-tight sm:leading-tight italic drop-shadow-xl px-2 tracking-tight transition-all duration-1000",
-                           cardVariant === 'ai' ? "text-lg sm:text-2xl uppercase" : "text-base sm:text-xl",
+                           "font-black font-headline leading-tight sm:leading-tight italic drop-shadow-2xl px-2 tracking-tight transition-all duration-1000",
+                           cardVariant === 'ai' ? "text-xl sm:text-3xl uppercase" : "text-base sm:text-xl",
                            "text-white"
                          )}>
                             "{cardVariant === 'ai' && aiData ? aiData.bodyText : selectedTestimonialForShare?.text}"
                          </p>
                          {cardVariant === 'ai' && (
-                           <p className="text-[8px] sm:text-[10px] text-primary font-black uppercase tracking-[0.3em] animate-in fade-in zoom-in duration-1000 flex items-center justify-center gap-2">
-                             <Sparkles className="w-3 h-3" /> {aiData?.tagline || 'IA Story Design'}
-                           </p>
+                           <div className="flex flex-col items-center gap-2 animate-in fade-in zoom-in duration-1000">
+                             <div className="h-px w-12 bg-primary/30" />
+                             <p className="text-[9px] sm:text-[11px] text-primary font-black uppercase tracking-[0.4em]">
+                               <Sparkles className="w-3 h-3 inline mr-2" /> {aiData?.tagline || 'EXCLUSIVIDADE'}
+                             </p>
+                           </div>
                          )}
                        </div>
                      </div>
                    )}
 
-                   <div className="w-full pt-4 border-t border-white/10 mt-2 sm:mt-4">
-                      <div className="flex flex-col items-center gap-2">
-                        <p className="text-white font-black text-[10px] sm:text-xs uppercase tracking-[0.2em]">
+                   <div className="w-full pt-6 border-t border-white/10 mt-2 sm:mt-4">
+                      <div className="flex flex-col items-center gap-3">
+                        <p className="text-white font-black text-[11px] sm:text-sm uppercase tracking-[0.3em] drop-shadow-md">
                           {cardVariant === 'ai' && aiData ? aiData.author : selectedTestimonialForShare?.userName}
                         </p>
-                        <div className="bg-white/5 px-3 py-1 rounded-full border border-white/10 inline-flex items-center gap-2">
-                             <CheckCircle2 className={cn("w-2.5 h-2.5", cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white")} />
-                             <p className="text-[7px] sm:text-[8px] text-white/80 font-bold uppercase tracking-widest">Avaliado via Proova</p>
+                        <div className="bg-white/5 px-4 py-1.5 rounded-full border border-white/10 inline-flex items-center gap-2 backdrop-blur-sm">
+                             <CheckCircle2 className={cn("w-3 h-3", cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white")} />
+                             <p className="text-[8px] sm:text-[9px] text-white/80 font-black uppercase tracking-widest">Certificado Proova</p>
                         </div>
                       </div>
                    </div>
@@ -1384,13 +1389,13 @@ export default function DashPage() {
               disabled={isExportingCard || isAIProcessing}
             >
               {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-5 h-5" />}
-              {selectedTestimonialForShare?.videoUrl && cardVariant !== 'ai' ? 'Renderizar Vídeo' : 'Baixar Card Social'}
+              {selectedTestimonialForShare?.videoUrl && cardVariant !== 'ai' ? 'Exportar Vídeo VIP' : 'Baixar Card Premium'}
             </Button>
           </div>
           
           <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
             <p className="text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
-              <Zap className="w-3 h-3 text-primary" /> Dica: Posts quadrados performam melhor no feed do Instagram.
+              <Zap className="w-3 h-3 text-primary" /> Dica: Peças de alto contraste geram 40% mais cliques no feed.
             </p>
           </DialogFooter>
         </DialogContent>

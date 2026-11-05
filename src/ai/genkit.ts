@@ -1,4 +1,3 @@
-
 import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 
@@ -16,3 +15,4 @@ export const ai = genkit({
 // Constantes de modelos estáveis para garantir o funcionamento em produção
 export const PRIMARY_MODEL = 'googleai/gemini-1.5-flash';
 export const FALLBACK_MODEL = 'googleai/gemini-1.5-flash';
+export const geminiModel = PRIMARY_MODEL;
