@@ -54,70 +54,79 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4 font-body text-foreground relative">
+      {/* Minimalist Navigation */}
       <div className="fixed top-8 left-8 flex items-center gap-4">
-        <Link href="/login" className="flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-primary transition-colors uppercase tracking-widest">
-          <ArrowLeft className="w-4 h-4" /> Voltar
+        <Link 
+          href="/login" 
+          className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary active:text-primary transition-all focus:outline-none select-none"
+        >
+          <ArrowLeft className="w-3.5 h-3.5" /> Cancelar
         </Link>
       </div>
 
+      {/* Clean Theme Toggle */}
       <div className="fixed top-8 right-8">
-        <ThemeToggle className="border-none bg-transparent shadow-none" />
+        <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" />
       </div>
 
-      <Card className="w-full max-w-md shadow-2xl border-none overflow-hidden bg-card">
-        <div className="h-2 bg-primary w-full" />
-        <CardHeader className="text-center space-y-4 pt-8">
+      <Card className="w-full max-w-md shadow-2xl border-none overflow-hidden bg-card rounded-[2rem] ring-1 ring-border/50">
+        <div className="h-1.5 bg-primary w-full" />
+        <CardHeader className="text-center space-y-4 pt-10">
           <div className="mx-auto w-fit animate-in zoom-in duration-700">
             <Fingerprint className="w-12 h-12 text-primary" />
           </div>
-          <div className="space-y-2">
-            <CardTitle className="text-3xl font-headline font-bold tracking-tight">Recuperar Senha</CardTitle>
-            <CardDescription className="text-sm font-medium">
+          <div className="space-y-1">
+            <CardTitle className="text-xl md:text-2xl font-black font-headline tracking-tight">Recuperar Senha</CardTitle>
+            <CardDescription className="text-xs font-medium">
               {isSent 
                 ? "Siga as instruções enviadas para seu e-mail." 
                 : "Informe o e-mail associado à sua conta para receber o link de acesso."}
             </CardDescription>
           </div>
         </CardHeader>
-        <CardContent className="px-8 pb-10">
+        <CardContent className="px-8 pb-10 md:pb-12">
           {isSent ? (
             <div className="space-y-8 text-center py-4 animate-in fade-in slide-in-from-bottom-4">
               <div className="flex justify-center">
                 <div className="bg-green-100 dark:bg-green-900/30 p-4 rounded-full">
-                  <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400" />
+                  <CheckCircle2 className="w-10 h-10 text-green-600 dark:text-green-400" />
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed font-medium">
                 Um e-mail de recuperação foi enviado para <br />
                 <span className="font-bold text-foreground">{email}</span>.
               </p>
-              <Button asChild className="w-full h-14 text-lg font-bold shadow-xl">
+              <Button asChild className="w-full h-14 text-base font-black shadow-xl rounded-2xl bg-primary hover:bg-primary/90 text-white">
                 <Link href="/login">Voltar ao Login</Link>
               </Button>
             </div>
           ) : (
             <form onSubmit={handleResetRequest} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-xs font-black uppercase tracking-widest text-muted-foreground ml-1">E-mail de Acesso</Label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-4 h-5 w-5 text-muted-foreground" />
+                <Label htmlFor="email" className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">E-mail de Acesso</Label>
+                <div className="relative group">
+                  <Mail className="absolute left-4 top-3.5 h-4 w-4 text-muted-foreground/40 transition-colors group-focus-within:text-primary" />
                   <Input
                     id="email"
                     type="email"
                     placeholder="exemplo@empresa.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-12 h-14 bg-muted/20 border-transparent focus:ring-primary/20 text-base"
+                    className="pl-11 h-11 bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm rounded-xl"
                     required
                   />
                 </div>
               </div>
-              <Button type="submit" className="w-full h-14 text-lg font-bold shadow-xl transition-all hover:translate-y-[-2px] active:translate-y-0" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                className="w-full h-14 text-base font-black shadow-xl hover:scale-[1.02] active:scale-95 transition-all rounded-2xl bg-primary hover:bg-primary/90 text-white" 
+                disabled={isLoading}
+              >
                 {isLoading ? (
-                  <>< Loader2 className="animate-spin mr-2 h-5 w-5" /> Processando...</>
+                  <><Loader2 className="animate-spin mr-2 h-5 w-5" /> Processando...</>
                 ) : 'Enviar Link de Recuperação'}
               </Button>
-              <p className="text-[10px] text-center text-muted-foreground uppercase tracking-widest font-bold opacity-40">
+              <p className="text-[8px] text-center text-muted-foreground uppercase tracking-[0.3em] font-black opacity-40">
                 🚀 Powered by Proova
               </p>
             </form>
