@@ -1,16 +1,13 @@
 
 import { genkit } from 'genkit';
-import { vertexAI } from '@genkit-ai/vertexai';
+import { googleAI } from '@genkit-ai/googleai';
 
 /**
- * Inicializa a instância global do Genkit com Vertex AI.
- * Project ID fixo conforme configurado no Google Cloud Console.
+ * Inicializa a instância global do Genkit com Google AI (Gemini API).
+ * Este método é mais estável para ambientes de desenvolvimento por usar API Key.
  */
 export const ai = genkit({
   plugins: [
-    vertexAI({
-      projectId: 'proova-513814',
-      location: 'us-central1', 
-    }),
+    googleAI(), // A chave de API será lida automaticamente de GOOGLE_GENAI_API_KEY no .env
   ],
 });

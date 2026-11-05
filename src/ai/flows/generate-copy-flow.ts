@@ -1,7 +1,7 @@
 
 'use server';
 /**
- * @fileOverview Flow para geração de copy persuasiva para landing pages via Vertex AI.
+ * @fileOverview Flow para geração de copy persuasiva via Google AI.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -19,21 +19,23 @@ export const generateCopyFlow = ai.defineFlow(
     outputSchema: z.string(),
   },
   async (input) => {
-    const { text } = await ai.generate({
-      model: 'vertexai/gemini-1.5-flash',
-      prompt: `Você é um copywriter de elite especialista em prova social. 
-      Gere um texto curto, matador e altamente persuasivo.
-      
-      Campo: ${input.type}
-      Empresa: ${input.companyName || 'Nossa Empresa'}
-      Contexto: ${input.context || 'Focar em autoridade e confiança.'}
-      
-      REGRAS:
-      1. Retorne APENAS o texto sugerido.
-      2. Sem aspas, sem explicações, sem introduções.
-      3. Máximo de 2 frases. 
-      4. Use Português do Brasil de forma nítida.`,
-    });
-    return text || '';
+    try {
+      const { text } = await ai.generate({
+        model: 'googleai/gemini-1.5-flash',
+        prompt: `Você é um copywriter de elite especialista em prova social. 
+        Gere um texto curto, matador e altamente persuasivo para o campo: ${input.type}.
+        Empresa: ${input.companyName || 'Nossa Empresa'}.
+        Contexto: ${input.context || 'Focar em autoridade e confiança.'}.
+        
+        REGRAS:
+        1. Retorne APENAS o texto sugerido.
+        2. Sem aspas, sem explicações.
+        3. Máximo de 2 frases.`,
+      });
+      return text || '';
+    } catch (err: any) {
+      console.error("ERRO COPY FLOW:", err);
+      return "Transforme sua autoridade em lucro real hoje.";
+    }
   }
 );

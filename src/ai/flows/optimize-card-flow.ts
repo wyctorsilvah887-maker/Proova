@@ -1,7 +1,7 @@
 
 'use server';
 /**
- * @fileOverview Flow para criação de roteiro de design para Instagram Story Posts via Vertex AI.
+ * @fileOverview Flow para criação de roteiro de design para Instagram Story via Google AI.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -12,31 +12,25 @@ const OptimizeCardInputSchema = z.object({
 });
 
 const OptimizeCardOutputSchema = z.object({
-  refinedText: z.string().describe('O depoimento transformado em uma headline matadora para Story.'),
-  bgPrompt: z.string().describe('Um prompt visual em inglês para o Imagen 3 gerar um fundo vertical 9:16.'),
+  refinedText: z.string().describe('O depoimento transformado em uma headline matadora.'),
+  bgPrompt: z.string().describe('Um prompt visual em inglês para o Imagen 3.'),
 });
 
 const optimizeCardPrompt = ai.definePrompt({
   name: 'optimizeCardPrompt',
-  model: 'vertexai/gemini-1.5-flash',
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: OptimizeCardInputSchema },
   output: { schema: OptimizeCardOutputSchema },
   config: {
     temperature: 0.7,
   },
-  prompt: `Você é um Diretor de Arte de uma agência de publicidade de luxo especializada em Prova Social. 
+  prompt: `Você é um Diretor de Arte de luxo. 
+  Crie um Story de impacto para: "{{{text}}}"
+  Setor: {{#if businessType}}{{{businessType}}}{{else}}Premium Business{{/if}}
   
-  O objetivo é criar um Instagram Story impactante baseado neste depoimento: "{{{text}}}"
-  Setor do negócio: {{#if businessType}}{{{businessType}}}{{else}}Premium Business{{/if}}
-  
-  INSTRUÇÕES DE CRIAÇÃO:
-  1. Headline (refinedText): Extraia a essência do elogio em uma frase poderosa, curta e inspiradora (máximo 8 palavras). Deve soar como um slogan de marca de luxo.
-  2. Visual (bgPrompt): Crie um prompt detalhado em INGLÊS para o Imagen 3 gerar uma imagem 9:16.
-     - Estilo: "High-end commercial photography, minimalist luxury, shallow depth of field, 8k resolution".
-     - Cenário: Algo que remeta ao setor {{#if businessType}}{{{businessType}}}{{else}}Geral{{/if}} de forma abstrata ou sofisticada (ex: texturas de mármore, iluminação de estúdio, design de interiores moderno).
-     - Composição: Espaço negativo amplo no centro para que o texto não cubra elementos importantes.
-  
-  Retorne rigorosamente no formato JSON.`,
+  INSTRUÇÕES:
+  1. Headline: Curta (max 8 palavras), impactante, soando como marca de luxo.
+  2. Visual: Prompt em inglês para fundo 9:16 abstrato e sofisticado (mármore, iluminação de estúdio, etc).`,
 });
 
 export const optimizeCardFlow = ai.defineFlow(
@@ -48,11 +42,11 @@ export const optimizeCardFlow = ai.defineFlow(
   async (input) => {
     try {
       const { output } = await optimizeCardPrompt(input);
-      if (!output) throw new Error("A IA não conseguiu estruturar os dados do card.");
+      if (!output) throw new Error("A IA não conseguiu estruturar os dados.");
       return output;
     } catch (err: any) {
-      console.error("ERRO VERTEX AI (Optimize):", err);
-      throw new Error(`Falha na IA (Vertex): ${err.message || 'Erro de comunicação'}.`);
+      console.error("ERRO IA OPTIMIZE:", err);
+      throw new Error(`Falha na IA: ${err.message || 'Erro de comunicação'}.`);
     }
   }
 );
