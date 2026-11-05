@@ -79,7 +79,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
       </div>
 
       <div className="flex items-center gap-2 md:gap-6">
-        {/* Alternador de Tema movido para a direita */}
+        {/* Alternador de Tema */}
         <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" />
         
         <div className="hidden sm:flex items-center gap-6">
@@ -252,9 +252,9 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
           </linearGradient>
           <linearGradient id="agency-fraud-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="white" />
-            <stop offset="15%" stopColor="#22c55e" /> {/* Green - reduced space */}
-            <stop offset="40%" stopColor="#ef4444" /> {/* Red - Pushed up significantly to dominate */}
-            <stop offset="100%" stopColor="#b91c1c" /> {/* Dark Red */}
+            <stop offset="15%" stopColor="#22c55e" />
+            <stop offset="40%" stopColor="#ef4444" />
+            <stop offset="100%" stopColor="#b91c1c" />
           </linearGradient>
         </defs>
       </svg>
@@ -326,7 +326,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
 AgitationSection.displayName = "AgitationSection";
 
 /**
- * Seção de Pilares (A Máquina de Domínio) - Redesign Step-by-Step
+ * Seção de Pilares (A Máquina de Domínio) - Redesign Vertical Stepper
  */
 const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -356,8 +356,6 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
       const rect = sectionRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
       
-      // Começamos a contar o progresso quando a seção entra na tela (offset de 30%)
-      // E terminamos quando a seção sai
       const triggerPoint = windowHeight * 0.7;
       const progress = (triggerPoint - rect.top) / (rect.height);
       const clampedProgress = Math.max(0, Math.min(1, progress));
@@ -389,18 +387,22 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
         </div>
         
         <div className="max-w-4xl mx-auto relative px-4 md:px-0">
-          {/* Track (Fundo da Linha) */}
-          <div className="absolute left-[26px] md:left-[45px] top-10 bottom-10 w-0.5 bg-muted/40 hidden sm:block rounded-full overflow-hidden">
-            {/* Active Progress Line */}
+          {/* Track (Trilho da Linha) */}
+          <div className="absolute left-[26px] md:left-[45px] top-8 bottom-8 w-0.5 bg-muted/40 hidden sm:block rounded-full overflow-hidden">
+            {/* Active Progress Fill */}
             <div 
               className="absolute top-0 left-0 w-full bg-primary transition-all duration-150 ease-out"
               style={{ height: `${scrollProgress * 100}%` }}
+            />
+            {/* Seguindo: Bolinha Indicadora Ativa */}
+            <div 
+              className="absolute w-3 h-3 bg-primary rounded-full -left-[5px] transition-all duration-150 ease-out shadow-[0_0_15px_rgba(249,115,22,0.8)] z-20 border-2 border-background"
+              style={{ top: `${scrollProgress * 100}%`, transform: 'translateY(-50%)' }}
             />
           </div>
 
           <div className="space-y-16 md:space-y-24">
             {steps.map((step, idx) => {
-              // Verifica se o progresso atingiu este passo específico
               const stepTrigger = idx / (steps.length - 1);
               const isActive = scrollProgress >= stepTrigger;
 
@@ -413,31 +415,32 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                   )}
                   style={{ transitionDelay: `${(idx + 1) * 100}ms` }}
                 >
-                  {/* Step Number with Dynamic Dot */}
+                  {/* Step Number */}
                   <div className="flex flex-col items-center shrink-0">
                     <div className={cn(
-                      "text-3xl md:text-5xl font-black font-headline transition-colors duration-500 mb-2",
+                      "text-xl md:text-3xl font-black font-headline transition-colors duration-500 mb-1",
                       isActive ? "text-primary" : "text-foreground/10"
                     )}>
                       {step.number}
                     </div>
+                    {/* Bolinha Fixa de Referência */}
                     <div className={cn(
-                      "w-3 h-3 rounded-full z-10 transition-all duration-500",
+                      "w-2.5 h-2.5 rounded-full z-10 transition-all duration-500 border-2",
                       isActive 
-                        ? "bg-primary scale-125 shadow-[0_0_15px_rgba(249,115,22,0.6)]" 
-                        : "bg-muted"
+                        ? "bg-primary border-primary scale-110" 
+                        : "bg-background border-muted"
                     )} />
                   </div>
 
                   {/* Content */}
                   <div className={cn(
-                    "space-y-3 pt-1 md:pt-2 transition-all duration-700",
+                    "space-y-3 pt-0.5 md:pt-1 transition-all duration-700",
                     isActive ? "translate-x-0 opacity-100" : "translate-x-2 opacity-50"
                   )}>
-                    <h4 className="text-2xl md:text-4xl font-black font-headline tracking-tight text-foreground">
+                    <h4 className="text-xl md:text-3xl font-black font-headline tracking-tight text-foreground">
                       {step.title}
                     </h4>
-                    <p className="text-muted-foreground text-sm md:text-xl leading-relaxed font-medium max-w-2xl">
+                    <p className="text-muted-foreground text-sm md:text-lg leading-relaxed font-medium max-w-2xl">
                       {step.desc}
                     </p>
                   </div>
@@ -632,7 +635,6 @@ export default function Home() {
     if (pillarsRef.current) observer.observe(pillarsRef.current);
     if (versatilityRef.current) observer.observe(versatilityRef.current);
 
-    // Fallback: force visibility after 2 seconds if observer fails
     const fallbackTimer = setTimeout(() => {
       setIsAgitationVisible(true);
       setIsPillarsVisible(true);
