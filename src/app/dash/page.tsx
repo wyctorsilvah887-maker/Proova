@@ -618,7 +618,7 @@ export default function DashPage() {
         ctx.arcTo(vX + vWidth, vY + vHeight, vX, vY + vHeight, radius);
         ctx.arcTo(vX, vY + vHeight, vX, vY, radius);
         ctx.arcTo(vX, vY, vX + vWidth, vY, radius);
-        closePath();
+        ctx.closePath();
         ctx.clip();
         
         ctx.drawImage(videoEl, vX, vY, vWidth, vHeight);
@@ -678,13 +678,22 @@ export default function DashPage() {
 
   const handleAIDesignMagic = async () => {
     if (!selectedTestimonialForShare || isAIProcessing) return;
+    
+    if (!isEnterpriseUser) {
+      toast({
+        title: "Recurso Enterprise",
+        description: "A Mágica de Design IA é exclusiva para o plano Enterprise.",
+      });
+      router.push('/pricing');
+      return;
+    }
+
     setIsAIProcessing(true);
     setCardVariant('ai');
     
     try {
       toast({ title: "🧠 Inteligência Proova Iniciada", description: "Otimizando copy e gerando arte generativa única..." });
       
-      // 1. Otimizar Texto e criar prompt visual
       const { refinedText, bgPrompt } = await optimizeCard({
         text: selectedTestimonialForShare.text,
         businessType: userData?.businessType
@@ -692,7 +701,6 @@ export default function DashPage() {
       
       setAiRefinedText(refinedText);
 
-      // 2. Gerar Fundo com Imagen
       const bgUrl = await generateCardBackground(bgPrompt);
       setAiBgUrl(bgUrl);
       
@@ -1126,7 +1134,7 @@ export default function DashPage() {
       <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
         <div className="flex items-center gap-2 relative w-[200px] h-[65px] md:w-[320px] md:h-[105px]">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain dark:hidden" priority />
-          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain hidden dark:block" priority />
+          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="hidden dark:block" priority />
         </div>
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
@@ -1275,7 +1283,7 @@ export default function DashPage() {
                   isAIProcessing && "animate-pulse"
                 )}
                >
-                 {isAIProcessing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
+                 {isAIProcessing ? <Loader2 className="w-3 h-3 animate-spin" /> : (isEnterpriseUser ? <Wand2 className="w-3 h-3" /> : <Lock className="w-3 h-3" />)}
                  AI Design
                </button>
             </div>
