@@ -1,9 +1,6 @@
-
 'use server';
 /**
- * @fileOverview Flow para criação de roteiro de design para Instagram Story via Vertex AI.
- * 
- * - optimizeCard - Transforma um depoimento bruto em uma headline de impacto e prompt visual.
+ * @fileOverview Flow para criação de roteiro de design para Instagram Story via Gemini 2.0.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
