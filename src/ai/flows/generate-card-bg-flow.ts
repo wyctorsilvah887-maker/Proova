@@ -1,7 +1,7 @@
 
 'use server';
 /**
- * @fileOverview Flow para geração de backgrounds via Gemini 2.0 Flash no Google AI.
+ * @fileOverview Flow para geração de backgrounds via Gemini no Google AI.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -18,11 +18,12 @@ export const generateCardBackgroundFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      // Como o plugin Google AI não suporta Imagen 3 (Vertex exclusivo), 
-      // usamos o Gemini 2.0 Flash com suporte a geração de imagem se disponível, 
-      // ou retornamos uma cor sólida/placeholder premium em caso de indisponibilidade.
+      // Como o plugin Google AI utiliza o Gemini 1.5 Flash como motor principal, 
+      // usamos o modelo multimodal para processar o prompt visual.
+      // Caso a geração direta de imagem não esteja disponível no seu tier de API,
+      // retornamos um fallback premium para não quebrar a experiência do usuário.
       const { media } = await ai.generate({
-        model: 'googleai/gemini-2.0-flash',
+        model: 'gemini-1.5-flash',
         prompt: `Generate a high-end 9:16 background image for an Instagram Story. Style: ${input.bgPrompt}. Focus on luxury textures and bokeh.`,
         config: {
           responseModalities: ['TEXT', 'IMAGE'],
@@ -30,14 +31,12 @@ export const generateCardBackgroundFlow = ai.defineFlow(
       });
 
       if (!media || !media.url) {
-        // Fallback para uma imagem premium do Unsplash caso o modelo não suporte geração direta
         return `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop`;
       }
 
       return media.url;
     } catch (err: any) {
       console.error("ERRO GOOGLE AI (BG):", err);
-      // Fallback resiliente
       return `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop`;
     }
   }
