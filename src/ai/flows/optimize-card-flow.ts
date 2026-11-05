@@ -1,41 +1,45 @@
 
 'use server';
-/**
- * @fileOverview Flow para otimização de Stories de Instagram via Google AI.
- * 
- * - optimizeCard - Função que transforma depoimentos em headlines poderosas.
- * - OptimizeCardInput - Schema de entrada (texto do depoimento e tipo de negócio).
- * - OptimizeCardOutput - Schema de saída (texto refinado e prompt visual).
- */
-import { ai, geminiModel } from '@/ai/genkit';
-import { z } from 'genkit';
 
-const OptimizeCardInputSchema = z.object({
-  text: z.string().describe('O texto original do depoimento.'),
-  businessType: z.string().optional().describe('O setor de atuação da empresa.'),
+import { genkit, z } from 'genkit';
+import { googleAI, gemini25Flash } from '@genkit-ai/googleai';
+
+// 1. Inicializa o Genkit configurando o plugin do Google AI Studio
+const ai = genkit({
+  plugins: [googleAI()],
+  model: gemini25Flash, // Define o modelo estável padrão
 });
-export type OptimizeCardInput = z.infer<typeof OptimizeCardInputSchema>;
 
 const OptimizeCardOutputSchema = z.object({
   refinedText: z.string().describe('Headline curta (max 8 palavras) e poderosa baseada no depoimento.'),
   bgPrompt: z.string().describe('Prompt visual em inglês para o background (estilo minimalista/luxo).'),
 });
+
 export type OptimizeCardOutput = z.infer<typeof OptimizeCardOutputSchema>;
 
-export async function optimizeCard(input: OptimizeCardInput): Promise<OptimizeCardOutput> {
+/**
+ * Wrapper para chamar o flow de otimização de cards.
+ */
+export async function optimizeCard(input: { text: string; businessType?: string }): Promise<OptimizeCardOutput> {
   return optimizeCardFlow(input);
 }
 
-const optimizeCardFlow = ai.defineFlow(
+// 2. Define o seu fluxo (flow) reaproveitando sua lógica existente
+export const optimizeCardFlow = ai.defineFlow(
   {
     name: 'optimizeCardFlow',
-    inputSchema: OptimizeCardInputSchema,
+    inputSchema: z.object({
+      text: z.string(),
+      businessType: z.string().optional(),
+    }),
     outputSchema: OptimizeCardOutputSchema,
   },
   async (input) => {
     try {
-      const { output } = await ai.generate({
-        model: geminiModel,
+      // 3. Executa a chamada de geração usando a sintaxe simplificada
+      // Mantemos o esquema de saída para não quebrar a UI do Dashboard
+      const response = await ai.generate({
+        model: gemini25Flash,
         prompt: `Você é um Diretor de Arte de marcas de luxo. 
         Sua tarefa é transformar um depoimento de cliente em um Story de Instagram de alto impacto.
         
@@ -45,15 +49,18 @@ const optimizeCardFlow = ai.defineFlow(
         REGRAS:
         1. Headline (refinedText): Frase curta, poderosa e aspiracional. Máximo 8 palavras.
         2. Visual (bgPrompt): Prompt detalhado em INGLÊS para uma imagem 9:16 sofisticada (luxo, minimalista).`,
-        output: { schema: OptimizeCardOutputSchema },
-        config: { temperature: 0.7 },
+        output: { schema: OptimizeCardOutputSchema }
       });
 
-      if (!output) throw new Error("Falha na inteligência artificial ao processar o card.");
-      return output;
+      if (!response.output) {
+        throw new Error("Falha ao gerar conteúdo estruturado.");
+      }
+
+      return response.output;
+
     } catch (err: any) {
-      console.error("ERRO GOOGLE AI (Optimize):", err);
-      throw new Error(`Falha na IA (Google): ${err.message || 'Erro de comunicação'}.`);
+      console.error("ERRO GOOGLE GEN AI (Genkit):", err);
+      throw new Error(`Falha na IA (Genkit): ${err.message || 'Erro de comunicação'}.`);
     }
   }
 );
