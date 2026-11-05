@@ -354,15 +354,20 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
       const rect = sectionRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
       
-      // O triggerPoint é o centro da tela
+      // O triggerPoint é o centro exato da tela.
+      // Quando um item chega aqui, ele deve estar 100% "atravessado" pela bolinha.
       const triggerPoint = windowHeight * 0.5;
-      const progress = (triggerPoint - rect.top) / rect.height;
-      const clampedProgress = Math.max(0, Math.min(1, progress));
       
-      setScrollProgress(clampedProgress);
+      // Cálculo de progresso relativo ao centro da tela
+      const currentPos = triggerPoint - rect.top;
+      const totalHeight = rect.height;
+      const progress = currentPos / totalHeight;
+      
+      setScrollProgress(Math.max(0, Math.min(1, progress)));
     };
 
     window.addEventListener('scroll', handleScroll);
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -386,26 +391,26 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
         
         <div className="max-w-4xl mx-auto relative">
           {/* TRACKER LINE CONTAINER */}
-          <div className="absolute left-[20px] md:left-[21px] top-6 bottom-6 w-[2px] z-10">
+          <div className="absolute left-[20px] md:left-[21px] top-6 bottom-6 w-[2px] z-10 overflow-visible">
             {/* Grey Background Track */}
             <div className="absolute inset-0 bg-muted/30 rounded-full" />
             
             {/* Orange Progress Fill */}
             <div 
-              className="absolute top-0 left-0 w-full bg-primary rounded-full transition-all duration-75 ease-linear"
+              className="absolute top-0 left-0 w-full bg-primary rounded-full transition-all duration-150 ease-out"
               style={{ height: `${scrollProgress * 100}%` }}
             />
             
-            {/* Moving Ball - RASTREADOR */}
+            {/* Moving Ball - RASTREADOR MILIMÉTRICO */}
             <div 
-              className="absolute w-4 h-4 md:w-5 md:h-5 bg-primary rounded-full -left-[7px] md:-left-[9px] transition-all duration-75 ease-linear shadow-[0_0_20px_rgba(249,115,22,1)] z-30"
+              className="absolute w-4 h-4 md:w-5 md:h-5 bg-primary rounded-full -left-[7px] md:-left-[9px] transition-all duration-150 ease-out shadow-[0_0_20px_rgba(249,115,22,1)] z-30"
               style={{ top: `${scrollProgress * 100}%`, transform: 'translateY(-50%)' }}
             />
           </div>
 
           <div className="space-y-20 md:space-y-32">
             {steps.map((step, idx) => {
-              // Sincronização direta: se o scrollProgress atingiu a posição da etapa, ela acende.
+              // Sincronização direta com o ponto de acendimento (centro da tela)
               const stepTrigger = idx / (steps.length - 1);
               const isActive = scrollProgress >= stepTrigger;
 
@@ -413,20 +418,20 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                 <div 
                   key={idx} 
                   className={cn(
-                    "flex items-start gap-8 md:gap-16 relative transition-all duration-200",
+                    "flex items-start gap-8 md:gap-16 relative transition-all duration-300",
                     isVisible ? "animate-in fade-in opacity-100" : "opacity-0"
                   )}
                 >
                   <div className="flex flex-col items-center shrink-0 w-11">
                     <div className={cn(
-                      "text-lg md:text-3xl font-black font-headline transition-all duration-200 mb-1.5",
+                      "text-lg md:text-3xl font-black font-headline transition-all duration-300 mb-1.5",
                       isActive ? "text-primary scale-110" : "text-foreground/10"
                     )}>
                       {step.number}
                     </div>
-                    {/* Marcador Estático - Sem fundo para não cortar a linha */}
+                    {/* Marcador Estático - Transparente para não cortar a linha */}
                     <div className={cn(
-                      "w-3 h-3 rounded-full z-20 transition-all duration-200 border-2",
+                      "w-3 h-3 rounded-full z-20 transition-all duration-300 border-2",
                       isActive 
                         ? "bg-primary border-primary scale-125 shadow-[0_0_15px_rgba(249,115,22,0.6)]" 
                         : "bg-transparent border-muted/50 scale-100"
@@ -434,8 +439,8 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                   </div>
 
                   <div className={cn(
-                    "space-y-3 md:space-y-4 pt-1 md:pt-2 transition-all duration-200 flex-1",
-                    isActive ? "translate-x-0 opacity-100" : "translate-x-4 opacity-10"
+                    "space-y-3 md:space-y-4 pt-1 md:pt-2 transition-all duration-300 flex-1",
+                    isActive ? "translate-x-0 opacity-100" : "translate-x-4 opacity-20 grayscale"
                   )}>
                     <h4 className="text-xl md:text-4xl font-black font-headline tracking-tight text-foreground">
                       {step.title}
