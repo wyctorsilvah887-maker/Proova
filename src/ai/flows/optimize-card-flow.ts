@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview Flow para criação de roteiro de design para Instagram Story via Gemini 2.0.
+ * @fileOverview Flow para criação de roteiro de design para Instagram Story via Gemini 2.0 Flash.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -12,7 +12,7 @@ const OptimizeCardInputSchema = z.object({
 
 const OptimizeCardOutputSchema = z.object({
   refinedText: z.string().describe('O depoimento transformado em uma headline matadora.'),
-  bgPrompt: z.string().describe('Um prompt visual em inglês para o Imagen 3.'),
+  bgPrompt: z.string().describe('Um prompt visual em inglês para o motor de imagem.'),
 });
 
 const optimizeCardPrompt = ai.definePrompt({

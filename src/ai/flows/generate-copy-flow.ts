@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview Flow para geração de copy persuasiva via Gemini 2.0 no Vertex AI.
+ * @fileOverview Flow para geração de copy persuasiva via Gemini 2.0 Flash no Vertex AI.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
