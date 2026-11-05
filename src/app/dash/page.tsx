@@ -935,8 +935,9 @@ export default function DashPage() {
               <div className="space-y-0.5">
                 <CardTitle className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Resumo {period !== 'all' ? `(${period}d)` : ''}</CardTitle>
               </div>
-              <div className="flex items-center gap-3">
-                <BarChart3 className="h-4 w-4 text-primary" />
+              <div className="flex items-center gap-1.5 text-primary">
+                <span className="text-[10px] font-black uppercase tracking-widest">Ver Métricas</span>
+                <ChevronRight className="w-3.5 h-3.5" />
               </div>
             </div>
             <div className="space-y-1"><div className="text-xl md:text-3xl font-bold">{filteredMetrics.count} <span className="text-sm md:text-lg font-medium text-muted-foreground">avaliações</span></div><Badge variant="secondary" className="border-none text-[8px] md:text-[10px] h-4 md:h-5 px-1.5 font-black bg-primary/10 text-primary">{filteredMetrics.trendLabel}</Badge></div>
@@ -1567,7 +1568,7 @@ export default function DashPage() {
                      <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-muted-foreground">Powered by</span>
                      <div className="relative w-32 h-10 md:w-36 md:h-12 transition-transform hover:scale-105">
                         <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Proova" fill className="object-contain dark:hidden" />
-                        <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Proova" fill className="object-contain hidden dark:block" />
+                        <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" />
                      </div>
                    </div>
                 </div>
