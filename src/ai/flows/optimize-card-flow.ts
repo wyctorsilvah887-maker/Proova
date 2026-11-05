@@ -17,7 +17,7 @@ const OptimizeCardOutputSchema = z.object({
 
 const optimizeCardPrompt = ai.definePrompt({
   name: 'optimizeCardPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: 'googleai/gemini-1.5-flash-latest',
   input: { schema: OptimizeCardInputSchema },
   output: { schema: OptimizeCardOutputSchema },
   prompt: `Você é um Diretor de Arte de uma agência de luxo focado em Instagram Stories (Social Proof).
@@ -27,7 +27,7 @@ const optimizeCardPrompt = ai.definePrompt({
   
   TAREFA:
   1. Refine o texto para ser uma frase curta e "matadora" (máximo 10 palavras). Deve evocar desejo e autoridade.
-  2. Crie um prompt visual em INGLÊS para o Imagen 4 gerar um fundo vertical (9:16).
+  2. Crie um prompt visual em INGLÊS para gerar um fundo vertical (9:16) no estilo Abstract Luxury.
      - O estilo deve ser: Abstract, luxury, minimalist, blurred textures, cinematic lighting.
      - Use cores que remetam ao setor: {{#if businessType}}{{{businessType}}}{{else}}Geral{{/if}}.
   
@@ -48,6 +48,6 @@ export async function optimizeCard(input: z.infer<typeof OptimizeCardInputSchema
     }
 
     // Se o erro persistir, lançamos a mensagem original para diagnóstico real
-    throw new Error(`Falha na IA: ${err.message || 'Erro de conexão'}. Verifique se a sua chave gratuita no AI Studio está ativa.`);
+    throw new Error(`Falha na IA: ${err.message || 'Erro de conexão'}. Verifique se a sua chave no AI Studio está ativa e permite o modelo gemini-1.5-flash-latest.`);
   }
 }
