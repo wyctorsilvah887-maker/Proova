@@ -1296,11 +1296,14 @@ export default function DashPage() {
                   cardVariant === 'ai' ? "w-[min(80vw,360px)] aspect-[9/16] rounded-none" : "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] p-6 sm:p-10"
                 )}
                 style={{ 
-                  background: cardVariant === 'ai' && aiBgUrl 
-                    ? `url(${aiBgUrl}) center/cover no-repeat` 
+                  backgroundImage: cardVariant === 'ai' && aiBgUrl 
+                    ? `url(${aiBgUrl})` 
                     : (cardVariant === 'dark' 
                       ? 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)'
                       : 'linear-gradient(160deg, #f97316 0%, #ea580c 60%, #ffffff 180%)'),
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
                   backgroundColor: cardVariant === 'dark' ? '#000000' : '#f97316'
                 }}
               >
