@@ -3,7 +3,7 @@
  * @fileOverview Flow para criação de roteiro de design para Instagram Story via Gemini no Google AI.
  */
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { z } from 'zod';
 
 const OptimizeCardInputSchema = z.object({
   text: z.string(),
@@ -34,24 +34,13 @@ const optimizeCardPrompt = ai.definePrompt({
   2. Visual (bgPrompt): Crie um prompt detalhado em INGLÊS para gerar uma imagem de fundo 9:16. Foque em: iluminação de estúdio, texturas sofisticadas (mármore, seda, metal escovado), profundidade de campo rasa e estilo minimalista luxuoso.`,
 });
 
-export const optimizeCardFlow = ai.defineFlow(
-  {
-    name: 'optimizeCardFlow',
-    inputSchema: OptimizeCardInputSchema,
-    outputSchema: OptimizeCardOutputSchema,
-  },
-  async (input) => {
-    try {
-      const { output } = await optimizeCardPrompt(input);
-      if (!output) throw new Error("A IA não conseguiu estruturar os dados.");
-      return output;
-    } catch (err: any) {
-      console.error("ERRO GOOGLE AI (Optimize):", err);
-      throw new Error(`Falha na IA (Google): ${err.message || 'Erro de comunicação'}.`);
-    }
-  }
-);
-
 export async function optimizeCard(input: z.infer<typeof OptimizeCardInputSchema>) {
-  return optimizeCardFlow(input);
+  try {
+    const { output } = await optimizeCardPrompt(input);
+    if (!output) throw new Error("A IA não conseguiu estruturar os dados.");
+    return output;
+  } catch (err: any) {
+    console.error("ERRO GOOGLE AI (Optimize):", err);
+    throw new Error(`Falha na IA (Google): ${err.message || 'Erro de comunicação'}.`);
+  }
 }
