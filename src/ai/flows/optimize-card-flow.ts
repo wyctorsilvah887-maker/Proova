@@ -3,11 +3,12 @@
 
 import { genkit, z } from 'genkit';
 import { googleAI } from '@genkit-ai/googleai';
+import { PRIMARY_MODEL, FALLBACK_MODEL } from '@/ai/genkit';
 
-// 1. Inicializa o Genkit configurando o plugin do Google AI Studio
+// Inicialização local para o fluxo específico
 const ai = genkit({
   plugins: [googleAI()],
-  model: 'googleai/gemini-3.8-flash', 
+  model: PRIMARY_MODEL, 
 });
 
 const OptimizeCardOutputSchema = z.object({
@@ -24,7 +25,7 @@ export async function optimizeCard(input: { text: string; businessType?: string 
   return optimizeCardFlow(input);
 }
 
-// 2. Define o seu fluxo (flow) com saída estruturada para o Dashboard
+// Definição do fluxo com lógica de retentativa e fallback
 export const optimizeCardFlow = ai.defineFlow(
   {
     name: 'optimizeCardFlow',
@@ -35,11 +36,7 @@ export const optimizeCardFlow = ai.defineFlow(
     outputSchema: OptimizeCardOutputSchema,
   },
   async (input) => {
-    try {
-      // 3. Executa a chamada de geração usando o identificador canônico
-      const response = await ai.generate({
-        model: 'googleai/gemini-3.8-flash',
-        prompt: `Você é um Diretor de Arte de marcas de luxo. 
+    const promptText = `Você é um Diretor de Arte de marcas de luxo. 
         Sua tarefa é transformar um depoimento de cliente em um Story de Instagram de alto impacto.
         
         Depoimento: "${input.text}"
@@ -47,7 +44,13 @@ export const optimizeCardFlow = ai.defineFlow(
         
         REGRAS:
         1. Headline (refinedText): Frase curta, poderosa e aspiracional. Máximo 8 palavras.
-        2. Visual (bgPrompt): Prompt detalhado em INGLÊS para uma imagem 9:16 sofisticada (luxo, minimalista).`,
+        2. Visual (bgPrompt): Prompt detalhado em INGLÊS para uma imagem 9:16 sofisticada (luxo, minimalista).`;
+
+    try {
+      // Tentativa 1: Modelo Primário (3.8 Flash)
+      const response = await ai.generate({
+        model: PRIMARY_MODEL,
+        prompt: promptText,
         output: { schema: OptimizeCardOutputSchema }
       });
 
@@ -58,6 +61,22 @@ export const optimizeCardFlow = ai.defineFlow(
       return response.output;
 
     } catch (err: any) {
+      // Lógica de Fallback: Se o 3.8 estiver lotado (503/demand), tenta o 1.5 Flash
+      if (err.message?.includes('503') || err.message?.includes('demand')) {
+        console.warn("Servidor do Gemini 3.8 lotado, tentando fallback para 1.5 Flash...");
+        try {
+          const fallbackResponse = await ai.generate({
+            model: FALLBACK_MODEL,
+            prompt: promptText,
+            output: { schema: OptimizeCardOutputSchema }
+          });
+          
+          if (fallbackResponse.output) return fallbackResponse.output;
+        } catch (fallbackErr) {
+          console.error("Erro crítico no fallback da IA:", fallbackErr);
+        }
+      }
+
       console.error("ERRO GOOGLE GEN AI (Genkit):", err);
       throw new Error(`Falha na IA (Genkit): ${err.message || 'Erro de comunicação'}.`);
     }
