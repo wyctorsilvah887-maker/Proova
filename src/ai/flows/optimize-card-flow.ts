@@ -1,6 +1,7 @@
+
 'use server';
 /**
- * @fileOverview Flow para criação de roteiro de design para Instagram Story via Gemini 2.0 Flash no Vertex AI.
+ * @fileOverview Flow para criação de roteiro de design para Instagram Story via Gemini no Google AI.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -17,7 +18,7 @@ const OptimizeCardOutputSchema = z.object({
 
 const optimizeCardPrompt = ai.definePrompt({
   name: 'optimizeCardPrompt',
-  model: 'vertexai/gemini-2.0-flash',
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: OptimizeCardInputSchema },
   output: { schema: OptimizeCardOutputSchema },
   config: {
@@ -46,8 +47,8 @@ export const optimizeCardFlow = ai.defineFlow(
       if (!output) throw new Error("A IA não conseguiu estruturar os dados.");
       return output;
     } catch (err: any) {
-      console.error("ERRO VERTEX AI (Optimize):", err);
-      throw new Error(`Falha na IA (Vertex): ${err.message || 'Erro de comunicação'}.`);
+      console.error("ERRO GOOGLE AI (Optimize):", err);
+      throw new Error(`Falha na IA (Google): ${err.message || 'Erro de comunicação'}.`);
     }
   }
 );

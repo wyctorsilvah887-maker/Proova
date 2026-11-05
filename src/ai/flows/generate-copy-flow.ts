@@ -1,6 +1,7 @@
+
 'use server';
 /**
- * @fileOverview Flow para geração de copy persuasiva via Gemini 2.0 Flash no Vertex AI.
+ * @fileOverview Flow para geração de copy persuasiva via Gemini no Google AI.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -20,7 +21,7 @@ export const generateCopyFlow = ai.defineFlow(
   async (input) => {
     try {
       const { text } = await ai.generate({
-        model: 'vertexai/gemini-2.0-flash',
+        model: 'googleai/gemini-1.5-flash',
         prompt: `Você é um copywriter de elite especialista em prova social. 
         Gere um texto curto, matador e altamente persuasivo para o campo: ${input.type}.
         Empresa: ${input.companyName || 'Nossa Empresa'}.
@@ -31,9 +32,9 @@ export const generateCopyFlow = ai.defineFlow(
         2. Sem aspas, sem explicações.
         3. Máximo de 2 frases.`,
       });
-      return text || '';
+      return text || 'Transforme sua autoridade em lucro real hoje.';
     } catch (err: any) {
-      console.error("ERRO VERTEX AI (Copy):", err);
+      console.error("ERRO GOOGLE AI (Copy):", err);
       return "Transforme sua autoridade em lucro real hoje.";
     }
   }
