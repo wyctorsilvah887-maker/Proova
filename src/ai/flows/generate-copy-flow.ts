@@ -1,8 +1,7 @@
+
 'use server';
 /**
- * @fileOverview Flow para geração de copy persuasiva para landing pages.
- * 
- * - generateCopyFlow - Gera sugestões de títulos e conteúdos baseados em IA.
+ * @fileOverview Flow para geração de copy persuasiva para landing pages via Vertex AI.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -21,6 +20,7 @@ export const generateCopyFlow = ai.defineFlow(
   },
   async (input) => {
     const { text } = await ai.generate({
+      model: 'vertexai/gemini-1.5-flash',
       prompt: `Você é um copywriter de elite especialista em prova social. 
       Gere um texto curto, matador e altamente persuasivo.
       

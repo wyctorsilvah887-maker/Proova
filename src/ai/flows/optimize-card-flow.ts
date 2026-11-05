@@ -18,8 +18,12 @@ const OptimizeCardOutputSchema = z.object({
 
 const optimizeCardPrompt = ai.definePrompt({
   name: 'optimizeCardPrompt',
+  model: 'vertexai/gemini-1.5-flash',
   input: { schema: OptimizeCardInputSchema },
   output: { schema: OptimizeCardOutputSchema },
+  config: {
+    temperature: 0.7,
+  },
   prompt: `Você é um Diretor de Arte de uma agência de publicidade de luxo especializada em Prova Social. 
   
   O objetivo é criar um Instagram Story impactante baseado neste depoimento: "{{{text}}}"
@@ -48,7 +52,7 @@ export const optimizeCardFlow = ai.defineFlow(
       return output;
     } catch (err: any) {
       console.error("ERRO VERTEX AI (Optimize):", err);
-      throw new Error(`Falha na IA (Vertex): ${err.message || 'Erro de comunicação'}. Certifique-se de estar autenticado no Google Cloud.`);
+      throw new Error(`Falha na IA (Vertex): ${err.message || 'Erro de comunicação'}.`);
     }
   }
 );

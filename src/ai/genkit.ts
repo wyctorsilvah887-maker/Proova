@@ -4,13 +4,13 @@ import { vertexAI } from '@genkit-ai/vertexai';
 
 /**
  * Inicializa a instância global do Genkit com Vertex AI (Google Cloud).
- * Utiliza o projeto configurado em GCLOUD_PROJECT no .env.
- * Requer autenticação via Google Cloud SDK (gcloud auth application-default login).
+ * Forçamos o uso do Project ID para garantir que o ADC encontre o projeto correto.
  */
 export const ai = genkit({
   plugins: [
     vertexAI({
-      location: 'us-central1', // Região padrão para maior disponibilidade do Imagen 3
+      projectId: process.env.GCLOUD_PROJECT || 'proova-513814',
+      location: 'us-central1', 
     }),
   ],
 });
