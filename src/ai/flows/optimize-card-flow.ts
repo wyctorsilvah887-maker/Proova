@@ -1,13 +1,10 @@
 'use server';
 /**
  * @fileOverview Flow para otimização de conteúdo de Social Cards.
- * - Adicionado maxDuration para evitar timeout.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
-
-export const maxDuration = 60; // 60 segundos para processamento de texto
 
 const OptimizeCardInputSchema = z.object({
   text: z.string(),

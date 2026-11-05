@@ -1,13 +1,10 @@
 'use server';
 /**
  * @fileOverview Flow para geração de backgrounds artísticos via Imagen 4.
- * - Adicionado maxDuration para evitar timeout em produção.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
-
-export const maxDuration = 110; // Aumentado para 110 segundos para dar margem ao Imagen
 
 export async function generateCardBackground(bgPrompt: string) {
   try {
