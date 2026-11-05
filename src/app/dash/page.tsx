@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -326,8 +325,7 @@ export default function DashPage() {
       // Auditoria de Maps apenas se não for negócio digital
       if (!isDigitalBusiness) {
         const mapsUrl = (userData.googleMapsUrl || '').toLowerCase().trim();
-        // Verificação robusta: Aceita links com writereview ou links curtos g.page que terminam/contêm review
-        const isReviewLink = mapsUrl.includes('writereview') || mapsUrl.includes('local/writereview') || mapsUrl.includes('/review') || mapsUrl.includes('.review');
+        const isReviewLink = mapsUrl.includes('review') || mapsUrl.includes('writereview');
         
         if (!userData.googleMapsUrl) {
           results.push({ id: 'maps-unlinked', label: 'Google Maps Desconectado', status: 'critical', description: 'Sua empresa não está recebendo redirecionamentos.', actionLabel: 'Vincular Agora', action: () => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }, icon: MapPin });
@@ -449,7 +447,6 @@ export default function DashPage() {
       const qrElement = document.getElementById('qr-container-print');
       if (!qrElement) throw new Error("Elemento do QR não encontrado. Certifique-se de que o diálogo está aberto.");
 
-      // Captura a imagem do QR Code do diálogo de forma nítida e independente de tela
       const qrImage = await toPng(qrElement, { 
         pixelRatio: 4, 
         backgroundColor: '#ffffff',
@@ -463,26 +460,23 @@ export default function DashPage() {
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
       
-      // Estilização do Cartaz A4 Premium
-      pdf.setFillColor(249, 115, 22); // Cor primária Proova (Laranja)
-      pdf.rect(0, 0, pageWidth, 20, 'F'); // Top bar decorativa
+      pdf.setFillColor(249, 115, 22); 
+      pdf.rect(0, 0, pageWidth, 20, 'F'); 
 
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(36);
-      pdf.setTextColor(17, 24, 39); // Slate-900
+      pdf.setTextColor(17, 24, 39); 
       pdf.text('SUA OPINIÃO É', pageWidth / 2, 50, { align: 'center' });
       pdf.text('MUITO IMPORTANTE!', pageWidth / 2, 65, { align: 'center' });
       
       pdf.setFontSize(20);
-      pdf.setTextColor(107, 114, 128); // Slate-500
+      pdf.setTextColor(107, 114, 128); 
       pdf.text(userData?.companyName || 'Nossa Empresa', pageWidth / 2, 85, { align: 'center' });
 
-      // QR Code centralizado com proporção preservada
       const qrSize = 130;
       const xPos = (pageWidth - qrSize) / 2;
       pdf.addImage(qrImage, 'PNG', xPos, 105, qrSize, qrSize);
 
-      // Instruções Persuasivas
       pdf.setFontSize(16);
       pdf.setTextColor(31, 41, 55);
       pdf.text('Escaneie agora com seu celular', pageWidth / 2, 250, { align: 'center' });
@@ -491,7 +485,6 @@ export default function DashPage() {
       pdf.setTextColor(156, 163, 175);
       pdf.text('Sua avaliação nos ajuda a crescer!', pageWidth / 2, 260, { align: 'center' });
 
-      // Branding Footer Discreto
       pdf.setFontSize(9);
       pdf.setTextColor(209, 213, 219);
       pdf.text('Tecnologia de Prova Social fornecida por PROOVA.com.br', pageWidth / 2, 285, { align: 'center' });
@@ -588,7 +581,6 @@ export default function DashPage() {
 
         ctx.clearRect(0, 0, size, size);
 
-        // MÁSCARA ARREDONDADA PARA O CARD INTEIRO
         const cardRadius = 40; 
         ctx.save();
         ctx.beginPath();
@@ -604,10 +596,8 @@ export default function DashPage() {
         ctx.closePath();
         ctx.clip();
 
-        // Desenha o fundo e textos
         ctx.drawImage(frameImg, 0, 0, size, size);
 
-        // Desenha o vídeo com seu próprio clip arredondado
         const vWidth = size * 0.85;
         const vHeight = vWidth * (9/16);
         const vX = (size - vWidth) / 2;
@@ -626,7 +616,7 @@ export default function DashPage() {
         
         ctx.drawImage(videoEl, vX, vY, vWidth, vHeight);
         ctx.restore();
-        ctx.restore(); // Restaura o clip do card principal
+        ctx.restore(); 
 
         requestAnimationFrame(renderLoop);
       };
@@ -657,11 +647,10 @@ export default function DashPage() {
     try {
       if (!shareCardRef.current) return;
       
-      // Captura a imagem preservando as bordas arredondadas e transparência
       const dataUrl = await toPng(shareCardRef.current, { 
         quality: 1.0, 
         pixelRatio: 3, 
-        backgroundColor: 'rgba(0,0,0,0)', // Transparência para respeitar quinas arredondadas
+        backgroundColor: 'rgba(0,0,0,0)', 
         style: {
           borderRadius: '2.5rem',
         }
@@ -945,24 +934,8 @@ export default function DashPage() {
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <CardTitle className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Resumo {period !== 'all' ? `(${period}d)` : ''}</CardTitle>
-                <button 
-                  onClick={(e) => {
-                    e.stopPropagation(); 
-                    handleSendWeeklyReport();
-                  }} 
-                  disabled={isSendingReport} 
-                  className={cn(
-                    "text-[9px] font-black uppercase tracking-widest flex items-center gap-1 hover:underline disabled:opacity-50",
-                    isPremiumUser ? "text-primary" : "text-muted-foreground opacity-50"
-                  )}
-                >
-                  {isSendingReport ? <Loader2 className="w-2.5 h-2.5 animate-spin" /> : <Mail className="w-2.5 h-2.5" />} 
-                  {!isPremiumUser && <Lock className="w-2.5 h-2.5" />} 
-                  Enviar Relatório
-                </button>
               </div>
               <div className="flex items-center gap-3">
-                <p className="text-[10px] font-black uppercase text-primary/60 tracking-widest hidden sm:block">Ver Métricas Detalhadas</p>
                 <BarChart3 className="h-4 w-4 text-primary" />
               </div>
             </div>
@@ -1184,7 +1157,7 @@ export default function DashPage() {
               className="w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 bg-primary hover:bg-primary/90 shadow-xl transition-all active:scale-95 group"
               onClick={() => {
                 const slug = userData?.companySlug || userData?.companyName?.toLowerCase().replace(/\s+/g, '-') || '';
-                router.push(`/pp/${slug}`); // Rota amigável unificada
+                router.push(`/pp/${slug}`); 
                 setIsPublicPageChoiceOpen(false);
               }}
             >
@@ -1231,7 +1204,7 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
 
-      {/* SHARE DIALOG (SOCIAL CARDS) - REDESENHADO PREMIUM DARK & ORANGE */}
+      {/* SHARE DIALOG (SOCIAL CARDS) */}
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[96vh] flex flex-col">
           <DialogHeader className="p-6 sm:p-8 pb-2 text-center shrink-0">
@@ -1251,7 +1224,6 @@ export default function DashPage() {
                   backgroundColor: cardVariant === 'dark' ? '#000000' : '#f97316'
                 }}
               >
-                 {/* Decorative Mesh background elements */}
                  <div className={cn(
                    "absolute -top-20 -right-20 w-64 h-64 rounded-full blur-[80px] opacity-40",
                    cardVariant === 'dark' ? "bg-primary/20" : "bg-white/20"
@@ -1265,7 +1237,6 @@ export default function DashPage() {
                  
                  <div className="relative z-10 w-full flex flex-col h-full justify-between items-center">
                    
-                   {/* Persuasive Header */}
                    <div id="card-header-cta" className="mb-2">
                      <p className={cn(
                        "text-[9px] sm:text-[11px] font-black uppercase tracking-[0.3em] drop-shadow-md",
@@ -1312,7 +1283,7 @@ export default function DashPage() {
                           </div>
                           <p className={cn(
                             "text-xs sm:text-base font-bold leading-tight italic line-clamp-3 px-4 drop-shadow-md",
-                            cardVariant === 'dark' ? "text-white" : "text-white"
+                            "text-white"
                           )}>
                              {selectedTestimonialForShare?.text && selectedTestimonialForShare?.text !== '(Depoimento em Vídeo)' 
                                ? `"${selectedTestimonialForShare.text}"` 
@@ -1333,7 +1304,7 @@ export default function DashPage() {
                        
                        <p className={cn(
                          "text-base sm:text-2xl font-black font-headline leading-snug sm:leading-tight line-clamp-6 italic drop-shadow-xl px-2 tracking-tight",
-                         cardVariant === 'dark' ? "text-white" : "text-white"
+                         "text-white"
                        )}>
                           "{selectedTestimonialForShare?.text}"
                        </p>
@@ -1543,7 +1514,6 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
       
-      {/* QR CODE DIALOG - REDESENHADO PREMIUM COMPACTO */}
       <Dialog open={isQrDialogOpenManual} onOpenChange={setIsQrDialogOpenManual}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-[420px] border-none shadow-2xl p-0 overflow-hidden bg-background flex flex-col max-h-[90vh]">
           <div className="h-2 bg-primary w-full shrink-0" />
