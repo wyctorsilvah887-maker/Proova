@@ -621,7 +621,7 @@ export default function DashPage() {
         ctx.arcTo(vX + vWidth, vY + vHeight, vX, vY + vHeight, radius);
         ctx.arcTo(vX, vY + vHeight, vX, vY, radius);
         ctx.arcTo(vX, vY, vX + vWidth, vY, radius);
-        closePath();
+        ctx.closePath();
         ctx.clip();
         
         ctx.drawImage(videoEl, vX, vY, vWidth, vHeight);
@@ -857,16 +857,22 @@ export default function DashPage() {
                 return (
                   <Card key={item.id} className={cn("border-none shadow-sm overflow-hidden rounded-2xl relative", item.status === 'critical' ? "bg-destructive/5" : "bg-orange-500/5")}>
                     <div className={cn("absolute top-0 left-0 w-1.5 h-full", item.status === 'critical' ? "bg-destructive" : "bg-orange-500")} />
-                    <CardContent className="p-4 flex flex-col sm:flex-row h-full justify-between items-start sm:items-center gap-4">
-                      <div className="flex gap-3 items-center">
-                        <div className={cn("p-2 rounded-xl shrink-0", item.status === 'critical' ? "bg-destructive/10 text-destructive" : "bg-orange-500/10 text-orange-600")}><item.icon className="w-5 h-5" /></div>
+                    <CardContent className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                      <div className="flex gap-4 items-center flex-1">
+                        <div className={cn("p-2.5 rounded-xl shrink-0", item.status === 'critical' ? "bg-destructive/10 text-destructive" : "bg-orange-500/10 text-orange-600")}>
+                          <item.icon className="w-5 h-5" />
+                        </div>
                         <div className="space-y-1">
-                          <p className="text-[10px] font-black uppercase tracking-tight">{item.label}</p>
-                          <p className="text-[11px] text-muted-foreground leading-snug">{item.description}</p>
+                          <p className="text-[10px] font-black uppercase tracking-widest leading-none">{item.label}</p>
+                          <p className="text-[11px] text-muted-foreground leading-relaxed font-medium">{item.description}</p>
                         </div>
                       </div>
-                      <button className="w-full sm:w-auto text-[10px] font-black uppercase h-8 rounded-lg shadow-sm shrink-0 bg-secondary hover:bg-secondary/80 px-4" onClick={item.action}>
-                        {item.actionLabel} <ArrowRight className="ml-1 w-3 h-3" />
+                      <button 
+                        className="inline-flex items-center justify-center gap-2 w-full sm:w-auto h-10 px-6 rounded-xl bg-foreground text-background text-[10px] font-black uppercase tracking-widest shadow-lg hover:opacity-90 active:scale-95 transition-all shrink-0" 
+                        onClick={item.action}
+                      >
+                        {item.actionLabel} 
+                        <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     </CardContent>
                   </Card>
