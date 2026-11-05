@@ -325,6 +325,7 @@ AgitationSection.displayName = "AgitationSection";
 
 /**
  * Seção de Pilares (A Máquina de Domínio)
+ * Simplificada: removido trilho vertical e rastreador de bolinha.
  */
 const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -354,11 +355,7 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
       const rect = sectionRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
       
-      // O triggerPoint é o centro exato da tela.
-      // Quando um item chega aqui, ele deve estar 100% "atravessado" pela bolinha.
       const triggerPoint = windowHeight * 0.5;
-      
-      // Cálculo de progresso relativo ao centro da tela
       const currentPos = triggerPoint - rect.top;
       const totalHeight = rect.height;
       const progress = currentPos / totalHeight;
@@ -389,30 +386,12 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
           <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Tecnologias de elite integradas para aniquilar objeções e forçar a conversão imediata.</p>
         </div>
         
-        <div className="max-w-4xl mx-auto relative">
-          {/* TRACKER LINE CONTAINER */}
-          <div className="absolute left-[20px] md:left-[21px] top-6 bottom-6 w-[2px] z-10 overflow-visible">
-            {/* Grey Background Track */}
-            <div className="absolute inset-0 bg-muted/30 rounded-full" />
-            
-            {/* Orange Progress Fill */}
-            <div 
-              className="absolute top-0 left-0 w-full bg-primary rounded-full transition-all duration-150 ease-out"
-              style={{ height: `${scrollProgress * 100}%` }}
-            />
-            
-            {/* Moving Ball - RASTREADOR MILIMÉTRICO */}
-            <div 
-              className="absolute w-4 h-4 md:w-5 md:h-5 bg-primary rounded-full -left-[7px] md:-left-[9px] transition-all duration-150 ease-out shadow-[0_0_20px_rgba(249,115,22,1)] z-30"
-              style={{ top: `${scrollProgress * 100}%`, transform: 'translateY(-50%)' }}
-            />
-          </div>
-
+        <div className="max-w-4xl mx-auto relative px-4 md:px-0">
           <div className="space-y-20 md:space-y-32">
             {steps.map((step, idx) => {
-              // Sincronização direta com o ponto de acendimento (centro da tela)
+              // Mantemos o destaque de cor baseado na posição central (opcional, para feedback visual)
               const stepTrigger = idx / (steps.length - 1);
-              const isActive = scrollProgress >= stepTrigger;
+              const isActive = scrollProgress >= stepTrigger - 0.1; // Pequena margem para facilitar o acendimento
 
               return (
                 <div 
@@ -429,7 +408,6 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                     )}>
                       {step.number}
                     </div>
-                    {/* Marcador Estático - Transparente para não cortar a linha */}
                     <div className={cn(
                       "w-3 h-3 rounded-full z-20 transition-all duration-300 border-2",
                       isActive 
@@ -442,10 +420,16 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                     "space-y-3 md:space-y-4 pt-1 md:pt-2 transition-all duration-300 flex-1",
                     isActive ? "translate-x-0 opacity-100" : "translate-x-4 opacity-20 grayscale"
                   )}>
-                    <h4 className="text-xl md:text-4xl font-black font-headline tracking-tight text-foreground">
+                    <h4 className={cn(
+                      "text-xl md:text-4xl font-black font-headline tracking-tight transition-colors duration-300",
+                      isActive ? "text-foreground" : "text-foreground/40"
+                    )}>
                       {step.title}
                     </h4>
-                    <p className="text-muted-foreground text-sm md:text-xl leading-relaxed font-medium max-w-2xl">
+                    <p className={cn(
+                      "text-muted-foreground text-sm md:text-xl leading-relaxed font-medium max-w-2xl transition-opacity duration-300",
+                      isActive ? "opacity-100" : "opacity-40"
+                    )}>
                       {step.desc}
                     </p>
                   </div>
