@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Loader2, Mail, Lock, Eye, EyeOff, KeyRound, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Mail, Lock, Eye, EyeOff, Fingerprint, CheckCircle2 } from 'lucide-react';
 import { useAuth, useUser } from '@/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { toast } from '@/hooks/use-toast';
@@ -87,8 +87,8 @@ export default function LoginPage() {
           <div className="h-1.5 bg-primary w-full" />
           
           <CardHeader className="text-center space-y-4 pt-8 md:pt-10">
-            <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit ring-8 ring-primary/5 animate-in zoom-in duration-500">
-              <KeyRound className="w-8 h-8 text-primary" />
+            <div className="mx-auto w-fit animate-in zoom-in duration-700">
+              <Fingerprint className="w-12 h-12 text-primary" />
             </div>
             <div className="space-y-1">
               <CardTitle className="text-xl md:text-2xl font-black font-headline tracking-tight">Bem-vindo de Volta</CardTitle>

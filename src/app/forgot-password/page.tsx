@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Mail, ArrowLeft, Loader2, KeyRound, CheckCircle2 } from 'lucide-react';
+import { Mail, ArrowLeft, Loader2, Fingerprint, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/firebase';
 import { sendPasswordResetEmail } from 'firebase/auth';
@@ -67,8 +67,8 @@ export default function ForgotPasswordPage() {
       <Card className="w-full max-w-md shadow-2xl border-none overflow-hidden bg-card">
         <div className="h-2 bg-primary w-full" />
         <CardHeader className="text-center space-y-4 pt-8">
-          <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit animate-in zoom-in duration-500">
-            <KeyRound className="w-8 h-8 text-primary" />
+          <div className="mx-auto w-fit animate-in zoom-in duration-700">
+            <Fingerprint className="w-12 h-12 text-primary" />
           </div>
           <div className="space-y-2">
             <CardTitle className="text-3xl font-headline font-bold tracking-tight">Recuperar Senha</CardTitle>
