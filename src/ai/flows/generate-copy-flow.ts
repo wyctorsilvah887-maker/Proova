@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Flow para geração de copy persuasiva via Google AI.
@@ -5,7 +6,7 @@
  * - generateCopy - Função que gera textos de marketing para a plataforma.
  * - CopyInput - Schema de entrada (tipo de campo e contexto).
  */
-import { ai } from '@/ai/genkit';
+import { ai, geminiModel } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const CopyInputSchema = z.object({
@@ -28,7 +29,7 @@ const generateCopyFlow = ai.defineFlow(
   async (input) => {
     try {
       const { text } = await ai.generate({
-        model: 'googleai/gemini-1.5-flash',
+        model: geminiModel,
         prompt: `Você é um copywriter especialista em prova social e conversão. 
         Gere um texto matador para o campo: ${input.type}.
         Empresa: ${input.companyName || 'Nossa Empresa'}.

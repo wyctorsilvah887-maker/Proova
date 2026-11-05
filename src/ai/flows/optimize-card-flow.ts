@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Flow para otimização de Stories de Instagram via Google AI.
@@ -6,7 +7,7 @@
  * - OptimizeCardInput - Schema de entrada (texto do depoimento e tipo de negócio).
  * - OptimizeCardOutput - Schema de saída (texto refinado e prompt visual).
  */
-import { ai } from '@/ai/genkit';
+import { ai, geminiModel } from '@/ai/genkit';
 import { z } from 'genkit';
 
 const OptimizeCardInputSchema = z.object({
@@ -34,7 +35,7 @@ const optimizeCardFlow = ai.defineFlow(
   async (input) => {
     try {
       const { output } = await ai.generate({
-        model: 'googleai/gemini-1.5-flash',
+        model: geminiModel,
         prompt: `Você é um Diretor de Arte de marcas de luxo. 
         Sua tarefa é transformar um depoimento de cliente em um Story de Instagram de alto impacto.
         

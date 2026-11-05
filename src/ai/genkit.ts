@@ -11,3 +11,9 @@ export const ai = genkit({
     googleAI(),
   ],
 });
+
+/**
+ * Referência tipada e segura para o modelo Gemini 1.5 Flash.
+ * Usar esta referência nos fluxos evita o erro "Unknown action type".
+ */
+export const geminiModel = 'googleai/gemini-1.5-flash';
