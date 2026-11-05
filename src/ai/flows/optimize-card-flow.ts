@@ -1,7 +1,7 @@
 
 'use server';
 /**
- * @fileOverview Flow para criação de roteiro de design para Instagram Story via Google AI.
+ * @fileOverview Flow para criação de roteiro de design para Instagram Story via Vertex AI.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -18,7 +18,7 @@ const OptimizeCardOutputSchema = z.object({
 
 const optimizeCardPrompt = ai.definePrompt({
   name: 'optimizeCardPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: 'vertexai/gemini-1.5-flash',
   input: { schema: OptimizeCardInputSchema },
   output: { schema: OptimizeCardOutputSchema },
   config: {
@@ -45,8 +45,9 @@ export const optimizeCardFlow = ai.defineFlow(
       if (!output) throw new Error("A IA não conseguiu estruturar os dados.");
       return output;
     } catch (err: any) {
-      console.error("ERRO IA OPTIMIZE:", err);
-      throw new Error(`Falha na IA: ${err.message || 'Erro de comunicação'}.`);
+      console.error("ERRO VERTEX AI (Optimize):", err);
+      // Erro amigável para o usuário no dashboard
+      throw new Error(`Falha na IA (Vertex): ${err.message || 'Erro de comunicação'}.`);
     }
   }
 );

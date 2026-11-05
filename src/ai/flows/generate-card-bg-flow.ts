@@ -1,7 +1,7 @@
 
 'use server';
 /**
- * @fileOverview Flow para geração de backgrounds verticais via Imagen 3 no Google AI.
+ * @fileOverview Flow para geração de backgrounds verticais via Imagen 3 no Vertex AI.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -18,9 +18,8 @@ export const generateCardBackgroundFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      // No Google AI Studio, o modelo de imagem é o imagen3
       const { media } = await ai.generate({
-        model: 'googleai/imagen-3',
+        model: 'vertexai/imagen-3',
         prompt: `Vertical 9:16 portrait orientation for Instagram Story, ${input.bgPrompt}, high-end commercial photography, shallow depth of field, 8k resolution, minimalist luxury style.`,
       });
 
@@ -30,7 +29,7 @@ export const generateCardBackgroundFlow = ai.defineFlow(
 
       return media.url;
     } catch (err: any) {
-      console.error("ERRO IMAGEN:", err);
+      console.error("ERRO VERTEX AI (Imagen):", err);
       throw new Error(`Falha ao gerar background: ${err.message}`);
     }
   }
