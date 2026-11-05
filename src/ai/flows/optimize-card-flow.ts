@@ -4,7 +4,6 @@
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { googleAI } from '@genkit-ai/google-genai';
 
 const OptimizeCardInputSchema = z.object({
   text: z.string(),
@@ -19,7 +18,7 @@ const OptimizeCardOutputSchema = z.object({
 export async function optimizeCard(input: z.infer<typeof OptimizeCardInputSchema>) {
   try {
     const { output } = await ai.generate({
-      model: googleAI.model('gemini-1.5-flash'),
+      model: 'googleai/gemini-1.5-flash',
       prompt: `Você é um Diretor de Arte e Copywriter de elite especializado em posts de Instagram (Social Proof).
       
       Recebi este depoimento: "${input.text}"
@@ -40,7 +39,7 @@ export async function optimizeCard(input: z.infer<typeof OptimizeCardInputSchema
     return output;
   } catch (err: any) {
     console.error("Erro crítico no Gemini (optimizeCard):", err);
-    throw new Error("Falha ao otimizar o texto do card.");
+    throw new Error("Falha ao otimizar o texto do card. Verifique as credenciais da API.");
   }
 }
 
