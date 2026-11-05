@@ -1,10 +1,11 @@
 
 'use server';
 /**
- * @fileOverview Flow para criação de roteiro de design para Instagram Story Posts via Vertex AI.
+ * @fileOverview Flow para criação de roteiro de design para Instagram Story Posts via Google AI.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { googleAI } from '@genkit-ai/google-genai';
 
 const OptimizeCardInputSchema = z.object({
   text: z.string(),
@@ -18,7 +19,7 @@ const OptimizeCardOutputSchema = z.object({
 
 const optimizeCardPrompt = ai.definePrompt({
   name: 'optimizeCardPrompt',
-  model: 'vertexai/gemini-1.5-flash',
+  model: googleAI.model('gemini-1.5-flash'),
   input: { schema: OptimizeCardInputSchema },
   output: { schema: OptimizeCardOutputSchema },
   prompt: `Você é um Diretor de Arte de uma agência de publicidade de luxo especializada em Prova Social. 
@@ -48,13 +49,8 @@ export const optimizeCardFlow = ai.defineFlow(
       if (!output) throw new Error("A IA não conseguiu estruturar os dados do card.");
       return output;
     } catch (err: any) {
-      console.error("ERRO VERTEX AI (Optimize):", err);
-      
-      if (err.message?.includes('403') || err.message?.includes('permission')) {
-        throw new Error("Erro de Permissão: Verifique se a conta de serviço tem o papel 'roles/aiplatform.user' no projeto proova-513814.");
-      }
-
-      throw new Error(`Falha na IA (Vertex): ${err.message || 'Erro de comunicação'}.`);
+      console.error("ERRO GOOGLE AI (Optimize):", err);
+      throw new Error(`Falha na IA: ${err.message || 'Erro de comunicação'}. Verifique se sua chave do AI Studio está configurada como GOOGLE_GENAI_API_KEY.`);
     }
   }
 );

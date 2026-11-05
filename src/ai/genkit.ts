@@ -1,16 +1,14 @@
 
 import { genkit } from 'genkit';
-import { vertexAI } from '@genkit-ai/vertexai';
+import { googleAI } from '@genkit-ai/google-genai';
 
 /**
- * Inicializa a instância global do Genkit com Vertex AI.
- * Vertex AI utiliza o faturamento padrão do Google Cloud.
- * Requer GOOGLE_CLOUD_PROJECT ou GCLOUD_PROJECT no ambiente.
+ * Inicializa a instância global do Genkit com Google AI (AI Studio).
+ * Este método é mais simples para desenvolvimento pois usa apenas uma API Key.
+ * Certifique-se de ter GOOGLE_GENAI_API_KEY no seu .env.
  */
 export const ai = genkit({
   plugins: [
-    vertexAI({
-      location: 'us-central1', // Região padrão com alta disponibilidade para Imagen/Gemini
-    }),
+    googleAI(),
   ],
 });

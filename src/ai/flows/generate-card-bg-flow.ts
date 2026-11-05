@@ -1,12 +1,11 @@
 
 'use server';
 /**
- * @fileOverview Flow para geração de backgrounds verticais (Stories) via Imagen 3 no Vertex AI.
- * 
- * - generateCardBackground - Gera uma imagem 9:16 de alta qualidade para o fundo do post.
+ * @fileOverview Flow para geração de backgrounds verticais (Stories) via Imagen 3 no Google AI Studio.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { googleAI } from '@genkit-ai/google-genai';
 
 const GenerateCardBgInputSchema = z.object({
   bgPrompt: z.string().describe('O prompt visual refinado para a imagem de fundo.'),
@@ -20,9 +19,9 @@ export const generateCardBackgroundFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      // Imagen 3 no Vertex AI exige Project ID configurado e API ativa.
+      // Imagen 3 no AI Studio usa o identificador 'imagen-3.0-generate-001'
       const { media } = await ai.generate({
-        model: 'vertexai/imagen-3.0-fast-generate-001',
+        model: googleAI.model('imagen-3.0-generate-001'),
         prompt: `Vertical 9:16 composition for smartphone screen, ${input.bgPrompt}, ultra-high definition, cinematic color grading, clean and professional look.`,
       });
 
@@ -32,8 +31,8 @@ export const generateCardBackgroundFlow = ai.defineFlow(
 
       return media.url;
     } catch (err: any) {
-      console.error("ERRO CRÍTICO IMAGEN (Vertex):", err);
-      throw new Error(`Falha ao gerar background no Vertex: ${err.message}`);
+      console.error("ERRO CRÍTICO IMAGEN (Google AI):", err);
+      throw new Error(`Falha ao gerar background: ${err.message}`);
     }
   }
 );
