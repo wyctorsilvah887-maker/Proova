@@ -18,11 +18,11 @@ export default function TermsPage() {
             </div>
           </Link>
         </div>
-        <div className="ml-auto flex items-center gap-4">
-          <ThemeToggle className="border-none bg-transparent shadow-none" />
+        <div className="ml-auto flex items-center gap-2 md:gap-4">
+          <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" />
           <Link href="/">
-            <Button variant="ghost" className="text-xs font-bold uppercase tracking-widest gap-2">
-              <ArrowLeft className="w-4 h-4" /> Voltar
+            <Button variant="ghost" size="sm" className="text-[10px] font-bold uppercase tracking-widest gap-1.5 h-8 px-2 text-muted-foreground hover:text-primary transition-colors">
+              <ArrowLeft className="w-3 h-3" /> Voltar
             </Button>
           </Link>
         </div>
