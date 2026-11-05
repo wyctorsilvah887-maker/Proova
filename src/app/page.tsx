@@ -325,7 +325,6 @@ AgitationSection.displayName = "AgitationSection";
 
 /**
  * Seção de Pilares (A Máquina de Domínio)
- * Simplificada: removido trilho vertical e rastreador de bolinha.
  */
 const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -389,9 +388,8 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
         <div className="max-w-4xl mx-auto relative px-4 md:px-0">
           <div className="space-y-20 md:space-y-32">
             {steps.map((step, idx) => {
-              // Mantemos o destaque de cor baseado na posição central (opcional, para feedback visual)
               const stepTrigger = idx / (steps.length - 1);
-              const isActive = scrollProgress >= stepTrigger - 0.1; // Pequena margem para facilitar o acendimento
+              const isActive = scrollProgress >= stepTrigger - 0.1;
 
               return (
                 <div 
@@ -408,12 +406,6 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                     )}>
                       {step.number}
                     </div>
-                    <div className={cn(
-                      "w-3 h-3 rounded-full z-20 transition-all duration-300 border-2",
-                      isActive 
-                        ? "bg-primary border-primary scale-125 shadow-[0_0_15px_rgba(249,115,22,0.6)]" 
-                        : "bg-transparent border-muted/50 scale-100"
-                    )} />
                   </div>
 
                   <div className={cn(
@@ -448,6 +440,24 @@ PillarsSection.displayName = "PillarsSection";
  * Seção de Versatilidade (Setores Atendidos)
  */
 const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
+  const demonstrationTestimonials = [
+    {
+      initials: "RB",
+      text: "O G-Boost mudou o jogo. Antes eu não recebia uma ligação do Google Maps, hoje meu telefone não para. A prova social é real!",
+      label: "Domínio de Maps Verificado"
+    },
+    {
+      initials: "ML",
+      text: "O Inbox Privado salvou minha reputação. Consegui resolver um problema com um cliente insatisfeito antes dele postar no Google. Vale cada centavo.",
+      label: "Gestão de Crise via Proova"
+    },
+    {
+      initials: "JP",
+      text: "A página da bio ficou sensacional. Meus seguidores agora veem autoridade imediata assim que clicam no link. A conversão subiu 300%.",
+      label: "Sucesso em Vendas na Bio"
+    }
+  ];
+
   return (
     <section id="setores-atendidos" ref={ref} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
       <div className="container px-4 mx-auto">
@@ -458,7 +468,9 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
           )}>
             <div className="space-y-4">
               <h2 className="text-3xl md:text-5xl font-black font-headline leading-tight tracking-tight">
-                Trabalhamos duro para você ser a <span className="text-primary italic">Única Opção</span>.
+                Trabalhamos duro para você ser a <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
+                  Única Opção
+                </span>.
               </h2>
               <p className="text-sm md:text-lg text-muted-foreground font-medium italic">
                 "Enquanto seus competidores dormem, sua reputação trabalha vendendo por você 24 horas por dia."
@@ -488,15 +500,15 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
             <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card p-6 ring-1 ring-primary/10">
               <div className="space-y-4 p-2">
-                 {[1, 2, 3].map((i) => (
+                 {demonstrationTestimonials.map((t, i) => (
                    <div key={i} className="bg-background p-6 rounded-[2rem] border shadow-sm flex flex-col gap-4">
                       <div className="flex gap-1">
                         {[1, 2, 3, 4, 5].map((s) => <Star key={s} className="w-3 h-3 fill-yellow-400 text-yellow-400" />)}
                       </div>
-                      <p className="text-xs md:text-sm italic font-bold leading-relaxed">"Eu estava em dúvida entre três opções, mas depois de ver tantos depoimentos reais, fechei com eles. Foi a melhor decisão!"</p>
+                      <p className="text-xs md:text-sm italic font-bold leading-relaxed">"{t.text}"</p>
                       <div className="flex items-center gap-3 border-t pt-4">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-black text-primary">SV</div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Sucesso Verificado via Proova</span>
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-black text-primary">{t.initials}</div>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t.label}</span>
                       </div>
                    </div>
                  ))}
