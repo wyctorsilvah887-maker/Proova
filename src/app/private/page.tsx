@@ -25,7 +25,8 @@ import {
   Sparkles,
   MessageSquare,
   Handshake,
-  Lock
+  Lock,
+  Globe
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -40,7 +41,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebase';
-import { doc, collection, query, orderBy, deleteDoc, updateDoc, getDocs, limit, arrayUnion, where } from 'firebase/firestore';
+import { doc, collection, query, orderBy, deleteDoc, updateDoc, getDocs, limit, arrayUnion, where, addDoc, serverTimestamp } from 'firebase/firestore';
 import Link from 'next/link';
 import { signOut } from 'firebase/auth';
 import { toast } from '@/hooks/use-toast';
@@ -110,7 +111,6 @@ export default function PrivateInboxPage() {
       });
   }, [privateFeedbacksList]);
 
-  // Lógica de Onboarding simplificada para bloqueio de menu
   const setupProgress = useMemo(() => {
     if (!userData) return { isCollectDone: false, isSetupComplete: false };
     const isLocationDone = !!userData.city && !!userData.state;
@@ -123,11 +123,11 @@ export default function PrivateInboxPage() {
 
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
-    if (status === 'enterprise') return 'Membro Enterprise';
-    if (status === 'gold') return 'Membro Gold';
-    if (status === 'trial') return 'Período Trial';
-    if (status === 'expired') return 'Plano Expirado';
-    return 'Plano Base';
+    if (status === 'enterprise') return 'ENTERPRISE';
+    if (status === 'gold') return 'GOLD';
+    if (status === 'trial') return 'TRIAL';
+    if (status === 'expired') return 'EXPIRADO';
+    return 'PLANO BASE';
   }, [userData]);
 
   const handleApproveTestimonial = async (id: string) => {
@@ -149,6 +149,47 @@ export default function PrivateInboxPage() {
       toast({ title: "Publicado!", description: "Depoimento aprovado e injetado no mural." });
     } catch (err) {
       toast({ variant: "destructive", title: "Erro na aprovação" });
+    } finally {
+      setIsProcessing(null);
+    }
+  };
+
+  const handlePromoteToPublic = async (feedback: any) => {
+    if (!db || !user || isProcessing) return;
+    setIsProcessing(feedback.id);
+
+    try {
+      // 1. Criar novo depoimento clonado na subcoleção 'testimonials'
+      const testimonialsRef = collection(db, 'users', user.uid, 'testimonials');
+      const newTestimonialData = {
+        userName: feedback.userName,
+        userEmail: feedback.userEmail || '',
+        rating: feedback.rating,
+        text: feedback.text,
+        videoUrl: feedback.videoUrl || null,
+        status: 'approved', // Já entra aprovado
+        createdAt: serverTimestamp(),
+        source: 'cloned_from_private'
+      };
+      
+      const newDocRef = await addDoc(testimonialsRef, newTestimonialData);
+
+      // 2. Injetar automaticamente no primeiro widget encontrado
+      const widgetsRef = collection(db, 'users', user.uid, 'widgets');
+      const widgetsSnap = await getDocs(query(widgetsRef, limit(1)));
+      if (!widgetsSnap.empty) {
+        await updateDoc(widgetsSnap.docs[0].ref, {
+          selectedTestimonialIds: arrayUnion(newDocRef.id)
+        });
+      }
+
+      // 3. Remover do Inbox Privado
+      await deleteDoc(doc(db, 'users', user.uid, 'private_feedbacks', feedback.id));
+
+      toast({ title: "Feedback Promovido!", description: "O item foi clonado para os depoimentos públicos e aprovado." });
+    } catch (err) {
+      console.error(err);
+      toast({ variant: "destructive", title: "Erro na clonagem" });
     } finally {
       setIsProcessing(null);
     }
@@ -207,7 +248,7 @@ export default function PrivateInboxPage() {
                     {userData?.companyName || 'Minha Empresa'}
                   </span>
                   <span className={cn(
-                    "text-[8px] uppercase tracking-widest font-black leading-tight",
+                    "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
                     userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
                   )}>
                     {membershipLabel}
@@ -217,9 +258,7 @@ export default function PrivateInboxPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
-              <DropdownMenuLabel className="px-3 py-2">
-                <p className="text-xs font-headline font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</p>
-              </DropdownMenuLabel>
+              <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
@@ -233,7 +272,7 @@ export default function PrivateInboxPage() {
                 )}
               >
                 <Layout className="mr-2 h-4 w-4 text-primary" />
-                <span>Meus Widgets</span>
+                <span>Meus Murais</span>
                 {!setupProgress.isCollectDone && <Lock className="ml-auto w-3 h-3 opacity-60" />}
               </DropdownMenuItem>
               <DropdownMenuItem 
@@ -249,7 +288,7 @@ export default function PrivateInboxPage() {
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
-                <span>Planos de Upgrade</span>
+                <span>Upgrade</span>
               </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={() => router.push('/pricing')} 
@@ -268,10 +307,7 @@ export default function PrivateInboxPage() {
               )}
 
               <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                {theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}
-                <span>Alternar Tema</span>
-              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
             </DropdownMenuContent>
@@ -317,7 +353,7 @@ export default function PrivateInboxPage() {
               <div className="grid gap-4">
                 <div className="bg-primary/5 p-4 rounded-2xl border border-primary/10 flex items-center gap-3 mb-2 animate-pulse">
                    <Sparkles className="w-5 h-5 text-primary shrink-0" />
-                   <p className="text-xs font-bold text-primary">Estes elógios são qualificados para o seu site. Aprove-os agora!</p>
+                   <p className="text-xs font-bold text-primary">Estes elogios são qualificados para o seu site. Aprove-os agora!</p>
                 </div>
                 {pendingTestimonials.map((t: any) => (
                   <Card key={t.id} className="border-none shadow-sm overflow-hidden rounded-2xl group transition-all hover:shadow-md">
@@ -393,8 +429,16 @@ export default function PrivateInboxPage() {
                       )}
                       <div className="flex items-center gap-4 text-[10px] text-muted-foreground font-bold uppercase tracking-widest"><span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {f.createdAt?.toDate ? f.createdAt.toDate().toLocaleString('pt-BR') : 'Agora'}</span></div>
                     </div>
-                    <div className="flex md:flex-col items-center justify-end gap-2 shrink-0">
-                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 rounded-xl h-10 w-10" onClick={() => handleDeleteFeedback(f.id)}><Trash2 className="w-4 h-4" /></Button>
+                    <div className="flex flex-row md:flex-col items-center justify-center gap-2 shrink-0 w-full md:w-auto">
+                      <Button 
+                        className="flex-1 md:w-40 h-11 rounded-xl font-bold gap-2 shadow-md bg-green-600 hover:bg-green-700 text-white border-none"
+                        disabled={isProcessing === f.id}
+                        onClick={() => handlePromoteToPublic(f)}
+                      >
+                        {isProcessing === f.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Globe className="w-4 h-4" />}
+                        Promover Público
+                      </Button>
+                      <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 rounded-xl h-11 w-11" onClick={() => handleDeleteFeedback(f.id)}><Trash2 className="w-4 h-4" /></Button>
                     </div>
                   </CardContent>
                 </Card>

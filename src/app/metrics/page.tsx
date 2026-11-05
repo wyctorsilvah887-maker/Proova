@@ -22,7 +22,8 @@ import {
   MessageSquare,
   ChevronDown,
   Mail,
-  Lock
+  Lock,
+  Shield
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -205,11 +206,11 @@ export default function MetricsPage() {
 
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
-    if (status === 'enterprise') return 'Membro Enterprise';
-    if (status === 'gold') return 'Membro Gold';
-    if (status === 'trial') return 'Período Trial';
-    if (status === 'expired') return 'Plano Expirado';
-    return 'Plano Base';
+    if (status === 'enterprise') return 'ENTERPRISE';
+    if (status === 'gold') return 'GOLD';
+    if (status === 'trial') return 'TRIAL';
+    if (status === 'expired') return 'EXPIRADO';
+    return 'PLANO BASE';
   }, [userData]);
 
   if (authLoading || userDataLoading || testimonialsLoading) {
@@ -235,13 +236,13 @@ export default function MetricsPage() {
         <div className="ml-auto flex items-center gap-2 md:gap-4">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 h-12 px-2 rounded-xl hover:bg-primary/5 group transition-all outline-none">
+              <button className="flex items-center gap-2 h-12 px-2 rounded-xl hover:bg-primary/5 group transition-all outline-none shadow-none focus-visible:ring-0">
                 <div className="flex flex-col items-end">
-                  <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[150px] leading-tight">
+                  <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[150px] transition-colors group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Minha Empresa'}
                   </span>
                   <span className={cn(
-                    "text-[8px] uppercase tracking-widest font-black leading-tight",
+                    "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
                     userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
                   )}>
                     {membershipLabel}
@@ -257,7 +258,7 @@ export default function MetricsPage() {
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
-                <span>Painel Principal</span>
+                <span>Dash</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Layout className="mr-2 h-4 w-4 text-primary" />
@@ -279,6 +280,14 @@ export default function MetricsPage() {
                 <span>Serviços de Parceiros</span>
                 <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
               </DropdownMenuItem>
+              
+              {userData?.isAdmin && (
+                <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                  <Shield className="mr-2 h-4 w-4 text-primary" />
+                  <span>Administração</span>
+                </DropdownMenuItem>
+              )}
+
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 {theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}
