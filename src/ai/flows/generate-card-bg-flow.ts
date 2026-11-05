@@ -2,6 +2,8 @@
 'use server';
 /**
  * @fileOverview Flow para geração de backgrounds verticais via Imagen 3 no Vertex AI.
+ * 
+ * - generateCardBackground - Gera uma imagem 9:16 de alta qualidade para Stories.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -18,9 +20,10 @@ export const generateCardBackgroundFlow = ai.defineFlow(
   },
   async (input) => {
     try {
+      // O modelo 'imagen-3' no Vertex AI é o estado da arte para design comercial.
       const { media } = await ai.generate({
         model: 'vertexai/imagen-3',
-        prompt: `Vertical 9:16 portrait orientation for Instagram Story, ${input.bgPrompt}, high-end commercial photography, shallow depth of field, 8k resolution, minimalist luxury style.`,
+        prompt: `Vertical 9:16 portrait orientation for Instagram Story, ${input.bgPrompt}, high-end commercial photography, minimalist luxury style, 8k resolution, clean composition, space for text overlay.`,
       });
 
       if (!media || !media.url) {

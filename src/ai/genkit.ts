@@ -5,7 +5,7 @@ import { vertexAI } from '@genkit-ai/vertexai';
 /**
  * Inicializa a instância global do Genkit com Vertex AI (Google Cloud).
  * Forçamos o ID do projeto e a localização para garantir que o ADC (Application Default Credentials)
- * funcione corretamente no ambiente Windows do usuário.
+ * funcione corretamente no ambiente Windows do usuário após o gcloud auth.
  */
 export const ai = genkit({
   plugins: [

@@ -2,6 +2,8 @@
 'use server';
 /**
  * @fileOverview Flow para criação de roteiro de design para Instagram Story via Vertex AI.
+ * 
+ * - optimizeCard - Transforma um depoimento bruto em uma headline de impacto e prompt visual.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -24,13 +26,15 @@ const optimizeCardPrompt = ai.definePrompt({
   config: {
     temperature: 0.7,
   },
-  prompt: `Você é um Diretor de Arte de luxo. 
-  Crie um Story de impacto para: "{{{text}}}"
-  Setor: {{#if businessType}}{{{businessType}}}{{else}}Premium Business{{/if}}
+  prompt: `Você é um Diretor de Arte de marcas de luxo. 
+  Sua tarefa é transformar um depoimento de cliente em um Story de Instagram de alto impacto.
+  
+  Depoimento: "{{{text}}}"
+  Setor do Negócio: {{#if businessType}}{{{businessType}}}{{else}}Premium Business{{/if}}
   
   INSTRUÇÕES:
-  1. Headline: Curta (max 8 palavras), impactante, soando como marca de luxo.
-  2. Visual: Prompt em inglês para fundo 9:16 abstrato e sofisticado (mármore, iluminação de estúdio, etc).`,
+  1. Headline (refinedText): Crie uma frase curta (max 8 palavras), poderosa e aspiracional baseada no elogio. Deve soar como uma marca de grife.
+  2. Visual (bgPrompt): Crie um prompt detalhado em INGLÊS para gerar uma imagem de fundo 9:16. Foque em: iluminação de estúdio, texturas sofisticadas (mármore, seda, metal escovado), profundidade de campo rasa e estilo minimalista luxuoso.`,
 });
 
 export const optimizeCardFlow = ai.defineFlow(
@@ -46,7 +50,6 @@ export const optimizeCardFlow = ai.defineFlow(
       return output;
     } catch (err: any) {
       console.error("ERRO VERTEX AI (Optimize):", err);
-      // Erro amigável para o usuário no dashboard
       throw new Error(`Falha na IA (Vertex): ${err.message || 'Erro de comunicação'}.`);
     }
   }
