@@ -34,7 +34,7 @@ const optimizeCardPrompt = ai.definePrompt({
   2. Visual (bgPrompt): Crie um prompt detalhado em INGLÊS para o Imagen 3 gerar uma imagem 9:16.
      - Estilo: "High-end commercial photography, minimalist luxury, shallow depth of field, 8k resolution".
      - Cenário: Algo que remeta ao setor {{#if businessType}}{{{businessType}}}{{else}}Geral{{/if}} de forma abstrata ou sofisticada (ex: texturas de mármore, iluminação de estúdio, design de interiores moderno).
-     - Composição: Espaço negativo amplo para que o texto não cubra elementos importantes.
+     - Composição: Espaço negativo amplo no centro para que o texto não cubra elementos importantes.
   
   Retorne rigorosamente no formato JSON.`,
 });

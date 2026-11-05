@@ -18,9 +18,10 @@ export const generateCardBackgroundFlow = ai.defineFlow(
   },
   async (input) => {
     try {
+      // No Vertex AI o modelo de imagem segue o padrão vertexai/
       const { media } = await ai.generate({
         model: 'vertexai/imagen-3.0-generate-001',
-        prompt: `Vertical 9:16 composition for smartphone screen, ${input.bgPrompt}, ultra-high definition, cinematic color grading, clean and professional look.`,
+        prompt: `Vertical 9:16 composition for smartphone screen, ${input.bgPrompt}, ultra-high definition, cinematic color grading, clean and professional look, commercial photography style.`,
       });
 
       if (!media || !media.url) {

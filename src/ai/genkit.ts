@@ -3,8 +3,8 @@ import { genkit } from 'genkit';
 import { vertexAI } from '@genkit-ai/vertexai';
 
 /**
- * Inicializa a instância global do Genkit com Vertex AI (Google Cloud).
- * O Project ID proova-513814 é o que você está configurando no terminal.
+ * Inicializa a instância global do Genkit com Vertex AI.
+ * Project ID fixo conforme configurado no Google Cloud Console.
  */
 export const ai = genkit({
   plugins: [
