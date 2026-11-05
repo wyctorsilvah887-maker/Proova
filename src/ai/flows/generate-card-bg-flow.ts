@@ -18,12 +18,10 @@ export const generateCardBackgroundFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      // Como o plugin Google AI utiliza o Gemini 1.5 Flash como motor principal, 
-      // usamos o modelo multimodal para processar o prompt visual.
-      // Caso a geração direta de imagem não esteja disponível no seu tier de API,
-      // retornamos um fallback premium para não quebrar a experiência do usuário.
+      // Utilizamos o identificador completo com namespace para o plugin Google AI.
+      // O Gemini 1.5 Flash processa o prompt e gera a imagem através de multimodalidade.
       const { media } = await ai.generate({
-        model: 'gemini-1.5-flash',
+        model: 'googleai/gemini-1.5-flash',
         prompt: `Generate a high-end 9:16 background image for an Instagram Story. Style: ${input.bgPrompt}. Focus on luxury textures and bokeh.`,
         config: {
           responseModalities: ['TEXT', 'IMAGE'],
@@ -37,6 +35,7 @@ export const generateCardBackgroundFlow = ai.defineFlow(
       return media.url;
     } catch (err: any) {
       console.error("ERRO GOOGLE AI (BG):", err);
+      // Fallback premium caso a geração de imagem falhe ou não esteja disponível no tier
       return `https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop`;
     }
   }
