@@ -387,8 +387,8 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
         </div>
         
         <div className="max-w-4xl mx-auto relative px-4 md:px-0">
-          {/* Track (Trilho da Linha) */}
-          <div className="absolute left-[26px] md:left-[45px] top-8 bottom-8 w-0.5 bg-muted/40 hidden sm:block rounded-full overflow-hidden">
+          {/* Track (Trilho da Linha) - Visível em todas as telas */}
+          <div className="absolute left-[26px] md:left-[45px] top-8 bottom-8 w-0.5 bg-muted/40 rounded-full overflow-hidden">
             {/* Active Progress Fill */}
             <div 
               className="absolute top-0 left-0 w-full bg-primary transition-all duration-150 ease-out"
