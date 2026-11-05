@@ -21,7 +21,7 @@ export const generateCopyFlow = ai.defineFlow(
   async (input) => {
     try {
       const { text } = await ai.generate({
-        model: 'vertexai/gemini-1.5-flash',
+        model: 'vertexai/gemini-1.5-flash-002',
         prompt: `Você é um copywriter de elite especialista em prova social. 
         Gere um texto curto, matador e altamente persuasivo para o campo: ${input.type}.
         Empresa: ${input.companyName || 'Nossa Empresa'}.
