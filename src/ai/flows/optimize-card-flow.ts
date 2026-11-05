@@ -4,6 +4,7 @@
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
+import { gemini15Flash } from '@genkit-ai/google-genai';
 
 const OptimizeCardInputSchema = z.object({
   text: z.string(),
@@ -17,7 +18,7 @@ const OptimizeCardOutputSchema = z.object({
 
 const optimizeCardPrompt = ai.definePrompt({
   name: 'optimizeCardPrompt',
-  model: 'googleai/gemini-1.5-flash',
+  model: gemini15Flash,
   input: { schema: OptimizeCardInputSchema },
   output: { schema: OptimizeCardOutputSchema },
   config: {
