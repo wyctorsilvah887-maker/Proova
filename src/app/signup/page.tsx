@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Mail, User, Building2, Lock, Loader2, Eye, EyeOff, CheckCircle2, ShieldCheck, Briefcase, ChevronRight } from "lucide-react";
+import { ArrowLeft, Mail, User, Building2, Lock, Loader2, Eye, EyeOff, CheckCircle2, ShieldCheck, Briefcase, ChevronRight, Fingerprint } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -23,7 +23,7 @@ export default function SignupPage() {
   const { user, loading: authLoading } = useUser();
   const router = useRouter();
   
-  const [step, setStep] = useState(0); // 0: Quiz/Business Type, 1: Account Details
+  const [step, setStep] = useState(0); // 0: Setor, 1: Identidade, 2: Acesso
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
@@ -40,30 +40,30 @@ export default function SignupPage() {
   }, [user, authLoading, router]);
 
   const handleNextStep = () => {
-    if (!businessType) {
-      toast({
-        variant: "destructive",
-        title: "Seleção Obrigatória",
-        description: "Selecione o tipo do seu negócio para prosseguir.",
-      });
-      return;
+    if (step === 0) {
+      if (!businessType) {
+        toast({ variant: "destructive", title: "Seleção Obrigatória", description: "Selecione o tipo do seu negócio." });
+        return;
+      }
+      setStep(1);
+    } else if (step === 1) {
+      if (!name.trim() || !company.trim()) {
+        toast({ variant: "destructive", title: "Campos Obrigatórios", description: "Informe seu nome e o nome comercial da empresa." });
+        return;
+      }
+      setStep(2);
     }
-    setStep(1);
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!termsAccepted) {
-      toast({
-        variant: "destructive",
-        title: "Termos Obrigatórios",
-        description: "Você deve aceitar os termos de uso e política de privacidade.",
-      });
+      toast({ variant: "destructive", title: "Termos Obrigatórios", description: "Você deve aceitar os termos de uso." });
       return;
     }
 
-    if (!name.trim() || !company.trim() || !email.trim() || !password.trim() || !db) return;
+    if (!email.trim() || !password.trim() || !db) return;
 
     setIsSubmitting(true);
     
@@ -121,10 +121,7 @@ export default function SignupPage() {
       
       await batch.commit();
       
-      toast({
-        title: "Conta Criada!",
-        description: "Bem-vindo à nova era da prova social.",
-      });
+      toast({ title: "Conta Criada!", description: "Bem-vindo à nova era da prova social." });
       router.push('/dash');
 
     } catch (error: any) {
@@ -166,31 +163,30 @@ export default function SignupPage() {
         <div className="flex flex-col items-center text-center space-y-2">
           <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">Criar Conta</h1>
           <p className="text-muted-foreground text-xs md:text-sm font-medium tracking-tight">
-            {step === 0 ? "Comece definindo sua atuação no mercado." : "Agora, informe seus dados de acesso."}
+            {step === 0 && "Comece definindo sua atuação no mercado."}
+            {step === 1 && "Agora, como devemos chamar você e sua empresa?"}
+            {step === 2 && "Por fim, defina seus dados de acesso."}
           </p>
         </div>
 
         <Card className="border-none shadow-2xl overflow-hidden bg-card rounded-[2rem] ring-1 ring-border/50">
           <div className="h-1.5 bg-primary w-full" />
           
-          <CardHeader className={cn(
-            "pt-10 text-center space-y-4",
-            step === 1 && "pb-2"
-          )}>
+          <CardHeader className="pt-10 text-center space-y-4">
             <div className="mx-auto w-fit animate-in zoom-in duration-700">
-              {step === 0 ? (
-                <Briefcase className="w-12 h-12 text-primary" />
-              ) : (
-                <User className="w-12 h-12 text-primary" />
-              )}
+              {step === 0 && <Briefcase className="w-12 h-12 text-primary" />}
+              {step === 1 && <User className="w-12 h-12 text-primary" />}
+              {step === 2 && <Fingerprint className="w-12 h-12 text-primary" />}
             </div>
             <CardTitle className="text-xl md:text-2xl font-black font-headline tracking-tight">
-              {step === 0 ? "Passo 1: Seu Negócio" : "Passo 2: Identificação"}
+              {step === 0 && "Passo 1: Seu Negócio"}
+              {step === 1 && "Passo 2: Identificação"}
+              {step === 2 && "Passo 3: Acesso"}
             </CardTitle>
           </CardHeader>
 
           <CardContent className="px-6 sm:px-10 pb-10 md:pb-12">
-            {step === 0 ? (
+            {step === 0 && (
               <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="space-y-4">
                   <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Em qual setor você atua?</label>
@@ -221,38 +217,60 @@ export default function SignupPage() {
                   Próximo Passo <ChevronRight className="w-5 h-5" />
                 </Button>
               </div>
-            ) : (
-              <form onSubmit={handleSignup} className="space-y-6 animate-in fade-in slide-in-from-left-4 duration-500">
+            )}
+
+            {step === 1 && (
+              <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Seu Nome</label>
-                      <div className="relative group">
-                        <User className="absolute left-4 top-3.5 h-4 w-4 text-muted-foreground/40 transition-colors group-focus-within:text-primary" />
-                        <Input
-                          placeholder="Nome Completo"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          className="h-11 pl-11 bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm rounded-xl"
-                          required
-                        />
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Sua Empresa</label>
-                      <div className="relative group">
-                        <Building2 className="absolute left-4 top-3.5 h-4 w-4 text-muted-foreground/40 transition-colors group-focus-within:text-primary" />
-                        <Input
-                          placeholder="Nome Comercial"
-                          value={company}
-                          onChange={(e) => setCompany(e.target.value)}
-                          className="h-11 pl-11 bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm rounded-xl"
-                          required
-                        />
-                      </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Seu Nome Completo</label>
+                    <div className="relative group">
+                      <User className="absolute left-4 top-3.5 h-4 w-4 text-muted-foreground/40 transition-colors group-focus-within:text-primary" />
+                      <Input
+                        placeholder="Nome e Sobrenome"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="h-11 pl-11 bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm rounded-xl"
+                        required
+                      />
                     </div>
                   </div>
+                  <div className="space-y-2">
+                    <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">Nome da Empresa</label>
+                    <div className="relative group">
+                      <Building2 className="absolute left-4 top-3.5 h-4 w-4 text-muted-foreground/40 transition-colors group-focus-within:text-primary" />
+                      <Input
+                        placeholder="Nome Comercial"
+                        value={company}
+                        onChange={(e) => setCompany(e.target.value)}
+                        className="h-11 pl-11 bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm rounded-xl"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
 
+                <div className="flex flex-col gap-3">
+                  <Button 
+                    onClick={handleNextStep}
+                    className="w-full h-14 text-base font-black shadow-xl hover:scale-[1.02] active:scale-95 transition-all rounded-2xl gap-3 bg-primary hover:bg-primary/90 text-white"
+                  >
+                    Próximo Passo <ChevronRight className="w-5 h-5" />
+                  </Button>
+                  <button 
+                    type="button"
+                    onClick={() => setStep(0)}
+                    className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors py-2 flex items-center justify-center gap-1.5"
+                  >
+                    <ArrowLeft className="w-3 h-3" /> Voltar ao Passo 1
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {step === 2 && (
+              <form onSubmit={handleSignup} className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-[9px] font-black uppercase tracking-widest text-muted-foreground ml-1">E-mail Corporativo</label>
                     <div className="relative group">
@@ -321,10 +339,10 @@ export default function SignupPage() {
                     
                     <button 
                       type="button"
-                      onClick={() => setStep(0)}
+                      onClick={() => setStep(1)}
                       className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors py-2 flex items-center justify-center gap-1.5"
                     >
-                      <ArrowLeft className="w-3 h-3" /> Alterar Tipo de Negócio
+                      <ArrowLeft className="w-3 h-3" /> Voltar ao Passo 2
                     </button>
                   </div>
                 </div>
