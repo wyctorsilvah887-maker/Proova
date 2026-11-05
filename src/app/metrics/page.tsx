@@ -53,7 +53,7 @@ import {
   Cell
 } from 'recharts';
 import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebase';
-import { doc, collection, query, where, orderBy } from 'firebase/firestore';
+import { doc, collection, query } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
@@ -80,16 +80,13 @@ export default function MetricsPage() {
     return status === 'gold' || status === 'enterprise' || status === 'trial';
   }, [userData]);
 
+  // Consulta simplificada para evitar erros de índice composto no Firebase
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
-    return query(
-      collection(db, 'users', user.uid, 'testimonials'),
-      where('status', '==', 'approved'),
-      orderBy('createdAt', 'desc')
-    );
+    return collection(db, 'users', user.uid, 'testimonials');
   }, [db, user]);
 
-  const { data: testimonials, loading: testimonialsLoading } = useCollection(testimonialsQuery);
+  const { data: rawTestimonials, loading: testimonialsLoading } = useCollection(testimonialsQuery);
 
   useEffect(() => {
     if (!authLoading && !user) router.replace('/login');
@@ -120,19 +117,29 @@ export default function MetricsPage() {
   };
 
   const stats = useMemo(() => {
-    if (!testimonials) return { 
+    // Garantimos que os dados brutos existam antes de calcular
+    if (!rawTestimonials) return { 
       total: 0, 
-      avgRating: 0, 
+      avgRating: "0.0", 
       chartData: [], 
       pieData: [],
       growth: 0 
     };
 
+    // Filtramos apenas os aprovados e ordenamos por data em memória
+    const approved = rawTestimonials
+      .filter((t: any) => t.status === 'approved')
+      .sort((a: any, b: any) => {
+        const da = a.createdAt?.toDate?.() || new Date(0);
+        const db = b.createdAt?.toDate?.() || new Date(0);
+        return db.getTime() - da.getTime();
+      });
+
     const now = new Date();
     const days = period === 'all' ? 365 : parseInt(period);
     const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
 
-    const filtered = testimonials.filter((t: any) => {
+    const filtered = approved.filter((t: any) => {
       const date = t.createdAt?.toDate?.() || new Date();
       return period === 'all' || date >= cutoff;
     });
@@ -140,9 +147,9 @@ export default function MetricsPage() {
     const sum = filtered.reduce((acc, t: any) => acc + (t.rating || 0), 0);
     const avg = filtered.length > 0 ? (sum / filtered.length).toFixed(1) : "0.0";
 
-    const lastNDays = Array.from({ length: days }, (_, i) => {
+    const lastNDays = Array.from({ length: days > 30 ? 30 : days }, (_, i) => {
       const d = new Date();
-      d.setDate(d.getDate() - (days - 1 - i));
+      d.setDate(d.getDate() - ((days > 30 ? 30 : days) - 1 - i));
       return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
     });
 
@@ -155,7 +162,7 @@ export default function MetricsPage() {
     const chartData = lastNDays.map(date => ({
       date,
       count: dayCounts[date] || 0
-    })).slice(-(period === '7' ? 7 : 14));
+    }));
 
     const ratings = filtered.reduce((acc: any, t: any) => {
       const r = t.rating || 5;
@@ -175,7 +182,7 @@ export default function MetricsPage() {
       chartData,
       pieData
     };
-  }, [testimonials, period]);
+  }, [rawTestimonials, period]);
 
   const chartConfig: ChartConfig = {
     count: {
@@ -377,7 +384,7 @@ export default function MetricsPage() {
             </CardHeader>
             <CardContent className="px-4 md:px-6 pb-4">
               <div className="text-2xl font-black text-primary">
-                {userData?.googleRedirectCount && stats.total ? ((userData.googleRedirectCount / stats.total) * 100).toFixed(0) : 0}%
+                {userData?.googleRedirectCount && stats.total && stats.total > 0 ? ((userData.googleRedirectCount / stats.total) * 100).toFixed(0) : 0}%
               </div>
               <p className="text-[9px] text-primary/60 uppercase font-bold">Elogios vs Cliques</p>
             </CardContent>
