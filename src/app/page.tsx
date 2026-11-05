@@ -418,16 +418,16 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                   {/* Step Number */}
                   <div className="flex flex-col items-center shrink-0">
                     <div className={cn(
-                      "text-xl md:text-3xl font-black font-headline transition-colors duration-500 mb-1",
+                      "text-xl md:text-3xl font-black font-headline transition-colors duration-200 mb-1",
                       isActive ? "text-primary" : "text-foreground/10"
                     )}>
                       {step.number}
                     </div>
                     {/* Bolinha Fixa de Referência */}
                     <div className={cn(
-                      "w-2.5 h-2.5 rounded-full z-10 transition-all duration-500 border-2",
+                      "w-2.5 h-2.5 rounded-full z-10 transition-all duration-200 border-2",
                       isActive 
-                        ? "bg-primary border-primary scale-110" 
+                        ? "bg-primary border-primary scale-110 shadow-[0_0_10px_rgba(249,115,22,0.5)]" 
                         : "bg-background border-muted"
                     )} />
                   </div>
