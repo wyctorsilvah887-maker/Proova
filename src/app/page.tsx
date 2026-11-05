@@ -56,7 +56,6 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
         ? "bg-background/95 backdrop-blur-md border-b shadow-sm" 
         : "bg-transparent border-b-transparent"
     )}>
-      {/* Logotipo na Extrema Esquerda */}
       <div className="flex items-center">
         <Link href="/" className="flex items-center group -ml-2 md:-ml-4">
           <div className="relative w-[180px] h-[60px] md:w-[280px] md:h-[90px] transition-transform group-hover:scale-105">
@@ -79,7 +78,6 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
       </div>
 
       <div className="flex items-center gap-2 md:gap-6">
-        {/* Alternador de Tema */}
         <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" />
         
         <div className="hidden sm:flex items-center gap-6">
@@ -243,7 +241,6 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
     <section id="ocusto-do-silencio" ref={ref} className="w-full py-24 bg-muted/30 dark:bg-zinc-950 text-foreground dark:text-white overflow-hidden relative border-y border-border/50 dark:border-zinc-900/30 min-h-[400px]">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
       
-      {/* Definições de Degradê para os Ícones */}
       <svg width="0" height="0" className="absolute invisible">
         <defs>
           <linearGradient id="skull-bleeding-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -262,7 +259,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
       <div className="container px-4 mx-auto text-center space-y-16">
         <div className={cn(
           "space-y-4 transition-all duration-1000",
-          isVisible ? "animate-in fade-in zoom-in-95 opacity-100" : "opacity-100"
+          isVisible ? "animate-in fade-in zoom-in-95 opacity-100" : "opacity-0"
         )}>
           <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">O Custo do Silêncio</h2>
           <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
@@ -299,7 +296,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
           ].map((item, idx) => (
             <div key={idx} className={cn(
               "space-y-4 transition-all duration-1000",
-              isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-100"
+              isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-0"
             )} style={{ transitionDelay: `${(idx + 1) * 200}ms` }}>
               <div className="flex justify-center">
                 <item.icon 
@@ -326,7 +323,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
 AgitationSection.displayName = "AgitationSection";
 
 /**
- * Seção de Pilares (A Máquina de Domínio) - Redesign Vertical Stepper
+ * Seção de Pilares (A Máquina de Domínio)
  */
 const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -372,12 +369,11 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
       <div className="container px-4 mx-auto">
         <div className={cn(
           "text-center space-y-4 mb-24 transition-all duration-1000",
-          isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-100"
+          isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-0"
         )}>
           <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">A Máquina de Domínio</h2>
           <h3 className={cn(
-            "text-3xl md:text-5xl font-black font-headline tracking-tighter",
-            isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-100"
+            "text-3xl md:text-5xl font-black font-headline tracking-tighter"
           )}>
             Retome o <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
               Controle
@@ -387,16 +383,13 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
         </div>
         
         <div className="max-w-4xl mx-auto relative px-4 md:px-0">
-          {/* Track (Trilho da Linha) - Visível em todas as telas */}
           <div className="absolute left-[26px] md:left-[45px] top-8 bottom-8 w-0.5 bg-muted/40 rounded-full overflow-hidden">
-            {/* Active Progress Fill */}
             <div 
               className="absolute top-0 left-0 w-full bg-primary transition-all duration-150 ease-out"
               style={{ height: `${scrollProgress * 100}%` }}
             />
-            {/* Seguindo: Bolinha Indicadora Ativa */}
             <div 
-              className="absolute w-3 h-3 bg-primary rounded-full -left-[5px] transition-all duration-150 ease-out shadow-[0_0_15px_rgba(249,115,22,0.8)] z-20 border-2 border-background"
+              className="absolute w-3 h-3 bg-primary rounded-full -left-[5px] transition-all duration-150 ease-out shadow-[0_0_15px_rgba(249,115,22,0.8)] z-20"
               style={{ top: `${scrollProgress * 100}%`, transform: 'translateY(-50%)' }}
             />
           </div>
@@ -404,18 +397,18 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
           <div className="space-y-16 md:space-y-24">
             {steps.map((step, idx) => {
               const stepTrigger = idx / (steps.length - 1);
+              // Sincronização milimétrica: ativa quando o scrollProgress passa o ponto do step
               const isActive = scrollProgress >= stepTrigger;
 
               return (
                 <div 
                   key={idx} 
                   className={cn(
-                    "flex items-start gap-6 md:gap-16 relative transition-all duration-700",
-                    isVisible ? "animate-in fade-in slide-in-from-bottom-20 opacity-100" : "opacity-100"
+                    "flex items-start gap-6 md:gap-16 relative transition-all duration-200",
+                    isVisible ? "animate-in fade-in slide-in-from-bottom-20 opacity-100" : "opacity-0"
                   )}
                   style={{ transitionDelay: `${(idx + 1) * 100}ms` }}
                 >
-                  {/* Step Number */}
                   <div className="flex flex-col items-center shrink-0">
                     <div className={cn(
                       "text-xl md:text-3xl font-black font-headline transition-colors duration-200 mb-1",
@@ -423,19 +416,17 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                     )}>
                       {step.number}
                     </div>
-                    {/* Bolinha Fixa de Referência */}
                     <div className={cn(
                       "w-2.5 h-2.5 rounded-full z-10 transition-all duration-200 border-2",
                       isActive 
                         ? "bg-primary border-primary scale-110 shadow-[0_0_10px_rgba(249,115,22,0.5)]" 
-                        : "bg-background border-muted"
+                        : "bg-transparent border-muted"
                     )} />
                   </div>
 
-                  {/* Content */}
                   <div className={cn(
-                    "space-y-3 pt-0.5 md:pt-1 transition-all duration-700",
-                    isActive ? "translate-x-0 opacity-100" : "translate-x-2 opacity-50"
+                    "space-y-3 pt-0.5 md:pt-1 transition-all duration-200",
+                    isActive ? "translate-x-0 opacity-100" : "translate-x-2 opacity-30"
                   )}>
                     <h4 className="text-xl md:text-3xl font-black font-headline tracking-tight text-foreground">
                       {step.title}
@@ -465,7 +456,7 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
         <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-center">
           <div className={cn(
             "space-y-8 transition-all duration-1000",
-            isVisible ? "animate-in fade-in slide-in-from-left-10 opacity-100" : "opacity-100"
+            isVisible ? "animate-in fade-in slide-in-from-left-10 opacity-100" : "opacity-0"
           )}>
             <div className="space-y-4">
               <h2 className="text-3xl md:text-5xl font-black font-headline leading-tight tracking-tight">
@@ -494,7 +485,7 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
 
           <div className={cn(
             "relative transition-all duration-1000 delay-500",
-            isVisible ? "animate-in fade-in slide-in-from-right-10 opacity-100" : "opacity-100"
+            isVisible ? "animate-in fade-in slide-in-from-right-10 opacity-100" : "opacity-0"
           )}>
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
             <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card p-6 ring-1 ring-primary/10">
