@@ -1,35 +1,50 @@
-
 'use server';
 /**
  * @fileOverview Flow para geração de copy persuasiva via Google AI.
+ * 
+ * - generateCopy - Função que gera textos de marketing para a plataforma.
+ * - CopyInput - Schema de entrada (tipo de campo e contexto).
  */
 import { ai } from '@/ai/genkit';
-import { z } from 'zod';
+import { z } from 'genkit';
+import { googleAI } from '@genkit-ai/google-genai';
 
 const CopyInputSchema = z.object({
-  type: z.string(),
-  companyName: z.string().optional(),
-  context: z.string().optional(),
+  type: z.string().describe('O campo para o qual a copy será gerada (ex: título, subtítulo).'),
+  companyName: z.string().optional().describe('O nome da empresa.'),
+  context: z.string().optional().describe('O contexto ou tom desejado para a copy.'),
 });
+export type CopyInput = z.infer<typeof CopyInputSchema>;
 
-export async function generateCopy(input: z.infer<typeof CopyInputSchema>) {
-  try {
-    const { text } = await ai.generate({
-      model: 'googleai/gemini-1.5-flash',
-      prompt: `Você é um copywriter especialista em prova social. 
-      Gere um texto matador para o campo: ${input.type}.
-      Empresa: ${input.companyName || 'Nossa Empresa'}.
-      Contexto: ${input.context || 'Focar em autoridade'}.
-      
-      REGRAS:
-      1. Apenas o texto sugerido.
-      2. Sem aspas.
-      3. Máximo 2 frases.`,
-    });
-    
-    return text || 'Transforme sua autoridade em lucro real hoje.';
-  } catch (err: any) {
-    console.error("ERRO GOOGLE AI (Copy):", err);
-    return "Transforme sua autoridade em lucro real hoje.";
-  }
+export async function generateCopy(input: CopyInput): Promise<string> {
+  return generateCopyFlow(input);
 }
+
+const generateCopyFlow = ai.defineFlow(
+  {
+    name: 'generateCopyFlow',
+    inputSchema: CopyInputSchema,
+    outputSchema: z.string(),
+  },
+  async (input) => {
+    try {
+      const { text } = await ai.generate({
+        model: googleAI.model('gemini-1.5-flash'),
+        prompt: `Você é um copywriter especialista em prova social e conversão. 
+        Gere um texto matador para o campo: ${input.type}.
+        Empresa: ${input.companyName || 'Nossa Empresa'}.
+        Contexto: ${input.context || 'Focar em autoridade e confiança'}.
+        
+        REGRAS:
+        1. Apenas o texto sugerido, sem explicações.
+        2. Sem aspas.
+        3. Máximo 2 frases curtas e impactantes.`,
+      });
+      
+      return text || 'Transforme sua autoridade em lucro real hoje.';
+    } catch (err) {
+      console.error("ERRO GOOGLE AI (Copy):", err);
+      return "Transforme sua autoridade em lucro real hoje.";
+    }
+  }
+);
