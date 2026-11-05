@@ -659,15 +659,15 @@ export default function DashPage() {
         pixelRatio: 3, 
         backgroundColor: 'rgba(0,0,0,0)', 
         style: {
-          borderRadius: '2.5rem',
+          borderRadius: cardVariant === 'ai' ? '0px' : '2.5rem',
         }
       });
       
       const link = document.createElement('a');
-      link.download = `proova-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
+      link.download = `proova-story-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
       link.href = dataUrl;
       link.click();
-      toast({ title: "Imagem Gerada!", description: "Seu card arredondado está pronto para as redes sociais." });
+      toast({ title: "Story Gerado!", description: "Sua arte está pronta para as redes sociais." });
     } catch (err) {
       console.error("Erro fatal ao exportar:", err);
       toast({ variant: "destructive", title: "Erro ao exportar conteúdo" });
@@ -692,7 +692,7 @@ export default function DashPage() {
     setCardVariant('ai');
     
     try {
-      toast({ title: "🧠 Inteligência Proova Iniciada", description: "Otimizando copy e gerando arte generativa única..." });
+      toast({ title: "🧠 Inteligência Proova Iniciada", description: "Otimizando para Story e gerando arte 9:16..." });
       
       const { refinedText, bgPrompt } = await optimizeCard({
         text: selectedTestimonialForShare.text,
@@ -704,7 +704,7 @@ export default function DashPage() {
       const bgUrl = await generateCardBackground(bgPrompt);
       setAiBgUrl(bgUrl);
       
-      toast({ title: "✨ Design Concluído!", description: "Seu card foi transformado em uma peça de elite." });
+      toast({ title: "✨ Story Concluído!", description: "Sua arte vertical de elite está pronta." });
     } catch (err: any) {
       console.error(err);
       toast({ variant: "destructive", title: "Erro na Mágica IA", description: "Não foi possível completar o design agora." });
@@ -1036,7 +1036,7 @@ export default function DashPage() {
               className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm"
             >
               <Share2 className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Social Card</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Story Post</span>
             </Button>
 
             <Button variant="outline" disabled={!isGoogleDone} onClick={() => setIsQrDialogOpenManual(true)} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
@@ -1122,7 +1122,7 @@ export default function DashPage() {
                     className="rounded-full gap-1.5 text-[9px] font-black uppercase tracking-widest h-8 border-primary/20 text-primary hover:bg-primary/5"
                     onClick={() => openShareDialog(t)}
                   >
-                    <Share className="w-3 h-3" /> Gerar Card
+                    <Share className="w-3 h-3" /> Criar Story
                   </Button>
                 </div>
               </Card>
@@ -1264,9 +1264,9 @@ export default function DashPage() {
           <DialogHeader className="p-6 sm:p-8 pb-2 text-center shrink-0">
             <div className="flex items-center justify-center gap-2 mb-1">
                <Share2 className="w-4 h-4 text-primary" />
-               <DialogTitle className="text-lg sm:text-xl font-black font-headline uppercase tracking-tight">Social Card Premium</DialogTitle>
+               <DialogTitle className="text-lg sm:text-xl font-black font-headline uppercase tracking-tight">Story Post Premium</DialogTitle>
             </div>
-            <DialogDescription className="text-xs">Gere um post profissional para suas redes sociais.</DialogDescription>
+            <DialogDescription className="text-xs">Gere um post vertical profissional para seu Instagram.</DialogDescription>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6 flex flex-col items-center gap-6 scrollbar-hide">
@@ -1291,7 +1291,10 @@ export default function DashPage() {
             <div className="w-full flex justify-center py-2 shrink-0">
               <div 
                 ref={shareCardRef}
-                className="w-[min(88vw,400px)] aspect-square relative overflow-hidden rounded-[2.5rem] shadow-2xl flex flex-col items-center p-6 sm:p-10 text-center transition-all duration-700"
+                className={cn(
+                  "relative overflow-hidden shadow-2xl flex flex-col items-center text-center transition-all duration-700",
+                  cardVariant === 'ai' ? "w-[min(80vw,360px)] aspect-[9/16] rounded-none" : "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] p-6 sm:p-10"
+                )}
                 style={{ 
                   background: cardVariant === 'ai' && aiBgUrl 
                     ? `url(${aiBgUrl}) center/cover no-repeat` 
@@ -1309,28 +1312,30 @@ export default function DashPage() {
                       cardVariant === 'dark' ? "bg-primary/20" : "bg-white/20"
                     )} />
                     <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-black/40 rounded-full blur-[80px]" />
+                    <Quote className={cn("absolute top-6 left-6 w-10 h-10 -rotate-12", cardVariant === 'dark' ? "text-white/5" : "text-black/5")} />
                    </>
                  )}
                  
                  {/* Pattern overlay for AI variant to ensure legibility */}
                  {cardVariant === 'ai' && (
-                   <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+                   <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
                  )}
 
                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-5 pointer-events-none" 
                    style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }} 
                  />
                  
-                 <Quote className={cn("absolute top-6 left-6 w-10 h-10 -rotate-12", cardVariant === 'dark' ? "text-white/5" : "text-black/5")} />
-                 
-                 <div className="relative z-10 w-full flex flex-col h-full justify-between items-center">
+                 <div className={cn(
+                   "relative z-10 w-full flex flex-col h-full justify-between items-center",
+                   cardVariant === 'ai' && "p-10 sm:p-12"
+                 )}>
                    
                    <div id="card-header-cta" className="mb-2">
                      <p className={cn(
                        "text-[9px] sm:text-[11px] font-black uppercase tracking-[0.3em] drop-shadow-md",
                        cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white"
                      )}>
-                       {cardVariant === 'ai' ? 'Insights de Satisfação' : 'Veja o que falam sobre nós'}
+                       {cardVariant === 'ai' ? 'AUTORIDADE REAL' : 'Veja o que falam sobre nós'}
                      </p>
                    </div>
 
@@ -1391,24 +1396,24 @@ export default function DashPage() {
                        </div>
                        
                        <p className={cn(
-                         "font-black font-headline leading-snug sm:leading-tight line-clamp-6 italic drop-shadow-xl px-2 tracking-tight",
-                         cardVariant === 'ai' ? "text-2xl sm:text-3xl" : "text-base sm:text-2xl",
+                         "font-black font-headline leading-snug sm:leading-tight italic drop-shadow-xl px-2 tracking-tight",
+                         cardVariant === 'ai' ? "text-3xl sm:text-5xl line-clamp-none uppercase" : "text-base sm:text-2xl line-clamp-6",
                          "text-white"
                        )}>
                           "{cardVariant === 'ai' && aiRefinedText ? aiRefinedText : selectedTestimonialForShare?.text}"
                        </p>
 
                        {cardVariant === 'ai' && (
-                         <div id="card-ai-badge" className="bg-primary/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-primary/30 animate-in fade-in zoom-in duration-500">
+                         <div id="card-ai-badge" className="bg-primary/20 backdrop-blur-md px-4 py-1.5 rounded-full border border-primary/30 animate-in fade-in zoom-in duration-500 mt-4">
                            <p className="text-[8px] sm:text-[10px] text-primary font-black uppercase tracking-widest flex items-center gap-2">
-                             <Sparkles className="w-3 h-3" /> Design Generativo Ativo
+                             <Sparkles className="w-3 h-3" /> IA Story Design
                            </p>
                          </div>
                        )}
                      </div>
                    )}
 
-                   <div className="w-full pt-4 sm:pt-6 border-t border-white/5 mt-2 sm:mt-4">
+                   <div className="w-full pt-4 sm:pt-6 border-t border-white/10 mt-2 sm:mt-4">
                       <div className="flex flex-col items-center gap-2 sm:gap-3">
                         <div className="space-y-0.5 sm:space-y-1">
                           <p className="text-white font-black text-[10px] sm:text-sm uppercase tracking-[0.2em] drop-shadow-sm">
@@ -1437,13 +1442,13 @@ export default function DashPage() {
               disabled={isExportingCard || isAIProcessing}
             >
               {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-5 h-5" />}
-              {selectedTestimonialForShare?.videoUrl && cardVariant !== 'ai' ? 'Renderizar Vídeo Premium' : 'Baixar Card de Alta'}
+              {selectedTestimonialForShare?.videoUrl && cardVariant !== 'ai' ? 'Renderizar Vídeo Story' : 'Baixar Arte Story 9:16'}
             </Button>
           </div>
           
           <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
             <p className="text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
-              <Zap className="w-3 h-3 text-primary" /> Dica: Posts com prova social aumentam o CTR em até 400%
+              <Zap className="w-3 h-3 text-primary" /> Dica: Stories reais aumentam o engajamento em até 400%
             </p>
           </DialogFooter>
         </DialogContent>

@@ -1,6 +1,6 @@
 'use server';
 /**
- * @fileOverview Flow para otimização de conteúdo de Social Cards via Gemini.
+ * @fileOverview Flow para criação de Instagram Story Posts de luxo via Gemini.
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
@@ -11,53 +11,35 @@ const OptimizeCardInputSchema = z.object({
 });
 
 const OptimizeCardOutputSchema = z.object({
-  refinedText: z.string().describe('O depoimento refinado, curto e impactante.'),
-  bgPrompt: z.string().describe('Um prompt em inglês para gerar um fundo abstrato condizente.'),
+  refinedText: z.string().describe('O depoimento refinado como uma frase de impacto para Story.'),
+  bgPrompt: z.string().describe('Um prompt visual em inglês para gerar um fundo vertical 9:16 luxuoso.'),
 });
 
-// Definindo o prompt de forma estruturada (Padrão Genkit 1.x)
 const optimizeCardPrompt = ai.definePrompt({
   name: 'optimizeCardPrompt',
   input: { schema: OptimizeCardInputSchema },
   output: { schema: OptimizeCardOutputSchema },
-  prompt: `Você é um Diretor de Arte e Copywriter de elite especializado em posts de Instagram (Social Proof).
+  prompt: `Você é um Diretor de Arte de uma agência de luxo focado em Instagram Stories (Social Proof).
   
-  Recebi este depoimento: "{{{text}}}"
+  O objetivo é criar um Story impactante baseado neste depoimento: "{{{text}}}"
   Setor do negócio: {{#if businessType}}{{{businessType}}}{{else}}Geral{{/if}}
   
   TAREFA:
-  1. Refine o texto para ser uma "Headline" de impacto. Deve ser CURTA (máximo 12 palavras), poderosa e manter o sentimento original. Remova excessos.
-  2. Crie um prompt visual em INGLÊS para o modelo Imagen gerar um fundo abstrato, moderno, minimalista e luxuoso. 
-     - O fundo deve usar cores que remetam ao setor: {{#if businessType}}{{{businessType}}}{{else}}Geral{{/if}}.
-     - O prompt deve focar em texturas, gradientes suaves e iluminação cinematográfica (estilo Behance/Dribbble).
+  1. Refine o texto para ser uma frase curta e "matadora" (máximo 10 palavras). Deve evocar desejo e autoridade.
+  2. Crie um prompt visual em INGLÊS para o Imagen 4 gerar um fundo vertical (9:16).
+     - O estilo deve ser: Abstract, luxury, minimalist, blurred textures, cinematic lighting.
+     - Use cores que remetam ao setor: {{#if businessType}}{{{businessType}}}{{else}}Geral{{/if}}.
   
   Retorne exatamente no formato JSON solicitado.`,
 });
 
 export async function optimizeCard(input: z.infer<typeof OptimizeCardInputSchema>) {
   try {
-    // Chamando o prompt definido
     const { output } = await optimizeCardPrompt(input);
-    
-    if (!output) {
-      throw new Error("A IA não retornou o formato esperado.");
-    }
-    
+    if (!output) throw new Error("Erro na resposta estruturada da IA.");
     return output;
   } catch (err: any) {
-    // Log detalhado para o administrador no console do servidor
-    console.error("ERRO CRÍTICO GENKIT (optimizeCard):", err);
-    
-    // Repassa o erro com uma mensagem mais técnica para ajudar no debug de produção
-    throw new Error(`Falha na IA: ${err.message || 'Erro desconhecido'}. Verifique se a GOOGLE_GENAI_API_KEY está configurada corretamente.`);
+    console.error("ERRO CRÍTICO GEMINI:", err);
+    throw new Error(`Falha na IA: ${err.message || 'Erro de conexão'}. Verifique se GOOGLE_GENAI_API_KEY está no seu arquivo .env`);
   }
 }
-
-export const optimizeCardFlow = ai.defineFlow(
-  {
-    name: 'optimizeCardFlow',
-    inputSchema: OptimizeCardInputSchema,
-    outputSchema: OptimizeCardOutputSchema,
-  },
-  async (input) => optimizeCard(input)
-);
