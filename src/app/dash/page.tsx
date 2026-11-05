@@ -928,7 +928,7 @@ export default function DashPage() {
 
         <div className="grid gap-4 md:gap-6 grid-cols-1">
           <Card 
-            className="border-none shadow-sm overflow-hidden rounded-2xl p-4 md:p-6 space-y-4 cursor-pointer hover:shadow-md transition-all active:scale-[0.98]"
+            className="border-none shadow-sm overflow-hidden rounded-2xl p-4 md:p-6 space-y-4 cursor-pointer hover:shadow-md transition-all active:scale-[0.98] select-none"
             onClick={() => router.push('/metrics')}
           >
             <div className="flex items-center justify-between">
