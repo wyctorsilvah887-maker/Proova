@@ -1,16 +1,16 @@
 
 import { genkit } from 'genkit';
-import { googleAI, gemini20Flash } from '@genkit-ai/googleai';
+import { googleAI } from '@genkit-ai/googleai';
 
 /**
  * Inicializa a instância global do Genkit com o plugin Google AI.
- * Utiliza o modelo gemini20Flash como padrão.
+ * Utilizamos a string 'gemini-1.5-flash' para garantir compatibilidade e estabilidade.
  */
 export const ai = genkit({
   plugins: [
     googleAI(),
   ],
-  model: gemini20Flash,
+  model: 'gemini-1.5-flash',
 });
 
-export const geminiModel = gemini20Flash;
+export const geminiModel = 'gemini-1.5-flash';
