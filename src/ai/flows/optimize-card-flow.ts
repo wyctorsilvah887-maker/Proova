@@ -8,7 +8,6 @@
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { googleAI } from '@genkit-ai/google-genai';
 
 const OptimizeCardInputSchema = z.object({
   text: z.string().describe('O texto original do depoimento.'),
@@ -33,22 +32,27 @@ const optimizeCardFlow = ai.defineFlow(
     outputSchema: OptimizeCardOutputSchema,
   },
   async (input) => {
-    const { output } = await ai.generate({
-      model: googleAI.model('gemini-1.5-flash'),
-      prompt: `Você é um Diretor de Arte de marcas de luxo. 
-      Sua tarefa é transformar um depoimento de cliente em um Story de Instagram de alto impacto.
-      
-      Depoimento: "${input.text}"
-      Setor: ${input.businessType || 'Premium Business'}
-      
-      REGRAS:
-      1. Headline (refinedText): Frase curta, poderosa e aspiracional. Máximo 8 palavras.
-      2. Visual (bgPrompt): Prompt detalhado em INGLÊS para uma imagem 9:16 sofisticada (luxo, minimalista).`,
-      output: { schema: OptimizeCardOutputSchema },
-      config: { temperature: 0.7 },
-    });
+    try {
+      const { output } = await ai.generate({
+        model: 'googleai/gemini-1.5-flash',
+        prompt: `Você é um Diretor de Arte de marcas de luxo. 
+        Sua tarefa é transformar um depoimento de cliente em um Story de Instagram de alto impacto.
+        
+        Depoimento: "${input.text}"
+        Setor: ${input.businessType || 'Premium Business'}
+        
+        REGRAS:
+        1. Headline (refinedText): Frase curta, poderosa e aspiracional. Máximo 8 palavras.
+        2. Visual (bgPrompt): Prompt detalhado em INGLÊS para uma imagem 9:16 sofisticada (luxo, minimalista).`,
+        output: { schema: OptimizeCardOutputSchema },
+        config: { temperature: 0.7 },
+      });
 
-    if (!output) throw new Error("Falha na inteligência artificial ao processar o card.");
-    return output;
+      if (!output) throw new Error("Falha na inteligência artificial ao processar o card.");
+      return output;
+    } catch (err: any) {
+      console.error("ERRO GOOGLE AI (Optimize):", err);
+      throw new Error(`Falha na IA (Google): ${err.message || 'Erro de comunicação'}.`);
+    }
   }
 );

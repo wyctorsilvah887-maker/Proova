@@ -7,7 +7,6 @@
  */
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { googleAI } from '@genkit-ai/google-genai';
 
 const CopyInputSchema = z.object({
   type: z.string().describe('O campo para o qual a copy será gerada (ex: título, subtítulo).'),
@@ -29,7 +28,7 @@ const generateCopyFlow = ai.defineFlow(
   async (input) => {
     try {
       const { text } = await ai.generate({
-        model: googleAI.model('gemini-1.5-flash'),
+        model: 'googleai/gemini-1.5-flash',
         prompt: `Você é um copywriter especialista em prova social e conversão. 
         Gere um texto matador para o campo: ${input.type}.
         Empresa: ${input.companyName || 'Nossa Empresa'}.
