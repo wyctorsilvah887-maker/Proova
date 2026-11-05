@@ -25,7 +25,7 @@ const generateCopyFlow = ai.defineFlow(
   async (input) => {
     try {
       const response = await ai.generate({
-        model: 'gemini-3.8-flash',
+        model: 'googleai/gemini-3.8-flash',
         prompt: `Você é um copywriter especialista em prova social e conversão. 
         Gere um texto matador para o campo: ${input.type}.
         Empresa: ${input.companyName || 'Nossa Empresa'}.

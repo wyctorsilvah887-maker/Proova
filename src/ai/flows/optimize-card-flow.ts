@@ -7,7 +7,7 @@ import { googleAI } from '@genkit-ai/googleai';
 // 1. Inicializa o Genkit configurando o plugin do Google AI Studio
 const ai = genkit({
   plugins: [googleAI()],
-  model: 'gemini-3.8-flash', 
+  model: 'googleai/gemini-3.8-flash', 
 });
 
 const OptimizeCardOutputSchema = z.object({
@@ -36,9 +36,9 @@ export const optimizeCardFlow = ai.defineFlow(
   },
   async (input) => {
     try {
-      // 3. Executa a chamada de geração usando a sintaxe simplificada e o modelo Gemini 3.8 Flash
+      // 3. Executa a chamada de geração usando o identificador canônico
       const response = await ai.generate({
-        model: 'gemini-3.8-flash',
+        model: 'googleai/gemini-3.8-flash',
         prompt: `Você é um Diretor de Arte de marcas de luxo. 
         Sua tarefa é transformar um depoimento de cliente em um Story de Instagram de alto impacto.
         
