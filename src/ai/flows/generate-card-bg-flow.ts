@@ -12,14 +12,14 @@ export async function generateCardBackground(bgPrompt: string) {
       prompt: `Masterpiece, professional abstract minimalist background for a luxury social media post. ${bgPrompt}. 4k, soft lighting, depth of field, high quality rendering, aesthetic gradients.`,
     });
 
-    if (!media) {
-      throw new Error('O modelo não retornou nenhuma imagem.');
+    if (!media || !media.url) {
+      throw new Error('O modelo Imagen não retornou nenhuma mídia válida.');
     }
 
     return media.url;
   } catch (err: any) {
-    console.error("Erro crítico na geração de imagem Imagen:", err);
-    throw new Error("Falha ao gerar arte visual. Verifique as cotas e permissões da API Imagen.");
+    console.error("ERRO CRÍTICO IMAGEN 4:", err);
+    throw new Error(`Falha ao gerar arte visual: ${err.message || 'Erro na API Imagen'}. Verifique as permissões do modelo.`);
   }
 }
 
