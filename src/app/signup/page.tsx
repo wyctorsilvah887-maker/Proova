@@ -200,15 +200,15 @@ export default function SignupPage() {
                     </SelectTrigger>
                     <SelectContent className="max-h-64 rounded-2xl">
                       <SelectItem value="academia">Academia / Studio / Crossfit</SelectItem>
+                      <SelectItem value="agencia">Agência de Marketing / Publicidade</SelectItem>
                       <SelectItem value="artes_marciais">Artes marciais / Lutas</SelectItem>
+                      <SelectItem value="barbearia">Barbearia</SelectItem>
                       <SelectItem value="clinica">Clínica / Consultório Médico</SelectItem>
                       <SelectItem value="estetica">Estética / Salão / Spa</SelectItem>
-                      <SelectItem value="barbearia">Barbearia</SelectItem>
-                      <SelectItem value="restaurante">Restaurante / Gastronomia</SelectItem>
                       <SelectItem value="oficina">Oficina / Estética Automotiva</SelectItem>
                       <SelectItem value="petshop">Pet shop / Veterinária</SelectItem>
-                      <SelectItem value="agencia">Agência de Marketing</SelectItem>
-                      <SelectItem value="servicos_digitais">Freelancer / Infoprodutor</SelectItem>
+                      <SelectItem value="servicos_digitais">Prestadores de Serviços Digitais / Freelancer</SelectItem>
+                      <SelectItem value="restaurante">Restaurante / Gastronomia</SelectItem>
                       <SelectItem value="outros">Outros Setores</SelectItem>
                     </SelectContent>
                   </Select>
