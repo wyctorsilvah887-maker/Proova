@@ -326,8 +326,8 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
     },
     { 
       number: '03', 
-      title: 'Ativos Visuais de Conversão', 
-      desc: 'Widgets premium de baixa latência e Social Cards de alto impacto visual, desenhados para aniquilar objeções em todos os seus canais de venda.' 
+      title: 'Hub de Autoridade Digital', 
+      desc: 'Uma Landing Page estratégica para o seu link da bio, reunindo seus depoimentos mais impactantes em uma interface de alta performance projetada para converter tráfego social em vendas.' 
     }
   ];
 
