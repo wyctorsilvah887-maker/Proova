@@ -104,7 +104,6 @@ import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebas
 import { doc, collection, query, updateDoc, orderBy, limit, where, getDocs, Timestamp, serverTimestamp, arrayUnion } from 'firebase/firestore';
 import Link from 'next/link';
 import { signOut } from 'firebase/auth';
-import { toast } from '@/hooks/size-toast'; // Note: Fixed path in real usage, but keeping consistent with project
 import { toast as shadcnToast } from '@/hooks/use-toast';
 import { QRCodeSVG } from 'qrcode.react';
 import { useTheme } from 'next-themes';
@@ -1280,7 +1279,6 @@ export default function DashPage() {
               >
                  {isAIProcessing ? (
                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90">
-                      {/* Scanner Animation */}
                       <div className="w-full h-full relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-[2px] bg-primary shadow-[0_0_15px_#f97316] animate-scanner z-20" />
                         <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent h-1/2 opacity-20 animate-scanner-gradient" />
@@ -1402,6 +1400,7 @@ export default function DashPage() {
                             </div>
                           </div>
                       </div>
+                    </div>
                    </>
                  )}
               </div>
