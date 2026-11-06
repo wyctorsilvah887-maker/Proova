@@ -719,11 +719,6 @@ export default function DashPage() {
                 <div className="flex flex-col items-end">
                   <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] leading-tight transition-colors group-hover:text-primary">{userData?.companyName || 'Minha Empresa'}</span>
                   <span className={cn("text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight", userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground")}>{membershipLabel}</span>
-                  {isMapsLinkValid && (
-                    <span className="text-[6px] font-black text-green-500 uppercase tracking-widest leading-none mt-0.5">
-                      G-Boost Ativo
-                    </span>
-                  )}
                 </div>
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
               </Button>
@@ -880,12 +875,6 @@ export default function DashPage() {
                 >
                   <MapPin className="w-3.5 h-3.5" /> Vincular Perfil Google
                 </Button>
-              )}
-              {isMapsLinkValid && (
-                <div className="flex items-center gap-2 px-3 h-7 rounded-full bg-green-500/10 border border-green-500/20">
-                   <CheckCircle2 className="w-3 h-3 text-green-500" />
-                   <span className="text-[9px] font-black text-green-600 uppercase tracking-widest">G-Boost Ativo</span>
-                </div>
               )}
             </div>
           </div>
