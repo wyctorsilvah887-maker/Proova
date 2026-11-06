@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { 
   Check, 
   ArrowRight, 
@@ -22,12 +22,16 @@ import {
   Sun, 
   Moon,
   Loader2,
-  Handshake,
   Lock,
-  Sparkles
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+  Monitor,
+  Video,
+  BarChart3,
+  MousePointer2
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useUser, useAuth, useFirestore, useDoc } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
@@ -42,6 +46,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 export default function PricingPage() {
   const { user, loading: authLoading } = useUser();
@@ -49,6 +54,8 @@ export default function PricingPage() {
   const db = useFirestore();
   const router = useRouter();
   const { theme, setTheme } = useTheme();
+
+  const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData } = useDoc(userDocRef);
@@ -87,7 +94,14 @@ export default function PricingPage() {
         cta: status === 'base' ? "Plano Atual" : "Começar Grátis",
         checkoutUrl: user ? "/dash" : "/signup",
         highlight: false,
-        disabled: status === 'base'
+        disabled: status === 'base',
+        benefits: [
+          "1 Mural de Depoimentos",
+          "10 Depoimentos Ativos",
+          "Inbox Privado (Shield)",
+          "QR Code de Balcão",
+          "Link de Coleta Padrão"
+        ]
       },
       {
         id: 'gold',
@@ -99,7 +113,15 @@ export default function PricingPage() {
         cta: status === 'gold' ? "Plano Atual" : "Ativar Gold",
         checkoutUrl: checkoutLinks.gold,
         highlight: true,
-        disabled: status === 'gold'
+        disabled: status === 'gold',
+        benefits: [
+          "Murais Ilimitados",
+          "50 Depoimentos Ativos",
+          "G-Boost (Google Maps Ranking)",
+          "Editor de Página Pública VIP",
+          "Auto-Publish Inteligente",
+          "Relatórios de Performance Semanais"
+        ]
       },
       {
         id: 'enterprise',
@@ -111,7 +133,15 @@ export default function PricingPage() {
         cta: status === 'enterprise' ? "Plano Atual" : "Seja Enterprise",
         checkoutUrl: checkoutLinks.enterprise,
         highlight: false,
-        disabled: status === 'enterprise'
+        disabled: status === 'enterprise',
+        benefits: [
+          "Vídeo Reviews 4K (Até 30s)",
+          "Depoimentos Ativos Ilimitados",
+          "Suporte Prioritário Via WhatsApp",
+          "Design de Página Ultra Customizado",
+          "Analytics Avançado de Conversão",
+          "Acesso Antecipado a Novas Funções"
+        ]
       }
     ];
   }, [user, checkoutLinks, status]);
@@ -154,102 +184,146 @@ export default function PricingPage() {
         </div>
       </header>
 
-      <main className="flex-1 pt-32 pb-24 px-4 container max-w-7xl mx-auto flex flex-col">
+      <main className="flex-1 pt-32 pb-24 px-4 container max-w-4xl mx-auto flex flex-col">
         <div className="text-center space-y-4 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-1000">
            <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 font-black text-[10px] uppercase tracking-[0.2em] px-4 py-1">Estratégia de Autoridade</Badge>
-           <h1 className="text-4xl md:text-7xl font-black font-headline tracking-tighter leading-[1] max-w-4xl mx-auto">
+           <h1 className="text-4xl md:text-6xl font-black font-headline tracking-tighter leading-[1] max-w-4xl mx-auto">
              O valor da sua marca é medido pela <span className="text-primary italic">Confiança</span>.
            </h1>
-           <p className="text-muted-foreground text-sm md:text-xl font-medium max-w-2xl mx-auto">Selecione o motor de prova social ideal para o seu momento de mercado.</p>
+           <p className="text-muted-foreground text-sm md:text-lg font-medium max-w-2xl mx-auto">Escolha o seu nível de influência no mercado.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-          {plans.map((plan) => (
-            <Card 
-              key={plan.id}
-              className={cn(
-                "relative overflow-hidden border-none shadow-2xl transition-all duration-500 rounded-[2.5rem] flex flex-col group",
-                plan.highlight ? "bg-primary text-white scale-105 z-10" : "bg-card text-card-foreground hover:scale-[1.02]"
-              )}
-            >
-              <CardHeader className="p-8 sm:p-10 pb-4 text-center space-y-6">
-                <div className={cn(
-                  "mx-auto p-4 rounded-3xl w-fit transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6",
-                  plan.highlight ? "bg-white/10" : "bg-primary/10"
-                )}>
-                  <plan.icon className={cn("w-10 h-10", plan.highlight ? "text-white" : "text-primary")} />
-                </div>
-                
-                <div className="space-y-1">
-                  <CardTitle className="text-3xl md:text-4xl font-black font-headline uppercase tracking-tighter">{plan.name}</CardTitle>
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-2xl md:text-4xl font-black">{plan.price}</span>
-                    <span className={cn("text-[10px] font-bold uppercase tracking-widest", plan.highlight ? "text-white/60" : "text-muted-foreground")}>{plan.period}</span>
-                  </div>
-                </div>
+        <div className="space-y-4">
+          {plans.map((plan) => {
+            const isExpanded = expandedPlan === plan.id;
+            
+            return (
+              <Collapsible
+                key={plan.id}
+                open={isExpanded}
+                onOpenChange={() => setExpandedPlan(isExpanded ? null : plan.id)}
+                className="w-full"
+              >
+                <Card 
+                  className={cn(
+                    "relative overflow-hidden border-none shadow-xl transition-all duration-300 rounded-3xl",
+                    plan.highlight ? "bg-primary text-white" : "bg-card text-card-foreground hover:bg-muted/30"
+                  )}
+                >
+                  <CollapsibleTrigger asChild>
+                    <div className="p-6 cursor-pointer select-none">
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+                        <div className="flex items-center gap-5 flex-1 w-full sm:w-auto">
+                          <div className={cn(
+                            "p-3 rounded-2xl shrink-0 transition-transform duration-500",
+                            plan.highlight ? "bg-white/10" : "bg-primary/10"
+                          )}>
+                            <plan.icon className={cn("w-6 h-6", plan.highlight ? "text-white" : "text-primary")} />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-xl font-black uppercase tracking-tight">{plan.name}</h3>
+                              {plan.highlight && (
+                                <Badge className="bg-white text-primary text-[8px] font-black uppercase h-4 px-1.5 border-none">POPULAR</Badge>
+                              )}
+                            </div>
+                            <p className={cn("text-[10px] font-bold uppercase tracking-widest opacity-70", plan.highlight ? "text-white" : "text-primary")}>
+                              {plan.description}
+                            </p>
+                          </div>
+                        </div>
 
-                <p className={cn("text-[10px] font-black uppercase tracking-widest px-4 opacity-80", plan.highlight ? "text-white" : "text-primary")}>
-                  {plan.description}
-                </p>
-              </CardHeader>
+                        <div className="flex items-center justify-between sm:justify-end gap-8 w-full sm:w-auto">
+                          <div className="text-right">
+                            <p className="text-xl font-black leading-none">{plan.price}</p>
+                            <p className="text-[10px] font-bold uppercase opacity-60">{plan.period}</p>
+                          </div>
+                          <div className={cn(
+                            "p-2 rounded-full transition-transform duration-300",
+                            isExpanded && "rotate-180",
+                            plan.highlight ? "bg-white/10" : "bg-muted"
+                          )}>
+                            <ChevronDown className="w-4 h-4" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CollapsibleTrigger>
 
-              <CardContent className="px-8 py-4 flex-1">
-                 {/* Conteúdo simplificado conforme solicitado - Apenas nomes e valor central */}
-              </CardContent>
+                  <CollapsibleContent className="animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className={cn(
+                      "px-6 pb-6 pt-2 space-y-6",
+                      plan.highlight ? "border-t border-white/10" : "border-t border-border"
+                    )}>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
+                        {plan.benefits.map((benefit, idx) => (
+                          <div key={idx} className="flex items-start gap-3">
+                            <div className={cn(
+                              "mt-1 p-0.5 rounded-full shrink-0",
+                              plan.highlight ? "bg-white/20" : "bg-primary/10"
+                            )}>
+                              <Check className="w-3 h-3" />
+                            </div>
+                            <span className="text-xs font-bold leading-relaxed">{benefit}</span>
+                          </div>
+                        ))}
+                      </div>
 
-              <CardFooter className="p-8 pt-0">
-                <Link href={plan.disabled ? "#" : plan.checkoutUrl} className="w-full" target={plan.checkoutUrl.startsWith('http') ? "_blank" : "_self"}>
-                  <Button 
-                    disabled={plan.disabled}
-                    className={cn(
-                      "w-full h-16 rounded-2xl text-sm font-black uppercase tracking-widest shadow-xl transition-all active:scale-95",
-                      plan.highlight 
-                        ? "bg-white text-primary hover:bg-zinc-100" 
-                        : "bg-primary text-white hover:bg-primary/90"
-                    )}
-                  >
-                    {plan.cta}
-                  </Button>
-                </Link>
-              </CardFooter>
-            </Card>
-          ))}
+                      <div className="pt-4">
+                        <Link href={plan.disabled ? "#" : plan.checkoutUrl} className="w-full" target={plan.checkoutUrl.startsWith('http') ? "_blank" : "_self"}>
+                          <Button 
+                            disabled={plan.disabled}
+                            className={cn(
+                              "w-full h-14 rounded-2xl text-xs font-black uppercase tracking-widest shadow-2xl transition-all active:scale-95 gap-2",
+                              plan.highlight 
+                                ? "bg-white text-primary hover:bg-zinc-100" 
+                                : "bg-primary text-white hover:bg-primary/90"
+                            )}
+                          >
+                            {plan.cta} <ArrowRight className="w-4 h-4" />
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
+            );
+          })}
         </div>
 
-        <section className="mt-32 space-y-12">
+        <section className="mt-24 space-y-10">
           <div className="text-center space-y-2">
-            <h2 className="text-2xl md:text-4xl font-black font-headline tracking-tighter">Entenda os Diferenciais</h2>
-            <p className="text-muted-foreground text-sm font-medium">As respostas que você precisa para assumir o controle.</p>
+            <h2 className="text-2xl md:text-3xl font-black font-headline tracking-tighter">Perguntas Frequentes</h2>
+            <p className="text-muted-foreground text-sm font-medium">Esclareça suas dúvidas agora.</p>
           </div>
 
-          <div className="max-w-3xl mx-auto bg-card rounded-[2.5rem] p-8 md:p-12 shadow-xl">
-            <Accordion type="single" collapsible className="w-full">
-              {[
-                { q: "O que é o G-Boost?", a: "O G-Boost é um acelerador de SEO Local. Ele detecta automaticamente elogios de 4 ou 5 estrelas e convida o cliente a postar no seu Google Maps, subindo sua posição nas buscas organicamente." },
-                { q: "Como funcionam os Vídeo Reviews?", a: "Disponível no Enterprise, permite que o cliente grave um depoimento cinematográfico de até 30s direto no navegador, sem baixar nada. É a prova social que mais converte hoje." },
-                { q: "Posso cancelar ou mudar de plano?", a: "Sim, a qualquer momento sem multas. No Proova, você tem total liberdade sobre sua assinatura diretamente no painel de gestão." }
-              ].map((item, idx) => (
-                <AccordionItem key={idx} value={`item-${idx}`} className="border-b border-primary/10">
-                  <AccordionTrigger className="text-left font-black text-sm uppercase tracking-tight py-6 hover:text-primary transition-colors">{item.q}</AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground font-medium leading-relaxed pb-6 text-sm">{item.a}</AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
+          <div className="grid gap-4">
+            {[
+              { q: "O que é o G-Boost?", a: "O G-Boost detecta elogios nota 5 e convida o cliente a postar no Google Maps automaticamente." },
+              { q: "Posso cancelar quando quiser?", a: "Sim. Você tem total controle sobre sua assinatura, sem fidelidade ou multas." },
+              { q: "O pagamento é seguro?", a: "Sim. Processamos via Cakto, com criptografia de ponta e checkout 100% verificado." }
+            ].map((item, idx) => (
+              <Card key={idx} className="border-none bg-muted/20 p-5 rounded-2xl">
+                <p className="text-xs font-black uppercase tracking-tight mb-1 text-primary">{item.q}</p>
+                <p className="text-xs text-muted-foreground font-medium leading-relaxed">{item.a}</p>
+              </Card>
+            ))}
           </div>
         </section>
 
-        <section className="mt-32">
-           <div className="bg-primary text-white rounded-[3rem] p-10 md:p-20 text-center space-y-10 relative overflow-hidden shadow-2xl">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32 animate-pulse" />
+        <section className="mt-24">
+           <div className="bg-zinc-950 text-white rounded-[2.5rem] p-10 md:p-16 text-center space-y-8 relative overflow-hidden shadow-2xl">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -mr-32 -mt-32" />
               <div className="relative z-10 space-y-6">
-                <Sparkles className="w-12 h-12 mx-auto text-white animate-bounce" />
-                <h2 className="text-3xl md:text-6xl font-black font-headline tracking-tighter">Domine seu Mercado.</h2>
-                <p className="text-white/80 font-bold text-lg md:text-2xl max-w-xl mx-auto leading-relaxed">
-                  Não seja apenas mais uma opção. Seja a escolha óbvia do seu setor.
+                <Sparkles className="w-10 h-10 mx-auto text-primary" />
+                <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">Domine seu Mercado.</h2>
+                <p className="text-zinc-400 font-bold text-base md:text-xl max-w-xl mx-auto leading-relaxed">
+                  Não seja apenas mais uma opção. Seja a escolha óbvia do seu setor através da prova social de elite.
                 </p>
-                <div className="pt-6">
-                   <Button variant="secondary" className="h-16 px-12 rounded-2xl text-sm md:text-xl font-black uppercase tracking-widest bg-white text-primary hover:bg-zinc-100 shadow-2xl transition-all hover:scale-105">
-                     Começar agora
+                <div className="pt-4">
+                   <Button size="lg" className="h-14 px-10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] bg-primary text-white hover:bg-primary/90 shadow-2xl transition-all hover:scale-105">
+                     COMEÇAR MINHA JORNADA
                    </Button>
                 </div>
               </div>
@@ -258,11 +332,11 @@ export default function PricingPage() {
       </main>
 
       <footer className="py-20 border-t bg-background/50 flex flex-col items-center gap-8 text-center">
-        <div className="relative w-[200px] h-[65px] opacity-40 grayscale">
+        <div className="relative w-[180px] h-[60px] opacity-30 grayscale">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain dark:hidden" />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain hidden dark:block" />
         </div>
-        <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.3em]">© 2026 PROOVA TECHNOLOGY - INTELIGÊNCIA EM REPUTAÇÃO</p>
+        <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.3em]">© 2026 PROOVA TECHNOLOGY - ESTRATÉGIA EM REPUTAÇÃO</p>
       </footer>
     </div>
   );
