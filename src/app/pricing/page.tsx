@@ -98,7 +98,7 @@ export default function PricingPage() {
         benefits: [
           "1 Mural de Depoimentos",
           "5 Depoimentos Ativos no Link in Bio",
-          "Inbox Privado (Shield)",
+          "Inbox Privado (Filtro de Feedbacks Críticos)",
           "QR Code de Balcão",
           "Link de Coleta Padrão"
         ]
@@ -155,7 +155,7 @@ export default function PricingPage() {
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
-          <div className="relative w-[150px] h-[50px] md:w-[280px] md:h-[90px] transition-transform hover:scale-105">
+          <div className="relative w-[180px] h-[60px] md:w-[280px] md:h-[90px] transition-transform hover:scale-105">
             <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
             <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" priority />
           </div>
