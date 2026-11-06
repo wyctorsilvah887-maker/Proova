@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -1010,15 +1011,16 @@ export default function DashPage() {
               <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Inbox Unificado</span>
             </Button>
 
-            <Button 
-              variant="outline" 
-              disabled={approvedTestimonials.length === 0}
-              onClick={() => document.getElementById('testimonials-section')?.scrollIntoView({ behavior: 'smooth' })} 
-              className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm"
-            >
-              <Share2 className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Story Post</span>
-            </Button>
+            <Link href="/social-cards" className="w-full">
+              <Button 
+                variant="outline" 
+                disabled={approvedTestimonials.length === 0}
+                className="h-24 w-full rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm"
+              >
+                <Share2 className="w-5 h-5 text-primary" />
+                <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Social Cards</span>
+              </Button>
+            </Link>
 
             <Button variant="outline" disabled={!isGoogleDone} onClick={() => setIsQrDialogOpenManual(true)} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
               <QrCode className="w-5 h-5 text-primary" />
@@ -1479,3 +1481,4 @@ export default function DashPage() {
     </div>
   );
 }
+
