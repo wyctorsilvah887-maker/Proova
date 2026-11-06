@@ -873,15 +873,6 @@ export default function DashPage() {
               <p className="text-xs md:text-base text-muted-foreground">Gestão de prova social dinâmica</p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Link href="/manual">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5"
-                >
-                  <BookOpen className="w-3.5 h-3.5" /> Manual do Usuário
-                </Button>
-              </Link>
               {!isDigitalBusiness && (
                 <Button 
                   variant="ghost" 
@@ -892,25 +883,6 @@ export default function DashPage() {
                   <Edit3 className="w-3.5 h-3.5" /> Google Maps
                 </Button>
               )}
-              <Link href={isSetupComplete ? "/private" : "#"} onClick={(e) => !isSetupComplete && e.preventDefault()}>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  disabled={!isSetupComplete}
-                  className={cn(
-                    "rounded-full gap-2 text-[10px] h-7 border border-primary/20 text-primary hover:bg-primary/5 relative",
-                    !isSetupComplete && "opacity-50 grayscale cursor-not-allowed"
-                  )}
-                >
-                  {isSetupComplete ? <Inbox className="w-3.5 h-3.5" /> : <Lock className="w-3.5 h-3.5" />} 
-                  Ver Inbox Unificado
-                  {isSetupComplete && pendingTestimonialsCount > 0 && (
-                    <Badge variant="destructive" className="ml-1 h-4 px-1.5 text-[8px] font-black animate-pulse">
-                      {pendingTestimonialsCount} NOVOS
-                    </Badge>
-                  )}
-                </Button>
-              </Link>
             </div>
           </div>
           <div className="w-full sm:w-48">
@@ -992,6 +964,13 @@ export default function DashPage() {
               <QrCode className="w-5 h-5 text-primary" />
               <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">QR de Balcão</span>
             </Button>
+
+            <Link href="/manual" className="w-full">
+              <Button variant="outline" className="h-24 w-full rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
+                <BookOpen className="w-5 h-5 text-primary" />
+                <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Manual Estratégico</span>
+              </Button>
+            </Link>
           </div>
         </section>
 
