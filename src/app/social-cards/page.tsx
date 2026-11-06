@@ -19,7 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useUser, useFirestore, useCollection, useDoc } from '@/firebase';
-import { doc, collection, query, where, orderBy } from 'firebase/firestore';
+import { doc, collection, query } from 'firebase/firestore';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -37,32 +37,41 @@ export default function SocialCardsPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData } = useDoc(userDocRef);
 
+  // Consulta simplificada para evitar erros de índice composto (assim como na página de métricas)
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
-    return query(
-      collection(db, 'users', user.uid, 'testimonials'),
-      where('status', '==', 'approved'),
-      orderBy('createdAt', 'desc')
-    );
+    return collection(db, 'users', user.uid, 'testimonials');
   }, [db, user]);
 
-  const { data: testimonialsList, loading: testimonialsLoading } = useCollection(testimonialsQuery);
+  const { data: rawTestimonials, loading: testimonialsLoading } = useCollection(testimonialsQuery);
 
   useEffect(() => {
     if (!authLoading && !user) router.replace('/login');
   }, [user, authLoading, router]);
 
   const filteredTestimonials = useMemo(() => {
-    if (!testimonialsList) return [];
-    let list = testimonialsList;
+    if (!rawTestimonials) return [];
+    
+    // 1. Filtrar e Ordenar em memória (Resiliente a falta de índices)
+    let list = rawTestimonials
+      .filter((t: any) => t.status === 'approved')
+      .sort((a: any, b: any) => {
+        const dateA = a.createdAt?.toDate?.() || new Date(0);
+        const dateB = b.createdAt?.toDate?.() || new Date(0);
+        return dateB.getTime() - dateA.getTime();
+      });
+
+    // 2. Aplicar busca por texto
     if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
       list = list.filter((t: any) => 
-        t.userName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.text?.toLowerCase().includes(searchTerm.toLowerCase())
+        (t.userName?.toLowerCase() || '').includes(term) ||
+        (t.text?.toLowerCase() || '').includes(term)
       );
     }
+
     return list;
-  }, [testimonialsList, searchTerm]);
+  }, [rawTestimonials, searchTerm]);
 
   const visibleTestimonials = useMemo(() => {
     return filteredTestimonials.slice(0, visibleLimit);
@@ -70,7 +79,7 @@ export default function SocialCardsPage() {
 
   const hasMore = filteredTestimonials.length > visibleLimit;
 
-  if (authLoading || testimonialsLoading) {
+  if (authLoading || (user && testimonialsLoading)) {
     return (
       <div className="flex h-screen items-center justify-center bg-muted/30">
         <Loader2 className="animate-spin h-10 w-10 text-primary mx-auto" />
