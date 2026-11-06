@@ -779,60 +779,58 @@ export default function DashPage() {
 
         <div className="grid gap-4 md:gap-6 grid-cols-1">
           <Card 
-            className="border-none shadow-xl overflow-hidden rounded-[2rem] p-6 md:p-10 space-y-6 cursor-pointer hover:shadow-2xl transition-all active:scale-[0.98] select-none bg-background group relative"
+            className="border-none shadow-xl overflow-hidden rounded-[2rem] p-5 md:p-10 space-y-4 md:space-y-6 cursor-pointer hover:shadow-2xl transition-all active:scale-[0.98] select-none bg-background group relative"
             onClick={() => router.push('/metrics')}
           >
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
             
             <div className="flex items-center justify-between relative z-10">
               <div className="flex items-center gap-3">
-                <div className="p-3 rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-500">
-                  <BarChart3 className="w-6 h-6" />
+                <div className="p-2.5 md:p-3 rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                  <BarChart3 className="w-5 h-5 md:w-6 md:h-6" />
                 </div>
                 <div className="space-y-0.5">
-                  <CardTitle className="text-xs font-black uppercase text-muted-foreground tracking-[0.2em]">Desempenho Geral</CardTitle>
-                  <p className="text-[10px] text-primary font-bold uppercase tracking-widest">{filteredMetrics.trendLabel}</p>
+                  <CardTitle className="text-[10px] md:text-xs font-black uppercase text-muted-foreground tracking-[0.15em] md:tracking-[0.2em]">Desempenho Geral</CardTitle>
+                  <p className="text-[8px] md:text-[10px] text-primary font-bold uppercase tracking-widest">{filteredMetrics.trendLabel}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-primary opacity-40 group-hover:opacity-100 transition-opacity">
+              <div className="hidden sm:flex items-center gap-2 text-primary opacity-40 group-hover:opacity-100 transition-opacity">
                 <span className="text-[10px] font-black uppercase tracking-widest">Análise Completa</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
 
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 relative z-10">
-              <div className="flex items-center gap-6">
-                <div className="space-y-1">
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-5xl md:text-7xl font-black tracking-tighter transition-transform duration-500 group-hover:scale-105 block">
-                      {filteredMetrics.count}
-                    </span>
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-5 h-5 fill-yellow-400 text-yellow-400 animate-pulse" />
-                        <span className="text-lg md:text-xl font-black uppercase tracking-tighter">Elogios</span>
-                      </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 items-center md:items-end gap-6 md:gap-8 relative z-10">
+              <div className="flex items-center justify-center md:justify-start gap-4 md:gap-6">
+                <div className="flex items-baseline gap-2 md:gap-3">
+                  <span className="text-6xl md:text-8xl font-black tracking-tighter transition-transform duration-500 group-hover:scale-105 block">
+                    {filteredMetrics.count}
+                  </span>
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4 md:w-5 md:h-5 fill-yellow-400 text-yellow-400 animate-pulse" />
+                      <span className="text-base md:text-xl font-black uppercase tracking-tighter">Elogios</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col items-start md:items-end gap-3">
+              <div className="flex flex-col items-center md:items-end gap-2 md:gap-3">
                 {todayCount > 0 ? (
-                  <div className="bg-green-500/10 border border-green-500/20 px-4 py-2 rounded-2xl flex items-center gap-2 animate-in zoom-in duration-700">
+                  <div className="bg-green-500/10 border border-green-500/20 px-3 md:px-4 py-1.5 md:py-2 rounded-2xl flex items-center gap-2 animate-in zoom-in duration-700">
                     <div className="h-2 w-2 rounded-full bg-green-500 animate-ping" />
-                    <span className="text-[10px] md:text-xs font-black text-green-600 uppercase tracking-widest">
+                    <span className="text-[9px] md:text-xs font-black text-green-600 uppercase tracking-widest">
                       +{todayCount} {todayCount === 1 ? 'novo hoje' : 'novos hoje'}
                     </span>
                   </div>
                 ) : (
-                  <div className="bg-primary/5 border border-primary/10 px-4 py-2 rounded-2xl">
-                    <span className="text-[10px] md:text-xs font-black text-primary uppercase tracking-widest opacity-60">
+                  <div className="bg-primary/5 border border-primary/10 px-3 md:px-4 py-1.5 md:py-2 rounded-2xl">
+                    <span className="text-[9px] md:text-xs font-black text-primary uppercase tracking-widest opacity-60">
                       Aguardando coletas hoje
                     </span>
                   </div>
                 )}
-                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest text-right">
+                <p className="text-[8px] md:text-[9px] text-muted-foreground font-bold uppercase tracking-widest text-center md:text-right max-w-[200px]">
                   Crescimento consolidado vs. período anterior
                 </p>
               </div>
