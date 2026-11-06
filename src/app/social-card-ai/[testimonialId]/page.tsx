@@ -23,7 +23,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useUser, useFirestore, useDoc } from '@/firebase';
-import { doc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -49,7 +49,7 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
   const [isProcessing, setIsProcessing] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   const testimonialRef = useMemo(() => (db && user ? doc(db, 'users', user.uid, 'testimonials', testimonialId) : null), [db, user, testimonialId]);
   const { data: testimonialData, loading: testimonialLoading } = useDoc(testimonialRef);
@@ -72,19 +72,25 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
       setMessages([
         { 
           role: 'assistant', 
-          content: 'Olá! Sou seu Diretor de Arte Proova. Identifiquei seu depoimento. Envie **/start** para começarmos a criar sua arte de elite.' 
+          content: 'Olá! Sou seu Diretor de Arte Proova. Estou pronto para criar designs de elite. Envie **/start** para a primeira versão ou escreva como deseja o seu card (ex: "fundo azul", "estilo minimalista").' 
         }
       ]);
     }
   }, []);
 
-  const handleDownload = async () => {
-    if (!cardRef.current || isExporting) return;
+  const handleDownload = async (index: number) => {
+    const targetRef = cardRefs.current[index];
+    if (!targetRef || isExporting) return;
+    
     setIsExporting(true);
     try {
-      const dataUrl = await toPng(cardRef.current, { pixelRatio: 3, quality: 1.0 });
+      const dataUrl = await toPng(targetRef, { 
+        pixelRatio: 3, 
+        quality: 1.0,
+        style: { borderRadius: '2.5rem' }
+      });
       const link = document.createElement('a');
-      link.download = `proova-ai-design-${testimonialId}.png`;
+      link.download = `proova-ai-design-${testimonialId}-${index}.png`;
       link.href = dataUrl;
       link.click();
       toast({ title: "Arte Baixada!", description: "Seu card 4K está pronto para o Instagram." });
@@ -102,55 +108,44 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
     setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
     setInputValue('');
 
-    if (userMessage.toLowerCase() === '/start') {
-      // Verificar trava diária
-      const lastGen = testimonialData.lastAiGenerationAt?.toDate();
-      const today = new Date();
-      if (lastGen && lastGen.toDateString() === today.toDateString()) {
-        setMessages(prev => [...prev, { 
+    setIsProcessing(true);
+    setMessages(prev => [...prev, { role: 'assistant', content: 'Processando nova variação criativa...' }]);
+
+    try {
+      const isInitial = userMessage.toLowerCase() === '/start';
+      
+      const result = await optimizeCard({
+        text: testimonialData.text,
+        userName: testimonialData.userName,
+        rating: testimonialData.rating,
+        businessType: userData?.businessType || 'Serviços',
+        userInstruction: isInitial ? undefined : userMessage // Passa a instrução se não for o comando inicial
+      });
+
+      // Atualizar timestamp no Firestore (apenas para registro interno, sem trava)
+      await updateDoc(testimonialRef!, {
+        lastAiGenerationAt: serverTimestamp()
+      });
+
+      setMessages(prev => [
+        ...prev.slice(0, -1), // Remove a mensagem de status
+        { 
           role: 'assistant', 
-          content: 'Atenção: O limite de 1 geração por dia para este depoimento foi atingido. Tente novamente amanhã para um novo visual!',
-          type: 'text'
-        }]);
-        return;
-      }
+          content: isInitial 
+            ? 'Aqui está sua arte inicial gerada por inteligência artificial. Se desejar mudar algo, basta me escrever!' 
+            : 'Entendido! Apliquei suas instruções e gerei esta nova versão.',
+          type: 'card',
+          data: result
+        }
+      ]);
 
-      setIsProcessing(true);
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Iniciando Processamento Criativo 4K...' }]);
-
-      try {
-        const result = await optimizeCard({
-          text: testimonialData.text,
-          userName: testimonialData.userName,
-          rating: testimonialData.rating,
-          businessType: userData?.businessType || 'Serviços'
-        });
-
-        // Atualizar timestamp no Firestore
-        await updateDoc(testimonialRef!, {
-          lastAiGenerationAt: serverTimestamp()
-        });
-
-        setMessages(prev => [
-          ...prev.slice(0, -1), // Remove a mensagem de status
-          { 
-            role: 'assistant', 
-            content: 'Aqui está sua arte exclusiva gerada por inteligência artificial.',
-            type: 'card',
-            data: result
-          }
-        ]);
-
-      } catch (err: any) {
-        setMessages(prev => [
-          ...prev.slice(0, -1),
-          { role: 'assistant', content: 'Ops, tive um problema técnico ao processar sua arte. Tente novamente em alguns minutos.' }
-        ]);
-      } finally {
-        setIsProcessing(false);
-      }
-    } else {
-      setMessages(prev => [...prev, { role: 'assistant', content: 'Comando não reconhecido. No momento, aceito apenas o comando **/start** para gerar designs.' }]);
+    } catch (err: any) {
+      setMessages(prev => [
+        ...prev.slice(0, -1),
+        { role: 'assistant', content: 'Ops, tive um problema técnico ao processar sua arte. Tente novamente em alguns minutos.' }
+      ]);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -176,21 +171,21 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
               <Sparkles className="w-5 h-5" />
             </div>
             <div className="min-w-0">
-               <h2 className="text-sm font-black uppercase tracking-tight truncate">Social Card AI</h2>
+               <h2 className="text-sm font-black uppercase tracking-tight truncate">Social Card AI Studio</h2>
                <p className="text-[10px] text-muted-foreground font-bold uppercase truncate max-w-[150px]">Cliente: {testimonialData?.userName}</p>
             </div>
           </div>
         </div>
         <div className="ml-auto flex items-center gap-4">
            <Badge variant="outline" className="hidden sm:flex h-6 text-[8px] font-black uppercase tracking-widest border-primary/20 text-primary">
-             Motor: Proova Engine v4.0
+             Motor: Proova Engine v5.0
            </Badge>
            <ThemeToggle />
         </div>
       </header>
 
       <main className="flex-1 mt-20 md:mt-24 overflow-y-auto p-4 md:p-8 flex justify-center scrollbar-hide pb-32">
-        <div className="w-full max-w-3xl space-y-6">
+        <div className="w-full max-w-3xl space-y-8">
           {messages.map((msg, idx) => (
             <div key={idx} className={cn(
               "flex items-start gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500",
@@ -216,7 +211,7 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
                 {msg.type === 'card' && msg.data && (
                   <div className="space-y-4 animate-in zoom-in duration-700 delay-300">
                     <div 
-                      ref={cardRef}
+                      ref={el => { cardRefs.current[idx] = el; }}
                       className="aspect-square w-full max-w-[400px] rounded-[2.5rem] shadow-2xl overflow-hidden relative border-8 border-background bg-black mx-auto md:mx-0"
                       style={{ 
                         backgroundImage: `url(${msg.data.backgroundImageUri})`,
@@ -247,11 +242,11 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
 
                     <div className="flex justify-center md:justify-start">
                       <Button 
-                        onClick={handleDownload} 
+                        onClick={() => handleDownload(idx)} 
                         disabled={isExporting}
-                        className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 shadow-xl"
+                        className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 shadow-xl bg-primary hover:bg-primary/90 text-white"
                       >
-                        {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />} Baixar Card 4K
+                        {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />} Baixar Variação 4K
                       </Button>
                     </div>
                   </div>
@@ -270,7 +265,7 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
                value={inputValue}
                onChange={(e) => setInputValue(e.target.value)}
                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-               placeholder="Digite /start para criar..."
+               placeholder="Peça para mudar cor, estilo ou texto..."
                className="w-full h-14 bg-muted/50 border-none rounded-2xl px-6 text-sm font-bold pr-14 focus:ring-2 focus:ring-primary/20 transition-all outline-none"
              />
              <div className="absolute right-2 top-1/2 -translate-y-1/2">
@@ -286,8 +281,8 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
           </div>
         </div>
         <div className="max-w-3xl mx-auto mt-2 px-2 flex items-center gap-2 text-muted-foreground opacity-50">
-           <AlertTriangle className="w-3 h-3" />
-           <p className="text-[8px] font-black uppercase tracking-widest">Limite: 1 design por depoimento a cada 24 horas.</p>
+           <Zap className="w-3 h-3 text-primary" />
+           <p className="text-[8px] font-black uppercase tracking-widest">Estúdio Livre: Gere variações ilimitadas através da conversa.</p>
         </div>
       </div>
     </div>

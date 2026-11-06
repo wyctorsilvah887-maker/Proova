@@ -4,8 +4,8 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 /**
- * @fileOverview Fluxo de Design Generativo Proova Premium (v4.0).
- * Utilizamos o Gemini 2.0 Flash para estratégia e o Nano-Banana para arte de fundo.
+ * @fileOverview Fluxo de Design Generativo Proova Premium (v5.0).
+ * Agora suporta instruções do usuário para refinamento contínuo.
  */
 
 const StoryResponseSchema = z.object({
@@ -19,22 +19,34 @@ const StoryResponseSchema = z.object({
 
 export type OptimizeCardOutput = z.infer<typeof StoryResponseSchema>;
 
-export async function optimizeCard(input: { text: string; userName?: string; rating?: number; businessType?: string }): Promise<OptimizeCardOutput> {
+export async function optimizeCard(input: { 
+  text: string; 
+  userName?: string; 
+  rating?: number; 
+  businessType?: string;
+  userInstruction?: string; // Nova instrução opcional do usuário
+}): Promise<OptimizeCardOutput> {
   try {
-    // PASSO 1: Estratégia de Texto (Gemini 2.0 Flash)
+    // PASSO 1: Estratégia de Texto e Conceito Visual (Gemini 2.0 Flash)
     const { output } = await ai.generate({
       model: 'googleai/gemini-2.0-flash',
       prompt: `Você é um Diretor de Arte de marcas de luxo. 
-      Sua tarefa é transformar este depoimento em uma peça de publicidade PREMIUM QUADRADA.
+      Sua tarefa é criar ou refinar uma peça de publicidade PREMIUM QUADRADA (1:1).
       
-      DEPOIMENTO: "${input.text}"
-      SETOR: "${input.businessType || 'Serviços'}"
-      NOME: "${input.userName || 'Cliente'}"
+      DADOS ORIGINAIS:
+      - DEPOIMENTO: "${input.text}"
+      - SETOR: "${input.businessType || 'Serviços'}"
+      - NOME: "${input.userName || 'Cliente'}"
+
+      INSTRUÇÃO DO USUÁRIO (Siga rigorosamente se houver):
+      "${input.userInstruction || 'Crie um design de elite padrão.'}"
 
       REGRAS:
-      1. Headline: Mantenha o nome do cliente.
-      2. BodyText: Refine o feedback para ser emocionante e luxuoso.
-      3. VisualConcept: Descreva um fundo (prompt em inglês): "Ultra-luxurious dark background with golden dust, sparkles, and soft cinematic lighting. Deep black and gold palette. 4K texture, professional branding style."`,
+      1. Headline: Use o nome do cliente ou uma frase curta de impacto.
+      2. BodyText: O texto deve ser emocionante e luxuoso.
+      3. VisualConcept: Descreva um fundo (prompt em inglês): "Ultra-luxurious dark background with [elementos baseados na instrução], professional branding style. NO TEXT in the image background."
+      
+      Se o usuário pediu uma cor específica ou elemento (ex: mármore, azul, tecnológico), incorpore isso no VisualConcept.`,
       output: { 
         format: 'json', 
         schema: StoryResponseSchema 
@@ -43,12 +55,12 @@ export async function optimizeCard(input: { text: string; userName?: string; rat
 
     if (!output) throw new Error("IA offline");
 
-    // PASSO 2: Geração da Imagem de Fundo (Banana Model)
+    // PASSO 2: Geração da Imagem de Fundo (Nano-Banana)
     try {
       const imageResponse = await ai.generate({
         model: 'googleai/gemini-2.5-flash-image',
         prompt: [
-          { text: `Create an ultra-high-end square 1:1 background. ${output.visualConcept}. NO TEXT. Minimalist and professional.` }
+          { text: `Create an ultra-high-end square 1:1 background for a luxury brand. ${output.visualConcept}. NO TEXT. Minimalist and cinematic lighting.` }
         ],
         config: {
           responseModalities: ['TEXT', 'IMAGE'],
