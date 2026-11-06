@@ -964,7 +964,7 @@ export default function DashPage() {
               className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm"
             >
               <Globe className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Página Pública</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Link in Bio</span>
             </Button>
 
             <Button variant="outline" disabled={!isSetupComplete} onClick={() => router.push('/private')} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all relative shadow-sm">
