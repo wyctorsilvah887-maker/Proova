@@ -1214,46 +1214,55 @@ export default function DashPage() {
                 ref={shareCardRef}
                 className={cn(
                   "relative overflow-hidden shadow-2xl transition-all duration-700",
-                  "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] flex flex-col items-center text-center"
+                  "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] flex flex-col items-center"
                 )}
                 style={{ 
                   backgroundImage: cardVariant === 'dark' 
-                      ? 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)'
-                      : 'linear-gradient(160deg, #f97316 0%, #ea580c 60%, #ffffff 180%)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
+                      ? 'linear-gradient(160deg, #050505 0%, #1a1a1a 60%, #f97316 160%)'
+                      : 'linear-gradient(160deg, #f97316 0%, #ea580c 70%, #ffffff 180%)',
                   backgroundColor: cardVariant === 'dark' ? '#000000' : '#f97316'
                 }}
               >
-                   <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-6 sm:p-10">
-                      <div id="card-header-cta" className="mb-2">
-                        <p className="text-[9px] sm:text-[11px] font-black uppercase tracking-[0.4em] drop-shadow-lg text-white">
+                   {/* Decorative Elements */}
+                   <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16" />
+                   <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -ml-16 -mb-16" />
+
+                   <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-8 sm:p-10">
+                      <div id="card-header-cta" className="text-center">
+                        <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.4em] text-white opacity-60">
                           O QUE DIZEM NOSSOS CLIENTES
                         </p>
                       </div>
 
-                      <div className="flex-1 flex flex-col justify-center items-center space-y-6 sm:space-y-8 py-4">
-                        <div className="flex justify-center gap-2 animate-in fade-in slide-in-from-top-4 duration-1000">
+                      <div className="flex-1 flex flex-col justify-center items-center w-full py-4 text-center">
+                        <div className="flex justify-center gap-1.5 mb-6 animate-in fade-in zoom-in duration-1000">
                             {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                              <Star key={i} className="w-6 h-6 sm:w-8 h-8 fill-current text-primary shadow-xl" />
+                              <Star key={i} className="w-5 h-5 sm:w-6 sm:h-6 fill-current text-primary drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]" />
                             ))}
                         </div>
                         
-                        <div className="space-y-6 bg-black/30 p-6 rounded-[2rem] backdrop-blur-md border border-white/10 shadow-2xl">
-                          <p className="font-black font-headline leading-tight italic drop-shadow-2xl px-2 tracking-tight transition-all duration-1000 text-base sm:text-xl text-white">
+                        <div className="relative w-full px-2">
+                          <Quote className="absolute -top-6 -left-2 w-8 h-8 text-primary opacity-20 rotate-180" />
+                          <div className="bg-white/5 backdrop-blur-lg p-6 sm:p-8 rounded-[2rem] border border-white/10 shadow-2xl ring-1 ring-white/5">
+                            <p className={cn(
+                              "font-black font-headline leading-tight italic drop-shadow-lg tracking-tight transition-all duration-1000 text-white",
+                              (selectedTestimonialForShare?.text?.length || 0) > 120 ? "text-sm sm:text-lg" : "text-lg sm:text-2xl"
+                            )}>
                               "{selectedTestimonialForShare?.text}"
-                          </p>
+                            </p>
+                          </div>
+                          <Quote className="absolute -bottom-6 -right-2 w-8 h-8 text-primary opacity-20" />
                         </div>
                       </div>
 
-                      <div className="w-full pt-6 border-t border-white/10 mt-2 sm:mt-4">
-                          <div className="flex flex-col items-center gap-3">
-                            <p className="text-white font-black text-[11px] sm:text-sm uppercase tracking-[0.3em] drop-shadow-md">
+                      <div className="w-full pt-6 border-t border-white/5 mt-4">
+                          <div className="flex flex-col items-center gap-2">
+                            <p className="text-white font-black text-[11px] sm:text-xs uppercase tracking-[0.3em] opacity-90">
                               {selectedTestimonialForShare?.userName}
                             </p>
-                            <div className="bg-white/10 px-4 py-1.5 rounded-full border border-white/10 inline-flex items-center gap-2 backdrop-blur-sm shadow-xl">
+                            <div className="bg-primary/10 px-4 py-1 rounded-full border border-primary/20 inline-flex items-center gap-1.5 backdrop-blur-sm">
                                 <CheckCircle2 className="w-3 h-3 text-primary" />
-                                <p className="text-[8px] sm:text-[9px] text-white font-black uppercase tracking-widest">Certificado Proova</p>
+                                <p className="text-[7px] sm:text-[8px] text-white/80 font-black uppercase tracking-widest">Feedback Verificado</p>
                             </div>
                           </div>
                       </div>
