@@ -5,8 +5,8 @@ import { z } from 'genkit';
 
 /**
  * @fileOverview Fluxo de Design Generativo de Elite.
- * 1. O Gemini cria o copywriting e o conceito visual.
- * 2. O Imagen gera uma imagem de fundo exclusiva 1:1.
+ * 1. O Gemini 1.5 Flash cria o copywriting e o conceito visual.
+ * 2. O Gemini 2.5 Flash Image gera uma imagem de fundo exclusiva 1:1.
  */
 
 const StoryResponseSchema = z.object({
@@ -22,7 +22,7 @@ export type OptimizeCardOutput = z.infer<typeof StoryResponseSchema>;
 
 export async function optimizeCard(input: { text: string; userName?: string; rating?: number; businessType?: string }): Promise<OptimizeCardOutput> {
   try {
-    // PASSO 1: Gerar a estratégia de texto e o conceito visual
+    // PASSO 1: Gerar a estratégia de texto e o conceito visual (Diretor de Arte)
     const textResponse = await ai.generate({
       model: geminiModel,
       prompt: `Você é um Diretor de Arte de marcas de luxo. 
@@ -32,9 +32,9 @@ export async function optimizeCard(input: { text: string; userName?: string; rat
       SETOR: "${input.businessType || 'Serviços'}"
 
       REGRAS:
-      1. Headline: Máximo 4 palavras.
-      2. BodyText: Refine para ser emocionante.
-      3. VisualConcept: Crie um prompt para geração de imagem (em inglês) que seja: Minimalista, LUXUOSO, focado em texturas (mármore, vidro, iluminação de estúdio) relacionado ao setor ${input.businessType}. NÃO inclua pessoas ou rostos. Foque em ambiente e atmosfera profissional.`,
+      1. Headline: Máximo 4 palavras de alto impacto.
+      2. BodyText: Refine o feedback para ser emocionante e elegante.
+      3. VisualConcept: Descreva uma imagem de fundo (em inglês) que seja: Minimalista, LUXUOSA, focada em texturas (mármore, vidro, iluminação de estúdio) relacionado ao setor ${input.businessType}. NÃO inclua pessoas ou rostos.`,
       output: { 
         format: 'json', 
         schema: StoryResponseSchema 
@@ -44,11 +44,16 @@ export async function optimizeCard(input: { text: string; userName?: string; rat
     const data = textResponse.output;
     if (!data) throw new Error("Falha na geração estratégica.");
 
-    // PASSO 2: Gerar a imagem de fundo real via IA (Imagen 3)
+    // PASSO 2: Gerar a imagem de fundo real via IA (Gemini 2.5 Flash Image)
     try {
       const imageResponse = await ai.generate({
-        model: 'googleai/imagen-3.0-generate-001',
-        prompt: `A professional, ultra-high-end, minimal background image for a business social card. ${data.visualConcept}. Cinematic lighting, soft bokeh, sophisticated textures, 8k resolution, elegant, neutral colors, square 1:1 aspect ratio.`,
+        model: 'googleai/gemini-2.5-flash-image',
+        prompt: [
+          { text: `Create a professional, ultra-high-end, minimal background image for a business social card. ${data.visualConcept}. Cinematic lighting, soft bokeh, sophisticated textures, clean composition, neutral colors, square 1:1 aspect ratio.` }
+        ],
+        config: {
+          responseModalities: ['TEXT', 'IMAGE'],
+        }
       });
 
       const media = imageResponse.media;
@@ -56,8 +61,8 @@ export async function optimizeCard(input: { text: string; userName?: string; rat
         data.backgroundImageUri = media.url;
       }
     } catch (imgErr) {
-      console.error("Erro Imagen 3 (Usando Fallback Visual):", imgErr);
-      // Mantemos o objeto sem imagem para o frontend usar o gradiente de segurança
+      console.error("Erro Gemini 2.5 Image:", imgErr);
+      // Fallback visual silencioso se a geração de imagem falhar
     }
 
     return data;
