@@ -118,7 +118,7 @@ export default function PricingPage() {
           "Murais Ilimitados",
           "50 Depoimentos Ativos",
           "G-Boost (Ranqueamento no Google Maps)",
-          "Editor de Página Pública VIP",
+          "Editor VIP Link in Bio",
           "Auto-Publish (Publicação Automática de Depoimentos)",
           "Relatórios de Performance Semanais"
         ]
