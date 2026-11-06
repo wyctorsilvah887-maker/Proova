@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -8,7 +7,6 @@ import {
   ArrowLeft, 
   Loader2, 
   Share2, 
-  Sparkles, 
   Star, 
   User, 
   MessageSquare,
@@ -146,16 +144,9 @@ export default function SocialCardsPage() {
                 <div className="grid grid-cols-1 gap-2 pt-2">
                   <Button 
                     className="w-full h-11 rounded-xl font-bold gap-2 text-xs uppercase tracking-widest bg-primary hover:bg-primary/90"
-                    onClick={() => router.push(`/social-card-ai/${t.id}`)}
+                    onClick={() => router.push('/dash')}
                   >
-                    <Sparkles className="w-4 h-4" /> Social Card AI
-                  </Button>
-                  <Button 
-                    variant="outline"
-                    className="w-full h-11 rounded-xl font-bold gap-2 text-xs uppercase tracking-widest border-primary/20 text-primary"
-                    onClick={() => router.push('/dash')} // Reutiliza a lógica do dash no MVP
-                  >
-                    <Share2 className="w-4 h-4" /> Gerar Card Padrão
+                    <Share2 className="w-4 h-4" /> Gerar Card Social
                   </Button>
                 </div>
               </CardContent>
@@ -191,4 +182,3 @@ export default function SocialCardsPage() {
     </div>
   );
 }
-

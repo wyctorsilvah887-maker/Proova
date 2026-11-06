@@ -113,7 +113,6 @@ import { cn } from '@/lib/utils';
 import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-actions';
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { askBlackAdvisor, type AdvisoryOutput } from '@/ai/flows/optimize-card-flow';
 
 interface AuditItem {
   id: string;
@@ -150,9 +149,7 @@ export default function DashPage() {
   const [selectedTestimonialForShare, setSelectedTestimonialForShare] = useState<any>(null);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isExportingCard, setIsExportingCard] = useState(false);
-  const [cardVariant, setCardVariant] = useState<'dark' | 'orange' | 'ai'>('dark');
-  const [isAIProcessing, setIsAIProcessing] = useState(false);
-  const [aiData, setAiData] = useState<AdvisoryOutput | null>(null);
+  const [cardVariant, setCardVariant] = useState<'dark' | 'orange'>('dark');
   
   const shareCardRef = useRef<HTMLDivElement>(null);
   const dialogVideoRef = useRef<HTMLVideoElement>(null);
@@ -659,45 +656,9 @@ export default function DashPage() {
     }
   };
 
-  const handleAIDesignMagic = async () => {
-    if (!selectedTestimonialForShare || isAIProcessing) return;
-    
-    if (!isEnterpriseUser) {
-      shadcnToast({
-        title: "Recurso Enterprise",
-        description: "A Mágica de Design IA é exclusiva para o plano Enterprise.",
-      });
-      router.push('/pricing');
-      return;
-    }
-
-    setIsAIProcessing(true);
-    setCardVariant('ai');
-    setAiData(null);
-    
-    try {
-      shadcnToast({ title: "🧠 Inteligência Proova Iniciada", description: "Otimizando copywriting e gerando visual 4K exclusivo..." });
-      
-      const advisorResponse = await askBlackAdvisor({
-        query: `Generate a luxury design concept for this testimonial: "${selectedTestimonialForShare.text}" from ${selectedTestimonialForShare.userName}. Format your response to include a premium background suggestion and a short impact headline.`,
-        memberRank: userData?.membershipStatus?.toUpperCase() || 'BASE'
-      });
-      
-      setAiData(advisorResponse);
-      shadcnToast({ title: "✨ Consultoria Concluída!", description: "O Advisor gerou o protocolo de design." });
-    } catch (err: any) {
-      console.error(err);
-      shadcnToast({ variant: "destructive", title: "Erro na Mágica IA", description: err.message || "Não foi possível completar o design agora." });
-      setCardVariant('dark');
-    } finally {
-      setIsAIProcessing(false);
-    }
-  };
-
   const openShareDialog = (testimonial: any) => {
     setSelectedTestimonialForShare(testimonial);
     setCardVariant('dark');
-    setAiData(null);
     setIsShareDialogOpen(true);
   };
 
@@ -863,7 +824,7 @@ export default function DashPage() {
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-primary" />
               <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
-                {isEnterpriseUser ? "Auditoria Consultiva Proova" : "Ações de Reputação"}
+                Ações de Reputação
               </h2>
             </div>
             <div className="grid gap-3 grid-cols-1">
@@ -1243,18 +1204,6 @@ export default function DashPage() {
             <div className="flex gap-2 p-1 bg-muted/50 rounded-xl w-fit">
                <button onClick={() => setCardVariant('dark')} className={cn("px-4 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all", cardVariant === 'dark' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground")}>Dark</button>
                <button onClick={() => setCardVariant('orange')} className={cn("px-4 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all", cardVariant === 'orange' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground")}>Orange</button>
-               <button 
-                onClick={handleAIDesignMagic} 
-                disabled={isAIProcessing}
-                className={cn(
-                  "px-4 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all flex items-center gap-1.5", 
-                  cardVariant === 'ai' ? "bg-primary text-white shadow-lg" : "bg-primary/10 text-primary hover:bg-primary/20",
-                  isAIProcessing && "animate-pulse"
-                )}
-               >
-                 {isAIProcessing ? <Loader2 className="w-3 h-3 animate-spin" /> : (isEnterpriseUser ? <Wand2 className="w-3 h-3" /> : <Lock className="w-3 h-3" />)}
-                 AI Design
-               </button>
             </div>
 
             <div className="w-full flex justify-center py-2 shrink-0">
@@ -1262,64 +1211,17 @@ export default function DashPage() {
                 ref={shareCardRef}
                 className={cn(
                   "relative overflow-hidden shadow-2xl transition-all duration-700",
-                  "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] flex flex-col items-center text-center",
-                  isAIProcessing ? "bg-black" : ""
+                  "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] flex flex-col items-center text-center"
                 )}
                 style={{ 
                   backgroundImage: cardVariant === 'dark' 
                       ? 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)'
-                      : cardVariant === 'orange'
-                        ? 'linear-gradient(160deg, #f97316 0%, #ea580c 60%, #ffffff 180%)'
-                        : 'none',
+                      : 'linear-gradient(160deg, #f97316 0%, #ea580c 60%, #ffffff 180%)',
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
-                  backgroundColor: isAIProcessing || cardVariant === 'dark' || cardVariant === 'ai' ? '#000000' : '#f97316'
+                  backgroundColor: cardVariant === 'dark' ? '#000000' : '#f97316'
                 }}
               >
-                 {isAIProcessing ? (
-                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90">
-                      <div className="w-full h-full relative overflow-hidden">
-                        <div className="absolute top-0 left-0 w-full h-[2px] bg-primary shadow-[0_0_15px_#f97316] animate-scanner z-20" />
-                        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent h-1/2 opacity-20 animate-scanner-gradient" />
-                      </div>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center space-y-4">
-                        <div className="p-4 rounded-full bg-primary/10 animate-pulse">
-                          <Fingerprint className="w-12 h-12 text-primary" />
-                        </div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary animate-pulse">Generative Engine...</p>
-                      </div>
-                   </div>
-                 ) : cardVariant === 'ai' && aiData ? (
-                   <div className="relative z-10 w-full h-full flex flex-col items-center justify-between p-6 sm:p-10">
-                      {/* Name Header */}
-                      <h2 className="text-white font-black text-3xl sm:text-4xl tracking-tighter mt-4 drop-shadow-2xl">
-                        {selectedTestimonialForShare?.userName}
-                      </h2>
-                      
-                      {/* Rating Center */}
-                      <div className="flex-1 flex flex-col justify-center items-center space-y-6 sm:space-y-8">
-                        <div className="flex justify-center gap-1.5 animate-in fade-in zoom-in duration-1000">
-                          {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                            <Star key={i} className="w-8 h-8 sm:w-10 h-10 fill-yellow-400 text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
-                          ))}
-                        </div>
-                        
-                        {/* Testimonial Box */}
-                        <div className="w-full border border-white/20 bg-black/40 backdrop-blur-xl rounded-[2rem] p-6 sm:p-8 shadow-2xl ring-1 ring-white/10">
-                          <p className="text-white text-base sm:text-lg font-bold leading-relaxed tracking-tight">
-                            "{selectedTestimonialForShare?.text}"
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Footer Badge */}
-                      <div className="bg-[#8b6d31]/80 px-6 py-2.5 rounded-xl border border-white/20 shadow-2xl mb-2 backdrop-blur-sm">
-                        <p className="text-[9px] sm:text-[11px] text-white/95 font-serif italic lowercase tracking-wide">
-                          feito pelo Proova IA Design
-                        </p>
-                      </div>
-                   </div>
-                 ) : (
                    <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-6 sm:p-10">
                       <div id="card-header-cta" className="mb-2">
                         <p className="text-[9px] sm:text-[11px] font-black uppercase tracking-[0.4em] drop-shadow-lg text-white">
@@ -1353,23 +1255,22 @@ export default function DashPage() {
                           </div>
                       </div>
                    </div>
-                 )}
               </div>
             </div>
 
             <Button 
               className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-xs bg-primary hover:bg-primary/90 text-white"
               onClick={handleDownloadContent}
-              disabled={isExportingCard || isAIProcessing}
+              disabled={isExportingCard}
             >
               {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-5 h-5" />}
-              {selectedTestimonialForShare?.videoUrl && cardVariant !== 'ai' ? 'Exportar Vídeo VIP' : 'Baixar Card Premium'}
+              {selectedTestimonialForShare?.videoUrl ? 'Exportar Vídeo VIP' : 'Baixar Card Premium'}
             </Button>
           </div>
           
           <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
             <p className="text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
-              <Zap className="w-3 h-3 text-primary" /> Dica: Imagens únicas geradas por IA aumentam o engajamento em 85%.
+              <Zap className="w-3 h-3 text-primary" /> Dica: Poste este card no seu Story e marque o cliente para aumentar seu alcance.
             </p>
           </DialogFooter>
         </DialogContent>
