@@ -1274,14 +1274,7 @@ export default function DashPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
-              <Button 
-                variant="outline"
-                className="h-14 rounded-2xl font-black uppercase tracking-widest gap-2 border-primary/20 text-primary hover:bg-primary/5 shadow-none"
-                onClick={handleShuffleVariant}
-              >
-                <RefreshCw className="w-4 h-4" /> Alternar Estilo
-              </Button>
+            <div className="grid grid-cols-1 gap-3 w-full">
               <Button 
                 className="h-14 rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-xs bg-primary hover:bg-primary/90 text-white"
                 onClick={handleDownloadContent}
