@@ -364,6 +364,12 @@ export default function DashPage() {
     return { count: periodTestimonials.length, displayList: periodTestimonials.slice(0, 5), trendLabel: `Últimos ${days} dias` };
   }, [approvedTestimonials, period, userData]);
 
+  const todayCount = useMemo(() => {
+    const startOfToday = new Date();
+    startOfToday.setHours(0,0,0,0);
+    return approvedTestimonials.filter(t => (t.createdAt?.toDate?.() || new Date()) >= startOfToday).length;
+  }, [approvedTestimonials]);
+
   const copyToClipboard = (text: string, description: string) => {
     if (!text) return;
     navigator.clipboard.writeText(text);
@@ -718,7 +724,10 @@ export default function DashPage() {
               <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
                 <div className="flex flex-col items-end">
                   <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] leading-tight transition-colors group-hover:text-primary">{userData?.companyName || 'Minha Empresa'}</span>
-                  <span className={cn("text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight", userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground")}>{membershipLabel}</span>
+                  <div className="flex flex-col items-end gap-0">
+                    <span className={cn("text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight", userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground")}>{membershipLabel}</span>
+                    {isMapsLinkValid && <span className="text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
+                  </div>
                 </div>
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
               </Button>
@@ -865,18 +874,6 @@ export default function DashPage() {
               <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Painel de Controle</h1>
               <p className="text-xs md:text-base text-muted-foreground">Gestão de prova social dinâmica</p>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              {!isDigitalBusiness && !isMapsLinkValid && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }} 
-                  className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5 animate-pulse"
-                >
-                  <MapPin className="w-3.5 h-3.5" /> Vincular Perfil Google
-                </Button>
-              )}
-            </div>
           </div>
           <div className="w-full sm:w-48">
             <Select value={period} onValueChange={(val: any) => setPeriod(val)}>
@@ -894,19 +891,64 @@ export default function DashPage() {
 
         <div className="grid gap-4 md:gap-6 grid-cols-1">
           <Card 
-            className="border-none shadow-sm overflow-hidden rounded-2xl p-4 md:p-6 space-y-4 cursor-pointer hover:shadow-md transition-all active:scale-[0.98] select-none"
+            className="border-none shadow-xl overflow-hidden rounded-[2rem] p-6 md:p-10 space-y-6 cursor-pointer hover:shadow-2xl transition-all active:scale-[0.98] select-none bg-background group relative"
             onClick={() => router.push('/metrics')}
           >
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <CardTitle className="text-xs font-bold uppercase text-muted-foreground tracking-widest">Resumo {period !== 'all' ? `(${period}d)` : ''}</CardTitle>
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
+            
+            <div className="flex items-center justify-between relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                  <BarChart3 className="w-6 h-6" />
+                </div>
+                <div className="space-y-0.5">
+                  <CardTitle className="text-xs font-black uppercase text-muted-foreground tracking-[0.2em]">Desempenho Geral</CardTitle>
+                  <p className="text-[10px] text-primary font-bold uppercase tracking-widest">{filteredMetrics.trendLabel}</p>
+                </div>
               </div>
-              <div className="flex items-center gap-1.5 text-primary select-none">
-                <span className="text-[10px] font-black uppercase tracking-widest">Ver Métricas</span>
-                <ChevronRight className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-2 text-primary opacity-40 group-hover:opacity-100 transition-opacity">
+                <span className="text-[10px] font-black uppercase tracking-widest">Análise Completa</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
-            <div className="space-y-1"><div className="text-xl md:text-3xl font-bold">{filteredMetrics.count} <span className="text-sm md:text-lg font-medium text-muted-foreground">avaliações</span></div><Badge variant="secondary" className="border-none text-[8px] md:text-[10px] h-4 md:h-5 px-1.5 font-black bg-primary/10 text-primary">{filteredMetrics.trendLabel}</Badge></div>
+
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 relative z-10">
+              <div className="flex items-center gap-6">
+                <div className="space-y-1">
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-5xl md:text-7xl font-black tracking-tighter transition-transform duration-500 group-hover:scale-105 block">
+                      {filteredMetrics.count}
+                    </span>
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-5 h-5 fill-yellow-400 text-yellow-400 animate-pulse" />
+                        <span className="text-lg md:text-xl font-black uppercase tracking-tighter">Elogios</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-start md:items-end gap-3">
+                {todayCount > 0 ? (
+                  <div className="bg-green-500/10 border border-green-500/20 px-4 py-2 rounded-2xl flex items-center gap-2 animate-in zoom-in duration-700">
+                    <div className="h-2 w-2 rounded-full bg-green-500 animate-ping" />
+                    <span className="text-[10px] md:text-xs font-black text-green-600 uppercase tracking-widest">
+                      +{todayCount} {todayCount === 1 ? 'novo hoje' : 'novos hoje'}
+                    </span>
+                  </div>
+                ) : (
+                  <div className="bg-primary/5 border border-primary/10 px-4 py-2 rounded-2xl">
+                    <span className="text-[10px] md:text-xs font-black text-primary uppercase tracking-widest opacity-60">
+                      Aguardando coletas hoje
+                    </span>
+                  </div>
+                )}
+                <p className="text-[9px] text-muted-foreground font-bold uppercase tracking-widest text-right">
+                  Crescimento consolidado vs. período anterior
+                </p>
+              </div>
+            </div>
           </Card>
         </div>
 
@@ -1118,7 +1160,7 @@ export default function DashPage() {
       <Dialog open={isPublicPageChoiceOpen} onOpenChange={setIsPublicPageChoiceOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background">
           <DialogHeader className="p-8 pb-4 text-center shrink-0">
-            <DialogTitle className="text-2xl font-black font-headline tracking-tight uppercase">Página de Autoridade</DialogTitle>
+            <DialogTitle className="text-2xl font-black font-headline tracking-tight uppercase">Link in Bio</DialogTitle>
             <DialogDescription className="text-sm">Escolha como deseja prosseguir com seu link da bio.</DialogDescription>
           </DialogHeader>
           <div className="px-8 pb-8 space-y-4">
