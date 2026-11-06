@@ -117,7 +117,7 @@ export default function PricingPage() {
         benefits: [
           "Murais Ilimitados",
           "50 Depoimentos Ativos",
-          "G-Boost (Google Maps Ranking)",
+          "G-Boost (Ranqueamento no Google Maps)",
           "Editor de Página Pública VIP",
           "Auto-Publish Inteligente",
           "Relatórios de Performance Semanais"
