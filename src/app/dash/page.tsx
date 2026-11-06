@@ -719,6 +719,11 @@ export default function DashPage() {
                 <div className="flex flex-col items-end">
                   <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] leading-tight transition-colors group-hover:text-primary">{userData?.companyName || 'Minha Empresa'}</span>
                   <span className={cn("text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight", userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground")}>{membershipLabel}</span>
+                  {isMapsLinkValid && (
+                    <span className="text-[6px] font-black text-green-500 uppercase tracking-widest leading-none mt-0.5">
+                      G-Boost Ativo
+                    </span>
+                  )}
                 </div>
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
               </Button>
