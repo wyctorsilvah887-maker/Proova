@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, useRef, use } from 'react';
@@ -17,10 +16,12 @@ import {
   Download,
   CheckCircle2,
   Lock,
-  AlertTriangle
+  AlertTriangle,
+  Star
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { useUser, useFirestore, useDoc } from '@/firebase';
 import { doc, updateDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import Link from 'next/link';
@@ -292,4 +293,3 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
     </div>
   );
 }
-
