@@ -149,6 +149,10 @@ export default function DashPage() {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isExportingCard, setIsExportingCard] = useState(false);
   const [cardVariant, setCardVariant] = useState<'dark' | 'orange'>('dark');
+
+  // Estado para Detalhe do Depoimento
+  const [selectedTestimonialForDetail, setSelectedTestimonialForDetail] = useState<any>(null);
+  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
   
   const shareCardRef = useRef<HTMLDivElement>(null);
   const dialogVideoRef = useRef<HTMLVideoElement>(null);
@@ -557,12 +561,18 @@ export default function DashPage() {
     }
   };
 
-  const openShareDialog = (testimonial: any) => {
+  const openShareDialog = (testimonial: any, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     setSelectedTestimonialForShare(testimonial);
     const variants: ('dark' | 'orange')[] = ['dark', 'orange'];
     const randomVariant = variants[Math.floor(Math.random() * variants.length)];
     setCardVariant(randomVariant);
     setIsShareDialogOpen(true);
+  };
+
+  const openDetailDialog = (testimonial: any) => {
+    setSelectedTestimonialForDetail(testimonial);
+    setIsDetailDialogOpen(true);
   };
 
   if (authLoading || userDataLoading || (user && !userData)) {
@@ -904,7 +914,11 @@ export default function DashPage() {
           </div>
           <div className="grid gap-3 md:gap-4">
             {testimonialsLoading ? <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary/50" /></div> : filteredMetrics.displayList.length > 0 ? filteredMetrics.displayList.map((t: any) => (
-              <Card key={t.id} className="border-none shadow-sm overflow-hidden rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md">
+              <Card 
+                key={t.id} 
+                className="border-none shadow-sm overflow-hidden rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md cursor-pointer active:scale-[0.99] group/card"
+                onClick={() => openDetailDialog(t)}
+              >
                 <div className="flex items-start gap-4 min-w-0 flex-1">
                   {t.videoUrl ? (
                     <div 
@@ -946,12 +960,12 @@ export default function DashPage() {
                       )}
                     </div>
                   ) : (
-                    <div className="bg-primary/10 p-2 rounded-xl hidden sm:block"><User className="w-4 h-4 text-primary" /></div>
+                    <div className="bg-primary/10 p-2 rounded-xl hidden sm:block transition-colors group-hover/card:bg-primary group-hover/card:text-white"><User className="w-4 h-4 text-primary group-hover/card:text-white" /></div>
                   )}
                   <div className="space-y-1 min-w-0 flex-1">
                     <div className="flex flex-col space-y-0.5">
                       <div className="flex items-center gap-2">
-                        <span className="font-bold text-xs truncate">{t.userName}</span>
+                        <span className="font-bold text-xs truncate group-hover/card:text-primary transition-colors">{t.userName}</span>
                         {t.videoUrl && <Badge variant="secondary" className="h-4 px-1 text-[7px] font-black uppercase bg-primary/10 text-primary border-none">Vídeo</Badge>}
                       </div>
                       <div className="flex gap-0.5">{Array.from({ length: t.rating || 5 }).map((_, i) => <Star key={i} className="w-2.5 h-2.5 fill-primary text-primary" />)}</div>
@@ -968,8 +982,8 @@ export default function DashPage() {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="rounded-full gap-1.5 text-[9px] font-black uppercase tracking-widest h-8 border-primary/20 text-primary hover:bg-primary/5"
-                    onClick={() => openShareDialog(t)}
+                    className="rounded-full gap-1.5 text-[9px] font-black uppercase tracking-widest h-8 border-primary/20 text-primary hover:bg-primary/5 relative z-20"
+                    onClick={(e) => openShareDialog(t, e)}
                   >
                     <Share className="w-3 h-3" /> Criar Story
                   </Button>
@@ -987,6 +1001,73 @@ export default function DashPage() {
         </div>
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
+
+      {/* Dialog Detalhe do Depoimento */}
+      <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
+        <DialogContent className="rounded-[2.5rem] sm:max-w-lg border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[90vh] flex flex-col">
+          <div className="h-2 bg-primary w-full shrink-0" />
+          <ScrollArea className="flex-1">
+            <div className="p-8 space-y-8">
+              <div className="flex flex-col items-center text-center space-y-4">
+                <div className="p-4 rounded-3xl bg-primary/10 text-primary">
+                  <User className="w-10 h-10" />
+                </div>
+                <div className="space-y-1">
+                  <DialogTitle className="text-2xl font-black font-headline tracking-tight uppercase">{selectedTestimonialForDetail?.userName}</DialogTitle>
+                  <p className="text-xs text-muted-foreground font-bold flex items-center justify-center gap-2">
+                    <Clock className="w-3.5 h-3.5" />
+                    {selectedTestimonialForDetail?.createdAt?.toDate ? selectedTestimonialForDetail.createdAt.toDate().toLocaleString('pt-BR') : 'Hoje'}
+                  </p>
+                </div>
+                <div className="flex justify-center gap-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star 
+                      key={i} 
+                      className={cn(
+                        "w-6 h-6",
+                        i < (selectedTestimonialForDetail?.rating || 5) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20"
+                      )} 
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {selectedTestimonialForDetail?.videoUrl && (
+                <div className="aspect-video rounded-[2rem] overflow-hidden bg-black shadow-2xl ring-4 ring-primary/5">
+                  <video 
+                    src={selectedTestimonialForDetail.videoUrl} 
+                    controls 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              )}
+
+              {selectedTestimonialForDetail?.text && selectedTestimonialForDetail?.text !== '(Depoimento em Vídeo)' && (
+                <div className="relative p-8 rounded-[2rem] bg-muted/30 border-2 border-primary/10">
+                  <Quote className="absolute top-4 left-4 w-8 h-8 text-primary/20 rotate-180" />
+                  <p className="text-base md:text-lg font-medium italic leading-relaxed text-center relative z-10">
+                    "{selectedTestimonialForDetail?.text}"
+                  </p>
+                  <Quote className="absolute bottom-4 right-4 w-8 h-8 text-primary/20" />
+                </div>
+              )}
+
+              <div className="flex flex-col gap-3">
+                 <Button 
+                  className="w-full h-14 rounded-2xl font-black uppercase tracking-widest gap-2 bg-primary shadow-xl"
+                  onClick={() => {
+                    setIsDetailDialogOpen(false);
+                    openShareDialog(selectedTestimonialForDetail);
+                  }}
+                 >
+                   <Share2 className="w-5 h-5" /> Criar Social Card
+                 </Button>
+                 <Button variant="ghost" onClick={() => setIsDetailDialogOpen(false)} className="w-full text-[10px] font-black uppercase tracking-widest text-muted-foreground">Fechar Visualização</Button>
+              </div>
+            </div>
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isCollectLinkChoiceOpen} onOpenChange={setIsCollectLinkChoiceOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background">
