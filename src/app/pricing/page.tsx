@@ -119,7 +119,7 @@ export default function PricingPage() {
           "50 Depoimentos Ativos",
           "G-Boost (Ranqueamento no Google Maps)",
           "Editor de Página Pública VIP",
-          "Auto-Publish Inteligente",
+          "Auto-Publish (Publicação Automática de Depoimentos)",
           "Relatórios de Performance Semanais"
         ]
       },
