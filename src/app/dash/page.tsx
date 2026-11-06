@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -114,7 +113,7 @@ import { cn } from '@/lib/utils';
 import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-actions';
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { optimizeCard, type OptimizeCardOutput } from '@/ai/flows/optimize-card-flow';
+import { askBlackAdvisor, type AdvisoryOutput } from '@/ai/flows/optimize-card-flow';
 
 interface AuditItem {
   id: string;
@@ -153,7 +152,7 @@ export default function DashPage() {
   const [isExportingCard, setIsExportingCard] = useState(false);
   const [cardVariant, setCardVariant] = useState<'dark' | 'orange' | 'ai'>('dark');
   const [isAIProcessing, setIsAIProcessing] = useState(false);
-  const [aiData, setAiData] = useState<OptimizeCardOutput | null>(null);
+  const [aiData, setAiData] = useState<AdvisoryOutput | null>(null);
   
   const shareCardRef = useRef<HTMLDivElement>(null);
   const dialogVideoRef = useRef<HTMLVideoElement>(null);
@@ -679,15 +678,13 @@ export default function DashPage() {
     try {
       shadcnToast({ title: "🧠 Inteligência Proova Iniciada", description: "Otimizando copywriting e gerando visual 4K exclusivo..." });
       
-      const storyData = await optimizeCard({
-        text: selectedTestimonialForShare.text,
-        userName: selectedTestimonialForShare.userName,
-        rating: selectedTestimonialForShare.rating,
-        businessType: userData?.businessType
+      const advisorResponse = await askBlackAdvisor({
+        query: `Generate a luxury design concept for this testimonial: "${selectedTestimonialForShare.text}" from ${selectedTestimonialForShare.userName}. Format your response to include a premium background suggestion and a short impact headline.`,
+        memberRank: userData?.membershipStatus?.toUpperCase() || 'BASE'
       });
       
-      setAiData(storyData);
-      shadcnToast({ title: "✨ Design Concluído!", description: "Sua imagem de fundo única foi gerada." });
+      setAiData(advisorResponse);
+      shadcnToast({ title: "✨ Consultoria Concluída!", description: "O Advisor gerou o protocolo de design." });
     } catch (err: any) {
       console.error(err);
       shadcnToast({ variant: "destructive", title: "Erro na Mágica IA", description: err.message || "Não foi possível completar o design agora." });
@@ -1269,13 +1266,11 @@ export default function DashPage() {
                   isAIProcessing ? "bg-black" : ""
                 )}
                 style={{ 
-                  backgroundImage: !isAIProcessing && aiData?.backgroundImageUri ? `url(${aiData.backgroundImageUri})` : (
-                    cardVariant === 'dark' 
+                  backgroundImage: cardVariant === 'dark' 
                       ? 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)'
                       : cardVariant === 'orange'
                         ? 'linear-gradient(160deg, #f97316 0%, #ea580c 60%, #ffffff 180%)'
-                        : 'none'
-                  ),
+                        : 'none',
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   backgroundColor: isAIProcessing || cardVariant === 'dark' || cardVariant === 'ai' ? '#000000' : '#f97316'
@@ -1298,7 +1293,7 @@ export default function DashPage() {
                    <div className="relative z-10 w-full h-full flex flex-col items-center justify-between p-6 sm:p-10">
                       {/* Name Header */}
                       <h2 className="text-white font-black text-3xl sm:text-4xl tracking-tighter mt-4 drop-shadow-2xl">
-                        {aiData.author}
+                        {selectedTestimonialForShare?.userName}
                       </h2>
                       
                       {/* Rating Center */}
@@ -1312,7 +1307,7 @@ export default function DashPage() {
                         {/* Testimonial Box */}
                         <div className="w-full border border-white/20 bg-black/40 backdrop-blur-xl rounded-[2rem] p-6 sm:p-8 shadow-2xl ring-1 ring-white/10">
                           <p className="text-white text-base sm:text-lg font-bold leading-relaxed tracking-tight">
-                            "{aiData.bodyText}"
+                            "{selectedTestimonialForShare?.text}"
                           </p>
                         </div>
                       </div>
@@ -1481,4 +1476,3 @@ export default function DashPage() {
     </div>
   );
 }
-

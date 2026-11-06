@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, useRef, use } from 'react';
@@ -30,14 +29,13 @@ import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { optimizeCard, type OptimizeCardOutput } from '@/ai/flows/optimize-card-flow';
+import { askBlackAdvisor, type AdvisoryOutput } from '@/ai/flows/optimize-card-flow';
 import { toast } from '@/hooks/use-toast';
-import { toPng } from 'html-to-image';
 
 interface ChatLog {
   type: 'user' | 'advisor' | 'error';
   content: string;
-  data?: OptimizeCardOutput;
+  data?: AdvisoryOutput;
   note?: string;
   insights?: string[];
 }
@@ -51,10 +49,8 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
   const [logs, setLogs] = useState<ChatLog[]>([]);
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
   
   const scrollRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<Record<number, HTMLDivElement | null>>({});
 
   const testimonialRef = useMemo(() => (db && user ? doc(db, 'users', user.uid, 'testimonials', testimonialId) : null), [db, user, testimonialId]);
   const { data: testimonialData, loading: testimonialLoading } = useDoc(testimonialRef);
@@ -77,35 +73,12 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
       setLogs([
         { 
           type: 'advisor', 
-          content: 'SISTEMA INICIALIZADO. Aguardando entrada de dados para processamento de design de elite. Digite /start ou descreva o visual desejado.',
-          note: 'LINK_ESTÁVEL_V5.5'
+          content: 'SISTEMA INICIALIZADO. Terminal Black Advisor pronto para consultoria técnica de alto nível. Identifique-se ou envie sua consulta.',
+          note: 'HB-PRT-2026-INIT'
         }
       ]);
     }
   }, []);
-
-  const handleDownload = async (index: number) => {
-    const targetRef = cardRefs.current[index];
-    if (!targetRef || isExporting) return;
-    
-    setIsExporting(true);
-    try {
-      const dataUrl = await toPng(targetRef, { 
-        pixelRatio: 3, 
-        quality: 1.0,
-        style: { borderRadius: '2.5rem' }
-      });
-      const link = document.createElement('a');
-      link.download = `proova-ai-design-${testimonialId}-${Date.now()}.png`;
-      link.href = dataUrl;
-      link.click();
-      toast({ title: "Arte Baixada!", description: "Seu card 4K está pronto para o Instagram." });
-    } catch (err) {
-      toast({ variant: "destructive", title: "Erro no download" });
-    } finally {
-      setIsExporting(false);
-    }
-  };
 
   const handleConsult = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,39 +90,28 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
     setIsLoading(true);
 
     try {
-      const isInitial = userQuery.toLowerCase() === '/start';
-      
-      const result = await optimizeCard({
-        text: testimonialData.text,
-        userName: testimonialData.userName,
-        rating: testimonialData.rating,
-        businessType: userData?.businessType || 'Geral',
-        userInstruction: isInitial ? "Create a standard luxury design" : userQuery
+      const result = await askBlackAdvisor({
+        query: userQuery,
+        memberRank: userData?.membershipStatus?.toUpperCase() || 'BASE'
       });
 
       setLogs(prev => [
         ...prev,
         { 
           type: 'advisor', 
-          content: isInitial 
-            ? 'Design inicial gerado com sucesso. Protocolo de autoridade aplicado.' 
-            : 'Instrução processada. Nova variação visual materializada.',
+          content: result.response,
           data: result,
-          note: `GEN_ID_${Math.random().toString(36).substring(7).toUpperCase()}`,
-          insights: [
-            `Tipografia: ${result.headline}`,
-            `Visual: ${result.visualConcept.substring(0, 40)}...`,
-            `Status: Renderização 4K Concluída`
-          ]
+          note: result.confidentialityNote,
+          insights: result.actionableInsights
         }
       ]);
 
       if (testimonialRef) {
-        updateDoc(testimonialRef, { lastAiGenerationAt: serverTimestamp() });
+        updateDoc(testimonialRef, { lastAiConsultationAt: serverTimestamp() });
       }
 
     } catch (err: any) {
-      setLogs(prev => [...prev, { type: 'error', content: 'Protocolo de comunicação interrompido. Verifique sua conexão com a IA.' }]);
+      setLogs(prev => [...prev, { type: 'error', content: 'Protocolo de comunicação interrompido. Verifique o link neural.' }]);
     } finally {
       setIsLoading(false);
     }
@@ -167,7 +129,7 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
 
   return (
     <div className="min-h-screen bg-black flex flex-col font-body text-foreground h-screen overflow-hidden">
-      {/* Header Minimalista Estilo Terminal */}
+      {/* Header Terminal Style */}
       <header className="bg-zinc-950 border-b border-zinc-900 h-20 flex items-center px-4 md:px-8 fixed top-0 w-full z-[60] shadow-sm">
         <div className="flex items-center gap-4">
           <Link href="/social-cards">
@@ -179,15 +141,14 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
             <Terminal className={cn("w-5 h-5", themeColor)} />
             <div>
               <h2 className="text-sm font-black uppercase tracking-tighter text-white">Black Advisor Studio</h2>
-              <p className="text-[8px] text-zinc-600 uppercase tracking-widest font-bold">Consultoria de Design de Elite</p>
+              <p className="text-[8px] text-zinc-600 uppercase tracking-widest font-bold">Consultoria de Protocolo Hall Black</p>
             </div>
           </div>
         </div>
         <div className="ml-auto flex items-center gap-4">
-           <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-full">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[8px] font-black uppercase tracking-widest text-zinc-500">Sistema Online</span>
-           </div>
+           <Badge variant="outline" className="hidden sm:flex h-6 text-[8px] font-black uppercase tracking-widest border-primary/20 text-primary">
+             Link de Dados: Estável
+           </Badge>
            <ThemeToggle className="bg-transparent border-zinc-800" />
         </div>
       </header>
@@ -198,15 +159,6 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
           ref={scrollRef}
           className="flex-1 overflow-y-auto space-y-12 pr-4 custom-scrollbar pb-40 scrollbar-hide"
         >
-          {logs.length === 0 && (
-            <div className="h-full flex flex-col items-center justify-center text-center space-y-6 opacity-20">
-              <Cpu className="w-16 h-16" />
-              <p className="text-[10px] font-black uppercase tracking-[0.5em] max-w-xs">
-                Aguardando entrada de dados para processamento de elite.
-              </p>
-            </div>
-          )}
-
           {logs.map((log, i) => (
             <div 
               key={i} 
@@ -229,51 +181,6 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
                     <p className="text-sm font-medium leading-relaxed text-zinc-300 italic">
                       {log.content}
                     </p>
-
-                    {log.data && (
-                      <div className="mt-8 space-y-6 animate-in zoom-in duration-700">
-                        <div 
-                          ref={el => { cardRefs.current[i] = el; }}
-                          className="aspect-square w-full max-w-[380px] rounded-[2.5rem] shadow-2xl overflow-hidden relative border-8 border-zinc-900 bg-black mx-auto lg:mx-0"
-                          style={{ 
-                            backgroundImage: log.data.backgroundImageUri ? `url(${log.data.backgroundImageUri})` : 'none',
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            backgroundColor: '#000'
-                          }}
-                        >
-                          <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px]" />
-                          <div className="relative z-10 w-full h-full flex flex-col items-center justify-between p-8 text-center">
-                             <h2 className="text-white font-black text-2xl tracking-tighter drop-shadow-2xl uppercase">
-                               {log.data.author}
-                             </h2>
-                             
-                             <div className="flex-1 flex flex-col justify-center items-center space-y-6">
-                                <div className="flex justify-center gap-1.5">
-                                  {Array.from({ length: testimonialData?.rating || 5 }).map((_, i) => (
-                                    <Star key={i} className="w-7 h-7 fill-yellow-400 text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]" />
-                                  ))}
-                                </div>
-                                <div className="bg-black/40 backdrop-blur-xl border border-white/20 rounded-[1.5rem] p-5 shadow-2xl">
-                                   <p className="text-white text-sm font-bold leading-relaxed italic">"{log.data.bodyText}"</p>
-                                </div>
-                             </div>
-
-                             <div className="bg-white/10 px-4 py-1.5 rounded-full border border-white/10">
-                               <p className="text-[8px] text-white font-black uppercase tracking-widest italic">{log.data.tagline}</p>
-                             </div>
-                          </div>
-                        </div>
-
-                        <Button 
-                          onClick={() => handleDownload(i)} 
-                          disabled={isExporting}
-                          className="h-11 px-8 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 shadow-xl bg-primary hover:bg-primary/90"
-                        >
-                          {isExporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />} Baixar Post 4K
-                        </Button>
-                      </div>
-                    )}
                     
                     {log.insights && log.insights.length > 0 && (
                       <div className="mt-8 pt-8 border-t border-zinc-900 space-y-4">
@@ -305,19 +212,19 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
           {isLoading && (
             <div className="flex items-center gap-3 ml-4 animate-pulse">
               <Loader2 className={cn("w-4 h-4 animate-spin", themeColor)} />
-              <span className="text-[9px] font-black uppercase tracking-widest text-zinc-700">Processando Linhagem Criativa...</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-zinc-700">Processando Protocolo de Elite...</span>
             </div>
           )}
         </div>
       </main>
 
-      {/* Input de Comando Estilo Black Advisor */}
+      {/* Input Terminal */}
       <div className="fixed bottom-0 w-full bg-black/80 backdrop-blur-md p-6 z-[70]">
         <form onSubmit={handleConsult} className="max-w-4xl mx-auto relative">
           <input 
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="SOLICITAR CONSULTORIA TÉCNICA DE DESIGN..."
+            placeholder="SOLICITAR CONSULTORIA TÉCNICA AO ADVISOR..."
             disabled={isLoading}
             className="w-full bg-zinc-950/50 border border-zinc-800 h-20 rounded-[2rem] px-8 text-sm font-black uppercase tracking-tight text-white focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all pr-32 placeholder:text-zinc-700"
           />
@@ -330,7 +237,7 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
           </Button>
           <div className="mt-3 px-8 hidden sm:flex items-center gap-2 text-zinc-800">
              <Fingerprint className="w-3 h-3" />
-             <p className="text-[8px] font-black uppercase tracking-[0.4em]">Autenticação Biométrica Ativa | Terminal Criptografado</p>
+             <p className="text-[8px] font-black uppercase tracking-[0.4em]">Autenticação Ativa | Terminal Hall Black Criptografado</p>
           </div>
         </form>
       </div>
@@ -352,13 +259,4 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
       `}</style>
     </div>
   );
-}
-
-async function getCroppedImg(imageSrc: string, pixelCrop: any, type: string): Promise<Blob> {
-  const image = new (window as any).Image(); image.src = imageSrc;
-  await new Promise((resolve) => (image.onload = resolve));
-  const canvas = document.createElement('canvas'); canvas.width = pixelCrop.width; canvas.height = pixelCrop.height;
-  const ctx = canvas.getContext('2d'); if (!ctx) throw new Error();
-  ctx.drawImage(image, pixelCrop.x, pixelCrop.y, pixelCrop.width, pixelCrop.height, 0, 0, pixelCrop.width, pixelCrop.height);
-  return new Promise((resolve) => canvas.toBlob((blob) => resolve(blob!), 'image/jpeg', 0.9));
 }
