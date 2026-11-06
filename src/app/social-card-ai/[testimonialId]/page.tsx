@@ -19,7 +19,9 @@ import {
   ShieldCheck,
   ChevronRight,
   AlertTriangle,
-  Fingerprint
+  Fingerprint,
+  Palette,
+  Wand2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -73,8 +75,8 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
       setLogs([
         { 
           type: 'advisor', 
-          content: 'SISTEMA INICIALIZADO. Terminal Black Advisor pronto para consultoria técnica de alto nível. Identifique-se ou envie sua consulta.',
-          note: 'HB-PRT-2026-INIT'
+          content: 'SISTEMA INICIALIZADO. Terminal Proova Designer ativo. Estou pronto para otimizar sua prova social com estratégia visual de alto nível. Como posso ajudar com seu design hoje?',
+          note: 'PROOVA-DSGN-UPLINK'
         }
       ]);
     }
@@ -111,19 +113,11 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
       }
 
     } catch (err: any) {
-      setLogs(prev => [...prev, { type: 'error', content: 'Protocolo de comunicação interrompido. Verifique o link neural.' }]);
+      setLogs(prev => [...prev, { type: 'error', content: 'Erro no motor de processamento. Tente reformular sua instrução de design.' }]);
     } finally {
       setIsLoading(false);
     }
   };
-
-  if (authLoading || testimonialLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-muted/30">
-        <Loader2 className="animate-spin h-10 w-10 text-primary mx-auto" />
-      </div>
-    );
-  }
 
   const themeColor = 'text-primary';
 
@@ -138,16 +132,16 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
             </Button>
           </Link>
           <div className="flex items-center gap-3 border-l border-zinc-800 pl-4">
-            <Terminal className={cn("w-5 h-5", themeColor)} />
+            <Palette className={cn("w-5 h-5", themeColor)} />
             <div>
-              <h2 className="text-sm font-black uppercase tracking-tighter text-white">Black Advisor Studio</h2>
-              <p className="text-[8px] text-zinc-600 uppercase tracking-widest font-bold">Consultoria de Protocolo Hall Black</p>
+              <h2 className="text-sm font-black uppercase tracking-tighter text-white">Proova Designer Studio</h2>
+              <p className="text-[8px] text-zinc-600 uppercase tracking-widest font-bold">Inteligência Criativa de Alta Performance</p>
             </div>
           </div>
         </div>
         <div className="ml-auto flex items-center gap-4">
            <Badge variant="outline" className="hidden sm:flex h-6 text-[8px] font-black uppercase tracking-widest border-primary/20 text-primary">
-             Link de Dados: Estável
+             Motor: Proova Engine 4.0
            </Badge>
            <ThemeToggle className="bg-transparent border-zinc-800" />
         </div>
@@ -175,7 +169,7 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
                 <div className="space-y-6 w-full max-w-2xl">
                   <div className="bg-zinc-950 border border-zinc-900 p-8 rounded-[2.5rem] shadow-2xl relative">
                     <div className="absolute -top-3 -left-3 bg-black border border-zinc-800 p-2 rounded-xl">
-                      <ShieldCheck className={cn("w-4 h-4", themeColor)} />
+                      <Wand2 className={cn("w-4 h-4", themeColor)} />
                     </div>
                     
                     <p className="text-sm font-medium leading-relaxed text-zinc-300 italic">
@@ -184,7 +178,7 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
                     
                     {log.insights && log.insights.length > 0 && (
                       <div className="mt-8 pt-8 border-t border-zinc-900 space-y-4">
-                         <p className={cn("text-[9px] font-black uppercase tracking-widest", themeColor)}>Metadados Acionáveis</p>
+                         <p className={cn("text-[9px] font-black uppercase tracking-widest", themeColor)}>Análise Técnica de Design</p>
                          <ul className="space-y-3">
                            {log.insights.map((insight, idx) => (
                              <li key={idx} className="flex items-start gap-3 text-[11px] text-zinc-500 font-bold uppercase">
@@ -197,7 +191,7 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
                     )}
                   </div>
                   <p className="text-[8px] text-zinc-800 font-black uppercase tracking-[0.4em] ml-4">
-                    DOC: {log.note}
+                    PROT: {log.note}
                   </p>
                 </div>
               ) : (
@@ -212,7 +206,7 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
           {isLoading && (
             <div className="flex items-center gap-3 ml-4 animate-pulse">
               <Loader2 className={cn("w-4 h-4 animate-spin", themeColor)} />
-              <span className="text-[9px] font-black uppercase tracking-widest text-zinc-700">Processando Protocolo de Elite...</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-zinc-700">Otimizando Conceito Visual...</span>
             </div>
           )}
         </div>
@@ -224,7 +218,7 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
           <input 
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="SOLICITAR CONSULTORIA TÉCNICA AO ADVISOR..."
+            placeholder="ENVIAR INSTRUÇÃO DE DESIGN (EX: USE FUNDO AZUL, ESTILO MINIMALISTA)..."
             disabled={isLoading}
             className="w-full bg-zinc-950/50 border border-zinc-800 h-20 rounded-[2rem] px-8 text-sm font-black uppercase tracking-tight text-white focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all pr-32 placeholder:text-zinc-700"
           />
@@ -237,7 +231,7 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
           </Button>
           <div className="mt-3 px-8 hidden sm:flex items-center gap-2 text-zinc-800">
              <Fingerprint className="w-3 h-3" />
-             <p className="text-[8px] font-black uppercase tracking-[0.4em]">Autenticação Ativa | Terminal Hall Black Criptografado</p>
+             <p className="text-[8px] font-black uppercase tracking-[0.4em]">Designer Link: Ativo | Motor Gráfico 4K Pronto</p>
           </div>
         </form>
       </div>
