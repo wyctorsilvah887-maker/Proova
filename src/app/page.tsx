@@ -59,7 +59,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
     )}>
       <div className="flex items-center">
         <Link href="/" className="flex items-center group -ml-2 md:-ml-4">
-          <div className="relative w-[180px] h-[60px] md:w-[280px] md:h-[90px] transition-transform group-hover:scale-105">
+          <div className="relative w-[200px] h-[66px] md:w-[320px] md:h-[106px] transition-transform group-hover:scale-105">
             <Image 
               src="/Logotipo%20PROOVA%20white%20mode%201.png" 
               alt="Logo" 
