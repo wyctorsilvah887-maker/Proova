@@ -1262,25 +1262,23 @@ export default function DashPage() {
               <div 
                 ref={shareCardRef}
                 className={cn(
-                  "relative overflow-hidden shadow-2xl flex flex-col items-center text-center transition-all duration-700",
-                  "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] p-6 sm:p-10",
-                  isAIProcessing && "bg-black"
+                  "relative overflow-hidden shadow-2xl transition-all duration-700",
+                  "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] flex flex-col items-center text-center",
+                  isAIProcessing ? "bg-black" : ""
                 )}
                 style={{ 
-                  backgroundImage: !isAIProcessing && aiData?.backgroundImageUri ? `url(${aiData.backgroundImageUri})` : 'none',
+                  backgroundImage: !isAIProcessing && aiData?.backgroundImageUri ? `url(${aiData.backgroundImageUri})` : (
+                    cardVariant === 'dark' 
+                      ? 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)'
+                      : cardVariant === 'orange'
+                        ? 'linear-gradient(160deg, #f97316 0%, #ea580c 60%, #ffffff 180%)'
+                        : 'none'
+                  ),
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   backgroundColor: isAIProcessing || cardVariant === 'dark' || cardVariant === 'ai' ? '#000000' : '#f97316'
                 }}
               >
-                 {!isAIProcessing && !aiData?.backgroundImageUri && (
-                    <div className="absolute inset-0 transition-all" style={{ 
-                      backgroundImage: cardVariant === 'dark' 
-                        ? 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)'
-                        : 'linear-gradient(160deg, #f97316 0%, #ea580c 60%, #ffffff 180%)'
-                    }} />
-                 )}
-
                  {isAIProcessing ? (
                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90">
                       <div className="w-full h-full relative overflow-hidden">
@@ -1294,39 +1292,54 @@ export default function DashPage() {
                         <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary animate-pulse">Generative Engine...</p>
                       </div>
                    </div>
-                 ) : (
-                   <>
-                    {cardVariant === 'ai' && (
-                      <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] z-0" />
-                    )}
-
-                    <div className={cn(
-                      "relative z-10 w-full flex flex-col h-full justify-between items-center"
-                    )}>
+                 ) : cardVariant === 'ai' && aiData ? (
+                   <div className="relative z-10 w-full h-full flex flex-col items-center justify-between p-6 sm:p-10">
+                      {/* Name Header */}
+                      <h2 className="text-white font-black text-3xl sm:text-4xl tracking-tighter mt-4 drop-shadow-2xl">
+                        {aiData.author}
+                      </h2>
                       
+                      {/* Rating Center */}
+                      <div className="flex-1 flex flex-col justify-center items-center space-y-6 sm:space-y-8">
+                        <div className="flex justify-center gap-1.5 animate-in fade-in zoom-in duration-1000">
+                          {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
+                            <Star key={i} className="w-8 h-8 sm:w-10 h-10 fill-yellow-400 text-yellow-400 drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
+                          ))}
+                        </div>
+                        
+                        {/* Testimonial Box */}
+                        <div className="w-full border border-white/20 bg-black/40 backdrop-blur-xl rounded-[2rem] p-6 sm:p-8 shadow-2xl ring-1 ring-white/10">
+                          <p className="text-white text-base sm:text-lg font-bold leading-relaxed tracking-tight">
+                            "{aiData.bodyText}"
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Footer Badge */}
+                      <div className="bg-[#8b6d31]/80 px-6 py-2.5 rounded-xl border border-white/20 shadow-2xl mb-2 backdrop-blur-sm">
+                        <p className="text-[9px] sm:text-[11px] text-white/95 font-serif italic lowercase tracking-wide">
+                          feito pelo Proova IA Design
+                        </p>
+                      </div>
+                   </div>
+                 ) : (
+                   <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-6 sm:p-10">
                       <div id="card-header-cta" className="mb-2">
-                        <p className={cn(
-                          "text-[9px] sm:text-[11px] font-black uppercase tracking-[0.4em] drop-shadow-lg",
-                          "text-white"
-                        )}>
-                          {cardVariant === 'ai' && aiData ? aiData.headline : 'O QUE DIZEM NOSSOS CLIENTES'}
+                        <p className="text-[9px] sm:text-[11px] font-black uppercase tracking-[0.4em] drop-shadow-lg text-white">
+                          O QUE DIZEM NOSSOS CLIENTES
                         </p>
                       </div>
 
                       <div className="flex-1 flex flex-col justify-center items-center space-y-6 sm:space-y-8 py-4">
                         <div className="flex justify-center gap-2 animate-in fade-in slide-in-from-top-4 duration-1000">
                             {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                              <Star key={i} className={cn("w-6 h-6 sm:w-8 h-8 fill-current text-primary shadow-xl")} />
+                              <Star key={i} className="w-6 h-6 sm:w-8 h-8 fill-current text-primary shadow-xl" />
                             ))}
                         </div>
                         
                         <div className="space-y-6 bg-black/30 p-6 rounded-[2rem] backdrop-blur-md border border-white/10 shadow-2xl">
-                          <p className={cn(
-                            "font-black font-headline leading-tight italic drop-shadow-2xl px-2 tracking-tight transition-all duration-1000",
-                            cardVariant === 'ai' ? "text-xl sm:text-2xl uppercase" : "text-base sm:text-xl",
-                            "text-white"
-                          )}>
-                              "{cardVariant === 'ai' && aiData ? aiData.bodyText : selectedTestimonialForShare?.text}"
+                          <p className="font-black font-headline leading-tight italic drop-shadow-2xl px-2 tracking-tight transition-all duration-1000 text-base sm:text-xl text-white">
+                              "{selectedTestimonialForShare?.text}"
                           </p>
                         </div>
                       </div>
@@ -1334,18 +1347,15 @@ export default function DashPage() {
                       <div className="w-full pt-6 border-t border-white/10 mt-2 sm:mt-4">
                           <div className="flex flex-col items-center gap-3">
                             <p className="text-white font-black text-[11px] sm:text-sm uppercase tracking-[0.3em] drop-shadow-md">
-                              {cardVariant === 'ai' && aiData ? aiData.author : selectedTestimonialForShare?.userName}
+                              {selectedTestimonialForShare?.userName}
                             </p>
                             <div className="bg-white/10 px-4 py-1.5 rounded-full border border-white/10 inline-flex items-center gap-2 backdrop-blur-sm shadow-xl">
                                 <CheckCircle2 className="w-3 h-3 text-primary" />
-                                <p className="text-[8px] sm:text-[9px] text-white font-black uppercase tracking-widest">
-                                  {cardVariant === 'ai' && aiData ? aiData.tagline : 'Certificado Proova'}
-                                </p>
+                                <p className="text-[8px] sm:text-[9px] text-white font-black uppercase tracking-widest">Certificado Proova</p>
                             </div>
                           </div>
                       </div>
-                    </div>
-                   </>
+                   </div>
                  )}
               </div>
             </div>
@@ -1368,7 +1378,7 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
       
-      {/* (O restante dos Diálogos de Google Maps e QR Code permanecem os mesmos) */}
+      {/* Diálogos de Google Maps e QR Code */}
       <Dialog open={isGoogleMapsDialogOpen} onOpenChange={setIsGoogleMapsDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-6 pb-2 pt-10 shrink-0 bg-background">
