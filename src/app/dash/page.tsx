@@ -104,7 +104,8 @@ import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebas
 import { doc, collection, query, updateDoc, orderBy, limit, where, getDocs, Timestamp, serverTimestamp, arrayUnion } from 'firebase/firestore';
 import Link from 'next/link';
 import { signOut } from 'firebase/auth';
-import { toast } from '@/hooks/use-toast';
+import { toast } from '@/hooks/size-toast'; // Note: Fixed path in real usage, but keeping consistent with project
+import { toast as shadcnToast } from '@/hooks/use-toast';
 import { QRCodeSVG } from 'qrcode.react';
 import { useTheme } from 'next-themes';
 import { jsPDF } from 'jspdf';
@@ -364,7 +365,7 @@ export default function DashPage() {
   const copyToClipboard = (text: string, description: string) => {
     if (!text) return;
     navigator.clipboard.writeText(text);
-    toast({ title: "Copiado!", description: `${description} copiado.` });
+    shadcnToast({ title: "Copiado!", description: `${description} copiado.` });
   };
 
   const handleSearchPlaces = async () => {
@@ -374,7 +375,7 @@ export default function DashPage() {
       const results = await searchGooglePlaces(searchQuery, city || userData?.city, state || userData?.state);
       setSearchResults(results);
     } catch (err) {
-      toast({ variant: "destructive", title: "Erro na busca" });
+      shadcnToast({ variant: "destructive", title: "Erro na busca" });
     } finally {
       setIsSearchingPlaces(false);
     }
@@ -391,11 +392,11 @@ export default function DashPage() {
         city: city || userData?.city || '',
         state: userData?.state || ''
       });
-      toast({ title: "Empresa Vinculada!", description: "Seu G-Boost está ativo." });
+      shadcnToast({ title: "Empresa Vinculada!", description: "Seu G-Boost está ativo." });
       setIsGoogleMapsDialogOpen(false);
       setSearchResults([]);
     } catch (err) {
-      toast({ variant: "destructive", title: "Erro ao salvar" });
+      shadcnToast({ variant: "destructive", title: "Erro ao salvar" });
     } finally {
       setIsUpdatingUrl(false);
     }
@@ -406,11 +407,11 @@ export default function DashPage() {
     setIsUpdatingUrl(true);
     try {
       await updateDoc(doc(db, 'users', user.uid), { city, state });
-      toast({ title: "Localização Salva" });
+      shadcnToast({ title: "Localização Salva" });
       setIsGoogleMapsDialogOpen(false); 
       setSearchQuery('');
     } catch (err) {
-      toast({ variant: "destructive", title: "Erro ao salvar local" });
+      shadcnToast({ variant: "destructive", title: "Erro ao salvar local" });
     } finally {
       setIsUpdatingUrl(false);
     }
@@ -424,10 +425,10 @@ export default function DashPage() {
         companyName: companyNameEdit.trim(), 
         companySlug: companySlugEdit.trim().toLowerCase().replace(/\s+/g, '-') 
       });
-      toast({ title: "Identidade Atualizada", description: "Seu link de coleta foi modificado." });
+      shadcnToast({ title: "Identidade Atualizada", description: "Seu link de coleta foi modificado." });
       setIsGoogleMapsDialogOpen(false);
     } catch (err) {
-      toast({ variant: "destructive", title: "Erro ao salvar identidade" });
+      shadcnToast({ variant: "destructive", title: "Erro ao salvar identidade" });
     } finally {
       setIsUpdatingUrl(false);
     }
@@ -493,10 +494,10 @@ export default function DashPage() {
       pdf.text('Tecnologia de Prova Social fornecida por PROOVA.com.br', pageWidth / 2, 285, { align: 'center' });
 
       pdf.save(`cartaz-balcao-${userData?.companySlug}.pdf`);
-      toast({ title: "PDF Pronto!", description: "Seu cartaz de balcão foi gerado com sucesso." });
+      shadcnToast({ title: "PDF Pronto!", description: "Seu cartaz de balcão foi gerado com sucesso." });
     } catch (err: any) { 
       console.error(err);
-      toast({ variant: "destructive", title: "Erro na Impressão", description: "Tente novamente ou use um computador." }); 
+      shadcnToast({ variant: "destructive", title: "Erro na Impressão", description: "Tente novamente ou use um computador." }); 
     } finally { 
       setIsGeneratingPdf(false); 
     }
@@ -506,7 +507,7 @@ export default function DashPage() {
     if (!selectedTestimonialForShare || !dialogVideoRef.current || !shareCardRef.current) return;
 
     setIsExportingCard(true);
-    toast({ title: "Processando Vídeo VIP", description: "Gravando moldura digital arredondada... aguarde." });
+    shadcnToast({ title: "Processando Vídeo VIP", description: "Gravando moldura digital arredondada... aguarde." });
 
     try {
       const videoEl = dialogVideoRef.current;
@@ -542,7 +543,7 @@ export default function DashPage() {
         link.download = `proova-social-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
         link.click();
         setIsExportingCard(false);
-        toast({ title: "Vídeo Gerado!", description: "Seu depoimento com moldura arredondada está pronto." });
+        shadcnToast({ title: "Vídeo Gerado!", description: "Seu depoimento com moldura arredondada está pronto." });
       };
 
       videoEl.currentTime = 0;
@@ -621,7 +622,7 @@ export default function DashPage() {
     } catch (err) {
       console.error("Erro na gravação composta:", err);
       setIsExportingCard(false);
-      toast({ variant: "destructive", title: "Erro na composição", description: "Tente o download simples." });
+      shadcnToast({ variant: "destructive", title: "Erro na composição", description: "Tente o download simples." });
     }
   };
 
@@ -650,10 +651,10 @@ export default function DashPage() {
       link.download = `proova-social-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
       link.href = dataUrl;
       link.click();
-      toast({ title: "Card Gerado!", description: "Sua arte está pronta para as redes sociais." });
+      shadcnToast({ title: "Card Gerado!", description: "Sua arte está pronta para as redes sociais." });
     } catch (err) {
       console.error("Erro fatal ao exportar:", err);
-      toast({ variant: "destructive", title: "Erro ao exportar conteúdo" });
+      shadcnToast({ variant: "destructive", title: "Erro ao exportar conteúdo" });
     } finally {
       setIsExportingCard(false);
     }
@@ -663,7 +664,7 @@ export default function DashPage() {
     if (!selectedTestimonialForShare || isAIProcessing) return;
     
     if (!isEnterpriseUser) {
-      toast({
+      shadcnToast({
         title: "Recurso Enterprise",
         description: "A Mágica de Design IA é exclusiva para o plano Enterprise.",
       });
@@ -673,20 +674,23 @@ export default function DashPage() {
 
     setIsAIProcessing(true);
     setCardVariant('ai');
+    setAiData(null);
     
     try {
-      toast({ title: "🧠 Inteligência Proova Iniciada", description: "Otimizando copywriting e gerando layout de elite..." });
+      shadcnToast({ title: "🧠 Inteligência Proova Iniciada", description: "Otimizando copywriting e gerando layout de elite..." });
       
       const storyData = await optimizeCard({
         text: selectedTestimonialForShare.text,
+        userName: selectedTestimonialForShare.userName,
+        rating: selectedTestimonialForShare.rating,
         businessType: userData?.businessType
       });
       
       setAiData(storyData);
-      toast({ title: "✨ Design Concluído!", description: "Seu card premium está pronto." });
+      shadcnToast({ title: "✨ Design Concluído!", description: "Seu card premium está pronto." });
     } catch (err: any) {
       console.error(err);
-      toast({ variant: "destructive", title: "Erro na Mágica IA", description: err.message || "Não foi possível completar o design agora." });
+      shadcnToast({ variant: "destructive", title: "Erro na Mágica IA", description: err.message || "Não foi possível completar o design agora." });
       setCardVariant('dark');
     } finally {
       setIsAIProcessing(false);
@@ -1260,126 +1264,146 @@ export default function DashPage() {
                 ref={shareCardRef}
                 className={cn(
                   "relative overflow-hidden shadow-2xl flex flex-col items-center text-center transition-all duration-700",
-                  "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] p-6 sm:p-10"
+                  "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] p-6 sm:p-10",
+                  isAIProcessing && "bg-black"
                 )}
                 style={{ 
-                  backgroundImage: cardVariant === 'dark' 
-                    ? 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)'
-                    : (cardVariant === 'ai' 
-                      ? 'linear-gradient(135deg, #0f0f0f 0%, #262626 50%, #1a1a1a 100%)' 
-                      : 'linear-gradient(160deg, #f97316 0%, #ea580c 60%, #ffffff 180%)'),
-                  backgroundColor: cardVariant === 'dark' || cardVariant === 'ai' ? '#000000' : '#f97316'
+                  backgroundImage: !isAIProcessing ? (
+                    cardVariant === 'dark' 
+                      ? 'linear-gradient(160deg, #050505 0%, #111111 60%, #f97316 160%)'
+                      : (cardVariant === 'ai' && aiData
+                        ? 'linear-gradient(135deg, #0f0f0f 0%, #262626 50%, #1a1a1a 100%)' 
+                        : 'linear-gradient(160deg, #f97316 0%, #ea580c 60%, #ffffff 180%)')
+                  ) : 'none',
+                  backgroundColor: isAIProcessing || cardVariant === 'dark' || cardVariant === 'ai' ? '#000000' : '#f97316'
                 }}
               >
-                 {cardVariant === 'ai' && (
-                   <>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-16 -mt-16" />
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/10 rounded-full blur-3xl -ml-24 -mb-24" />
-                    <div className="absolute inset-0 border-[4px] border-primary/20 m-2 rounded-[2.2rem] pointer-events-none" />
-                    <div className="absolute inset-0 border-[1px] border-white/10 m-4 rounded-[2rem] pointer-events-none" />
-                   </>
-                 )}
-                 
-                 {cardVariant !== 'ai' && (
-                   <>
-                    <div className={cn(
-                      "absolute -top-20 -right-20 w-64 h-64 rounded-full blur-[80px] opacity-40",
-                      cardVariant === 'dark' ? "bg-primary/20" : "bg-white/20"
-                    )} />
-                    <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-black/40 rounded-full blur-[80px]" />
-                   </>
-                 )}
-
-                 <Quote className={cn("absolute top-8 left-8 w-12 h-12 -rotate-12", cardVariant === 'ai' ? "text-primary/10" : (cardVariant === 'dark' ? "text-white/5" : "text-black/5"))} />
-
-                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-[0.03] pointer-events-none" 
-                   style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} 
-                 />
-                 
-                 <div className={cn(
-                   "relative z-10 w-full flex flex-col h-full justify-between items-center"
-                 )}>
-                   
-                   <div id="card-header-cta" className="mb-2">
-                     <p className={cn(
-                       "text-[9px] sm:text-[11px] font-black uppercase tracking-[0.4em] drop-shadow-lg",
-                       cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white"
-                     )}>
-                       {cardVariant === 'ai' ? (aiData?.headline || 'AUTORIDADE MÁXIMA') : 'Veja o que falam sobre nós'}
-                     </p>
-                   </div>
-
-                   {selectedTestimonialForShare?.videoUrl && cardVariant !== 'ai' ? (
-                     <div className="w-full flex flex-col items-center gap-4 mt-1 sm:mt-2">
-                        <div className="w-full aspect-video rounded-[1.5rem] overflow-hidden bg-black/40 relative border-4 border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] group">
-                          <video 
-                            ref={dialogVideoRef}
-                            src={`/api/download/video?url=${encodeURIComponent(selectedTestimonialForShare.videoUrl)}`} 
-                            className="w-full h-full object-cover"
-                            style={{ width: '100%', height: '100%' }}
-                            muted
-                            autoPlay
-                            loop
-                            playsInline
-                            preload="auto"
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                             <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-2xl">
-                                <Play className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white" />
-                             </div>
-                          </div>
+                 {isAIProcessing ? (
+                   <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90">
+                      {/* Scanner Animation */}
+                      <div className="w-full h-full relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-[2px] bg-primary shadow-[0_0_15px_#f97316] animate-scanner z-20" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent h-1/2 opacity-20 animate-scanner-gradient" />
+                      </div>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center space-y-4">
+                        <div className="p-4 rounded-full bg-primary/10 animate-pulse">
+                          <Fingerprint className="w-12 h-12 text-primary" />
                         </div>
-                        <div className="space-y-2 sm:space-y-3">
-                          <div className="flex justify-center gap-1">
-                            {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                              <Star key={i} className={cn("w-3.5 h-3.5 sm:w-4 h-4 fill-current", cardVariant === 'dark' ? "text-primary" : "text-white")} />
-                            ))}
-                          </div>
-                          <p className="text-xs sm:text-base font-bold leading-tight italic text-white line-clamp-3 px-4">
-                             {selectedTestimonialForShare?.text && selectedTestimonialForShare?.text !== '(Depoimento em Vídeo)' ? `"${selectedTestimonialForShare.text}"` : '"Incrível experiência!"'}
-                          </p>
-                        </div>
-                     </div>
-                   ) : (
-                     <div className="flex-1 flex flex-col justify-center items-center space-y-6 sm:space-y-8 py-4">
-                       <div className="flex justify-center gap-2 animate-in fade-in slide-in-from-top-4 duration-1000">
-                          {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
-                            <Star key={i} className={cn("w-5 h-5 sm:w-7 h-7 fill-current", cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white")} />
-                          ))}
-                       </div>
-                       
-                       <div className="space-y-6">
-                         <p className={cn(
-                           "font-black font-headline leading-tight sm:leading-tight italic drop-shadow-2xl px-2 tracking-tight transition-all duration-1000",
-                           cardVariant === 'ai' ? "text-xl sm:text-3xl uppercase" : "text-base sm:text-xl",
-                           "text-white"
-                         )}>
-                            "{cardVariant === 'ai' && aiData ? aiData.bodyText : selectedTestimonialForShare?.text}"
-                         </p>
-                         {cardVariant === 'ai' && (
-                           <div className="flex flex-col items-center gap-2 animate-in fade-in zoom-in duration-1000">
-                             <div className="h-px w-12 bg-primary/30" />
-                             <p className="text-[9px] sm:text-[11px] text-primary font-black uppercase tracking-[0.4em]">
-                               <Sparkles className="w-3 h-3 inline mr-2" /> {aiData?.tagline || 'EXCLUSIVIDADE'}
-                             </p>
-                           </div>
-                         )}
-                       </div>
-                     </div>
-                   )}
-
-                   <div className="w-full pt-6 border-t border-white/10 mt-2 sm:mt-4">
-                      <div className="flex flex-col items-center gap-3">
-                        <p className="text-white font-black text-[11px] sm:text-sm uppercase tracking-[0.3em] drop-shadow-md">
-                          {cardVariant === 'ai' && aiData ? aiData.author : selectedTestimonialForShare?.userName}
-                        </p>
-                        <div className="bg-white/5 px-4 py-1.5 rounded-full border border-white/10 inline-flex items-center gap-2 backdrop-blur-sm">
-                             <CheckCircle2 className={cn("w-3 h-3", cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white")} />
-                             <p className="text-[8px] sm:text-[9px] text-white/80 font-black uppercase tracking-widest">Certificado Proova</p>
-                        </div>
+                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary animate-pulse">Scanning Data...</p>
                       </div>
                    </div>
-                 </div>
+                 ) : (
+                   <>
+                    {cardVariant === 'ai' && aiData && (
+                      <>
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-3xl -mr-16 -mt-16" />
+                        <div className="absolute bottom-0 left-0 w-48 h-48 bg-primary/10 rounded-full blur-3xl -ml-24 -mb-24" />
+                        <div className="absolute inset-0 border-[4px] border-primary/20 m-2 rounded-[2.2rem] pointer-events-none" />
+                        <div className="absolute inset-0 border-[1px] border-white/10 m-4 rounded-[2rem] pointer-events-none" />
+                      </>
+                    )}
+                    
+                    {cardVariant !== 'ai' && (
+                      <>
+                        <div className={cn(
+                          "absolute -top-20 -right-20 w-64 h-64 rounded-full blur-[80px] opacity-40",
+                          cardVariant === 'dark' ? "bg-primary/20" : "bg-white/20"
+                        )} />
+                        <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-black/40 rounded-full blur-[80px]" />
+                      </>
+                    )}
+
+                    <Quote className={cn("absolute top-8 left-8 w-12 h-12 -rotate-12", cardVariant === 'ai' ? "text-primary/10" : (cardVariant === 'dark' ? "text-white/5" : "text-black/5"))} />
+
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-[0.03] pointer-events-none" 
+                      style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '32px 32px' }} 
+                    />
+                    
+                    <div className={cn(
+                      "relative z-10 w-full flex flex-col h-full justify-between items-center"
+                    )}>
+                      
+                      <div id="card-header-cta" className="mb-2">
+                        <p className={cn(
+                          "text-[9px] sm:text-[11px] font-black uppercase tracking-[0.4em] drop-shadow-lg",
+                          cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white"
+                        )}>
+                          {cardVariant === 'ai' && aiData ? aiData.headline : 'Veja o que falam sobre nós'}
+                        </p>
+                      </div>
+
+                      {selectedTestimonialForShare?.videoUrl && cardVariant !== 'ai' ? (
+                        <div className="w-full flex flex-col items-center gap-4 mt-1 sm:mt-2">
+                            <div className="w-full aspect-video rounded-[1.5rem] overflow-hidden bg-black/40 relative border-4 border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] group">
+                              <video 
+                                ref={dialogVideoRef}
+                                src={`/api/download/video?url=${encodeURIComponent(selectedTestimonialForShare.videoUrl)}`} 
+                                className="w-full h-full object-cover"
+                                style={{ width: '100%', height: '100%' }}
+                                muted
+                                autoPlay
+                                loop
+                                playsInline
+                                preload="auto"
+                              />
+                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-2xl">
+                                    <Play className="w-5 h-5 sm:w-6 sm:h-6 text-white fill-white" />
+                                </div>
+                              </div>
+                            </div>
+                            <div className="space-y-2 sm:space-y-3">
+                              <div className="flex justify-center gap-1">
+                                {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
+                                  <Star key={i} className={cn("w-3.5 h-3.5 sm:w-4 h-4 fill-current", cardVariant === 'dark' ? "text-primary" : "text-white")} />
+                                ))}
+                              </div>
+                              <p className="text-xs sm:text-base font-bold leading-tight italic text-white line-clamp-3 px-4">
+                                {selectedTestimonialForShare?.text && selectedTestimonialForShare?.text !== '(Depoimento em Vídeo)' ? `"${selectedTestimonialForShare.text}"` : '"Incrível experiência!"'}
+                              </p>
+                            </div>
+                        </div>
+                      ) : (
+                        <div className="flex-1 flex flex-col justify-center items-center space-y-6 sm:space-y-8 py-4">
+                          <div className="flex justify-center gap-2 animate-in fade-in slide-in-from-top-4 duration-1000">
+                              {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
+                                <Star key={i} className={cn("w-5 h-5 sm:w-7 h-7 fill-current", cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white")} />
+                              ))}
+                          </div>
+                          
+                          <div className="space-y-6">
+                            <p className={cn(
+                              "font-black font-headline leading-tight sm:leading-tight italic drop-shadow-2xl px-2 tracking-tight transition-all duration-1000",
+                              cardVariant === 'ai' ? "text-xl sm:text-3xl uppercase" : "text-base sm:text-xl",
+                              "text-white"
+                            )}>
+                                "{cardVariant === 'ai' && aiData ? aiData.bodyText : selectedTestimonialForShare?.text}"
+                            </p>
+                            {cardVariant === 'ai' && aiData && (
+                              <div className="flex flex-col items-center gap-2 animate-in fade-in zoom-in duration-1000">
+                                <div className="h-px w-12 bg-primary/30" />
+                                <p className="text-[9px] sm:text-[11px] text-primary font-black uppercase tracking-[0.4em]">
+                                  <Sparkles className="w-3 h-3 inline mr-2" /> {aiData.tagline}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="w-full pt-6 border-t border-white/10 mt-2 sm:mt-4">
+                          <div className="flex flex-col items-center gap-3">
+                            <p className="text-white font-black text-[11px] sm:text-sm uppercase tracking-[0.3em] drop-shadow-md">
+                              {cardVariant === 'ai' && aiData ? aiData.author : selectedTestimonialForShare?.userName}
+                            </p>
+                            <div className="bg-white/5 px-4 py-1.5 rounded-full border border-white/10 inline-flex items-center gap-2 backdrop-blur-sm">
+                                <CheckCircle2 className={cn("w-3 h-3", cardVariant === 'dark' || cardVariant === 'ai' ? "text-primary" : "text-white")} />
+                                <p className="text-[8px] sm:text-[9px] text-white/80 font-black uppercase tracking-widest">Certificado Proova</p>
+                            </div>
+                          </div>
+                      </div>
+                   </>
+                 )}
               </div>
             </div>
 
