@@ -13,7 +13,6 @@ import {
   Star, 
   Shield as ShieldIcon, 
   ArrowLeft, 
-  Clock, 
   User, 
   LogOut, 
   TrendingUp, 
@@ -25,8 +24,8 @@ import {
   Loader2,
   Box,
   Handshake,
-  Video,
-  Lock
+  Lock,
+  Sparkles
 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useUser, useAuth, useFirestore, useDoc } from '@/firebase';
@@ -77,320 +76,220 @@ export default function PricingPage() {
   }, [user]);
 
   const plans = useMemo(() => {
-    const allPlans = [
+    return [
       {
         id: 'base',
         name: "Base",
         price: "Grátis",
         period: "/sempre",
-        description: "A fundação para organizar sua prova social e blindar sua reputação.",
+        description: "A fundação para organizar sua prova social e blindar sua marca.",
+        icon: ShieldIcon,
         features: [
-          "Até 10 depoimentos ativos",
-          "Coleta ilimitada para Inbox",
-          "Inbox Privado (1-3 estrelas)",
-          "Link padrão + QR Code",
-          "Métricas básicas",
-          "Checklist de Onboarding",
+          "5 depoimentos ativos",
+          "Reputation Shield (Inbox)",
+          "Link de Coleta Padrão",
+          "QR Code de Balcão"
         ],
-        cta: status === 'base' ? "Plano Atual" : "Plano Gratuito",
+        cta: status === 'base' ? "Plano Atual" : "Começar Grátis",
         checkoutUrl: user ? "/dash" : "/signup",
-        popular: false,
         highlight: false,
-        disabled: status === 'base',
-        hidden: false
+        disabled: status === 'base'
       },
       {
         id: 'gold',
         name: "Gold",
         price: "R$ 49,90",
         period: "/mês",
-        description: "Ideal para profissionais liberais e pequenos negócios em crescimento.",
+        description: "Potencialize sua conversão com automação e SEO Local.",
+        icon: Star,
         features: [
-          "Até 50 depoimentos ativos",
-          "Mural de depoimentos avançado",
-          "Link de coleta personalizado",
-          "Redirecionamento Google Maps",
-          "Auto-curadoria inteligente",
-          "Relatório semanal por e-mail",
-          "Suporte prioritário",
+          "50 depoimentos ativos",
+          "G-Boost (Google Maps)",
+          "Link in Bio Personalizado",
+          "Relatórios por E-mail"
         ],
-        cta: status === 'gold' ? "Plano Atual" : "Assinar Gold",
+        cta: status === 'gold' ? "Plano Atual" : "Ativar Gold",
         checkoutUrl: checkoutLinks.gold,
-        popular: false,
-        highlight: false,
-        disabled: status === 'gold',
-        hidden: false
+        highlight: true,
+        disabled: status === 'gold'
       },
       {
         id: 'enterprise',
         name: "Enterprise",
         price: "R$ 97",
         period: "/mês",
-        description: "O plano completo para empresas que buscam domínio total do mercado.",
+        description: "Domínio total de mercado com vídeos e branding VIP.",
+        icon: Zap,
         features: [
-          "Depoimentos ilimitados",
-          "Depoimentos em Vídeo 4K",
-          "Todos os widgets liberados",
-          "Consultor Proova (Auditoria Digital)",
-          "Auto-curadoria inteligente",
-          "Relatório semanal por e-mail",
-          ...(userData?.businessType === 'academia' || userData?.businessType === 'artes_marciais' ? ["FitBase incluso"] : []),
-          "Branding 100% customizado",
-          "Remocão da marca Proova",
-          "Suporte VIP via WhatsApp",
+          "Depoimentos Ilimitados",
+          "Vídeo Reviews 4K",
+          "Consultor Proova (AI)",
+          "Remoção de Branding"
         ],
         cta: status === 'enterprise' ? "Plano Atual" : "Seja Enterprise",
         checkoutUrl: checkoutLinks.enterprise,
-        popular: true,
-        highlight: true,
-        disabled: status === 'enterprise',
-        hidden: false
+        highlight: false,
+        disabled: status === 'enterprise'
       }
     ];
-
-    return allPlans.filter(p => !p.hidden);
-  }, [user, userData, checkoutLinks, status]);
+  }, [user, checkoutLinks, status]);
 
   return (
-    <div className="min-h-screen bg-background font-body text-foreground flex flex-col">
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[100] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center gap-2 md:gap-4">
+    <div className="min-h-screen bg-background font-body text-foreground flex flex-col overflow-x-hidden">
+      <header className="bg-background border-b h-20 md:h-28 flex items-center px-4 md:px-8 fixed top-0 w-full z-[100] shadow-sm backdrop-blur-md bg-background/95">
+        <div className="flex items-center gap-4">
           <Link href={user ? "/dash" : "/"}>
-            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-primary transition-colors h-8 px-2 font-bold uppercase tracking-widest text-[10px]">
-              <ArrowLeft className="w-4 h-4" /> Voltar
+            <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:text-primary transition-all">
+              <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
-          <Link href="/" className="flex items-center group">
-            <div className="relative w-[150px] h-[50px] md:w-[280px] md:h-[90px] transition-transform group-hover:scale-105">
-              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
-              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="dark:block object-contain hidden" />
-            </div>
-          </Link>
+          <div className="relative w-[150px] h-[50px] md:w-[280px] md:h-[90px] transition-transform hover:scale-105">
+            <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
+            <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" priority />
+          </div>
         </div>
-        <div className="flex items-center gap-2 sm:gap-4 ml-auto">
-          <ThemeToggle className="border-none bg-transparent shadow-none" />
-          
+        <div className="ml-auto flex items-center gap-4">
+          <ThemeToggle className="border-none bg-transparent" />
           {!authLoading && user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-10 md:h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
-                  <div className="hidden md:flex flex-col items-end">
-                    <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
-                      {userData?.companyName || 'Minha Empresa'}
-                    </span>
-                    <span className={cn(
-                      "text-[8px] uppercase tracking-widest font-black leading-tight",
-                      status === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
-                    )}>
-                      {membershipLabel}
-                    </span>
+                <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 transition-all">
+                  <div className="hidden sm:flex flex-col items-end">
+                    <span className="text-xs font-bold truncate max-w-[120px]">{userData?.companyName}</span>
+                    <span className="text-[8px] uppercase font-black opacity-60">{membershipLabel}</span>
                   </div>
-                  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
-                    <User className="w-4 h-4" />
-                  </div>
+                  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20"><User className="w-4 h-4 text-primary" /></div>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
-                <DropdownMenuLabel className="px-3 py-2">
-                  <p className="text-xs font-headline font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</p>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator className="mx-1" />
-                <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                  <TrendingUp className="mr-2 h-4 w-4 text-primary" />
-                  <span>Dash</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                  <Layout className="mr-2 h-4 w-4 text-primary" />
-                  <span>Meus Widgets</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                  <Inbox className="mr-2 h-4 w-4 text-primary" />
-                  <span>Inbox Privado</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
-                  <Gem className="mr-2 h-4 w-4 text-primary" />
-                  <span>Planos de Upgrade</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={() => router.push('/pricing')} 
-                  className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
-                >
-                  <Handshake className="mr-2 h-4 w-4 text-primary" />
-                  <span>Serviços de Parceiros</span>
-                  <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
-                </DropdownMenuItem>
-                
-                <DropdownMenuSeparator className="mx-1" />
-                <DropdownMenuItem 
-                  onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-                  className="rounded-xl cursor-pointer font-bold py-2.5"
-                >
-                  {theme === 'light' ? (
-                    <Moon className="mr-2 h-4 w-4 text-primary" />
-                  ) : (
-                    <Sun className="mr-2 h-4 w-4 text-primary" />
-                  )}
-                  <span>Alternar Tema</span>
-                </DropdownMenuItem>
-
-                {userData?.isAdmin && (
-                  <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                    <ShieldIcon className="mr-2 h-4 w-4 text-primary" />
-                    <span>Administração</span>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuSeparator className="mx-1" />
-                <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sair do Sistema</span>
-                </DropdownMenuItem>
+              <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl border">
+                <DropdownMenuLabel className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Conta</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold cursor-pointer py-2.5"><TrendingUp className="mr-2 h-4 w-4 text-primary" />Dash</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive font-bold cursor-pointer py-2.5"><LogOut className="mr-2 h-4 w-4" />Sair</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          )}
-
-          {authLoading && (
-            <div className="w-9 h-9 flex items-center justify-center">
-              <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-            </div>
           )}
         </div>
       </header>
 
-      <main className="flex-1 pt-24 md:pt-32">
-        <section className="py-12 md:py-24 px-4 container mx-auto text-center space-y-6">
-          <div className="inline-flex items-center rounded-full bg-primary/10 px-4 py-1.5 text-[10px] sm:text-xs font-bold text-primary border border-primary/20 backdrop-blur-sm">
-            💎 Oferta especial: 50% OFF vitalício nos planos pagos
-          </div>
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-black font-headline tracking-tighter max-w-4xl mx-auto leading-[1.1]">
-            Escolha o plano perfeito para sua <span className="text-primary italic">Autoridade</span>.
-          </h1>
-          <p className="text-muted-foreground text-base sm:text-lg md:text-xl max-w-2xl mx-auto font-medium">
-            Transforme a confiança dos seus clientes em lucro real. Comece grátis ou escolha um plano profissional.
-          </p>
-        </section>
+      <main className="flex-1 pt-32 pb-24 px-4 container max-w-7xl mx-auto flex flex-col">
+        <div className="text-center space-y-4 mb-16 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+           <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20 font-black text-[10px] uppercase tracking-[0.2em] px-4 py-1">Estratégia de Autoridade</Badge>
+           <h1 className="text-4xl md:text-7xl font-black font-headline tracking-tighter leading-[1] max-w-4xl mx-auto">
+             O valor da sua marca é medido pela <span className="text-primary italic">Confiança</span>.
+           </h1>
+           <p className="text-muted-foreground text-sm md:text-xl font-medium max-w-2xl mx-auto">Selecione o motor de prova social ideal para o seu momento de mercado.</p>
+        </div>
 
-        <section className="pb-24 px-4 container mx-auto">
-          <div className={cn(
-            "grid grid-cols-1 gap-8 max-w-7xl mx-auto items-stretch",
-            plans.length === 3 ? "md:grid-cols-3" : "md:grid-cols-2 max-w-4xl"
-          )}>
-            {plans.map((plan, idx) => (
-              <Card 
-                key={idx} 
-                className={`relative overflow-hidden border-2 transition-all duration-300 hover:shadow-2xl flex flex-col h-full ${plan.highlight ? 'border-primary shadow-xl md:scale-105 z-10' : 'border-border bg-card/50'}`}
-              >
-                {plan.popular && (
-                  <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-bl-xl shadow-lg z-20">
-                    Mais Escolhido
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+          {plans.map((plan) => (
+            <Card 
+              key={plan.id}
+              className={cn(
+                "relative overflow-hidden border-none shadow-2xl transition-all duration-500 rounded-[2.5rem] flex flex-col group",
+                plan.highlight ? "bg-primary text-white scale-105 z-10" : "bg-card text-card-foreground hover:scale-[1.02]"
+              )}
+            >
+              <CardHeader className="p-8 sm:p-10 pb-4 text-center space-y-6">
+                <div className={cn(
+                  "mx-auto p-4 rounded-3xl w-fit transition-transform duration-500 group-hover:scale-110 group-hover:rotate-6",
+                  plan.highlight ? "bg-white/10" : "bg-primary/10"
+                )}>
+                  <plan.icon className={cn("w-10 h-10", plan.highlight ? "text-white" : "text-primary")} />
+                </div>
+                
+                <div className="space-y-1">
+                  <CardTitle className="text-3xl md:text-4xl font-black font-headline uppercase tracking-tighter">{plan.name}</CardTitle>
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="text-2xl md:text-4xl font-black">{plan.price}</span>
+                    <span className={cn("text-[10px] font-bold uppercase tracking-widest", plan.highlight ? "text-white/60" : "text-muted-foreground")}>{plan.period}</span>
                   </div>
-                )}
-                <CardHeader className="p-6 sm:p-8 shrink-0">
-                  <div className="flex items-center justify-between mb-4">
-                    <CardTitle className="text-xl sm:text-2xl font-black font-headline uppercase tracking-widest">
-                      {plan.name}
-                    </CardTitle>
-                    {plan.id === "base" && <Box className="w-5 h-5 text-muted-foreground" />}
-                    {plan.id === "gold" && <Star className="w-5 h-5 text-primary" />}
-                    {plan.id === "enterprise" && <Zap className="w-5 h-5 text-primary" />}
-                  </div>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-4xl sm:text-5xl font-black">{plan.price}</span>
-                    <span className="text-muted-foreground font-medium text-sm">{plan.period}</span>
-                  </div>
-                  <p className="text-muted-foreground mt-4 font-medium text-xs sm:text-sm leading-relaxed">
-                    {plan.description}
-                  </p>
-                </CardHeader>
-                <CardContent className="p-6 sm:p-8 pt-0 flex-1">
-                  <ul className="space-y-3 sm:space-y-4">
-                    {plan.features.map((feature, fIdx) => (
-                      <li key={fIdx} className="flex items-start gap-3 text-xs sm:text-sm font-medium">
-                        <div className="bg-primary/10 p-1 rounded-full text-primary shrink-0 mt-0.5">
-                          <Check className="w-3.5 h-3.5 sm:w-4 h-4" />
-                        </div>
-                        <span className="leading-tight">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-                <CardFooter className="p-6 sm:p-8 pt-6 shrink-0 mt-auto">
-                  <Link href={plan.disabled ? "#" : plan.checkoutUrl} className="w-full" target={plan.checkoutUrl.startsWith('http') ? "_blank" : "_self"}>
-                    <Button 
-                      disabled={plan.disabled}
-                      className={`w-full h-14 sm:h-16 text-base sm:text-lg font-black rounded-xl shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2 ${
-                        plan.highlight 
-                          ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
-                          : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                      }`}
-                    >
-                      <span className="truncate">{plan.cta}</span>
-                      {!plan.disabled && <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />}
-                    </Button>
-                  </Link>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </section>
+                </div>
 
-        <section className="py-16 bg-muted/30 border-y">
-          <div className="container px-4 mx-auto max-w-4xl">
-            <h2 className="text-2xl sm:text-3xl font-black font-headline text-center mb-12 tracking-tight">Perguntas Frequentes</h2>
+                <p className={cn("text-xs font-medium leading-relaxed px-4 opacity-80", plan.highlight ? "text-white" : "text-muted-foreground")}>
+                  {plan.description}
+                </p>
+              </CardHeader>
+
+              <CardContent className="p-8 pt-4 flex-1">
+                <ul className="space-y-4">
+                  {plan.features.map((feature, i) => (
+                    <li key={i} className="flex items-center gap-3 text-xs font-bold">
+                      <div className={cn("h-5 w-5 rounded-full flex items-center justify-center shrink-0", plan.highlight ? "bg-white/20" : "bg-primary/10 text-primary")}>
+                        <Check className="w-3 h-3" strokeWidth={4} />
+                      </div>
+                      <span className="tracking-tight">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+
+              <CardFooter className="p-8 pt-0">
+                <Link href={plan.disabled ? "#" : plan.checkoutUrl} className="w-full" target={plan.checkoutUrl.startsWith('http') ? "_blank" : "_self"}>
+                  <Button 
+                    disabled={plan.disabled}
+                    className={cn(
+                      "w-full h-16 rounded-2xl text-sm font-black uppercase tracking-widest shadow-xl transition-all active:scale-95",
+                      plan.highlight 
+                        ? "bg-white text-primary hover:bg-zinc-100" 
+                        : "bg-primary text-white hover:bg-primary/90"
+                    )}
+                  >
+                    {plan.cta}
+                  </Button>
+                </Link>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+
+        <section className="mt-32 space-y-12">
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl md:text-4xl font-black font-headline tracking-tighter">Entenda os Diferenciais</h2>
+            <p className="text-muted-foreground text-sm font-medium">As respostas que você precisa para assumir o controle.</p>
+          </div>
+
+          <div className="max-w-3xl mx-auto bg-card rounded-[2.5rem] p-8 md:p-12 shadow-xl">
             <Accordion type="single" collapsible className="w-full">
-              <AccordionItem value="item-1" className="border-b border-primary/10">
-                <AccordionTrigger className="text-left font-bold py-5 hover:text-primary transition-colors text-sm sm:text-base">Posso mudar de plano a qualquer momento?</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-6 font-medium text-xs sm:text-sm">
-                  Sim! Você pode fazer o upgrade ou downgrade do seu plano diretamente pelo seu painel administrativo. A diferença de valor será ajustada proporcionalmente na sua próxima fatura.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-2" className="border-b border-primary/10">
-                <AccordionTrigger className="text-left font-bold py-5 hover:text-primary transition-colors text-sm sm:text-base">Como funciona o redirecionamento para o Google Maps?</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-6 font-medium text-xs sm:text-sm">
-                  Ao receber uma avaliação de 4 ou 5 estrelas, o Proova exibe um botão especial incentivando o cliente a replicar esse elogio no seu perfil do Google Business, aumentando seu SEO local. Disponível nos planos Gold e Enterprise.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="item-3" className="border-b border-primary/10">
-                <AccordionTrigger className="text-left font-bold py-5 hover:text-primary transition-colors text-sm sm:text-base">Como funcionam os depoimentos em vídeo?</AccordionTrigger>
-                <AccordionContent className="text-muted-foreground pb-6 font-medium text-xs sm:text-sm">
-                  O Proova Enterprise libera uma ferramenta cinematográfica de captura direta no navegador. Seus clientes podem gravar depoimentos de até 30 segundos em 4K UHD, que são hospedados automaticamente e podem ser exibidos em seus widgets para converter muito mais.
-                </AccordionContent>
-              </AccordionItem>
+              {[
+                { q: "O que é o G-Boost?", a: "O G-Boost é um acelerador de SEO Local. Ele detecta automaticamente elogios de 4 ou 5 estrelas e convida o cliente a postar no seu Google Maps, subindo sua posição nas buscas organicamente." },
+                { q: "Como funcionam os Vídeo Reviews?", a: "Disponível no Enterprise, permite que o cliente grave um depoimento cinematográfico de até 30s direto no navegador, sem baixar nada. É a prova social que mais converte hoje." },
+                { q: "Posso cancelar ou mudar de plano?", a: "Sim, a qualquer momento sem multas. No Proova, você tem total liberdade sobre sua assinatura diretamente no painel de gestão." }
+              ].map((item, idx) => (
+                <AccordionItem key={idx} value={`item-${idx}`} className="border-b border-primary/10">
+                  <AccordionTrigger className="text-left font-black text-sm uppercase tracking-tight py-6 hover:text-primary transition-colors">{item.q}</AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground font-medium leading-relaxed pb-6 text-sm">{item.a}</AccordionContent>
+                </AccordionItem>
+              ))}
             </Accordion>
           </div>
         </section>
 
-        <section className="py-16 container px-4 mx-auto">
-          <div className="bg-primary text-primary-foreground rounded-[2rem] sm:rounded-[3rem] p-8 sm:p-12 text-center space-y-8 relative overflow-hidden shadow-2xl">
-             <div className="relative z-10 space-y-4">
-              <h2 className="text-2xl sm:text-3xl md:text-5xl font-black font-headline tracking-tighter">Ainda tem dúvidas?</h2>
-              <p className="text-primary-foreground/90 font-medium text-base sm:text-lg max-w-xl mx-auto">
-                Nossa equipe de especialistas está pronta para ajudar você a turbinar suas vendas através da prova social.
-              </p>
-              <div className="pt-4 sm:pt-6">
-                <Button variant="secondary" size="lg" className="h-14 sm:h-16 px-8 sm:px-10 rounded-2xl text-lg sm:text-xl font-black shadow-2xl w-full sm:w-auto">
-                  Falar com Especialista
-                </Button>
+        <section className="mt-32">
+           <div className="bg-primary text-white rounded-[3rem] p-10 md:p-20 text-center space-y-10 relative overflow-hidden shadow-2xl">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32 animate-pulse" />
+              <div className="relative z-10 space-y-6">
+                <Sparkles className="w-12 h-12 mx-auto text-white animate-bounce" />
+                <h2 className="text-3xl md:text-6xl font-black font-headline tracking-tighter">Domine seu Mercado.</h2>
+                <p className="text-white/80 font-bold text-lg md:text-2xl max-w-xl mx-auto leading-relaxed">
+                  Não seja apenas mais uma opção. Seja a escolha óbvia do seu setor.
+                </p>
+                <div className="pt-6">
+                   <Button variant="secondary" className="h-16 px-12 rounded-2xl text-sm md:text-xl font-black uppercase tracking-widest bg-white text-primary hover:bg-zinc-100 shadow-2xl transition-all hover:scale-105">
+                     Começar agora
+                   </Button>
+                </div>
               </div>
-             </div>
-             <div className="absolute top-0 right-0 w-48 h-48 sm:w-64 sm:h-64 bg-white/10 rounded-full blur-3xl -mr-24 -mt-24 sm:-mr-32 sm:-mt-32" />
-             <div className="absolute bottom-0 left-0 w-48 h-48 sm:w-64 sm:h-64 bg-black/10 rounded-full blur-3xl -ml-24 -mb-24 sm:-ml-32 -mb-32" />
-          </div>
+           </div>
         </section>
       </main>
 
-      <footer className="py-12 md:py-20 border-t bg-background">
-        <div className="container px-4 md:px-6 mx-auto flex flex-col justify-center items-center gap-10 text-center">
-          <div className="flex items-center gap-2 relative w-[200px] h-[65px] md:w-[320px] md:h-[105px]">
-             <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="dark:hidden object-contain" />
-             <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="hidden dark:block object-contain" />
-          </div>
-          <div className="space-y-2">
-            <p className="text-xs md:text-sm text-muted-foreground font-bold italic">"Onde a confiança vira conversão."</p>
-            <p className="text-[10px] text-muted-foreground uppercase tracking-[0.3em] font-black opacity-40">
-              © 2026 PROOVA TECHNOLOGY
-            </p>
-          </div>
+      <footer className="py-20 border-t bg-background/50 flex flex-col items-center gap-8 text-center">
+        <div className="relative w-[200px] h-[65px] opacity-40 grayscale">
+          <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain dark:hidden" />
+          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain hidden dark:block" />
         </div>
+        <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.3em]">© 2026 PROOVA TECHNOLOGY - INTELIGÊNCIA EM REPUTAÇÃO</p>
       </footer>
     </div>
   );
