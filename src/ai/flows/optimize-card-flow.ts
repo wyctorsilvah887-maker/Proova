@@ -23,6 +23,7 @@ export type AdvisoryOutput = z.infer<typeof AdvisoryOutputSchema>;
 
 const prompt = ai.definePrompt({
   name: 'proovaDesignerPrompt',
+  model: 'gemini-1.5-flash',
   input: { schema: AdvisoryInputSchema },
   output: { schema: AdvisoryOutputSchema },
   prompt: `Você é o Proova Designer, o especialista em inteligência visual e autoridade digital da plataforma Proova.
@@ -49,11 +50,20 @@ const advisorFlow = ai.defineFlow(
     outputSchema: AdvisoryOutputSchema,
   },
   async (input) => {
-    const { output } = await prompt(input);
-    if (!output) {
-      throw new Error('Falha no processamento criativo. Reinicie o terminal de design.');
+    try {
+      const { output } = await prompt(input);
+      if (!output) {
+        throw new Error('Falha no processamento criativo.');
+      }
+      return output;
+    } catch (error: any) {
+      console.error("ERRO FLOW DESIGNER:", error);
+      return {
+        response: "Sistema de design momentaneamente instável. Por favor, tente novamente em alguns segundos para que eu possa processar sua instrução de arte.",
+        actionableInsights: ["Verificar estabilidade da rede", "Simplificar comando visual"],
+        confidentialityNote: "PROOVA-ERR-RETRY"
+      };
     }
-    return output;
   }
 );
 

@@ -9,22 +9,16 @@ import {
   Sparkles, 
   Send, 
   User, 
-  Bot, 
   Zap, 
-  Download,
   Star,
   RefreshCcw,
-  Terminal,
-  Cpu,
-  ShieldCheck,
-  ChevronRight,
-  AlertTriangle,
-  Fingerprint,
   Palette,
-  Wand2
+  Wand2,
+  AlertTriangle,
+  ChevronRight,
+  Fingerprint
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useUser, useFirestore, useDoc } from '@/firebase';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
@@ -75,8 +69,8 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
       setLogs([
         { 
           type: 'advisor', 
-          content: 'SISTEMA INICIALIZADO. Terminal Proova Designer ativo. Estou pronto para otimizar sua prova social com estratégia visual de alto nível. Como posso ajudar com seu design hoje?',
-          note: 'PROOVA-DSGN-UPLINK'
+          content: 'SISTEMA INICIALIZADO. Terminal Proova Designer Studio ativo. Sou seu diretor de arte e estou pronto para otimizar sua prova social com estratégia visual de alto nível. Qual conceito de design vamos aplicar hoje?',
+          note: 'PROOVA-DSGN-ACTIVE'
         }
       ]);
     }
@@ -113,7 +107,8 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
       }
 
     } catch (err: any) {
-      setLogs(prev => [...prev, { type: 'error', content: 'Erro no motor de processamento. Tente reformular sua instrução de design.' }]);
+      console.error(err);
+      setLogs(prev => [...prev, { type: 'error', content: 'ERRO NO MOTOR: Falha ao processar instrução de design. Verifique sua chave de API ou tente reformular o pedido.' }]);
     } finally {
       setIsLoading(false);
     }
@@ -123,7 +118,6 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
 
   return (
     <div className="min-h-screen bg-black flex flex-col font-body text-foreground h-screen overflow-hidden">
-      {/* Header Terminal Style */}
       <header className="bg-zinc-950 border-b border-zinc-900 h-20 flex items-center px-4 md:px-8 fixed top-0 w-full z-[60] shadow-sm">
         <div className="flex items-center gap-4">
           <Link href="/social-cards">
@@ -135,7 +129,7 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
             <Palette className={cn("w-5 h-5", themeColor)} />
             <div>
               <h2 className="text-sm font-black uppercase tracking-tighter text-white">Proova Designer Studio</h2>
-              <p className="text-[8px] text-zinc-600 uppercase tracking-widest font-bold">Inteligência Criativa de Alta Performance</p>
+              <p className="text-[8px] text-zinc-600 uppercase tracking-widest font-bold">Diretoria de Arte Inteligente</p>
             </div>
           </div>
         </div>
@@ -147,7 +141,6 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
         </div>
       </header>
 
-      {/* Main Chat Area */}
       <main className="flex-1 mt-20 overflow-hidden flex flex-col max-w-5xl mx-auto w-full px-4 pt-8">
         <div 
           ref={scrollRef}
@@ -178,7 +171,7 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
                     
                     {log.insights && log.insights.length > 0 && (
                       <div className="mt-8 pt-8 border-t border-zinc-900 space-y-4">
-                         <p className={cn("text-[9px] font-black uppercase tracking-widest", themeColor)}>Análise Técnica de Design</p>
+                         <p className={cn("text-[9px] font-black uppercase tracking-widest", themeColor)}>Análise do Especialista</p>
                          <ul className="space-y-3">
                            {log.insights.map((insight, idx) => (
                              <li key={idx} className="flex items-start gap-3 text-[11px] text-zinc-500 font-bold uppercase">
@@ -206,19 +199,18 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
           {isLoading && (
             <div className="flex items-center gap-3 ml-4 animate-pulse">
               <Loader2 className={cn("w-4 h-4 animate-spin", themeColor)} />
-              <span className="text-[9px] font-black uppercase tracking-widest text-zinc-700">Otimizando Conceito Visual...</span>
+              <span className="text-[9px] font-black uppercase tracking-widest text-zinc-700">Otimizando Conceito de Arte...</span>
             </div>
           )}
         </div>
       </main>
 
-      {/* Input Terminal */}
       <div className="fixed bottom-0 w-full bg-black/80 backdrop-blur-md p-6 z-[70]">
         <form onSubmit={handleConsult} className="max-w-4xl mx-auto relative">
           <input 
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="ENVIAR INSTRUÇÃO DE DESIGN (EX: USE FUNDO AZUL, ESTILO MINIMALISTA)..."
+            placeholder="ENVIAR INSTRUÇÃO DE DESIGN (EX: ESTILO MINIMALISTA, CORES AZUIS)..."
             disabled={isLoading}
             className="w-full bg-zinc-950/50 border border-zinc-800 h-20 rounded-[2rem] px-8 text-sm font-black uppercase tracking-tight text-white focus:outline-none focus:border-primary/40 focus:ring-1 focus:ring-primary/20 transition-all pr-32 placeholder:text-zinc-700"
           />
@@ -231,7 +223,7 @@ export default function SocialCardAIPage({ params }: { params: Promise<{ testimo
           </Button>
           <div className="mt-3 px-8 hidden sm:flex items-center gap-2 text-zinc-800">
              <Fingerprint className="w-3 h-3" />
-             <p className="text-[8px] font-black uppercase tracking-[0.4em]">Designer Link: Ativo | Motor Gráfico 4K Pronto</p>
+             <p className="text-[8px] font-black uppercase tracking-[0.4em]">Designer Studio: Ativo | Link Neural Pronto</p>
           </div>
         </form>
       </div>
