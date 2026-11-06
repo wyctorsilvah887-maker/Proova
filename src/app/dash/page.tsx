@@ -75,7 +75,8 @@ import {
   Eye,
   Settings,
   BookOpen,
-  Wand2
+  Wand2,
+  RefreshCw
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -658,8 +659,15 @@ export default function DashPage() {
 
   const openShareDialog = (testimonial: any) => {
     setSelectedTestimonialForShare(testimonial);
-    setCardVariant('dark');
+    // Sorteia aleatoriamente a variante ao abrir
+    const variants: ('dark' | 'orange')[] = ['dark', 'orange'];
+    const randomVariant = variants[Math.floor(Math.random() * variants.length)];
+    setCardVariant(randomVariant);
     setIsShareDialogOpen(true);
+  };
+
+  const handleShuffleVariant = () => {
+    setCardVariant(prev => prev === 'dark' ? 'orange' : 'dark');
   };
 
   if (authLoading || userDataLoading || (user && !userData)) {
@@ -1201,11 +1209,6 @@ export default function DashPage() {
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6 flex flex-col items-center gap-6 scrollbar-hide">
-            <div className="flex gap-2 p-1 bg-muted/50 rounded-xl w-fit">
-               <button onClick={() => setCardVariant('dark')} className={cn("px-4 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all", cardVariant === 'dark' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground")}>Dark</button>
-               <button onClick={() => setCardVariant('orange')} className={cn("px-4 py-1.5 rounded-lg text-[9px] font-black uppercase transition-all", cardVariant === 'orange' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground")}>Orange</button>
-            </div>
-
             <div className="w-full flex justify-center py-2 shrink-0">
               <div 
                 ref={shareCardRef}
@@ -1258,14 +1261,23 @@ export default function DashPage() {
               </div>
             </div>
 
-            <Button 
-              className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-xs bg-primary hover:bg-primary/90 text-white"
-              onClick={handleDownloadContent}
-              disabled={isExportingCard}
-            >
-              {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-5 h-5" />}
-              {selectedTestimonialForShare?.videoUrl ? 'Exportar Vídeo VIP' : 'Baixar Card Premium'}
-            </Button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+              <Button 
+                variant="outline"
+                className="h-14 rounded-2xl font-black uppercase tracking-widest gap-2 border-primary/20 text-primary hover:bg-primary/5 shadow-none"
+                onClick={handleShuffleVariant}
+              >
+                <RefreshCw className="w-4 h-4" /> Alternar Estilo
+              </Button>
+              <Button 
+                className="h-14 rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-xs bg-primary hover:bg-primary/90 text-white"
+                onClick={handleDownloadContent}
+                disabled={isExportingCard}
+              >
+                {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-5 h-5" />}
+                {selectedTestimonialForShare?.videoUrl ? 'Exportar Vídeo VIP' : 'Baixar Card'}
+              </Button>
+            </div>
           </div>
           
           <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
