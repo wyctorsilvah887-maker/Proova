@@ -95,6 +95,7 @@ import {
 } from '@/components/ui/sheet';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -995,7 +996,7 @@ export default function DashPage() {
       </main>
 
       <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
-        <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[106px]">
+        <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[105px]">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain dark:hidden" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="hidden dark:block object-contain" priority />
         </div>
