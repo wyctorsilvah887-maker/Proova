@@ -322,7 +322,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const isGold = membershipStatus === 'gold';
   const isTrial = membershipStatus === 'trial';
   
-  const SELECTION_LIMIT = isEnterprise ? Infinity : ((isGold || isTrial) ? 50 : 10);
+  const SELECTION_LIMIT = isEnterprise ? Infinity : ((isGold || isTrial) ? 50 : 5);
   const isGoldPlan = isGold || isTrial || isEnterprise;
   const isPremiumUser = isGoldPlan;
 

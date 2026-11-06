@@ -97,7 +97,7 @@ export default function PricingPage() {
         disabled: status === 'base',
         benefits: [
           "1 Mural de Depoimentos",
-          "10 Depoimentos Ativos",
+          "5 Depoimentos Ativos no Link in Bio",
           "Inbox Privado (Shield)",
           "QR Code de Balcão",
           "Link de Coleta Padrão"

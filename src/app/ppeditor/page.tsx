@@ -639,7 +639,7 @@ export default function PPEditorPage() {
 
   const isEnterprise = userData?.membershipStatus === 'enterprise';
   const isGoldPlan = isEnterprise || userData?.membershipStatus === 'gold' || userData?.membershipStatus === 'trial';
-  const SELECTION_LIMIT = isEnterprise ? Infinity : (isGoldPlan ? 50 : 10);
+  const SELECTION_LIMIT = isEnterprise ? Infinity : (isGoldPlan ? 50 : 5);
 
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
@@ -850,7 +850,7 @@ export default function PPEditorPage() {
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl font-bold py-2.5 cursor-pointer">
                 <Gem className="mr-2 h-4 w-4 text-primary" />Upgrade
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70">
+              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-bold py-2.5 opacity-70">
                 <Handshake className="mr-2 h-4 w-4 text-primary" /><span>Parceiros</span><Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl font-bold py-2.5 cursor-pointer">
