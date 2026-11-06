@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useRef, forwardRef } from "react";
@@ -17,10 +16,8 @@ import {
   Scale, 
   Lock,
   Globe,
-  Skull,
-  ShieldAlert,
-  TrendingDown,
-  ShieldHalf,
+  TrendingUp,
+  ShieldCheck,
   MousePointerClick,
   Users,
   MessageCircle,
@@ -28,7 +25,10 @@ import {
   X,
   MessageSquareQuote,
   Check,
-  Target
+  Target,
+  Building2,
+  Rocket,
+  Shield
 } from "lucide-react";
 import { 
   Sheet, 
@@ -82,9 +82,9 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
         <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" />
         
         <div className="hidden sm:flex items-center gap-6">
-          <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Entrar</Link>
+          <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Acesso Membro</Link>
           <Link href="/signup">
-            <Button className="font-black uppercase tracking-widest shadow-lg px-4 h-9 text-[9px] rounded-xl">Começar Agora</Button>
+            <Button className="font-black uppercase tracking-widest shadow-lg px-4 h-9 text-[9px] rounded-xl">Iniciar Estratégia</Button>
           </Link>
         </div>
 
@@ -110,13 +110,13 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
               </SheetHeader>
               <div className="flex flex-col h-full bg-background">
                 <div className="p-4 flex items-center justify-between shrink-0">
-                  <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/60">Navegação Digital</span>
+                  <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/60">Navegação Estratégica</span>
                 </div>
                 <div className="flex-1 p-4 space-y-1 overflow-y-auto">
                   {[
-                    { id: 'ocusto-do-silencio', label: 'O Custo do Silêncio', icon: Skull },
-                    { id: 'maquina-de-dominio', label: 'Máquina de Domínio', icon: ShieldHalf },
-                    { id: 'setores-atendidos', label: 'Setores Atendidos', icon: Target },
+                    { id: 'valor-reputacao', label: 'Valor da Reputação', icon: TrendingUp },
+                    { id: 'metodologia', label: 'Metodologia Proova', icon: ShieldCheck },
+                    { id: 'setores', label: 'Sectores de Atuação', icon: Target },
                   ].map((item) => (
                     <SheetClose asChild key={item.id}>
                       <button 
@@ -138,7 +138,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
                     <div className="grid grid-cols-2 gap-2 pt-4 border-t border-border/10">
                       {[
                         { href: '/pricing', label: 'Planos' },
-                        { href: '/login', label: 'Entrar' },
+                        { href: '/login', label: 'Login' },
                         { href: '/terms', label: 'Termos' },
                         { href: '/privacy', label: 'Privacidade' },
                       ].map((link) => (
@@ -155,10 +155,10 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
 
                     <div className="space-y-3">
                       <Link href="/login" className="block" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="outline" className="w-full h-11 rounded-xl font-black uppercase tracking-widest text-[8px]">Acessar Painel</Button>
+                        <Button variant="outline" className="w-full h-11 rounded-xl font-black uppercase tracking-widest text-[8px]">Painel de Gestão</Button>
                       </Link>
                       <Link href="/signup" className="block" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-2xl">Cadastrar Grátis</Button>
+                        <Button className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-2xl">Ativar Licença Gratuita</Button>
                       </Link>
                     </div>
                   </div>
@@ -179,17 +179,17 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
   return (
     <section className="relative w-full pb-12 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh] pt-32">
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[15%] left-[8%] animate-float opacity-35 text-primary">
+        <div className="absolute top-[15%] left-[8%] animate-float opacity-20 text-primary">
           <MessageSquareQuote className="w-16 h-16 md:w-24 md:h-24" />
         </div>
-        <div className="absolute top-[20%] right-[12%] animate-float-delayed opacity-35 text-primary">
+        <div className="absolute top-[20%] right-[12%] animate-float-delayed opacity-20 text-primary">
           <Star className="w-12 h-12 md:w-20 md:h-20 fill-current" />
         </div>
-        <div className="absolute bottom-[20%] left-[15%] animate-float-delayed opacity-35 text-primary">
-          <Users className="w-20 h-20 md:w-32 md:h-32" />
+        <div className="absolute bottom-[20%] left-[15%] animate-float-delayed opacity-20 text-primary">
+          <Shield className="w-20 h-20 md:w-32 md:h-32" />
         </div>
-        <div className="absolute bottom-[25%] right-[10%] animate-float opacity-35 text-primary">
-          <MessageCircle className="w-14 h-14 md:w-28 md:h-28" />
+        <div className="absolute bottom-[25%] right-[10%] animate-float opacity-20 text-primary">
+          <Building2 className="w-14 h-14 md:w-28 md:h-28" />
         </div>
       </div>
       
@@ -199,23 +199,24 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
             "inline-flex items-center text-primary px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-1000",
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
           )}>
-            Sua invisibilidade drena seu lucro
+            A autoridade da sua marca é o seu maior ativo de vendas
           </div>
           
           <h1 className={cn(
             "text-3xl font-black tracking-tighter sm:text-5xl md:text-7xl font-headline leading-[1] transition-all duration-1000",
             isVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
           )}>
-            Sua empresa é <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
-              INVISÍVEL
-            </span>. <br className="hidden sm:block" /> E isso custa uma fortuna.
+            Implemente uma Engenharia de <br className="hidden sm:block" />
+            <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
+              CONFIANÇA
+            </span> imediata.
           </h1>
           
           <p className={cn(
             "max-w-xl mx-auto text-muted-foreground text-sm md:text-xl font-medium leading-relaxed transition-all duration-1000 delay-300",
             isVisible ? "animate-in fade-in slide-in-from-right-20 opacity-100" : "opacity-0"
           )}>
-            92% dos clientes ignoram quem não tem avaliações. Enquanto você espera, seus concorrentes usam <strong className="text-foreground">Prova Social</strong> para roubar suas vendas.
+            Utilize a Proova para consolidar sua reputação digital e transformar depoimentos reais em um motor de conversão de alta performance.
           </p>
           
           <div className={cn(
@@ -223,8 +224,8 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
             isVisible ? "animate-in fade-in slide-in-from-bottom-5 opacity-100" : "opacity-0"
           )}>
             <Link href="/signup" className="w-full sm:w-auto">
-              <Button className="w-full sm:w-auto h-11 px-6 rounded-xl text-[9px] font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
-                ESTANCAR PERDA DE VENDAS <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+              <Button className="w-full sm:w-auto h-11 px-8 rounded-xl text-[9px] font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
+                CONSOLIDAR MINHA AUTORIDADE <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
               </Button>
             </Link>
           </div>
@@ -235,64 +236,49 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
 };
 
 /**
- * Seção de Agitação (O Custo do Silêncio)
+ * Seção de Agitação (O Valor da Reputação)
  */
 const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   return (
-    <section id="ocusto-do-silencio" ref={ref} className="w-full py-24 bg-muted/30 dark:bg-zinc-950 text-foreground dark:text-white overflow-hidden relative border-y border-border/50 dark:border-zinc-900/30 min-h-[400px]">
+    <section id="valor-reputacao" ref={ref} className="w-full py-24 bg-muted/30 dark:bg-zinc-950 text-foreground dark:text-white overflow-hidden relative border-y border-border/50 dark:border-zinc-900/30 min-h-[400px]">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
       
-      <svg width="0" height="0" className="absolute invisible">
-        <defs>
-          <linearGradient id="skull-bleeding-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="hsl(var(--primary))" />
-            <stop offset="100%" stopColor="hsl(var(--destructive))" />
-          </linearGradient>
-          <linearGradient id="agency-fraud-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="white" />
-            <stop offset="15%" stopColor="#22c55e" />
-            <stop offset="40%" stopColor="#ef4444" />
-            <stop offset="100%" stopColor="#b91c1c" />
-          </linearGradient>
-        </defs>
-      </svg>
-
       <div className="container px-4 mx-auto text-center space-y-16">
         <div className={cn(
           "space-y-4 transition-all duration-1000",
           isVisible ? "animate-in fade-in zoom-in-95 opacity-100" : "opacity-0"
         )}>
-          <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">O Custo do Silêncio</h2>
+          <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">A Ciência da Reputação Digital</h2>
           <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
-            O custo mortal de ser um <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
-              Zé Ninguém
-            </span> para o mercado.
+            Seja a <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
+              Referência
+            </span> absoluta do seu mercado.
           </h3>
-          <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">Cada minuto que você passa sem Prova Social é um cliente que escolhe o seu vizinho.</p>
+          <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">A ausência de prova social gera incerteza. A incerteza interrompe a venda.</p>
         </div>
 
         <div className="grid gap-12 lg:grid-cols-3">
           {[
             { 
-              icon: Skull, 
-              title: "Negócios Locais: O Cemitério do Maps", 
-              desc: "Se o seu concorrente tem 50 avaliações e você tem 5, o Google te enterra. Você não existe para quem pesquisa no celular com dinheiro na mão agora.", 
+              icon: MapPin, 
+              title: "SEO Local e Visibilidade", 
+              desc: "Aumente sua relevância no Google Maps. Perfis com alto volume de avaliações 5 estrelas são priorizados pelo algoritmo, capturando a demanda qualificada da sua região.", 
               animate: true,
-              isSkull: true 
+              color: "text-primary"
             },
             { 
-              icon: X, 
-              title: "Serviços: O Medo do Pix", 
-              desc: "Prestadores sem depoimentos parecem amadores. O cliente entra, sente insegurança e fecha com a agência que 'parece' mais oficial. O medo dele é o seu prejuízo.", 
+              icon: ShieldCheck, 
+              title: "Segurança na Decisão", 
+              desc: "Elimine o atrito no checkout. Exibir depoimentos verificados reduz a percepção de risco e acelera o ciclo de decisão do seu cliente final.", 
               animate: true,
-              color: "text-red-600" 
+              color: "text-primary" 
             },
             { 
-              icon: TrendingDown, 
-              title: "Agências: A Fraude da Autoridade", 
-              desc: "Como vender marketing se a sua própria marca é silenciosa? A falta de casos de sucesso reais mata sua conversão e faz você implorar por cada contrato.", 
+              icon: TrendingUp, 
+              title: "Autoridade Consolidada", 
+              desc: "Deixe de ser apenas mais um no mercado. Com a Proova, sua marca transmite solidez e sucesso contínuo, atraindo parcerias e contratos de maior valor.", 
               animate: false,
-              isAgency: true 
+              color: "text-primary" 
             }
           ].map((item, idx) => (
             <div key={idx} className={cn(
@@ -300,17 +286,14 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
               isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-0"
             )} style={{ transitionDelay: `${(idx + 1) * 200}ms` }}>
               <div className="flex justify-center">
-                <item.icon 
-                  className={cn(
-                    "w-12 h-12", 
-                    item.animate && "animate-pulse",
-                    !item.isSkull && !item.isAgency && (item.color || "text-primary")
-                  )} 
-                  style={
-                    item.isSkull ? { stroke: "url(#skull-bleeding-gradient)", strokeWidth: 2.5 } : 
-                    item.isAgency ? { stroke: "url(#agency-fraud-gradient)", strokeWidth: 2.5 } : {}
-                  }
-                />
+                <div className="p-4 rounded-2xl bg-primary/5 text-primary">
+                  <item.icon 
+                    className={cn(
+                      "w-10 h-10", 
+                      item.animate && "animate-pulse"
+                    )} 
+                  />
+                </div>
               </div>
               <h4 className="text-xl font-bold font-headline px-4">{item.title}</h4>
               <p className="text-muted-foreground dark:text-zinc-500 text-sm leading-relaxed font-medium px-6">{item.desc}</p>
@@ -324,7 +307,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
 AgitationSection.displayName = "AgitationSection";
 
 /**
- * Seção de Pilares (A Máquina de Domínio)
+ * Seção de Pilares (Metodologia Proova)
  */
 const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -333,18 +316,18 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
   const steps = [
     { 
       number: '01', 
-      title: 'G-Boost: Domínio Local', 
-      desc: 'Inundamos seu perfil com avaliações 5 estrelas reais. Force o algoritmo do Google a aumentar sua chances de aparecer no topo e roubar os cliques da concorrência.' 
+      title: 'Estratégia G-Boost', 
+      desc: 'Integração direta com o ecossistema Google para maximizar o volume de avaliações positivas no seu perfil comercial, elevando seu rankeamento orgânico.' 
     },
     { 
       number: '02', 
-      title: 'Blindagem de Marca', 
-      desc: 'Nosso Reputation Shield intercepta o ódio antes dele virar público. Resolva crises no Inbox Privado e mantenha sua imagem impecável perante o mercado.' 
+      title: 'Protocolo Reputation Shield', 
+      desc: 'Blindagem de marca através de um canal de feedback privado. Resolva intercorrências internamente e preserve sua imagem pública imaculada.' 
     },
     { 
       number: '03', 
-      title: 'Vitrines Magnéticas', 
-      desc: 'Widgets hipnóticos que aniquilam dúvidas em segundos. Prove que você é a única escolha segura através de murais e carrosséis com design de alto nível.' 
+      title: 'Ativos Visuais de Conversão', 
+      desc: 'Widgets premium de baixa latência e Social Cards de alto impacto visual, desenhados para aniquilar objeções em todos os seus canais de venda.' 
     }
   ];
 
@@ -368,21 +351,21 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
   }, []);
 
   return (
-    <section id="maquina-de-dominio" ref={sectionRef} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
+    <section id="metodologia" ref={sectionRef} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
       <div className="container px-4 mx-auto">
         <div className={cn(
           "text-center space-y-4 mb-24 transition-all duration-1000",
           isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-0"
         )}>
-          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">A Máquina de Domínio</h2>
+          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Metodologia Proova</h2>
           <h3 className={cn(
             "text-3xl md:text-5xl font-black font-headline tracking-tighter"
           )}>
-            Retome o <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
-              Controle
+            O Padrão Ouro em <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
+              Reputação
             </span>.
           </h3>
-          <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Tecnologias de elite integradas para aniquilar objeções e forçar a conversão imediata.</p>
+          <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Uma infraestrutura completa para gerir, proteger e exibir a força da sua marca.</p>
         </div>
         
         <div className="max-w-4xl mx-auto relative px-4 md:px-0">
@@ -443,23 +426,23 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
   const demonstrationTestimonials = [
     {
       initials: "RB",
-      text: "O G-Boost mudou o jogo. Antes eu não recebia uma ligação do Google Maps, hoje meu telefone não para. A prova social é real!",
-      label: "Domínio de Maps Verificado"
+      text: "A implementação do G-Boost foi um divisor de águas na nossa estratégia de SEO local. O volume de contatos via Maps cresceu exponencialmente.",
+      label: "Performance Comercial Verificada"
     },
     {
       initials: "ML",
-      text: "O Inbox Privado salvou minha reputação. Consegui resolver um problema com um cliente insatisfeito antes dele postar no Google. Vale cada centavo.",
-      label: "Gestão de Crise via Proova"
+      text: "O Reputation Shield nos permitiu profissionalizar a gestão de crises. Resolvemos intercorrências de forma discreta e eficiente no canal privado.",
+      label: "Compliance e Gestão de Marca"
     },
     {
       initials: "JP",
-      text: "A página da bio ficou sensacional. Meus seguidores agora veem autoridade imediata assim que clicam no link. A conversão subiu 300%.",
-      label: "Sucesso em Vendas na Bio"
+      text: "Nossos murais agora transmitem a autoridade que a marca exige. A Proova elevou o nível da nossa prova social em todos os pontos de contato.",
+      label: "Autoridade Visual de Elite"
     }
   ];
 
   return (
-    <section id="setores-atendidos" ref={ref} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
+    <section id="setores" ref={ref} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
       <div className="container px-4 mx-auto">
         <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-center">
           <div className={cn(
@@ -468,19 +451,19 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
           )}>
             <div className="space-y-4">
               <h2 className="text-3xl md:text-5xl font-black font-headline leading-tight tracking-tight">
-                Trabalhamos duro para você ser a <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
+                Consolide sua marca como a <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
                   Única Opção
-                </span>.
+                </span> viável.
               </h2>
               <p className="text-sm md:text-lg text-muted-foreground font-medium italic">
-                "Enquanto seus competidores dormem, sua reputação trabalha vendendo por você 24 horas por dia."
+                "No mercado moderno, a confiança não é um detalhe — é a moeda que dita o seu volume de vendas."
               </p>
             </div>
 
             <div className="space-y-6">
               {[
-                { icon: MapPin, title: 'Negócios Locais', desc: 'Domine sua região. Faça com que cada pessoa que pesquise no Maps veja sua empresa como a escolha óbvia.' },
-                { icon: Zap, title: 'Serviços & SaaS', desc: 'Mostre que outros já validaram seu trabalho e tiveram sucesso total, eliminando o medo da compra.' }
+                { icon: Building2, title: 'Ecossistema Corporativo', desc: 'Estruture a autoridade da sua rede de franquias ou unidades locais com dashboards unificados de performance.' },
+                { icon: Target, title: 'Serviços de Alto Ticket', desc: 'Reduza a resistência de compra em serviços premium exibindo validações de clientes satisfeitos em tempo real.' }
               ].map((item, idx) => (
                 <div key={idx} className="flex gap-6 group">
                   <item.icon className="w-7 h-7 text-primary shrink-0 group-hover:scale-110 transition-transform duration-500" />
@@ -532,26 +515,26 @@ const CTASection = () => {
       {ctaBg && (
         <Image src={ctaBg.imageUrl} alt="CTA Bg" fill className="object-cover opacity-20 grayscale brightness-50" />
       )}
-      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-red-950/20" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-primary/10" />
       
       <div className="container relative z-10 px-4 mx-auto">
         <div className="max-w-3xl mx-auto text-center space-y-10">
           <div className="space-y-4">
             <h2 className="text-4xl md:text-7xl font-black font-headline tracking-tighter leading-[1] animate-in fade-in slide-in-from-bottom-10 duration-1000">
-              Vai aceitar ser a <span className="text-primary italic">Segunda Opção</span>?
+              Pronto para elevar o <span className="text-primary italic">Patamar</span> da sua marca?
             </h2>
             <p className="max-w-lg mx-auto text-base md:text-2xl font-medium text-white/80 animate-in fade-in duration-1000 delay-300">
-              A cada minute sem Prova Social, um cliente desiste de você. Retome o controle agora.
+              Assuma a liderança do seu setor através da prova social estratégica.
             </p>
           </div>
           <div className="flex flex-col items-center gap-5 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-500">
             <Link href="/pricing" className="w-full sm:w-auto">
               <Button size="lg" variant="secondary" className="w-full sm:w-auto h-16 md:h-20 px-12 rounded-2xl text-sm md:text-xl font-black shadow-2xl hover:scale-105 transition-all bg-white text-black hover:bg-white/90">
-                GARANTIR MEU DOMÍNIO AGORA
+                GARANTIR MEU ACESSO ESTRATÉGICO
               </Button>
             </Link>
             <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">
-              🔥 ÚLTIMAS VAGAS COM DESCONTO VITALÍCIO DE LANÇAMENTO
+              ⭐ Junte-se a centenas de empresas que dominam seu nicho com a Proova.
             </p>
           </div>
         </div>
@@ -574,13 +557,13 @@ const Footer = () => {
         <div className="space-y-8">
           <div className="flex flex-wrap justify-center gap-8 md:gap-12">
             <Link href="/pricing" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Planos</Link>
-            <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Entrar</Link>
+            <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Login Membro</Link>
             <Link href="/terms" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2"><Scale className="w-4 h-4" /> Termos</Link>
             <Link href="/privacy" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2"><Lock className="w-4 h-4" /> Privacidade</Link>
           </div>
           <div className="space-y-2">
             <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.3em] opacity-40">
-              © 2026 PROOVA TECHNOLOGY - ONDE A CONFIANÇA VIRA CONVERSÃO
+              © 2026 PROOVA TECHNOLOGY - INTELIGÊNCIA EM REPUTAÇÃO E CONVERSÃO
             </p>
           </div>
         </div>
@@ -625,9 +608,9 @@ export default function Home() {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           const id = entry.target.id;
-          if (id === 'ocusto-do-silencio') setIsAgitationVisible(true);
-          if (id === 'maquina-de-dominio') setIsPillarsVisible(true);
-          if (id === 'setores-atendidos') setIsVersatilityVisible(true);
+          if (id === 'valor-reputacao') setIsAgitationVisible(true);
+          if (id === 'metodologia') setIsPillarsVisible(true);
+          if (id === 'setores') setIsVersatilityVisible(true);
         }
       });
     }, observerOptions);
