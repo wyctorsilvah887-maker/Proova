@@ -112,7 +112,6 @@ import { jsPDF } from 'jspdf';
 import { toPng } from 'html-to-image';
 import { cn } from '@/lib/utils';
 import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-actions';
-import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 interface AuditItem {
@@ -143,7 +142,6 @@ export default function DashPage() {
   const [newGoogleMapsUrl, setNewGoogleMapsUrl] = useState('');
   const [isUpdatingUrl, setIsUpdatingUrl] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-  const [isSendingReport, setIsSendingReport] = useState(false);
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
 
   // Estados para Social Cards
@@ -302,6 +300,13 @@ export default function DashPage() {
   const isSetupComplete = completedStepsCount === setupSteps.length;
   const isCollectDone = setupSteps.find(s => s.id === 'collect')?.completed;
   const isGoogleDone = isDigitalBusiness ? true : !!userData?.googleMapsUrl;
+
+  // Verifica se o link do Google é o "direto" para avaliações
+  const isMapsLinkValid = useMemo(() => {
+    if (!userData?.googleMapsUrl) return false;
+    const url = userData.googleMapsUrl.toLowerCase();
+    return url.includes('review') || url.includes('writereview') || url.includes('placeid');
+  }, [userData]);
 
   const [auditItems, setAuditItems] = useState<AuditItem[]>([]);
   const [isAuditing, setIsAuditing] = useState(false);
@@ -666,10 +671,6 @@ export default function DashPage() {
     setIsShareDialogOpen(true);
   };
 
-  const handleShuffleVariant = () => {
-    setCardVariant(prev => prev === 'dark' ? 'orange' : 'dark');
-  };
-
   if (authLoading || userDataLoading || (user && !userData)) {
     return (
       <div className="flex h-screen items-center justify-center bg-muted/30">
@@ -736,14 +737,6 @@ export default function DashPage() {
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Murais</span>
                 {!isCollectDone && <Lock className="ml-auto w-3 h-3 opacity-60" />}
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => isSetupComplete && router.push('/private')} 
-                className={cn("rounded-xl cursor-pointer font-bold py-2.5", !isSetupComplete && "opacity-50 grayscale cursor-not-allowed")}
-              >
-                <Inbox className="mr-2 h-4 w-4 text-primary" />
-                <span>Inbox Privado</span>
-                {!isSetupComplete && <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
@@ -873,15 +866,21 @@ export default function DashPage() {
               <p className="text-xs md:text-base text-muted-foreground">Gestão de prova social dinâmica</p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              {!isDigitalBusiness && (
+              {!isDigitalBusiness && !isMapsLinkValid && (
                 <Button 
                   variant="ghost" 
                   size="sm" 
                   onClick={() => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }} 
-                  className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5"
+                  className="rounded-full gap-1.5 text-[10px] font-bold h-7 border border-primary/20 text-primary hover:bg-primary/5 animate-pulse"
                 >
-                  <Edit3 className="w-3.5 h-3.5" /> Google Maps
+                  <MapPin className="w-3.5 h-3.5" /> Vincular Perfil Google
                 </Button>
+              )}
+              {isMapsLinkValid && (
+                <div className="flex items-center gap-2 px-3 h-7 rounded-full bg-green-500/10 border border-green-500/20">
+                   <CheckCircle2 className="w-3 h-3 text-green-500" />
+                   <span className="text-[9px] font-black text-green-600 uppercase tracking-widest">G-Boost Ativo</span>
+                </div>
               )}
             </div>
           </div>
@@ -918,7 +917,7 @@ export default function DashPage() {
         </div>
 
         <section className="space-y-3">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Ações Rápidas</h2>
+          <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Ferramentas de Conversão</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             <Button 
               variant="outline" 
