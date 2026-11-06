@@ -22,11 +22,11 @@ import {
   Sun, 
   Moon,
   Loader2,
-  Box,
   Handshake,
   Lock,
   Sparkles
 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useUser, useAuth, useFirestore, useDoc } from '@/firebase';
 import { doc } from 'firebase/firestore';
@@ -82,14 +82,8 @@ export default function PricingPage() {
         name: "Base",
         price: "Grátis",
         period: "/sempre",
-        description: "A fundação para organizar sua prova social e blindar sua marca.",
+        description: "Fundação de Reputação",
         icon: ShieldIcon,
-        features: [
-          "5 depoimentos ativos",
-          "Reputation Shield (Inbox)",
-          "Link de Coleta Padrão",
-          "QR Code de Balcão"
-        ],
         cta: status === 'base' ? "Plano Atual" : "Começar Grátis",
         checkoutUrl: user ? "/dash" : "/signup",
         highlight: false,
@@ -100,14 +94,8 @@ export default function PricingPage() {
         name: "Gold",
         price: "R$ 49,90",
         period: "/mês",
-        description: "Potencialize sua conversão com automação e SEO Local.",
+        description: "Aceleração de Vendas",
         icon: Star,
-        features: [
-          "50 depoimentos ativos",
-          "G-Boost (Google Maps)",
-          "Link in Bio Personalizado",
-          "Relatórios por E-mail"
-        ],
         cta: status === 'gold' ? "Plano Atual" : "Ativar Gold",
         checkoutUrl: checkoutLinks.gold,
         highlight: true,
@@ -118,14 +106,8 @@ export default function PricingPage() {
         name: "Enterprise",
         price: "R$ 97",
         period: "/mês",
-        description: "Domínio total de mercado com vídeos e branding VIP.",
+        description: "Domínio de Mercado",
         icon: Zap,
-        features: [
-          "Depoimentos Ilimitados",
-          "Vídeo Reviews 4K",
-          "Consultor Proova (AI)",
-          "Remoção de Branding"
-        ],
         cta: status === 'enterprise' ? "Plano Atual" : "Seja Enterprise",
         checkoutUrl: checkoutLinks.enterprise,
         highlight: false,
@@ -153,7 +135,7 @@ export default function PricingPage() {
           {!authLoading && user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 transition-all">
+                <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
                   <div className="hidden sm:flex flex-col items-end">
                     <span className="text-xs font-bold truncate max-w-[120px]">{userData?.companyName}</span>
                     <span className="text-[8px] uppercase font-black opacity-60">{membershipLabel}</span>
@@ -206,22 +188,13 @@ export default function PricingPage() {
                   </div>
                 </div>
 
-                <p className={cn("text-xs font-medium leading-relaxed px-4 opacity-80", plan.highlight ? "text-white" : "text-muted-foreground")}>
+                <p className={cn("text-[10px] font-black uppercase tracking-widest px-4 opacity-80", plan.highlight ? "text-white" : "text-primary")}>
                   {plan.description}
                 </p>
               </CardHeader>
 
-              <CardContent className="p-8 pt-4 flex-1">
-                <ul className="space-y-4">
-                  {plan.features.map((feature, i) => (
-                    <li key={i} className="flex items-center gap-3 text-xs font-bold">
-                      <div className={cn("h-5 w-5 rounded-full flex items-center justify-center shrink-0", plan.highlight ? "bg-white/20" : "bg-primary/10 text-primary")}>
-                        <Check className="w-3 h-3" strokeWidth={4} />
-                      </div>
-                      <span className="tracking-tight">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
+              <CardContent className="px-8 py-4 flex-1">
+                 {/* Conteúdo simplificado conforme solicitado - Apenas nomes e valor central */}
               </CardContent>
 
               <CardFooter className="p-8 pt-0">
