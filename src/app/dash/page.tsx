@@ -301,7 +301,6 @@ export default function DashPage() {
   const isCollectDone = setupSteps.find(s => s.id === 'collect')?.completed;
   const isGoogleDone = isDigitalBusiness ? true : !!userData?.googleMapsUrl;
 
-  // Verifica se o link do Google é o "direto" para avaliações
   const isMapsLinkValid = useMemo(() => {
     if (!userData?.googleMapsUrl) return false;
     const url = userData.googleMapsUrl.toLowerCase();
@@ -511,134 +510,24 @@ export default function DashPage() {
     }
   };
 
-  const handleDownloadComposedVideo = async () => {
-    if (!selectedTestimonialForShare || !dialogVideoRef.current || !shareCardRef.current) return;
-
-    setIsExportingCard(true);
-    shadcnToast({ title: "Processando Vídeo VIP", description: "Gravando moldura digital arredondada... aguarde." });
-
-    try {
-      const videoEl = dialogVideoRef.current;
-      const cardEl = shareCardRef.current;
-      
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      if (!ctx) throw new Error("Falha ao iniciar motor gráfico");
-
-      const size = 720;
-      canvas.width = size;
-      canvas.height = size;
-
-      const stream = (canvas as any).captureStream(30);
-      
-      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-      const source = audioCtx.createMediaElementSource(videoEl);
-      const destination = audioCtx.createMediaStreamDestination();
-      source.connect(destination);
-      source.connect(audioCtx.destination);
-      
-      destination.stream.getAudioTracks().forEach(track => stream.addTrack(track));
-
-      const recorder = new MediaRecorder(stream, { mimeType: 'video/webm;codecs=vp9,opus' });
-      const chunks: Blob[] = [];
-      
-      recorder.ondataavailable = (e: any) => chunks.push(e.data);
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: 'video/webm' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `proova-social-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
-        link.click();
-        setIsExportingCard(false);
-        shadcnToast({ title: "Vídeo Gerado!", description: "Seu depoimento com moldura arredondada está pronto." });
-      };
-
-      videoEl.currentTime = 0;
-      videoEl.muted = false;
-      
-      const cardImage = await toPng(cardEl, { 
-        pixelRatio: 2,
-        backgroundColor: 'rgba(0,0,0,0)',
-        filter: (node) => {
-          const el = node as HTMLElement;
-          return el.tagName !== 'VIDEO' && el.id !== 'video-overlay-badge' && el.id !== 'card-header-cta' && el.id !== 'card-ai-badge';
-        }
-      });
-      
-      const frameImg = new (window as any).Image();
-      frameImg.src = cardImage;
-      await new Promise(r => frameImg.onload = r);
-
-      recorder.start();
-
-      const renderLoop = () => {
-        if (videoEl.paused || videoEl.ended) {
-          if (recorder.state === 'recording') recorder.stop();
-          return;
-        }
-
-        ctx.clearRect(0, 0, size, size);
-
-        const cardRadius = 40; 
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(cardRadius, 0);
-        ctx.lineTo(size - cardRadius, 0);
-        ctx.quadraticCurveTo(size, 0, size, cardRadius);
-        ctx.lineTo(size, size - cardRadius);
-        ctx.quadraticCurveTo(size, size, size - cardRadius, size);
-        ctx.lineTo(cardRadius, size);
-        ctx.quadraticCurveTo(0, size, 0, size - cardRadius);
-        ctx.lineTo(0, cardRadius);
-        ctx.quadraticCurveTo(0, 0, cardRadius, 0);
-        ctx.closePath();
-        ctx.clip();
-
-        ctx.drawImage(frameImg, 0, 0, size, size);
-
-        const vWidth = size * 0.85;
-        const vHeight = vWidth * (9/16);
-        const vX = (size - vWidth) / 2;
-        const vY = size * 0.22;
-
-        ctx.save();
-        ctx.beginPath();
-        const radius = 24;
-        ctx.moveTo(vX + radius, vY);
-        ctx.arcTo(vX + vWidth, vY, vX + vWidth, vY + vHeight, radius);
-        ctx.arcTo(vX + vWidth, vY + vHeight, vX, vY + vHeight, radius);
-        ctx.arcTo(vX, vY + vHeight, vX, vY, radius);
-        ctx.arcTo(vX, vY, vX + vWidth, vY, radius);
-        ctx.closePath();
-        ctx.clip();
-        
-        ctx.drawImage(videoEl, vX, vY, vWidth, vHeight);
-        ctx.restore();
-        ctx.restore(); 
-
-        requestAnimationFrame(renderLoop);
-      };
-
-      videoEl.play();
-      renderLoop();
-
-      setTimeout(() => {
-        if (recorder.state === 'recording') recorder.stop();
-      }, 16000);
-
-    } catch (err) {
-      console.error("Erro na gravação composta:", err);
-      setIsExportingCard(false);
-      shadcnToast({ variant: "destructive", title: "Erro na composição", description: "Tente o download simples." });
-    }
-  };
-
   const handleDownloadContent = async () => {
     if (!selectedTestimonialForShare) return;
 
     if (selectedTestimonialForShare.videoUrl) {
-      await handleDownloadComposedVideo();
+      setIsExportingCard(true);
+      shadcnToast({ title: "Processando Vídeo VIP", description: "Iniciando download... aguarde." });
+      try {
+        const link = document.createElement('a');
+        link.href = selectedTestimonialForShare.videoUrl;
+        link.download = `proova-social-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
+        link.target = "_blank";
+        link.click();
+        shadcnToast({ title: "Vídeo Iniciado!", description: "Seu vídeo review está sendo baixado." });
+      } catch (err) {
+        shadcnToast({ variant: "destructive", title: "Erro no download" });
+      } finally {
+        setIsExportingCard(false);
+      }
       return;
     }
 
@@ -670,7 +559,6 @@ export default function DashPage() {
 
   const openShareDialog = (testimonial: any) => {
     setSelectedTestimonialForShare(testimonial);
-    // Sorteia aleatoriamente a variante ao abrir
     const variants: ('dark' | 'orange')[] = ['dark', 'orange'];
     const randomVariant = variants[Math.floor(Math.random() * variants.length)];
     setCardVariant(randomVariant);
@@ -708,28 +596,28 @@ export default function DashPage() {
         </div>
       )}
 
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
+      <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center">
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
-            <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
+            <div className="relative w-[140px] h-[45px] md:w-[200px] md:h-[65px] transition-transform group-hover:scale-105">
               <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
               <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </Link>
         </div>
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle className="hidden md:flex" />
+          <ThemeToggle className="hidden sm:flex" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
+              <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
                 <div className="flex flex-col items-end">
-                  <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] leading-tight transition-colors group-hover:text-primary">{userData?.companyName || 'Minha Empresa'}</span>
+                  <span className="text-[10px] md:text-xs font-bold truncate max-w-[70px] sm:max-w-[120px] leading-tight transition-colors group-hover:text-primary">{userData?.companyName || 'Minha Empresa'}</span>
                   <div className="flex flex-col items-end gap-0">
-                    <span className={cn("text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight", userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground")}>{membershipLabel}</span>
-                    {isMapsLinkValid && <span className="text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
+                    <span className={cn("text-[6px] sm:text-[8px] uppercase tracking-widest font-black leading-tight", userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground")}>{membershipLabel}</span>
+                    {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
                   </div>
                 </div>
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
+                <div className="h-7 w-7 md:h-8 md:w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-3.5 h-3.5 md:w-4 md:h-4" /></div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
@@ -774,7 +662,7 @@ export default function DashPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-24 md:pt-32">
+      <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-20 md:pt-24">
         {!isSetupComplete && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="flex items-center justify-between">
@@ -1097,7 +985,7 @@ export default function DashPage() {
       <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
         <div className="flex items-center gap-2 relative w-[200px] h-[65px] md:w-[320px] md:h-[105px]">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain dark:hidden" priority />
-          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="hidden dark:block" priority />
+          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="hidden dark:block object-contain" priority />
         </div>
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
@@ -1295,7 +1183,7 @@ export default function DashPage() {
                 disabled={isExportingCard}
               >
                 {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-5 h-5" />}
-                {selectedTestimonialForShare?.videoUrl ? 'Exportar Vídeo VIP' : 'Baixar Card'}
+                {selectedTestimonialForShare?.videoUrl ? 'Baixar Vídeo Review' : 'Baixar Card'}
               </Button>
             </div>
           </div>
