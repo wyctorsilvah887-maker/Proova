@@ -1,18 +1,20 @@
+
 import { genkit } from 'genkit';
 import { googleAI } from '@genkit-ai/google-genai';
 
 /**
- * Inicializa a instância global do Genkit com o plugin Google AI.
- * Utilizamos o modelo gemini-1.5-flash por ser o mais estável para produção.
+ * Inicializa a instância global do Genkit.
+ * Configurado para ler explicitamente a API KEY do arquivo .env
  */
 export const ai = genkit({
   plugins: [
-    googleAI(),
+    googleAI({
+      // Forçamos o uso da chave do ambiente para garantir a comunicação
+      apiKey: process.env.GOOGLE_GENAI_API_KEY || process.env.GEMINI_API_KEY,
+    }),
   ],
-  model: 'googleai/gemini-1.5-flash',
 });
 
-// Constantes de modelos estáveis para garantir o funcionamento em produção
-export const PRIMARY_MODEL = 'googleai/gemini-1.5-flash';
-export const FALLBACK_MODEL = 'googleai/gemini-1.5-flash';
+// Modelos de elite para copywriting e lógica
+export const PRIMARY_MODEL = 'googleai/gemini-2.0-flash';
 export const geminiModel = PRIMARY_MODEL;

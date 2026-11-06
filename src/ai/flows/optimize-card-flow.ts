@@ -1,10 +1,11 @@
+
 'use server';
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 /**
- * @fileOverview Fluxo de Design Generativo Proova Premium (v5.6).
+ * @fileOverview Fluxo de Design Generativo Proova Premium (v6.0).
  * Otimizado para seguir RIGOROSAMENTE as instruções do chat do usuário.
  */
 
@@ -13,7 +14,7 @@ const StoryResponseSchema = z.object({
   bodyText: z.string().describe('O texto do feedback revisado, curto e impactante.'),
   author: z.string().describe('Nome do autor formatado elegantemente.'),
   tagline: z.string().describe('Sempre: "feito pelo Proova IA Design"'),
-  visualConcept: z.string().describe('Prompt detalhado em inglês para o motor de imagem. Deve ser EXTREMAMENTE específico sobre as cores e materiais que o usuário pediu no chat.'),
+  visualConcept: z.string().describe('Prompt detalhado em inglês para o motor de imagem. Deve ser EXTREMAMENTE específico sobre as cores e materiais que o usuário pediu.'),
   backgroundImageUri: z.string().optional().describe('A imagem gerada pela IA.'),
 });
 
@@ -28,24 +29,23 @@ export async function optimizeCard(input: {
 }): Promise<OptimizeCardOutput> {
   try {
     // PASSO 1: Inteligência de Design (Gemini 2.0 Flash)
-    // Forçamos o modelo a abandonar o "luxo padrão" se o usuário pedir algo diferente.
+    // Este modelo decide o conceito visual baseado na ordem do usuário.
     const { output } = await ai.generate({
       model: 'googleai/gemini-2.0-flash',
       system: `Você é um Diretor de Arte Criativo e OBEDIENTE.
       Sua missão é criar um design publicitário baseado na instrução do usuário.
       
       REGRAS CRÍTICAS:
-      1. Se o usuário pedir uma COR, um TEMA (ex: neon, rústico, futurista) ou um ELEMENTO, você deve focar 100% nisso.
-      2. O campo 'visualConcept' deve ser um prompt em inglês poderoso para o motor de imagem (Gemini 2.5 Flash Image).
-      3. Seja drástico na variação. Se pedirem azul, não use dourado. Se pedirem rústico, não use metal.
-      4. O texto (headline/bodyText) deve acompanhar o TOM da instrução do usuário.`,
-      prompt: `DADOS DO CLIENTE:
-      - DEPOIMENTO: "${input.text}"
-      - SETOR: "${input.businessType || 'Serviços'}"
+      1. Se o usuário pedir uma COR, um TEMA ou MATERIAL, você DEVE ignorar o padrão preto/dourado e usar o que foi pedido.
+      2. O campo 'visualConcept' deve ser um prompt em inglês PODEROSO para o motor de imagem.
+      3. O texto (headline/bodyText) deve ser adaptado ao tom da conversa.`,
+      prompt: `DADOS DO DEPOIMENTO:
+      - TEXTO: "${input.text}"
+      - SETOR: "${input.businessType || 'Geral'}"
       - NOME: "${input.userName || 'Cliente'}"
 
-      INSTRUÇÃO DO USUÁRIO (PRIORIDADE MÁXIMA):
-      "${input.userInstruction || 'Crie um design de luxo inicial com tons escuros e dourados.'}"`,
+      ORDEM DO USUÁRIO NO CHAT:
+      "${input.userInstruction || 'Crie um design luxuoso de alto padrão.'}"`,
       output: { 
         format: 'json', 
         schema: StoryResponseSchema 
@@ -54,13 +54,13 @@ export async function optimizeCard(input: {
 
     if (!output) throw new Error("Falha na geração de metadados");
 
-    // PASSO 2: Geração da Imagem (Gemini 2.5 Flash Image)
-    // O motor de imagem agora recebe uma ordem muito mais forte baseada na visualConcept.
+    // PASSO 2: Geração da Imagem Real (Gemini 2.5 Flash Image)
+    // O motor "banana" agora recebe uma ordem muito mais clara.
     try {
       const imageResponse = await ai.generate({
         model: 'googleai/gemini-2.5-flash-image',
         prompt: [
-          { text: `A 1:1 square advertising background, professional photography style. NO TEXT, NO PEOPLE. Concept: ${output.visualConcept}. High resolution, clean composition, 8k.` }
+          { text: `A professional advertising background, 1:1 square. NO TEXT, NO PEOPLE. Style: Cinematic, 8k, Clean. Concept: ${output.visualConcept}` }
         ],
         config: {
           responseModalities: ['TEXT', 'IMAGE'],
@@ -71,9 +71,7 @@ export async function optimizeCard(input: {
         output.backgroundImageUri = imageResponse.media.url;
       }
     } catch (imgErr: any) {
-      console.error("ERRO NA GERAÇÃO DA IMAGEM (Verifique sua API Key):", imgErr.message);
-      // Fallback: Se a imagem falhar (provavelmente por causa da chave de API mencionada no seu Studio), 
-      // o card usará o gradiente padrão do CSS.
+      console.error("ERRO NA GERAÇÃO DA IMAGEM:", imgErr.message);
       output.backgroundImageUri = ''; 
     }
 
@@ -90,7 +88,7 @@ export async function optimizeCard(input: {
       bodyText: input.text,
       author: input.userName || "Cliente VIP",
       tagline: "feito pelo Proova IA Design",
-      visualConcept: "Standard dark luxury",
+      visualConcept: "Standard fallback",
     };
   }
 }
