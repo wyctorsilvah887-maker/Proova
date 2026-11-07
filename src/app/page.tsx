@@ -215,7 +215,7 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
             isVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
           )}>
             Implemente uma Engenharia de <br className="hidden sm:block" />
-            <span className="inline-block relative px-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-orange-400 italic">
+            <span className="inline-block relative px-2 bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto]">
               CONFIANÇA
             </span> imediata.
           </h1>
@@ -258,7 +258,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
         )}>
           <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">A Ciência da Reputação Digital</h2>
           <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
-            Seja a <span className="text-primary italic">Referência</span> absoluta do seu mercado.
+            Seja a <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto]">Referência</span> absoluta do seu mercado.
           </h3>
           <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">A ausência de prova social gera incerteza. A incerteza interrompe a venda.</p>
         </div>
@@ -465,17 +465,14 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
             isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
           )}>
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
-            <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card p-4 sm:p-8 ring-1 ring-primary/10">
-              <div className="w-full flex items-center justify-center min-h-[450px]">
-                {/* O NOVO EMBED VIA IFRAME: Simples, rápido e robusto */}
-                <iframe 
-                  src="/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova" 
-                  width="100%" 
-                  height="600px" 
-                  style={{ border: 'none' }} 
-                  allowtransparency="true"
-                ></iframe>
-              </div>
+            <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card p-4 sm:p-8 ring-1 ring-primary/10 h-[600px] flex items-center justify-center">
+              <iframe 
+                src="/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova" 
+                width="100%" 
+                height="600px" 
+                style={{ border: 'none' }} 
+                allowtransparency="true"
+              ></iframe>
             </Card>
           </div>
         </div>
@@ -662,44 +659,6 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 PricingSection.displayName = "PricingSection";
 
 /**
- * Seção de Chamada Final (CTA)
- */
-const CTASection = () => {
-  const ctaBg = PlaceHolderImages.find(img => img.id === 'cta-bg-photo');
-  return (
-    <section className="relative w-full py-24 md:py-36 bg-black text-white overflow-hidden">
-      {ctaBg && (
-        <Image src={ctaBg.imageUrl} alt="CTA Bg" fill className="object-cover opacity-20 grayscale brightness-50" />
-      )}
-      <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-primary/10" />
-      
-      <div className="container relative z-10 px-4 mx-auto">
-        <div className="max-w-3xl mx-auto text-center space-y-10">
-          <div className="space-y-4">
-            <h2 className="text-4xl md:text-7xl font-black font-headline tracking-tighter leading-[1]">
-              Pronto para elevar o <span className="text-primary italic">Patamar</span> da sua marca?
-            </h2>
-            <p className="max-w-lg mx-auto text-base md:text-2xl font-medium text-white/80">
-              Assuma a liderança do seu setor através da prova social estratégica.
-            </p>
-          </div>
-          <div className="flex flex-col items-center gap-5">
-            <Link href="/pricing" className="w-full sm:w-auto">
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto h-16 md:h-20 px-12 rounded-2xl text-sm md:text-xl font-black shadow-2xl hover:scale-105 transition-all bg-white text-black hover:bg-white/90">
-                GARANTIR MEU ACESSO ESTRATÉGICO
-              </Button>
-            </Link>
-            <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">
-              ⭐ Junte-se a centenas de empresas que dominam seu nicho com a Proova.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-/**
  * Rodapé Institucional
  */
 const Footer = () => {
@@ -869,7 +828,33 @@ export default function Home() {
           isVisible={isPricingVisible}
         />
         
-        <CTASection />
+        <section className="relative w-full py-24 md:py-36 bg-black text-white overflow-hidden">
+          <Image src="https://picsum.photos/seed/ctabg88/1920/1080" alt="CTA Bg" fill className="object-cover opacity-20 grayscale brightness-50" data-ai-hint="tech abstract" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-primary/10" />
+          
+          <div className="container relative z-10 px-4 mx-auto">
+            <div className="max-w-3xl mx-auto text-center space-y-10">
+              <div className="space-y-4">
+                <h2 className="text-4xl md:text-7xl font-black font-headline tracking-tighter leading-[1]">
+                  Pronto para elevar o <span className="text-primary italic">Patamar</span> da sua marca?
+                </h2>
+                <p className="max-w-lg mx-auto text-base md:text-2xl font-medium text-white/80">
+                  Assuma a liderança do seu setor através da prova social estratégica.
+                </p>
+              </div>
+              <div className="flex flex-col items-center gap-5">
+                <Link href="/pricing" className="w-full sm:w-auto">
+                  <Button size="lg" variant="secondary" className="w-full sm:w-auto h-16 md:h-20 px-12 rounded-2xl text-sm md:text-xl font-black shadow-2xl hover:scale-105 transition-all bg-white text-black hover:bg-white/90">
+                    GARANTIR MEU ACESSO ESTRATÉGICO
+                  </Button>
+                </Link>
+                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">
+                  ⭐ Junte-se a centenas de empresas que dominam seu nicho com a Proova.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
       <Footer />
