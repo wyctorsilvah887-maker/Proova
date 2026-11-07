@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -217,52 +218,48 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
 };
 
 const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0, isPopup = false, isAnimating = false }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number, isPopup?: boolean, isAnimating?: boolean }) => {
-  const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent' && secondaryColor !== '#ffffff';
+  const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
   const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
   
   return (
     <Card 
-      key={t.id}
+      key={`${t.id}-${muralIndex}`}
       className={cn(
-        "bg-card rounded-[2.5rem] p-6 sm:p-8 shadow-2xl transition-all duration-700 hover:scale-[1.02] border-none mb-12 w-full",
+        "rounded-[1.5rem] p-5 border-none shadow-2xl transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white mb-6",
         !isPopup && "animate-in fade-in duration-700 ease-out fill-both",
-        !isPopup && (side === 'left' ? "slide-in-from-left-12" : "slide-in-from-right-12"),
+        !isPopup && (side === 'left' ? "slide-in-from-left-8" : "slide-in-from-right-8"),
         isPopup && !isAnimating && "animate-in fade-in slide-in-from-bottom-10 duration-1000",
         isPopup && isAnimating && "animate-out fade-out slide-out-to-top-10 duration-1000"
       )}
       style={{ 
-        boxShadow: `0 20px 40px -20px ${themeColor}25`,
-        border: hasSecondary ? `2px solid ${secondaryColor}` : 'none'
+        border: hasSecondary ? `2px solid ${secondaryColor}` : 'none',
+        boxShadow: hasSecondary 
+          ? `0 0 20px ${secondaryColor}30, 0 15px 35px -10px rgba(0,0,0,0.1)` 
+          : `0 20px 40px -20px ${themeColor}25`,
       }}
     >
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-2xl flex items-center justify-center text-white font-black text-sm shadow-lg rotate-3 shrink-0" style={{ backgroundColor: themeColor }}>
-              {t.userName?.substring(0, 2).toUpperCase()}
-            </div>
-            <div className="min-w-0">
-              <p className="font-black text-sm text-foreground tracking-tight truncate max-w-[120px]">{t.userName}</p>
-              <div className="flex items-center gap-1.5">
-                 <CheckCircle2 className="w-2.5 h-2.5 text-green-500 fill-green-500/20" />
-                 <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Verificado</span>
-              </div>
-            </div>
+      <div className="space-y-4">
+        <div className="flex items-center gap-4">
+          <div className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: `${themeColor}40` }}>
+            <User className="w-4 h-4" style={{ color: themeColor }} />
           </div>
-          <div className="flex gap-0.5">
-            {[1, 2, 3, 4, 5].map((s) => (
-              <Star key={s} className={cn("w-3 h-3", s <= (t.rating || 5) ? "fill-current" : "opacity-20")} style={{ color: themeColor }} />
-            ))}
+          <div className="flex-1 min-w-0">
+            <p className="font-black text-xs tracking-tight truncate uppercase leading-none">{t.userName}</p>
+            <div className="flex gap-0.5 mt-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} className={cn("w-3 h-3 fill-current transition-all", i < (t.rating || 5) ? "" : "opacity-10")} style={{ color: themeColor }} />
+              ))}
+            </div>
           </div>
         </div>
 
         {t.videoUrl && (
-          <div className="relative aspect-video rounded-3xl overflow-hidden bg-black shadow-2xl group ring-1 ring-white/10">
+          <div className="relative aspect-video rounded-2xl overflow-hidden bg-black shadow-lg ring-1 ring-white/10">
              <video src={t.videoUrl} className="w-full h-full object-cover" muted loop playsInline autoPlay />
-             <div className="absolute bottom-3 left-3 flex items-center gap-2">
-               <div className="bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+             <div className="absolute bottom-3 left-3">
+               <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
                  <p className="text-[8px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
-                   <Play className="w-2 h-2 fill-white" /> Vídeo Review
+                   <Play className="w-2.5 h-2.5 fill-white" /> Vídeo
                  </p>
                </div>
              </div>
@@ -271,19 +268,23 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
 
         {t.text && t.text !== '(Depoimento em Vídeo)' && (
           <div className="relative">
-            <span className="absolute -top-3 -left-2 text-5xl opacity-10 font-serif select-none pointer-events-none" style={{ color: themeColor }}>“</span>
-            <p className="text-foreground/90 font-medium text-sm sm:text-base leading-relaxed italic relative z-10 px-2">
-              {t.text}
+            <p className="opacity-80 font-bold text-sm sm:text-base leading-relaxed italic tracking-tight relative z-10 px-1">
+              "{t.text}"
             </p>
           </div>
         )}
 
-        <div className="pt-5 border-t border-muted-foreground/10 flex items-center justify-between">
-          <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] flex items-center gap-1.5">
-            <Clock className="w-3 h-3" />
-            {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Hoje'}
-          </span>
-          <div className="h-1.5 w-1.5 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
+        <div className="pt-4 border-t border-muted/10 flex items-center justify-between opacity-50">
+          <div className="flex items-center gap-1.5">
+             <Clock className="w-3 h-3" />
+             <span className="text-[8px] font-black uppercase tracking-widest">
+               {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Agora'}
+             </span>
+          </div>
+          <div className="flex items-center gap-1.5">
+             <CheckCircle2 className="w-3 h-3 text-green-500" />
+             <span className="text-[8px] font-black uppercase tracking-widest">Verificado</span>
+          </div>
         </div>
       </div>
     </Card>
@@ -400,7 +401,7 @@ const PublicPageSettings = ({
 
               <div className={cn("space-y-6 pt-6 border-t", !isGoldPlan && "opacity-40 grayscale pointer-events-none")}>
                 <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 ml-1">
-                  <Palette className="w-3 h-3 text-primary" /> Cor Secundária (Bordas) {!isGoldPlan && <Lock className="w-2.5 h-2.5 ml-1" />}
+                  <Palette className="w-3 h-3 text-primary" /> Efeito Bordas Neon {!isGoldPlan && <Lock className="w-2.5 h-2.5 ml-1" />}
                 </Label>
                 <div className="flex flex-wrap gap-2">
                   <button 
@@ -813,7 +814,6 @@ export default function PPEditorPage() {
       return [currentSelection[muralIndex % currentSelection.length]];
     }
     
-    if (layout === 'grid') return currentSelection;
     return currentSelection;
   }, [currentSelection, layout, muralIndex]);
 
@@ -885,7 +885,7 @@ export default function PPEditorPage() {
         </div>
       </header>
 
-      <main className="flex-1 flex overflow-hidden relative w-full flex-row pt-24 md:pt-32">
+      <main className="flex-1 p-4 md:p-8 space-y-8 max-w-5xl mx-auto w-full pt-24 md:pt-32">
         <Sheet>
           <aside className="hidden lg:flex w-80 bg-background border-r flex-col shrink-0 h-full">
             <PublicPageSettings 
