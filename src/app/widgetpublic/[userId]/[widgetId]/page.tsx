@@ -17,6 +17,7 @@ import {
  * Página pública do Widget (Embed VIP)
  * Renderiza apenas o mural de depoimentos de forma limpa e otimizada para ser usada em Iframes.
  * Otimizada para temas menores e dispositivos móveis.
+ * Sem scroll e com centralização estratégica.
  */
 export default function WidgetPublicPage({ params }: { params: Promise<{ userId: string, widgetId: string }> }) {
   const { userId, widgetId } = use(params);
@@ -106,10 +107,10 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
       <Card 
         key={t.id}
         className={cn(
-          "bg-[#111111] rounded-[1.5rem] sm:rounded-[2.5rem] p-5 sm:p-8 border-none shadow-2xl transition-all duration-700 hover:scale-[1.02] w-full",
+          "bg-[#111111] rounded-[1.5rem] sm:rounded-[2.5rem] p-5 sm:p-8 border-none shadow-2xl transition-all duration-700 hover:scale-[1.02] w-full max-w-full",
           layout === 'grid' && "animate-in fade-in zoom-in-95 duration-500",
           layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-8 duration-700" : "animate-in fade-in slide-in-from-right-8 duration-700"),
-          layout === 'popup' && !isAnimating && "animate-in fade-in slide-in-from-bottom-8 duration-700"
+          layout === 'popup' && !isAnimating && "animate-in fade-in zoom-in-90 duration-1000"
         )}
         style={{ 
           boxShadow: `0 20px 40px -20px ${themeColor}25`,
@@ -171,15 +172,15 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   };
 
   return (
-    <div className="min-h-screen bg-transparent p-2 sm:p-4 font-body overflow-x-hidden">
-      <div className="w-full h-full flex flex-col items-center">
+    <div className="min-h-screen h-screen bg-transparent p-2 sm:p-4 font-body overflow-hidden">
+      <div className="w-full h-full flex flex-col items-center justify-center">
         {filteredTestimonials.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center opacity-10 py-20">
             <Star className="w-12 h-12 mb-4" />
             <p className="text-[10px] font-black uppercase tracking-widest">Aguardando Prova Social</p>
           </div>
         ) : (
-          <div className="w-full">
+          <div className="w-full max-w-full">
             {layout === 'grid' && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                 {visibleTestimonials.map((t, i) => (
@@ -214,7 +215,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
             )}
 
             {layout === 'popup' && (
-              <div className="fixed bottom-4 right-4 left-4 sm:left-auto sm:w-[320px] z-50">
+              <div className="flex items-center justify-center w-full max-w-sm mx-auto animate-in fade-in zoom-in duration-700">
                 <TestimonialCard t={filteredTestimonials[muralIndex]} />
               </div>
             )}
