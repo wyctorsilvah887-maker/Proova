@@ -437,28 +437,35 @@ export default function AdminPage() {
       </header>
 
       <main className="container mx-auto p-4 md:p-6 space-y-8 flex-1 max-w-7xl overflow-x-hidden pt-24 md:pt-32">
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Gestão Global</h1>
-            <p className="text-muted-foreground text-sm">Controle central de usuários e métricas da plataforma.</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button 
-              variant="outline" 
-              className="gap-2 border-primary/20 text-primary hover:bg-primary/5 h-12 rounded-xl font-bold transition-all shadow-sm"
-              onClick={() => router.push('/admin/support')}
-            >
-              <Headphones className="w-4 h-4" /> Fila de Suporte {ticketsList && ticketsList.length > 0 && <Badge className="ml-1 h-4 px-1 text-[8px]">{ticketsList.length}</Badge>}
+        <div className="flex flex-col gap-4">
+          <Link href="/dash">
+            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-primary transition-colors h-8 px-0 font-bold uppercase tracking-widest text-[10px]">
+              <ArrowLeft className="w-4 h-4" /> Voltar ao Dashboard
             </Button>
-            <Button 
-              variant="outline" 
-              className="gap-2 border-primary/20 text-primary hover:bg-primary/5 h-12 rounded-xl font-bold transition-all shadow-sm"
-              onClick={() => router.push('/admin/advanced')}
-            >
-              <Settings className="w-4 h-4" /> Avisos Globais
-            </Button>
-          </div>
-        </header>
+          </Link>
+          <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Gestão Global</h1>
+              <p className="text-muted-foreground text-sm">Controle central de usuários e métricas da plataforma.</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button 
+                variant="outline" 
+                className="gap-2 border-primary/20 text-primary hover:bg-primary/5 h-12 rounded-xl font-bold transition-all shadow-sm"
+                onClick={() => router.push('/admin/support')}
+              >
+                <Headphones className="w-4 h-4" /> Fila de Suporte {ticketsList && ticketsList.length > 0 && <Badge className="ml-1 h-4 px-1 text-[8px]">{ticketsList.length}</Badge>}
+              </Button>
+              <Button 
+                variant="outline" 
+                className="gap-2 border-primary/20 text-primary hover:bg-primary/5 h-12 rounded-xl font-bold transition-all shadow-sm"
+                onClick={() => router.push('/admin/advanced')}
+              >
+                <Settings className="w-4 h-4" /> Avisos Globais
+              </Button>
+            </div>
+          </header>
+        </div>
 
         <div className="grid gap-4 md:gap-6 grid-cols-2 md:grid-cols-4">
           <Card className="border-none shadow-sm overflow-hidden">
