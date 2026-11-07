@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -15,7 +14,7 @@ import {
 import { Card } from '@/components/ui/card';
 import { Star, User, Loader2, Globe, ArrowLeft, CheckCircle2, Clock, Play, ArrowRight, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Link from 'link';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/theme-toggle';
 import {
@@ -160,7 +159,7 @@ export default function PPClient({ slug }: { slug: string }) {
         )}
         style={{ 
           boxShadow: hasSecondary 
-            ? `0 0 25px ${secondaryColor}50, 0 10px 30px -10px rgba(0,0,0,0.15)` 
+            ? `0 0 35px ${secondaryColor}60, 0 15px 40px -10px rgba(0,0,0,0.2)` 
             : `0 20px 40px -20px ${themeColor}25`,
         }}
       >
