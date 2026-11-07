@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect, use } from 'react';
 import { useFirestore } from '@/firebase';
 import { doc, onSnapshot, collection, query, where } from 'firebase/firestore';
-import { Star, CheckCircle2, Clock, Play } from 'lucide-react';
+import { Star, CheckCircle2, Clock, Play, User } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import {
@@ -15,7 +15,7 @@ import {
 
 /**
  * Página pública do Widget (Embed VIP)
- * Renderiza o mural de depoimentos com visual Premium VIP.
+ * Renderiza o mural de depoimentos com o visual Premium Minimalista (Referência Wyctor).
  * Otimizada para temas menores e dispositivos móveis.
  */
 export default function WidgetPublicPage({ params }: { params: Promise<{ userId: string, widgetId: string }> }) {
@@ -103,42 +103,39 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
       <Card 
         key={t.id}
         className={cn(
-          "rounded-[2.5rem] p-6 sm:p-10 border-none shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] transition-all duration-700 hover:scale-[1.02] w-full max-w-full ring-1 ring-white/5",
+          "rounded-3xl p-6 sm:p-10 border-none shadow-2xl transition-all duration-700 hover:scale-[1.02] w-full max-w-full ring-1 ring-white/5",
           layout === 'grid' && "animate-in fade-in zoom-in-95 duration-500",
           layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-8 duration-700" : "animate-in fade-in slide-in-from-right-8 duration-700"),
           layout === 'popup' && !isAnimating && "animate-in fade-in zoom-in-90 duration-1000"
         )}
         style={{ 
           backgroundColor: secondaryColor || '#111111',
-          boxShadow: `0 30px 70px -20px ${themeColor}30, 0 20px 40px -20px rgba(0,0,0,0.5)`,
+          boxShadow: `0 30px 70px -20px ${themeColor}20`,
         }}
       >
         <div className="space-y-6 sm:space-y-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 sm:gap-4">
-              <div className="h-2.5 w-2.5 rounded-full animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.4)]" style={{ backgroundColor: themeColor }} />
-              <div className="min-w-0">
-                <p className="font-black text-[13px] sm:text-lg text-white tracking-tighter truncate max-w-[120px] sm:max-w-[180px] uppercase">{t.userName}</p>
-                <div className="flex items-center gap-1.5">
-                   <CheckCircle2 className="w-3 h-3 text-green-500 fill-green-500/10" />
-                   <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Feedback Verificado</span>
-                </div>
+          <div className="flex flex-col gap-4 sm:gap-6">
+            <div className="flex items-center gap-4">
+              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border-2 flex items-center justify-center shrink-0" style={{ borderColor: themeColor }}>
+                <User className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: themeColor }} />
               </div>
+              <p className="font-black text-base sm:text-xl text-white tracking-tighter truncate uppercase flex-1">{t.userName}</p>
             </div>
+            
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((s) => (
-                <Star key={s} className={cn("w-3.5 h-3.5 sm:w-5 sm:h-5 fill-current transition-all duration-700", s <= (t.rating || 5) ? "drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" : "opacity-10")} style={{ color: themeColor }} />
+                <Star key={s} className={cn("w-4 h-4 sm:w-6 sm:h-6 fill-current transition-all duration-700", s <= (t.rating || 5) ? "drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" : "opacity-10")} style={{ color: themeColor }} />
               ))}
             </div>
           </div>
 
           {t.videoUrl && (
-            <div className="relative aspect-video rounded-[2rem] overflow-hidden bg-black shadow-3xl ring-1 ring-white/10 group">
+            <div className="relative aspect-video rounded-2xl overflow-hidden bg-black shadow-3xl ring-1 ring-white/10 group">
                <video src={t.videoUrl} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" muted loop playsInline autoPlay />
                <div className="absolute bottom-4 left-4">
                  <div className="bg-black/60 backdrop-blur-xl px-4 py-1.5 rounded-full border border-white/10 shadow-2xl">
                    <p className="text-[8px] sm:text-[10px] text-white font-black uppercase tracking-[0.25em] flex items-center gap-2">
-                     <Play className="w-2.5 h-2.5 fill-white" /> Cinema Review
+                     <Play className="w-2.5 h-2.5 fill-white" /> Vídeo Review
                    </p>
                  </div>
                </div>
@@ -146,10 +143,9 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
           )}
 
           {t.text && t.text !== '(Depoimento em Vídeo)' && (
-            <div className="relative px-2">
-              <span className="absolute -top-6 -left-3 text-6xl sm:text-8xl opacity-[0.03] font-serif select-none pointer-events-none italic" style={{ color: themeColor }}>“</span>
-              <p className="text-zinc-200 font-bold text-sm sm:text-xl leading-relaxed italic relative z-10 tracking-tight drop-shadow-sm">
-                {t.text}
+            <div className="relative">
+              <p className="text-zinc-200 font-bold text-sm sm:text-2xl leading-relaxed italic tracking-tight drop-shadow-sm">
+                "{t.text}"
               </p>
             </div>
           )}
@@ -161,9 +157,9 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
                  {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Recent Post'}
                </span>
             </div>
-            <div className="flex items-center gap-1">
-               <div className="h-1 w-4 rounded-full opacity-20" style={{ backgroundColor: themeColor }} />
-               <div className="h-1 w-1 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
+            <div className="flex items-center gap-2 opacity-30">
+               <CheckCircle2 className="w-3 h-3 text-green-500" />
+               <span className="text-[7px] sm:text-[9px] font-black uppercase tracking-widest text-zinc-400">Verificado</span>
             </div>
           </div>
         </div>

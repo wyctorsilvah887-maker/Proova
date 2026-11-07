@@ -25,7 +25,6 @@ import {
   Shield,
   Sun,
   Moon,
-  Lock,
   Zap,
   Settings2,
   Sparkles,
@@ -82,30 +81,28 @@ type LayoutType = 'mural' | 'carousel' | 'grid' | 'popup';
 const TestimonialCardPreview = ({ t, themeColor, secondaryColor }: { t: any, themeColor: string, secondaryColor: string }) => {
   return (
     <Card 
-      className="rounded-[2.5rem] p-7 border-none shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] text-left ring-1 ring-white/5 transition-all hover:scale-[1.02]"
+      className="rounded-3xl p-6 border-none shadow-2xl text-left ring-1 ring-white/5 transition-all hover:scale-[1.02]"
       style={{ 
         backgroundColor: secondaryColor || '#111111',
       }}
     >
-      <div className="space-y-5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-             <div className="h-2 w-2 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
-             <p className="font-black text-xs text-white tracking-tight truncate max-w-[120px]">{t.userName}</p>
+      <div className="space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-full border flex items-center justify-center shrink-0" style={{ borderColor: themeColor }}>
+            <User className="w-4 h-4" style={{ color: themeColor }} />
           </div>
-          <div className="flex gap-0.5">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} className="w-3 h-3 fill-current drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]" style={{ color: themeColor }} />
-            ))}
-          </div>
+          <p className="font-black text-sm text-white tracking-tight truncate flex-1">{t.userName}</p>
         </div>
+        
+        <div className="flex gap-0.5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Star key={i} className="w-4 h-4 fill-current" style={{ color: themeColor }} />
+          ))}
+        </div>
+
         {t.text && t.text !== '(Depoimento em Vídeo)' && (
-          <p className="italic text-[11px] leading-relaxed text-zinc-300 font-medium">"{t.text}"</p>
+          <p className="italic text-xs leading-relaxed text-zinc-300 font-medium">"{t.text}"</p>
         )}
-        <div className="pt-2 flex items-center gap-2 opacity-30">
-          <CheckCircle2 className="w-3 h-3 text-green-500" />
-          <span className="text-[8px] font-black uppercase tracking-widest text-white">Verificado</span>
-        </div>
       </div>
     </Card>
   );
@@ -437,7 +434,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
             </div>
             
             <div className="relative border shadow-2xl bg-muted/20 p-8 md:p-12 rounded-[3rem] min-h-[400px] flex items-center justify-center ring-1 ring-primary/5">
-              <div className="w-full max-w-2xl">
+              <div className="w-full max-w-lg">
                 {currentSelection.length > 0 ? (
                   <div className={cn("grid gap-6", layout === 'grid' || layout === 'mural' ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1")}>
                     {currentSelection.slice(0, 4).map((t: any) => <TestimonialCardPreview key={t.id} t={t} themeColor={themeColor} secondaryColor={secondaryColor} />)}
