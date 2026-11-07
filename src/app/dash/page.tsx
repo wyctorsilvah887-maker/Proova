@@ -319,7 +319,6 @@ export default function DashPage() {
   const completedStepsCount = setupSteps.filter(s => s.completed).length;
   const progressPercentage = (completedStepsCount / setupSteps.length) * 100;
   const isSetupComplete = completedStepsCount === setupSteps.length;
-  const isCollectDone = setupSteps.find(s => s.id === 'collect')?.completed;
   
   const isGoogleDone = useMemo(() => {
     if (isDigitalBusiness) return true;
@@ -361,8 +360,8 @@ export default function DashPage() {
         });
       }
 
-      if (pushSupported && permission === 'default') {
-        const vapidKey = process.env.NEXT_PUBLIC_VAPID_KEY;
+      // Lógica de Auditoria Push: Só mostra o alerta se o usuário NÃO tiver um token salvo e ativo no perfil
+      if (pushSupported && !userData.fcmToken && permission !== 'denied') {
         results.push({
           id: 'push-inactive',
           label: 'Notificações Desativadas',
@@ -370,8 +369,9 @@ export default function DashPage() {
           description: 'Ative os alertas para saber instantaneamente quando receber um elogio.',
           actionLabel: 'Ativar Agora',
           action: () => {
+            const vapidKey = process.env.NEXT_PUBLIC_VAPID_KEY;
             if (!vapidKey) {
-              shadcnToast({ variant: "destructive", title: "Configuração Pendente", description: "O administrador ainda não configurou a VAPID Key no ambiente." });
+              shadcnToast({ variant: "destructive", title: "Configuração Pendente", description: "O administrador ainda não configurou a VAPID Key no ambiente de produção." });
               return;
             }
             requestPermission(vapidKey);
