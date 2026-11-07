@@ -22,6 +22,7 @@
         "googleRedirectCount": { "type": "number" },
         "ppVisitCount": { "type": "number" },
         "whatsappClickCount": { "type": "number" },
+        "fcmToken": { "type": "string", "description": "Token para envio de notificações push via FCM." },
         "createdAt": { "type": "string", "format": "date-time" }
       }
     },

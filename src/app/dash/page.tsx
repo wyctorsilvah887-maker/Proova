@@ -78,7 +78,9 @@ import {
   BookOpen,
   Wand2,
   RefreshCw,
-  Headphones
+  Headphones,
+  Bell,
+  BellRing
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -116,6 +118,7 @@ import { toPng } from 'html-to-image';
 import { cn } from '@/lib/utils';
 import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-actions';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { useNotifications } from '@/hooks/use-notifications';
 
 interface AuditItem {
   id: string;
@@ -171,6 +174,9 @@ export default function DashPage() {
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
+
+  // Sistema de Notificações Push
+  const { permission, requestPermission, isSupported: pushSupported } = useNotifications(user?.uid);
 
   // Sistema de Notificações de Suporte em Tempo Real
   const supportTicketQuery = useMemo(() => {
@@ -352,6 +358,18 @@ export default function DashPage() {
         });
       }
 
+      if (pushSupported && permission === 'default') {
+        results.push({
+          id: 'push-inactive',
+          label: 'Notificações Desativadas',
+          status: 'attention',
+          description: 'Ative os alertas para saber instantaneamente quando receber um elogio.',
+          actionLabel: 'Ativar Agora',
+          action: () => requestPermission('BNpA6y9_8O6E5R8w... (SUA_VAPID_KEY_AQUI)'), // O USUÁRIO DEVE TROCAR PELA CHAVE DO CONSOLE
+          icon: BellRing
+        });
+      }
+
       if (!isDigitalBusiness) {
         const mapsUrl = (userData.googleMapsUrl || '').toLowerCase().trim();
         const isReviewLink = mapsUrl.includes('review') || mapsUrl.includes('writereview');
@@ -375,7 +393,7 @@ export default function DashPage() {
       setIsAuditing(false);
     }
     runAudit();
-  }, [isSetupComplete, userData, widgetsList, pendingTestimonialsCount, router, isEnterpriseUser, isDigitalBusiness]);
+  }, [isSetupComplete, userData, widgetsList, pendingTestimonialsCount, router, isEnterpriseUser, isDigitalBusiness, pushSupported, permission]);
 
   const filteredMetrics = useMemo(() => {
     const testimonials = approvedTestimonials;
@@ -630,8 +648,20 @@ export default function DashPage() {
         <div className="flex items-center">
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[200px] h-[66px] md:w-[320px] md:h-[106px] transition-transform group-hover:scale-105">
-              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
-              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+              <Image 
+                src="/Logotipo%20PROOVA%20white%20mode%201.png" 
+                alt="Logo" 
+                fill 
+                className="object-contain object-left dark:hidden" 
+                priority 
+              />
+              <Image 
+                src="/Logotipo%20PROOVA%20dark%20mode%201.png" 
+                alt="Logo" 
+                fill 
+                className="object-contain object-left hidden dark:block" 
+                priority 
+              />
             </div>
           </Link>
         </div>
@@ -656,6 +686,7 @@ export default function DashPage() {
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
               <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator className="mx-1" />
+              
               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
@@ -896,7 +927,7 @@ export default function DashPage() {
             </button>
 
             <button 
-              disabled={!isSetupComplete && !userData?.isSetupProcessDone} 
+              disabled={!userData?.isSetupProcessDone && completedStepsCount < setupSteps.length} 
               onClick={() => router.push('/private')} 
               className="h-24 rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all relative shadow-sm active:scale-95 disabled:opacity-40"
             >
@@ -1253,7 +1284,7 @@ export default function DashPage() {
                         </div>
                         
                         <div className="relative w-full max-w-[90%]">
-                          <Quote className="absolute -top-4 -left-3 w-6 h-6 text-white opacity-20 rotate-180" />
+                          <平和 className="absolute -top-4 -left-3 w-6 h-6 text-white opacity-20 rotate-180" />
                           <div className="bg-white/5 backdrop-blur-xl p-6 sm:p-8 rounded-[2rem] border border-white/10 shadow-2xl ring-1 ring-white/5">
                             <p className={cn(
                               "font-black font-headline leading-tight italic drop-shadow-md tracking-tight transition-all duration-1000 text-white",
@@ -1263,7 +1294,7 @@ export default function DashPage() {
                               "{selectedTestimonialForShare?.text}"
                             </p>
                           </div>
-                          <Quote className="absolute -bottom-4 -right-3 w-6 h-6 text-white opacity-20" />
+                          <平和 className="absolute -bottom-4 -right-3 w-6 h-6 text-white opacity-20" />
                         </div>
                       </div>
 

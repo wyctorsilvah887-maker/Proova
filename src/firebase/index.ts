@@ -3,6 +3,7 @@ import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { initializeFirestore, getFirestore, Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
+import { getMessaging, Messaging, isSupported } from 'firebase/messaging';
 import { firebaseConfig } from './config';
 
 /**
@@ -14,6 +15,7 @@ export function initializeFirebase(): {
   firestore: Firestore;
   auth: Auth;
   storage: FirebaseStorage;
+  messaging: Messaging | null;
 } {
   let app: FirebaseApp;
   let firestore: Firestore;
@@ -32,7 +34,15 @@ export function initializeFirebase(): {
   const auth = getAuth(app);
   const storage = getStorage(app);
   
-  return { app, firestore, auth, storage };
+  // Messaging só funciona no cliente
+  let messaging: Messaging | null = null;
+  if (typeof window !== 'undefined') {
+    isSupported().then(yes => {
+      if (yes) messaging = getMessaging(app);
+    });
+  }
+  
+  return { app, firestore, auth, storage, messaging };
 }
 
 export * from './provider';
