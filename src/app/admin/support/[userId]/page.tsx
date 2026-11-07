@@ -15,7 +15,8 @@ import {
   ExternalLink,
   MessageSquare,
   Clock,
-  Sparkles
+  Sparkles,
+  CheckCircle2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,12 +33,14 @@ import {
   where, 
   getDocs,
   updateDoc,
-  Timestamp
+  Timestamp,
+  writeBatch
 } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { notifySupportPresence } from '@/app/actions/support-actions';
 import { Badge } from '@/components/ui/badge';
+import { toast } from '@/hooks/use-toast';
 
 export default function AdminChatPage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = use(params);
@@ -47,6 +50,7 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
   
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [isResolving, setIsResolving] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const targetUserRef = useMemo(() => (db ? doc(db, 'users', userId) : null), [db, userId]);
@@ -136,6 +140,39 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
     }
   };
 
+  const handleResolveSupport = async () => {
+    if (!db || isResolving) return;
+    setIsResolving(true);
+
+    try {
+      const q = query(collection(db, 'support_tickets'), where('userId', '==', userId), limit(1));
+      const snap = await getDocs(q);
+      
+      const batch = writeBatch(db);
+      
+      // 1. Enviar mensagem de encerramento
+      const messagesRef = collection(db, 'users', userId, 'support_messages');
+      batch.set(doc(messagesRef), {
+        text: "O atendimento humano foi concluído com sucesso. ✅\nO **Consultor Proova** foi reativado para te auxiliar. Como posso ajudar?",
+        sender: 'support',
+        createdAt: serverTimestamp(),
+        isSystem: true
+      });
+
+      // 2. Remover o ticket
+      if (!snap.empty) {
+        batch.delete(snap.docs[0].ref);
+      }
+
+      await batch.commit();
+      toast({ title: "Atendimento Concluído", description: "O ticket foi resolvido e o bot reativado." });
+      router.push('/admin/support');
+    } catch (err) {
+      toast({ variant: "destructive", title: "Erro ao concluir" });
+      setIsResolving(false);
+    }
+  };
+
   if (userLoading || messagesLoading) {
     return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
   }
@@ -161,6 +198,24 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
           </div>
         </div>
         <div className="ml-auto flex items-center gap-3">
+          <Button 
+            variant="outline" 
+            className="hidden sm:flex h-10 rounded-xl gap-2 font-bold text-green-600 border-green-600/20 hover:bg-green-50"
+            onClick={handleResolveSupport}
+            disabled={isResolving}
+          >
+            {isResolving ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+            Concluir Atendimento
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="sm:hidden text-green-600"
+            onClick={handleResolveSupport}
+            disabled={isResolving}
+          >
+            <CheckCircle2 className="w-5 h-5" />
+          </Button>
           <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full">
             <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
             <span className="text-[9px] font-black uppercase tracking-widest text-green-600">Sessão Ativa</span>
@@ -208,13 +263,13 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
                  onChange={(e) => setMessage(e.target.value)}
                  placeholder="Digite sua resposta técnica ou estratégica..."
                  className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs md:text-sm font-medium"
-                 disabled={isSending}
+                 disabled={isSending || isResolving}
                />
                <Button 
                 type="submit" 
                 size="icon" 
                 className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl shadow-xl bg-primary hover:bg-primary/90 shrink-0"
-                disabled={!message.trim() || isSending}
+                disabled={!message.trim() || isSending || isResolving}
                >
                  {isSending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                </Button>

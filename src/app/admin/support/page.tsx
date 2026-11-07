@@ -12,7 +12,7 @@ import {
   Search, Filter, MessageSquare
 } from 'lucide-react';
 import { useFirestore, useUser, useCollection, useDoc } from '@/firebase';
-import { collection, query, doc, deleteDoc, orderBy, updateDoc } from 'firebase/firestore';
+import { collection, query, doc, deleteDoc, orderBy, updateDoc, writeBatch, serverTimestamp } from 'firebase/firestore';
 import { toast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
@@ -46,11 +46,35 @@ export default function AdminSupportPage() {
     );
   }, [ticketsList, searchTerm]);
 
+  const handleResolveTicket = async (ticket: any) => {
+    if (!db) return;
+    try {
+      const batch = writeBatch(db);
+      
+      // 1. Remover o ticket da fila
+      batch.delete(doc(db, 'support_tickets', ticket.id));
+      
+      // 2. Enviar mensagem de encerramento para o usuário
+      const messagesRef = collection(db, 'users', ticket.userId, 'support_messages');
+      batch.set(doc(messagesRef), {
+        text: "O atendimento humano foi concluído com sucesso. ✅\nO **Consultor Proova** foi reativado para te auxiliar. Como posso ajudar?",
+        sender: 'support',
+        createdAt: serverTimestamp(),
+        isSystem: true
+      });
+
+      await batch.commit();
+      toast({ title: "Ticket Resolvido", description: "O atendimento foi removido da fila e o bot reativado." });
+    } catch (error: any) {
+      toast({ variant: "destructive", title: "Erro ao resolver" });
+    }
+  };
+
   const handleDeleteTicket = async (id: string) => {
     if (!db) return;
     try {
       await deleteDoc(doc(db, 'support_tickets', id));
-      toast({ title: "Ticket Resolvido", description: "O atendimento foi removido da fila." });
+      toast({ title: "Removido", description: "O ticket foi excluído sem notificação." });
     } catch (error: any) {
       toast({ variant: "destructive", title: "Erro ao remover" });
     }
@@ -204,7 +228,7 @@ export default function AdminSupportPage() {
                             variant="ghost" 
                             size="icon" 
                             className="h-8 w-8 rounded-xl text-green-600 hover:bg-green-50"
-                            onClick={() => handleDeleteTicket(ticket.id)}
+                            onClick={() => handleResolveTicket(ticket)}
                             title="Marcar como Resolvido"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" />
