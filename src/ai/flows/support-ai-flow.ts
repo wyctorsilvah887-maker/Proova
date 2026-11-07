@@ -25,17 +25,14 @@ const SupportAiOutputSchema = z.object({
 export type SupportAiOutput = z.infer<typeof SupportAiOutputSchema>;
 
 /**
- * Função de ação do servidor que aciona o fluxo Genkit.
+ * Função de ação do servidor que aciona o suporte inteligente.
+ * Utiliza o modelo e plugin configurados globalmente no objeto ai.
  */
 export async function supportAiAction(input: SupportAiInput): Promise<SupportAiOutput> {
-  return supportAiFlow(input);
-}
-
-const prompt = ai.definePrompt({
-  name: 'supportAiPrompt',
-  input: { schema: SupportAiInputSchema },
-  output: { schema: SupportAiOutputSchema },
-  prompt: `Você é o "Especialista Proova", o assistente de suporte inteligente da plataforma Proova.
+  const { output } = await ai.generate({
+    input: input,
+    output: { schema: SupportAiOutputSchema },
+    system: `Você é o "Especialista Proova", o assistente de suporte inteligente da plataforma Proova.
 Sua missão é ajudar o usuário {{{userName}}} (Plano: {{{membershipStatus}}}) a dominar o mercado através da prova social.
 
 ### CONHECIMENTO ESTRATÉGICO PROOVA:
@@ -52,25 +49,13 @@ Sua missão é ajudar o usuário {{{userName}}} (Plano: {{{membershipStatus}}}) 
 - Se o usuário perguntar sobre Auto-Publish ou Vídeo Reviews e não for 'enterprise', mencione que estes são os diferenciais do plano Enterprise.
 - Nunca invente funcionalidades. Se não souber algo, peça para ele aguardar um consultor humano.
 - Use emojis moderadamente para manter o visual "tech".
-- Mantenha as respostas concisas para facilitar a leitura no chat.
+- Mantenha as respostas concisas para facilitar a leitura no chat.`,
+    prompt: `Dúvida do Usuário: {{{message}}}`,
+  });
 
-Dúvida do Usuário: {{{message}}}`,
-});
-
-/**
- * Fluxo oficial que encapsula a chamada do prompt para registro correto no plugin googleai.
- */
-const supportAiFlow = ai.defineFlow(
-  {
-    name: 'supportAiFlow',
-    inputSchema: SupportAiInputSchema,
-    outputSchema: SupportAiOutputSchema,
-  },
-  async (input) => {
-    const { output } = await prompt(input);
-    if (!output) {
-      throw new Error('A IA não gerou uma resposta válida para o suporte.');
-    }
-    return output;
+  if (!output) {
+    throw new Error('A IA não gerou uma resposta válida para o suporte.');
   }
-);
+
+  return output;
+}
