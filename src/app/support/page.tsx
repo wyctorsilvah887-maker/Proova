@@ -22,13 +22,27 @@ import {
   Zap,
   Sparkles,
   Headphones,
-  Ticket
+  Ticket,
+  XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUser, useFirestore, useCollection, useDoc, useAuth } from '@/firebase';
-import { collection, addDoc, serverTimestamp, query, orderBy, limit, doc, where, Timestamp } from 'firebase/firestore';
+import { 
+  collection, 
+  addDoc, 
+  serverTimestamp, 
+  query, 
+  orderBy, 
+  limit, 
+  doc, 
+  where, 
+  Timestamp, 
+  getDocs, 
+  deleteDoc, 
+  writeBatch 
+} from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -43,6 +57,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { getConsultantResponse } from '@/lib/consultant-rules';
+import { toast } from '@/hooks/use-toast';
 
 export default function SupportPage() {
   const { user, loading: authLoading } = useUser();
@@ -55,6 +70,7 @@ export default function SupportPage() {
   const [isSending, setIsSending] = useState(false);
   const [isAiThinking, setIsAiThinking] = useState(false);
   const [isCreatingTicket, setIsCreatingTicket] = useState(false);
+  const [isEndingChat, setIsEndingChat] = useState(false);
   const [localMessages, setLocalMessages] = useState<any[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -210,6 +226,41 @@ export default function SupportPage() {
     }
   };
 
+  const handleEndChat = async () => {
+    if (!user || !db || isEndingChat) return;
+    
+    if (!confirm("Isso apagará todo o histórico e tickets ativos. Deseja encerrar?")) return;
+
+    setIsEndingChat(true);
+    try {
+      const batch = writeBatch(db);
+
+      // 1. Apagar Mensagens
+      const messagesRef = collection(db, 'users', user.uid, 'support_messages');
+      const messagesSnap = await getDocs(messagesRef);
+      messagesSnap.forEach(doc => batch.delete(doc.ref));
+
+      // 2. Apagar Tickets
+      const ticketsRef = collection(db, 'support_tickets');
+      const ticketsSnap = await getDocs(query(ticketsRef, where('userId', '==', user.uid)));
+      ticketsSnap.forEach(doc => batch.delete(doc.ref));
+
+      await batch.commit();
+
+      // 3. Limpar LocalStorage e Estado
+      localStorage.removeItem(`proova_support_v1_${user.uid}`);
+      setLocalMessages([]);
+      
+      toast({ title: "Atendimento Encerrado", description: "Histórico limpo com sucesso." });
+      router.push('/dash');
+    } catch (err: any) {
+      console.error(err);
+      toast({ variant: "destructive", title: "Erro ao encerrar", description: "Não foi possível limpar os dados agora." });
+    } finally {
+      setIsEndingChat(false);
+    }
+  };
+
   const isMapsLinkValid = !!userData?.googleMapsUrl;
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
@@ -312,6 +363,17 @@ export default function SupportPage() {
                 </div>
               </div>
             </div>
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleEndChat}
+              disabled={isEndingChat || (localMessages.length === 0 && !isAiThinking)}
+              className="h-9 px-3 rounded-xl gap-2 text-destructive border-destructive/20 hover:bg-destructive/5 font-bold transition-all text-[10px] uppercase tracking-widest"
+            >
+              {isEndingChat ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3 h-3" />}
+              Encerrar Atendimento
+            </Button>
           </div>
 
           <ScrollArea ref={scrollRef} className="flex-1 px-4 py-6 md:p-10">
@@ -403,14 +465,14 @@ export default function SupportPage() {
                      onChange={(e) => setMessage(e.target.value)}
                      placeholder="Digite o número da opção (ex: 1)..."
                      className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 pr-10 text-xs md:text-sm font-medium transition-all"
-                     disabled={isSending || isAiThinking}
+                     disabled={isSending || isAiThinking || isEndingChat}
                    />
                  </div>
                  <Button 
                   type="submit" 
                   size="icon" 
                   className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl shadow-xl transition-all active:scale-90 bg-primary hover:bg-primary/90 shrink-0"
-                  disabled={!message.trim() || isSending || isAiThinking}
+                  disabled={!message.trim() || isSending || isAiThinking || isEndingChat}
                  >
                    {isSending || isAiThinking ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                  </Button>

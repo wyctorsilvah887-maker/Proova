@@ -14,7 +14,12 @@ service cloud.firestore {
     // Regras para Tickets de Suporte Global
     match /support_tickets/{ticketId} {
       allow create: if request.auth != null;
-      allow read, update, delete: if request.auth != null && 
+      // Usuário pode deletar seu próprio ticket ao encerrar o chat
+      allow delete: if request.auth != null && (
+        resource.data.userId == request.auth.uid ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true
+      );
+      allow read, update: if request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
 
@@ -48,7 +53,7 @@ service cloud.firestore {
       
       // Suporte Técnico (Chat)
       match /support_messages/{messageId} {
-        allow read, create: if request.auth != null && request.auth.uid == userId;
+        allow read, create, delete: if request.auth != null && request.auth.uid == userId;
       }
 
       // Página Pública (PP)
