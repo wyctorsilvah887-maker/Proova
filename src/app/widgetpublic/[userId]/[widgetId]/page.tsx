@@ -103,13 +103,15 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
       <Card 
         key={t.id}
         className={cn(
-          "rounded-2xl p-4 border-none shadow-xl transition-all duration-700 w-full max-w-full ring-1 ring-black/5 dark:ring-white/5 bg-card text-card-foreground",
+          "rounded-2xl p-4 border-none transition-all duration-700 w-full max-w-full bg-white dark:bg-black text-black dark:text-white",
           layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-4 duration-700" : "animate-in fade-in slide-in-from-right-4 duration-700"),
           layout === 'popup' && !isAnimating && "animate-in fade-in zoom-in-90 duration-1000"
         )}
         style={{ 
-          backgroundColor: hasSecondary ? secondaryColor : undefined,
-          boxShadow: `0 10px 30px -10px ${themeColor}15`,
+          border: hasSecondary ? `2px solid ${secondaryColor}` : 'none',
+          boxShadow: hasSecondary 
+            ? `0 0 15px ${secondaryColor}40, 0 10px 30px -10px rgba(0,0,0,0.1)` 
+            : `0 10px 30px -10px ${themeColor}15`,
         }}
       >
         <div className="space-y-3">
@@ -118,7 +120,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
               <User className="w-3.5 h-3.5" style={{ color: themeColor }} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-black text-[10px] sm:text-[11px] text-foreground tracking-tight truncate uppercase leading-none">{t.userName}</p>
+              <p className="font-black text-[10px] sm:text-[11px] tracking-tight truncate uppercase leading-none">{t.userName}</p>
               <div className="flex gap-0.5 mt-0.5">
                 {[1, 2, 3, 4, 5].map((s) => (
                   <Star key={s} className={cn("w-2 h-2 sm:w-2.5 sm:h-2.5 fill-current transition-all duration-700", s <= (t.rating || 5) ? "" : "opacity-10")} style={{ color: themeColor }} />
@@ -142,14 +144,14 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
 
           {t.text && t.text !== '(Depoimento em Vídeo)' && (
             <div className="relative">
-              <p className="text-muted-foreground font-bold text-[10px] sm:text-[12px] leading-relaxed italic tracking-tight line-clamp-3">
+              <p className="opacity-70 font-bold text-[10px] sm:text-[12px] leading-relaxed italic tracking-tight line-clamp-3">
                 "{t.text}"
               </p>
             </div>
           )}
 
           <div className="pt-2 border-t border-muted/20 flex items-center justify-between opacity-50">
-            <div className="flex items-center gap-1 text-muted-foreground">
+            <div className="flex items-center gap-1">
                <Clock className="w-2.5 h-2.5 opacity-50" />
                <span className="text-[6px] font-black uppercase tracking-widest">
                  {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Agora'}
@@ -157,7 +159,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
             </div>
             <div className="flex items-center gap-1">
                <CheckCircle2 className="w-2 h-2 text-green-500" />
-               <span className="text-[6px] font-black uppercase tracking-widest text-muted-foreground">Verificado</span>
+               <span className="text-[6px] font-black uppercase tracking-widest">Verificado</span>
             </div>
           </div>
         </div>

@@ -104,13 +104,16 @@ const TestimonialCardPreview = ({
   return (
     <Card 
       className={cn(
-        "rounded-[1.5rem] p-4 border-none shadow-xl text-left ring-1 ring-black/5 dark:ring-white/5 transition-all duration-700 w-full",
+        "rounded-[1.5rem] p-4 border-none shadow-xl text-left transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white",
         !isPopup && (side === 'left' ? "animate-in fade-in slide-in-from-left-4" : "animate-in fade-in slide-in-from-right-4"),
         isPopup && !isAnimating && "animate-in fade-in zoom-in-95 duration-1000",
         isPopup && isAnimating && "animate-out fade-out zoom-out-95 duration-1000"
       )}
       style={{ 
-        backgroundColor: hasSecondary ? secondaryColor : undefined,
+        border: hasSecondary ? `2px solid ${secondaryColor}` : 'none',
+        boxShadow: hasSecondary 
+          ? `0 0 15px ${secondaryColor}40, 0 10px 30px -10px rgba(0,0,0,0.1)` 
+          : `0 10px 30px -10px ${themeColor}15`,
       }}
     >
       <div className="space-y-3">
@@ -119,7 +122,7 @@ const TestimonialCardPreview = ({
             <User className="w-3.5 h-3.5" style={{ color: themeColor }} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-black text-[11px] text-foreground tracking-tight truncate uppercase leading-none">{t.userName}</p>
+            <p className="font-black text-[11px] tracking-tight truncate uppercase leading-none">{t.userName}</p>
             <div className="flex gap-0.5 mt-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star key={i} className={cn("w-2.5 h-2.5 fill-current", i < (t.rating || 5) ? "" : "opacity-10")} style={{ color: themeColor }} />
@@ -129,7 +132,7 @@ const TestimonialCardPreview = ({
         </div>
 
         {t.text && t.text !== '(Depoimento em Vídeo)' && (
-          <p className="italic text-[11px] sm:text-xs leading-relaxed text-muted-foreground font-medium tracking-tight">"{t.text}"</p>
+          <p className="italic text-[11px] sm:text-xs leading-relaxed opacity-70 font-medium tracking-tight">"{t.text}"</p>
         )}
         
         <div className="pt-2 border-t border-muted/20 flex items-center justify-between opacity-50">
@@ -268,7 +271,7 @@ const EmbedSettings = ({
           <div className="space-y-6 pt-4 border-t">
             <div className="space-y-4">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2 ml-1">
-                <Palette className="w-3 h-3 text-primary" /> Cor de Fundo do Card
+                <Palette className="w-3 h-3 text-primary" /> Efeito Bordas Neon
               </Label>
               <div className="flex flex-wrap gap-2">
                 <button 
@@ -277,7 +280,7 @@ const EmbedSettings = ({
                     "w-7 h-7 rounded-full border-2 transition-transform flex items-center justify-center bg-muted/20 relative overflow-hidden", 
                     !secondaryColor ? "border-foreground scale-110 shadow-sm" : "border-transparent opacity-80"
                   )}
-                  title="Automático (Modo Claro/Escuro)"
+                  title="Nenhum Efeito"
                 >
                   <div className="absolute inset-0 bg-card" />
                   <div className="absolute inset-0 flex items-center justify-center"><div className="w-px h-full bg-red-500 rotate-45" /></div>
@@ -286,6 +289,7 @@ const EmbedSettings = ({
                   <button key={color} onClick={() => setSecondaryColor(color)} className={cn("w-7 h-7 rounded-full border-2 transition-transform", secondaryColor === color ? "border-foreground scale-110 shadow-sm" : "border-transparent opacity-80 shadow-inner")} style={{ backgroundColor: color }} />
                 ))}
               </div>
+              <p className="text-[9px] text-muted-foreground italic ml-1">Escolha uma cor para ativar o brilho neon nas bordas.</p>
             </div>
           </div>
         </div>
