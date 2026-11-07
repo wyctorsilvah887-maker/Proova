@@ -311,7 +311,7 @@ export default function WidgetsPage() {
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -359,7 +359,7 @@ export default function WidgetsPage() {
             </div>
           ) : filteredWidgets.length > 0 ? (
             filteredWidgets.map((w: any) => (
-              <Card key={w.id} className="border-none shadow-sm hover:shadow-md transition-all overflow-hidden group rounded-2xl">
+              <Card key={w.id} className="border-none shadow-sm hover:shadow-md transition-all overflow-hidden group rounded-2xl relative">
                 <div className="flex flex-col p-5 md:p-6 gap-6">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
@@ -367,7 +367,7 @@ export default function WidgetsPage() {
                         <Layout className="w-6 h-6 text-primary group-hover:text-black transition-colors" />
                       </div>
                       <div className="space-y-1.5 flex-1 min-w-0">
-                        <h3 className="font-black font-headline text-lg md:text-xl truncate group-hover:text-primary transition-colors pr-8 sm:pr-0">{w.name}</h3>
+                        <h3 className="font-black font-headline text-lg md:text-xl truncate group-hover:text-primary transition-colors pr-10 sm:pr-0">{w.name}</h3>
                         <div className="flex flex-wrap gap-2">
                           <Badge variant="secondary" className="text-[9px] h-5 bg-primary/5 text-primary border-none px-2 font-black">
                             {w.selectedTestimonialIds?.length || 0} AVALIAÇÕES
@@ -379,14 +379,14 @@ export default function WidgetsPage() {
                       </div>
                     </div>
 
-                    <div className="absolute right-4 top-4 sm:relative sm:right-0 sm:top-0">
+                    <div className="absolute right-4 top-5 sm:relative sm:right-0 sm:top-0">
                       <Button 
                         variant="ghost" 
                         size="icon" 
                         className="text-destructive h-10 w-10 hover:bg-destructive/10 rounded-xl"
                         onClick={() => setWidgetToDelete(w)}
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-5 h-5" />
                       </Button>
                     </div>
                   </div>
@@ -466,7 +466,7 @@ export default function WidgetsPage() {
 
       {/* Confirmação de Exclusão */}
       <AlertDialog open={!!widgetToDelete} onOpenChange={() => setWidgetToDelete(null)}>
-        <AlertDialogContent className="rounded-[2rem] border-none shadow-2xl p-8">
+        <AlertDialogContent className="rounded-[2.5rem] border-none shadow-2xl p-8">
           <AlertDialogHeader className="space-y-4">
             <div className="mx-auto bg-destructive/10 p-4 rounded-full w-fit">
               <AlertTriangle className="w-8 h-8 text-destructive" />
