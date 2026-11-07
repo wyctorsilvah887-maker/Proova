@@ -383,7 +383,13 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
         </aside>
 
         <Sheet open={isSidebarOpen && isMobile} onOpenChange={setIsSidebarOpen}>
-          <SheetContent side="left" className="p-0 w-80 border-none"><EmbedSettings {...sidebarProps} /></SheetContent>
+          <SheetContent side="left" className="p-0 w-80 border-none">
+            <SheetHeader className="sr-only">
+              <SheetTitle>Configurações do Mural</SheetTitle>
+              <SheetDescription>Ajuste o layout, automações e cores do seu mural de depoimentos.</SheetDescription>
+            </SheetHeader>
+            <EmbedSettings {...sidebarProps} />
+          </SheetContent>
         </Sheet>
 
         <div className="flex-1 overflow-y-auto bg-muted/30 p-4 sm:p-8">

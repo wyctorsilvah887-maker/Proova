@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useRef, forwardRef } from "react";
@@ -7,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import Script from "next/script";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { 
   Star, 
@@ -469,16 +467,14 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
             <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card p-4 sm:p-8 ring-1 ring-primary/10">
               <div className="w-full flex items-center justify-center min-h-[450px]">
-                {/* 
-                  Mural Oficial Proova: 
-                  O contêiner possui o ID correspondente ao widget para injeção automática do script de linha única.
-                */}
-                <div id="primeiromuralproova" className="w-full">
-                  <div className="flex flex-col items-center justify-center py-12 text-muted-foreground animate-pulse">
-                    <Loader2 className="w-8 h-8 animate-spin mb-4" />
-                    <p className="text-[10px] font-black uppercase tracking-widest">Carregando Prova Social...</p>
-                  </div>
-                </div>
+                {/* O NOVO EMBED VIA IFRAME: Simples, rápido e robusto */}
+                <iframe 
+                  src="/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova" 
+                  width="100%" 
+                  height="600px" 
+                  style={{ border: 'none' }} 
+                  allowtransparency="true"
+                ></iframe>
               </div>
             </Card>
           </div>
@@ -843,12 +839,6 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
-      {/* Script Oficial Proova (Linha Única) */}
-      <Script 
-        src="https://6000-firebase-studio-1777301707689.cluster-mdgxqvvkkbfpqrfigfiuugu5pk.cloudworkstations.dev/widget.js?id=primeiromuralproova&user=EE6Mqdqq4Pc4maNgFy7rNq52ms13" 
-        strategy="afterInteractive"
-      />
-
       <Navigation 
         isScrolled={isScrolled} 
         isMenuOpen={isMenuOpen} 
