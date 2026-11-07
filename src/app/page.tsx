@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useRef, forwardRef } from "react";
@@ -477,13 +476,15 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
             </Card>
             
             <div className="mt-6 text-center animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-1000">
-              <Link 
+              <a 
                 href="https://www.useproova.online/c/proova" 
-                className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center justify-center gap-2 group"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center justify-center gap-2 group cursor-pointer"
               >
                 Quer aparecer na nossa página? Deixe sua experiência usando o Proova
                 <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-              </Link>
+              </a>
             </div>
           </div>
         </div>
