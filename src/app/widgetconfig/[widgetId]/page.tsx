@@ -344,7 +344,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const [isCodeDialogOpen, setIsCodeDialogOpen] = useState(false);
   const [baseUrl, setBaseUrl] = useState('');
   
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   // Estados para animação do preview
