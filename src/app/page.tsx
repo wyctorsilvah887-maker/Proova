@@ -477,15 +477,13 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
             </Card>
             
             <div className="mt-8 text-center animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-1000 relative z-20">
-              <a 
-                href="https://www.useproova.online/c/proova" 
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link 
+                href="/c/proova" 
                 className="inline-flex items-center justify-center gap-2 group cursor-pointer text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-all py-2 px-4 rounded-full bg-background/50 backdrop-blur-sm border border-border/50 shadow-sm"
               >
                 Quer aparecer na nossa página? Deixe sua experiência usando o Proova
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </a>
+              </Link>
             </div>
           </div>
         </div>
