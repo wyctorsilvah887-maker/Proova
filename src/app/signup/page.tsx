@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from "react";
@@ -108,6 +109,7 @@ export default function SignupPage() {
         businessType: businessType,
         isAdmin: false,
         membershipStatus: 'base',
+        isSetupProcessDone: false,
         testimonialsCount: 0,
         googleRedirectCount: 0,
         createdAt: serverTimestamp(),

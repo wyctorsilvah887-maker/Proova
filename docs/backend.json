@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -16,6 +17,7 @@
         "googlePlaceId": { "type": "string" },
         "isAdmin": { "type": "boolean" },
         "membershipStatus": { "type": "string" },
+        "isSetupProcessDone": { "type": "boolean", "description": "Indica se o usuário já completou o checklist de onboarding pelo menos uma vez." },
         "createdAt": { "type": "string", "format": "date-time" }
       }
     },

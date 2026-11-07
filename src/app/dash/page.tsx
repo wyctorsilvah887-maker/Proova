@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -306,6 +307,15 @@ export default function DashPage() {
   const isCollectDone = setupSteps.find(s => s.id === 'collect')?.completed;
   const isGoogleDone = isDigitalBusiness ? true : !!userData?.googleMapsUrl;
 
+  // Efeito para persistir que o setup foi concluído uma vez
+  useEffect(() => {
+    if (isSetupComplete && userData && !userData.isSetupProcessDone && db && user) {
+      updateDoc(doc(db, 'users', user.uid), {
+        isSetupProcessDone: true
+      });
+    }
+  }, [isSetupComplete, userData, db, user]);
+
   const isMapsLinkValid = useMemo(() => {
     if (!userData?.googleMapsUrl) return false;
     const url = userData.googleMapsUrl.toLowerCase();
@@ -317,7 +327,8 @@ export default function DashPage() {
 
   useEffect(() => {
     async function runAudit() {
-      if (!isSetupComplete || !userData) return;
+      // Auditoria ativa se o setup foi concluído pelo menos uma vez
+      if ((!isSetupComplete && !userData?.isSetupProcessDone) || !userData) return;
       setIsAuditing(true);
       const results: AuditItem[] = [];
 
@@ -674,7 +685,8 @@ export default function DashPage() {
       </header>
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-20 md:pt-24">
-        {!isSetupComplete && (
+        {/* Checklist de Missões - Só aparece se nunca foi concluído ou se ainda está pendente */}
+        {(!isSetupComplete && !userData?.isSetupProcessDone) && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -728,7 +740,7 @@ export default function DashPage() {
           </section>
         )}
 
-        {isSetupComplete && auditItems.length > 0 && (
+        {(isSetupComplete || userData?.isSetupProcessDone) && auditItems.length > 0 && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-primary" />
@@ -870,7 +882,7 @@ export default function DashPage() {
             </button>
 
             <button 
-              disabled={!isSetupComplete} 
+              disabled={!isSetupComplete && !userData?.isSetupProcessDone} 
               onClick={() => router.push('/private')} 
               className="h-24 rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all relative shadow-sm active:scale-95 disabled:opacity-40"
             >
