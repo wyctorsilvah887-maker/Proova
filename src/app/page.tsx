@@ -480,7 +480,7 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
                 */}
                 <div id="proova-mural-landing" className="w-full">
                   <Script 
-                    src="https://www.useproova.online/widget.js?id=primeiromuralproova&user=EE6Mqdqq4Pc4maNgFy7rNq52ms13" 
+                    src="https://6000-firebase-studio-1777301707689.cluster-mdgxqvvkkbfpqrfigfiuugu5pk.cloudworkstations.dev/widget.js?id=primeiromuralproova&user=EE6Mqdqq4Pc4maNgFy7rNq52ms13" 
                     strategy="afterInteractive" 
                   />
                 </div>
