@@ -79,20 +79,18 @@ import { ThemeToggle } from '@/components/theme-toggle';
 
 type LayoutType = 'mural' | 'carousel' | 'grid' | 'popup';
 
-const TestimonialCardPreview = ({ t, themeColor }: { t: any, themeColor: string }) => {
+const TestimonialCardPreview = ({ t, themeColor, secondaryColor }: { t: any, themeColor: string, secondaryColor: string }) => {
   return (
     <Card 
-      className="bg-[#111111] rounded-[2.5rem] p-6 border-none shadow-xl text-left"
+      className="rounded-[2.5rem] p-6 border-none shadow-xl text-left"
       style={{ 
+        backgroundColor: secondaryColor || '#111111',
         boxShadow: `0 10px 30px -15px ${themeColor}30`,
       }}
     >
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-2xl flex items-center justify-center text-white font-black text-sm rotate-3 shrink-0" style={{ backgroundColor: themeColor }}>
-              {t.userName?.substring(0, 2).toUpperCase()}
-            </div>
             <p className="font-bold text-xs text-white truncate max-w-[100px]">{t.userName}</p>
           </div>
           <div className="flex gap-0.5">
@@ -112,6 +110,7 @@ const TestimonialCardPreview = ({ t, themeColor }: { t: any, themeColor: string 
 const EmbedSettings = ({ 
   layout, setLayout, 
   themeColor, setThemeColor,
+  secondaryColor, setSecondaryColor,
   autoPublishEnabled, setAutoPublishEnabled,
   autoPublishMinRating, setAutoPublishMinRating,
   autoPublishMinChars, setAutoPublishMinChars,
@@ -226,11 +225,35 @@ const EmbedSettings = ({
           <div className="space-y-6 pt-4 border-t">
             <div className="space-y-4">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                <Palette className="w-3 h-3 text-primary" /> Cor da Marca
+                <Palette className="w-3 h-3 text-primary" /> Cor da Marca (Estrelas/Destaque)
               </Label>
               <div className="flex flex-wrap gap-2">
                 {colors.map((color) => (
                   <button key={color} onClick={() => setThemeColor(color)} className={cn("w-7 h-7 rounded-full border-2 transition-transform", themeColor === color ? "border-foreground scale-110 shadow-sm" : "border-transparent opacity-80 shadow-inner")} style={{ backgroundColor: color }} />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-6 pt-4 border-t">
+            <div className="space-y-4">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                <Palette className="w-3 h-3 text-primary" /> Cor de Fundo do Card
+              </Label>
+              <div className="flex flex-wrap gap-2">
+                <button 
+                  onClick={() => setSecondaryColor('')} 
+                  className={cn(
+                    "w-7 h-7 rounded-full border-2 transition-transform flex items-center justify-center bg-muted/20 relative overflow-hidden", 
+                    !secondaryColor ? "border-foreground scale-110 shadow-sm" : "border-transparent opacity-80"
+                  )}
+                  title="Padrão Proova (Escuro)"
+                >
+                  <div className="absolute inset-0 bg-white dark:bg-zinc-800" />
+                  <div className="absolute inset-0 flex items-center justify-center"><div className="w-px h-full bg-red-500 rotate-45" /></div>
+                </button>
+                {colors.map((color) => (
+                  <button key={color} onClick={() => setSecondaryColor(color)} className={cn("w-7 h-7 rounded-full border-2 transition-transform", secondaryColor === color ? "border-foreground scale-110 shadow-sm" : "border-transparent opacity-80 shadow-inner")} style={{ backgroundColor: color }} />
                 ))}
               </div>
             </div>
@@ -277,6 +300,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [layout, setLayout] = useState<LayoutType>('grid'); 
   const [themeColor, setThemeColor] = useState('#f97316');
+  const [secondaryColor, setSecondaryColor] = useState('');
   const [autoPublishEnabled, setAutoPublishEnabled] = useState(false);
   const [autoPublishMinRating, setAutoPublishMinRating] = useState(5);
   const [autoPublishMinChars, setAutoPublishMinChars] = useState(0);
@@ -303,6 +327,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
       setSelectedIds(widgetData.selectedTestimonialIds || []);
       setLayout(widgetData.layout || 'grid');
       setThemeColor(widgetData.themeColor || '#f97316');
+      setSecondaryColor(widgetData.secondaryColor || '');
       setAutoPublishEnabled(widgetData.autoPublishEnabled || false);
       setAutoPublishMinRating(widgetData.autoPublishMinRating || 5);
       autoPublishMinChars !== undefined && setAutoPublishMinChars(widgetData.autoPublishMinChars || 0);
@@ -320,6 +345,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
       selectedTestimonialIds: selectedIds,
       layout,
       themeColor,
+      secondaryColor,
       autoPublishEnabled,
       autoPublishMinRating,
       autoPublishMinChars
@@ -351,7 +377,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   }
 
   const sidebarProps = { 
-    layout, setLayout, themeColor, setThemeColor, 
+    layout, setLayout, themeColor, setThemeColor, secondaryColor, setSecondaryColor,
     autoPublishEnabled, setAutoPublishEnabled, autoPublishMinRating, setAutoPublishMinRating, autoPublishMinChars, setAutoPublishMinChars,
     handleSave, isSaving, isGoldPlan,
     onClose: () => setIsSidebarOpen(false)
@@ -418,7 +444,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
               <div className="w-full max-w-2xl">
                 {currentSelection.length > 0 ? (
                   <div className={cn("grid gap-4", layout === 'grid' || layout === 'mural' ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1")}>
-                    {currentSelection.slice(0, 4).map((t: any) => <TestimonialCardPreview key={t.id} t={t} themeColor={themeColor} />)}
+                    {currentSelection.slice(0, 4).map((t: any) => <TestimonialCardPreview key={t.id} t={t} themeColor={themeColor} secondaryColor={secondaryColor} />)}
                   </div>
                 ) : <div className="text-center opacity-30 italic text-sm">Selecione depoimentos abaixo.</div>}
               </div>

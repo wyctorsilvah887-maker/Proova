@@ -56,6 +56,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
 
   const layout = widgetData?.layout || 'grid';
   const themeColor = widgetData?.themeColor || '#f97316';
+  const secondaryColor = widgetData?.secondaryColor || '';
 
   // Lógica de rotação para layouts dinâmicos (Mural e Popup)
   useEffect(() => {
@@ -107,12 +108,13 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
       <Card 
         key={t.id}
         className={cn(
-          "bg-[#111111] rounded-[1.5rem] sm:rounded-[2.5rem] p-5 sm:p-8 border-none shadow-2xl transition-all duration-700 hover:scale-[1.02] w-full max-w-full",
+          "rounded-[1.5rem] sm:rounded-[2.5rem] p-5 sm:p-8 border-none shadow-2xl transition-all duration-700 hover:scale-[1.02] w-full max-w-full",
           layout === 'grid' && "animate-in fade-in zoom-in-95 duration-500",
           layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-8 duration-700" : "animate-in fade-in slide-in-from-right-8 duration-700"),
           layout === 'popup' && !isAnimating && "animate-in fade-in zoom-in-90 duration-1000"
         )}
         style={{ 
+          backgroundColor: secondaryColor || '#111111',
           boxShadow: `0 20px 40px -20px ${themeColor}25`,
         }}
       >
