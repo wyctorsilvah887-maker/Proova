@@ -191,9 +191,11 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
 
       await batch.commit();
       toast({ title: "Atendimento Concluído", description: "O ticket foi resolvido e o bot reativado." });
+      
+      // Redireciona instantaneamente para a fila de suporte
+      router.push('/admin/support');
     } catch (err) {
       toast({ variant: "destructive", title: "Erro ao concluir" });
-    } finally {
       setIsResolving(false);
     }
   };
