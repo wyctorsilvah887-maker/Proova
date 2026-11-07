@@ -30,7 +30,8 @@ import {
   Sparkles,
   ExternalLink,
   Lock,
-  X
+  X,
+  Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -80,36 +81,66 @@ import { ThemeToggle } from '@/components/theme-toggle';
 
 type LayoutType = 'mural' | 'carousel' | 'grid' | 'popup';
 
-const TestimonialCardPreview = ({ t, themeColor, secondaryColor }: { t: any, themeColor: string, secondaryColor: string }) => {
+const TestimonialCardPreview = ({ 
+  t, 
+  themeColor, 
+  secondaryColor, 
+  isPopup = false, 
+  isAnimating = false, 
+  index = 0, 
+  muralIndex = 0 
+}: { 
+  t: any, 
+  themeColor: string, 
+  secondaryColor: string, 
+  isPopup?: boolean, 
+  isAnimating?: boolean, 
+  index?: number, 
+  muralIndex?: number 
+}) => {
+  const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
+  const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
+
   return (
     <Card 
-      className="rounded-3xl p-6 border-none shadow-2xl text-left ring-1 ring-white/5 transition-all hover:scale-[1.02] bg-zinc-900"
+      className={cn(
+        "rounded-[1.5rem] p-4 border-none shadow-xl text-left ring-1 ring-black/5 dark:ring-white/5 transition-all duration-700 w-full",
+        !isPopup && (side === 'left' ? "animate-in fade-in slide-in-from-left-4" : "animate-in fade-in slide-in-from-right-4"),
+        isPopup && !isAnimating && "animate-in fade-in zoom-in-95 duration-1000",
+        isPopup && isAnimating && "animate-out fade-out zoom-out-95 duration-1000"
+      )}
       style={{ 
-        backgroundColor: secondaryColor || '#111111',
+        backgroundColor: hasSecondary ? secondaryColor : undefined,
       }}
     >
-      <div className="space-y-4">
+      <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0" style={{ borderColor: `${themeColor}40` }}>
-            <User className="w-4 h-4" style={{ color: themeColor }} />
+          <div className="h-7 w-7 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: `${themeColor}40` }}>
+            <User className="w-3.5 h-3.5" style={{ color: themeColor }} />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-black text-sm text-white tracking-tight truncate uppercase leading-none">{t.userName}</p>
-            <div className="flex gap-0.5 mt-1">
+            <p className="font-black text-[11px] text-foreground tracking-tight truncate uppercase leading-none">{t.userName}</p>
+            <div className="flex gap-0.5 mt-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} className="w-3.5 h-3.5 fill-current" style={{ color: themeColor }} />
+                <Star key={i} className={cn("w-2.5 h-2.5 fill-current", i < (t.rating || 5) ? "" : "opacity-10")} style={{ color: themeColor }} />
               ))}
             </div>
           </div>
         </div>
 
         {t.text && t.text !== '(Depoimento em Vídeo)' && (
-          <p className="italic text-sm leading-relaxed text-zinc-300 font-medium tracking-tight">"{t.text}"</p>
+          <p className="italic text-[11px] sm:text-xs leading-relaxed text-muted-foreground font-medium tracking-tight">"{t.text}"</p>
         )}
         
-        <div className="pt-3 border-t border-white/5 flex items-center justify-between opacity-40">
-           <span className="text-[8px] font-black uppercase tracking-widest text-zinc-400">Verificado</span>
-           <CheckCircle2 className="w-3 h-3 text-green-500" />
+        <div className="pt-2 border-t border-muted/20 flex items-center justify-between opacity-50">
+           <div className="flex items-center gap-1">
+             <Clock className="w-2.5 h-2.5" />
+             <span className="text-[7px] font-black uppercase tracking-widest">Agora</span>
+           </div>
+           <div className="flex items-center gap-1">
+             <CheckCircle2 className="w-2.5 h-2.5 text-green-500" />
+             <span className="text-[7px] font-black uppercase tracking-widest">Verificado</span>
+           </div>
         </div>
       </div>
     </Card>
@@ -246,9 +277,9 @@ const EmbedSettings = ({
                     "w-7 h-7 rounded-full border-2 transition-transform flex items-center justify-center bg-muted/20 relative overflow-hidden", 
                     !secondaryColor ? "border-foreground scale-110 shadow-sm" : "border-transparent opacity-80"
                   )}
-                  title="Padrão Proova (Escuro)"
+                  title="Automático (Modo Claro/Escuro)"
                 >
-                  <div className="absolute inset-0 bg-white dark:bg-zinc-800" />
+                  <div className="absolute inset-0 bg-card" />
                   <div className="absolute inset-0 flex items-center justify-center"><div className="w-px h-full bg-red-500 rotate-45" /></div>
                 </button>
                 {colors.map((color) => (
@@ -311,6 +342,10 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
+  // Estados para animação do preview
+  const [muralIndex, setMuralIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       setBaseUrl(window.location.origin);
@@ -329,13 +364,47 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
       setSecondaryColor(widgetData.secondaryColor || '');
       setAutoPublishEnabled(widgetData.autoPublishEnabled || false);
       setAutoPublishMinRating(widgetData.autoPublishMinRating || 5);
-      autoPublishMinChars !== undefined && setAutoPublishMinChars(widgetData.autoPublishMinChars || 0);
+      setAutoPublishMinChars(widgetData.autoPublishMinChars || 0);
     }
   }, [widgetData]);
+
+  // Efeito de animação do preview igual ao widgetpublic
+  useEffect(() => {
+    if ((layout === 'mural' || layout === 'popup' || layout === 'carousel') && selectedIds.length > 0) {
+      const interval = setInterval(() => {
+        setIsAnimating(true);
+        setTimeout(() => {
+          setMuralIndex(prev => (prev + 1) % selectedIds.length);
+          setIsAnimating(false);
+        }, 500);
+      }, layout === 'popup' ? 8000 : 6000);
+      return () => clearInterval(interval);
+    }
+  }, [layout, selectedIds]);
 
   const currentSelection = useMemo(() => {
     return approvedTestimonials?.filter(t => selectedIds.includes(t.id)) || [];
   }, [approvedTestimonials, selectedIds]);
+
+  const visibleTestimonialsPreview = useMemo(() => {
+    if (currentSelection.length === 0) return [];
+    
+    if (layout === 'mural') {
+      const slice = [];
+      const count = Math.min(2, currentSelection.length);
+      for (let i = 0; i < count; i++) {
+        const idx = (muralIndex + i) % currentSelection.length;
+        slice.push(currentSelection[idx]);
+      }
+      return slice;
+    }
+    
+    if (layout === 'carousel' || layout === 'popup') {
+      return [currentSelection[muralIndex % currentSelection.length]];
+    }
+    
+    return currentSelection;
+  }, [currentSelection, layout, muralIndex]);
 
   const handleSave = async () => {
     if (!widgetRef) return;
@@ -444,11 +513,28 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
               </div>
             </div>
             
-            <div className="relative border shadow-2xl bg-muted/20 p-8 md:p-12 rounded-[3rem] min-h-[400px] flex items-center justify-center ring-1 ring-primary/5">
+            <div className="relative border shadow-2xl bg-muted/10 p-8 md:p-12 rounded-[3rem] min-h-[400px] flex items-center justify-center ring-1 ring-primary/5">
               <div className="w-full max-w-lg">
-                {currentSelection.length > 0 ? (
-                  <div className={cn("grid gap-6", layout === 'grid' || layout === 'mural' ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1")}>
-                    {currentSelection.slice(0, 4).map((t: any) => <TestimonialCardPreview key={t.id} t={t} themeColor={themeColor} secondaryColor={secondaryColor} />)}
+                {visibleTestimonialsPreview.length > 0 ? (
+                  <div className={cn(
+                    "grid gap-6", 
+                    layout === 'grid' ? "grid-cols-1 md:grid-cols-2" : (
+                      layout === 'mural' ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1"
+                    )
+                  )}>
+                    {visibleTestimonialsPreview.map((t: any, i: number) => (
+                      <div key={`${t.id}-${muralIndex}-${i}`} className="flex justify-center">
+                        <TestimonialCardPreview 
+                          t={t} 
+                          themeColor={themeColor} 
+                          secondaryColor={secondaryColor} 
+                          isPopup={layout === 'popup'} 
+                          isAnimating={isAnimating}
+                          index={i}
+                          muralIndex={muralIndex}
+                        />
+                      </div>
+                    ))}
                   </div>
                 ) : <div className="text-center opacity-30 italic text-sm">Selecione depoimentos abaixo para gerar a visualização.</div>}
               </div>

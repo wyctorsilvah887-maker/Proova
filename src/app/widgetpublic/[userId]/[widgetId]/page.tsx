@@ -15,7 +15,7 @@ import {
 
 /**
  * Página pública do Widget (Embed VIP)
- * Otimizada para ser "miúda" e ultra-minimalista.
+ * Otimizada para ser "miúda" e ultra-minimalista, com suporte a White Mode.
  */
 export default function WidgetPublicPage({ params }: { params: Promise<{ userId: string, widgetId: string }> }) {
   const { userId, widgetId } = use(params);
@@ -97,28 +97,29 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
 
   const TestimonialCard = ({ t, index = 0 }: { t: any, index?: number }) => {
     const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
+    const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
     
     return (
       <Card 
         key={t.id}
         className={cn(
-          "rounded-2xl p-4 sm:p-5 border-none shadow-xl transition-all duration-700 hover:scale-[1.02] w-full max-w-full ring-1 ring-white/5",
+          "rounded-2xl p-4 sm:p-5 border-none shadow-xl transition-all duration-700 hover:scale-[1.02] w-full max-w-full ring-1 ring-black/5 dark:ring-white/5",
           layout === 'grid' && "animate-in fade-in zoom-in-95 duration-500",
           layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-4 duration-700" : "animate-in fade-in slide-in-from-right-4 duration-700"),
           layout === 'popup' && !isAnimating && "animate-in fade-in zoom-in-90 duration-1000"
         )}
         style={{ 
-          backgroundColor: secondaryColor || '#111111',
+          backgroundColor: hasSecondary ? secondaryColor : undefined,
           boxShadow: `0 15px 35px -10px ${themeColor}15`,
         }}
       >
         <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className="h-7 w-7 rounded-full border flex items-center justify-center shrink-0" style={{ borderColor: `${themeColor}40` }}>
+            <div className="h-7 w-7 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: `${themeColor}40` }}>
               <User className="w-3.5 h-3.5" style={{ color: themeColor }} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-black text-[11px] sm:text-xs text-white tracking-tight truncate uppercase">{t.userName}</p>
+              <p className="font-black text-[11px] sm:text-xs text-foreground tracking-tight truncate uppercase leading-none">{t.userName}</p>
               <div className="flex gap-0.5 mt-0.5">
                 {[1, 2, 3, 4, 5].map((s) => (
                   <Star key={s} className={cn("w-2.5 h-2.5 fill-current transition-all duration-700", s <= (t.rating || 5) ? "" : "opacity-10")} style={{ color: themeColor }} />
@@ -142,22 +143,22 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
 
           {t.text && t.text !== '(Depoimento em Vídeo)' && (
             <div className="relative">
-              <p className="text-zinc-300 font-bold text-[11px] sm:text-[13px] leading-relaxed italic tracking-tight">
+              <p className="text-muted-foreground font-bold text-[11px] sm:text-[13px] leading-relaxed italic tracking-tight">
                 "{t.text}"
               </p>
             </div>
           )}
 
-          <div className="pt-3 border-t border-white/5 flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-zinc-500">
+          <div className="pt-3 border-t border-muted/20 flex items-center justify-between opacity-50">
+            <div className="flex items-center gap-1.5 text-muted-foreground">
                <Clock className="w-2.5 h-2.5 opacity-50" />
                <span className="text-[7px] font-black uppercase tracking-widest">
                  {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Agora'}
                </span>
             </div>
-            <div className="flex items-center gap-1 opacity-40">
+            <div className="flex items-center gap-1">
                <CheckCircle2 className="w-2.5 h-2.5 text-green-500" />
-               <span className="text-[6px] font-black uppercase tracking-widest text-zinc-400">Verificado</span>
+               <span className="text-[6px] font-black uppercase tracking-widest text-muted-foreground">Verificado</span>
             </div>
           </div>
         </div>
