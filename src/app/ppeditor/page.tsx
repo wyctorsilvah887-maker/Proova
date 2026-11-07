@@ -42,7 +42,9 @@ import {
   Link2,
   Bell,
   ExternalLink,
-  Zap
+  Zap,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -218,12 +220,13 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
     <Card 
       key={`${t.id}-${muralIndex}`}
       className={cn(
-        "rounded-[1.5rem] p-5 transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white mb-6 border-none",
+        "rounded-[1.5rem] p-5 transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white mb-6",
         !isPopup && "animate-in fade-in duration-700 ease-out fill-both",
         isPopup && !isAnimating && "animate-in fade-in slide-in-from-bottom-10 duration-1000",
         isPopup && isAnimating && "animate-out fade-out slide-out-to-top-10 duration-1000"
       )}
       style={{ 
+        border: 'none',
         boxShadow: hasSecondary 
           ? `0 0 25px ${secondaryColor}60, 0 15px 40px -10px rgba(0,0,0,0.2)` 
           : `0 20px 40px -20px ${themeColor}25`,
@@ -310,6 +313,30 @@ const PublicPageSettings = ({
 }: any) => {
   const colors = ['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff'];
   const router = useRouter();
+  const tabsScrollRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(false);
+
+  const checkScroll = () => {
+    if (tabsScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tabsScrollRef.current;
+      setShowLeftArrow(scrollLeft > 0);
+      setShowRightArrow(scrollLeft < scrollWidth - clientWidth - 5);
+    }
+  };
+
+  useEffect(() => {
+    const el = tabsScrollRef.current;
+    if (el) {
+      checkScroll();
+      el.addEventListener('scroll', checkScroll);
+      window.addEventListener('resize', checkScroll);
+      return () => {
+        el.removeEventListener('scroll', checkScroll);
+        window.removeEventListener('resize', checkScroll);
+      };
+    }
+  }, []);
 
   const addSection = () => {
     if (!isGoldPlan) return;
@@ -352,18 +379,33 @@ const PublicPageSettings = ({
       </div>
 
       <Tabs defaultValue="geral" className="w-full flex-1 flex flex-col min-h-0">
-        <div className="w-full border-b overflow-x-auto scrollbar-hide">
-          <TabsList className="flex w-max justify-start rounded-none bg-transparent h-12 px-2 shrink-0">
-            <TabsTrigger value="geral" className="text-[10px] font-bold uppercase tracking-widest px-3">Visual</TabsTrigger>
-            <TabsTrigger value="conteudo" className="text-[10px] font-bold uppercase tracking-widest px-3 flex items-center gap-1.5">
-              Conteúdo {!isGoldPlan && <Lock className="w-2.5 h-2.5 opacity-40" />}
-            </TabsTrigger>
-            <TabsTrigger value="automacao" className="text-[10px] font-bold uppercase tracking-widest px-3 flex items-center gap-1.5">
-              Automação {!isEnterprise && <Lock className="w-2.5 h-2.5 opacity-40" />}
-            </TabsTrigger>
-            <TabsTrigger value="design" className="text-[10px] font-bold uppercase tracking-widest px-3">Layout</TabsTrigger>
-            <TabsTrigger value="social" className="text-[10px] font-bold uppercase tracking-widest px-3">Contato/Info</TabsTrigger>
-          </TabsList>
+        <div className="w-full border-b relative">
+          {showLeftArrow && (
+            <div className="absolute left-0 top-0 bottom-0 z-10 w-8 bg-gradient-to-r from-background to-transparent flex items-center justify-start pl-1 pointer-events-none">
+              <ChevronLeft className="w-4 h-4 text-primary animate-pulse" />
+            </div>
+          )}
+          {showRightArrow && (
+            <div className="absolute right-0 top-0 bottom-0 z-10 w-8 bg-gradient-to-l from-background to-transparent flex items-center justify-end pr-1 pointer-events-none">
+              <ChevronRight className="w-4 h-4 text-primary animate-pulse" />
+            </div>
+          )}
+          <div 
+            ref={tabsScrollRef}
+            className="w-full overflow-x-auto scrollbar-hide"
+          >
+            <TabsList className="flex w-max justify-start rounded-none bg-transparent h-12 px-2 shrink-0">
+              <TabsTrigger value="geral" className="text-[10px] font-bold uppercase tracking-widest px-3">Visual</TabsTrigger>
+              <TabsTrigger value="conteudo" className="text-[10px] font-bold uppercase tracking-widest px-3 flex items-center gap-1.5">
+                Conteúdo {!isGoldPlan && <Lock className="w-2.5 h-2.5 opacity-40" />}
+              </TabsTrigger>
+              <TabsTrigger value="automacao" className="text-[10px] font-bold uppercase tracking-widest px-3 flex items-center gap-1.5">
+                Automação {!isEnterprise && <Lock className="w-2.5 h-2.5 opacity-40" />}
+              </TabsTrigger>
+              <TabsTrigger value="design" className="text-[10px] font-bold uppercase tracking-widest px-3">Layout</TabsTrigger>
+              <TabsTrigger value="social" className="text-[10px] font-bold uppercase tracking-widest px-3">Contato/Info</TabsTrigger>
+            </TabsList>
+          </div>
         </div>
         
         <ScrollArea className="flex-1">
