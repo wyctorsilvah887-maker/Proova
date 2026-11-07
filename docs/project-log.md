@@ -2,6 +2,7 @@
 # Proova - Log de Desenvolvimento
 
 ## 📝 Histórico de Alterações Recentes
+- **Ajuste de Produção (FCM) - [EM ANDAMENTO]:** Identificada a necessidade de redeploy para injeção da `NEXT_PUBLIC_VAPID_KEY` via variáveis de ambiente do provedor de hospedagem.
 - **Notificações Push (FCM) - [FINALIZADO]:** Implementada a infraestrutura completa para Web Push. Adicionado suporte a VAPID via variáveis de ambiente, registro de tokens no perfil do usuário e Service Worker para recebimento em background.
 - **Mural em Tempo Real (Landing Page) - [FINALIZADO]:** Substituído o componente de depoimentos estático por um iframe dinâmico que exibe o mural oficial da Proova em tempo real, servindo como demonstração viva da tecnologia.
 - **Acesso Direto à Coleta (Landing Page) - [FINALIZADO]:** Adicionado link estratégico discreto na Landing Page (`/c/proova`) para capturar depoimentos de clientes da própria plataforma Proova, reforçando a autoridade da marca.
