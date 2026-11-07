@@ -487,16 +487,6 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <button 
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="flex flex-col items-center justify-center gap-1 group transition-all text-primary hover:text-primary/80 mr-2"
-          >
-            <div className={cn("h-10 w-10 flex items-center justify-center rounded-xl transition-all", isSidebarOpen ? "bg-primary/10" : "bg-transparent group-hover:bg-primary/5")}>
-              <Monitor className="h-6 w-6" />
-            </div>
-            <span className="text-[8px] font-black uppercase tracking-widest leading-none">EDITAR</span>
-          </button>
-
           <Button 
             onClick={handleSave} 
             disabled={isSaving} 
@@ -526,7 +516,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
                   </div>
                 </div>
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
-                  <User className="w-4 h-4 text-primary group-hover:text-white" />
+                  <User className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary group-hover:text-white" />
                 </div>
               </Button>
             </DropdownMenuTrigger>
