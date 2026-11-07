@@ -11,7 +11,7 @@ import {
   ArrowRight, 
   Zap, 
   Star, 
-  Shield as ShieldIcon, 
+  Shield, 
   ArrowLeft, 
   User, 
   LogOut, 
@@ -25,11 +25,6 @@ import {
   Lock,
   Sparkles,
   ChevronDown,
-  ChevronUp,
-  Monitor,
-  Video,
-  BarChart3,
-  MousePointer2,
   Handshake
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -96,7 +91,7 @@ export default function PricingPage() {
         price: "Grátis",
         period: "/sempre",
         description: "Fundação de Reputação",
-        icon: ShieldIcon,
+        icon: Shield,
         cta: status === 'base' ? "Plano Atual" : "Começar Grátis",
         checkoutUrl: user ? "/dash" : "/signup",
         highlight: false,
@@ -193,7 +188,9 @@ export default function PricingPage() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl bg-background border">
-                <DropdownMenuLabel className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Minha Conta</DropdownMenuLabel>
+                <DropdownMenuLabel className="px-3 py-2">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Minha Conta</p>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator className="mx-1" />
                 
                 <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold py-2.5 cursor-pointer">
@@ -210,6 +207,22 @@ export default function PricingPage() {
                   <Inbox className="mr-2 h-4 w-4 text-primary" />
                   <span>Inbox Privado</span>
                 </DropdownMenuItem>
+
+                <DropdownMenuItem 
+                  onClick={() => router.push('/pricing')} 
+                  className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
+                >
+                  <Handshake className="mr-2 h-4 w-4 text-primary" />
+                  <span>Serviços de Parceiros</span>
+                  <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
+                </DropdownMenuItem>
+
+                {userData?.isAdmin && (
+                  <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                    <Shield className="mr-2 h-4 w-4 text-primary" />
+                    <span>Administração</span>
+                  </DropdownMenuItem>
+                )}
 
                 <DropdownMenuItem 
                   onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} 
