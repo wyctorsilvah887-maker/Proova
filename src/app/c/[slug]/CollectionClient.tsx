@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
@@ -6,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, Globe, X, Camera, Square, RefreshCcw, SwitchCamera, Play, Clock, ArrowLeft } from 'lucide-react';
+import { Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, Globe, X, Camera, Square, RefreshCcw, SwitchCamera, Play, Clock, ArrowLeft, Shield } from 'lucide-react';
 import { useFirestore, useStorage } from '@/firebase';
 import { collection, query, where, getDocs, limit, doc, updateDoc, increment } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
