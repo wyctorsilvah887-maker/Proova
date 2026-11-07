@@ -852,26 +852,28 @@ export default function DashPage() {
         <section className="space-y-3">
           <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Ferramentas de Conversão</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <Button 
-              variant="outline" 
+            <button 
               disabled={!isGoogleDone}
               onClick={() => setIsCollectLinkChoiceOpen(true)} 
-              className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm"
+              className="h-24 rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
             >
               <Link2 className="w-5 h-5 text-primary" />
               <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Link de Coleta</span>
-            </Button>
+            </button>
 
-            <Button 
-              variant="outline" 
+            <button 
               onClick={() => setIsPublicPageChoiceOpen(true)} 
-              className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm"
+              className="h-24 rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
             >
               <Globe className="w-5 h-5 text-primary" />
               <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Link in Bio</span>
-            </Button>
+            </button>
 
-            <Button variant="outline" disabled={!isSetupComplete} onClick={() => router.push('/private')} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all relative shadow-sm">
+            <button 
+              disabled={!isSetupComplete} 
+              onClick={() => router.push('/private')} 
+              className="h-24 rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all relative shadow-sm active:scale-95 disabled:opacity-40"
+            >
               <Inbox className="w-5 h-5 text-primary" />
               {pendingTestimonialsCount > 0 && (
                 <span className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white shadow-lg animate-in zoom-in duration-300">
@@ -879,29 +881,32 @@ export default function DashPage() {
                 </span>
               )}
               <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Inbox Unificado</span>
-            </Button>
+            </button>
 
             <Link href="/social-cards" className="w-full">
-              <Button 
-                variant="outline" 
+              <button 
                 disabled={approvedTestimonials.length === 0}
-                className="h-24 w-full rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm"
+                className="h-24 w-full rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
               >
                 <Share2 className="w-5 h-5 text-primary" />
                 <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Social Cards</span>
-              </Button>
+              </button>
             </Link>
 
-            <Button variant="outline" disabled={!isGoogleDone} onClick={() => setIsQrDialogOpenManual(true)} className="h-24 rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
+            <button 
+              disabled={!isGoogleDone} 
+              onClick={() => setIsQrDialogOpenManual(true)} 
+              className="h-24 rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
+            >
               <QrCode className="w-5 h-5 text-primary" />
               <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">QR de Balcão</span>
-            </Button>
+            </button>
 
             <Link href="/manual" className="w-full">
-              <Button variant="outline" className="h-24 w-full rounded-[1.5rem] flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm">
+              <button className="h-24 w-full rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95">
                 <BookOpen className="w-5 h-5 text-primary" />
                 <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Manual Estratégico</span>
-              </Button>
+              </button>
             </Link>
           </div>
         </section>
@@ -997,7 +1002,7 @@ export default function DashPage() {
 
       <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
         <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[105px]">
-          <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain dark:hidden" priority />
+          <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="hidden dark:block object-contain" priority />
         </div>
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
@@ -1070,112 +1075,117 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
 
+      {/* OTIMIZADO PARA MOBILE: Link de Coleta Choice */}
       <Dialog open={isCollectLinkChoiceOpen} onOpenChange={setIsCollectLinkChoiceOpen}>
-        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background">
+        <DialogContent className="rounded-[2.5rem] w-[95vw] max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[90vh] flex flex-col">
           <DialogHeader className="p-8 pb-4 text-center shrink-0">
-            <DialogTitle className="text-2xl font-black font-headline tracking-tight uppercase">Link de Coleta</DialogTitle>
-            <DialogDescription className="text-sm">Gerencie como você captura novos elogios.</DialogDescription>
+            <DialogTitle className="text-xl md:text-2xl font-black font-headline tracking-tight uppercase">Link de Coleta</DialogTitle>
+            <DialogDescription className="text-xs md:text-sm">Capture elogios reais agora mesmo.</DialogDescription>
           </DialogHeader>
-          <div className="px-8 pb-8 space-y-4">
-            <Button 
-              className="w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 bg-primary hover:bg-primary/90 shadow-xl transition-all active:scale-95 group"
-              onClick={() => {
-                copyToClipboard(collectionLink, "Link de coleta");
-                setIsCollectLinkChoiceOpen(false);
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <Copy className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                <span className="text-lg font-black uppercase tracking-tight">Copiar Link Agora</span>
-              </div>
-              <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Pronto para enviar aos clientes</span>
-            </Button>
-            <Button 
-              variant="outline"
-              className={cn(
-                "w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 border-primary/20 text-primary hover:bg-primary/5 transition-all active:scale-95 group relative",
-                !isPremiumUser && "opacity-80"
-              )}
-              onClick={() => {
-                if (!isPremiumUser) {
-                  router.push('/pricing');
-                  return;
-                }
-                setConfigMode('business');
-                setIsGoogleMapsDialogOpen(true);
-                setIsCollectLinkChoiceOpen(false);
-              }}
-            >
-              <div className="flex items-center gap-2">
-                {isPremiumUser ? (
-                  <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
-                ) : (
-                  <Lock className="w-5 h-5 text-muted-foreground" />
+          <ScrollArea className="flex-1 px-6 md:px-8">
+            <div className="pb-8 space-y-4">
+              <Button 
+                className="w-full h-24 md:h-20 rounded-2xl flex flex-col items-center justify-center gap-1 bg-primary hover:bg-primary/90 shadow-xl transition-all active:scale-95 group"
+                onClick={() => {
+                  copyToClipboard(collectionLink, "Link de coleta");
+                  setIsCollectLinkChoiceOpen(false);
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <Copy className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  <span className="text-lg font-black uppercase tracking-tight">Copiar Link</span>
+                </div>
+                <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Enviar aos clientes via WhatsApp</span>
+              </Button>
+              <Button 
+                variant="outline"
+                className={cn(
+                  "w-full h-24 md:h-20 rounded-2xl flex flex-col items-center justify-center gap-1 border-primary/20 text-primary hover:bg-primary/5 transition-all active:scale-95 group relative",
+                  !isPremiumUser && "opacity-80"
                 )}
-                <span className="text-lg font-black uppercase tracking-tight">Personalizar Identidade</span>
-              </div>
-              <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">
-                {isPremiumUser ? 'Ajustar Nome e Slug da URL' : 'Recurso Exclusivo Gold/Enterprise'}
-              </span>
-            </Button>
-          </div>
-          <DialogFooter className="p-4 bg-muted/30 border-t text-center flex justify-center">
-            <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-60">Dica: Envie o link via WhatsApp logo após o atendimento para ter mais elogios.</p>
+                onClick={() => {
+                  if (!isPremiumUser) {
+                    router.push('/pricing');
+                    return;
+                  }
+                  setConfigMode('business');
+                  setIsGoogleMapsDialogOpen(true);
+                  setIsCollectLinkChoiceOpen(false);
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  {isPremiumUser ? (
+                    <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
+                  ) : (
+                    <Lock className="w-5 h-5 text-muted-foreground" />
+                  )}
+                  <span className="text-lg font-black uppercase tracking-tight">Identidade</span>
+                </div>
+                <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">
+                  {isPremiumUser ? 'Ajustar Nome e Slug da URL' : 'Recurso Exclusivo Premium'}
+                </span>
+              </Button>
+            </div>
+          </ScrollArea>
+          <DialogFooter className="p-5 bg-muted/30 border-t text-center flex justify-center shrink-0">
+            <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest opacity-60">Dica: Envie logo após o atendimento para converter melhor.</p>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
+      {/* OTIMIZADO PARA MOBILE: Public Page Choice */}
       <Dialog open={isPublicPageChoiceOpen} onOpenChange={setIsPublicPageChoiceOpen}>
-        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background">
+        <DialogContent className="rounded-[2.5rem] w-[95vw] max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[90vh] flex flex-col">
           <DialogHeader className="p-8 pb-4 text-center shrink-0">
-            <DialogTitle className="text-2xl font-black font-headline tracking-tight uppercase">Link in Bio</DialogTitle>
-            <DialogDescription className="text-sm">Escolha como deseja prosseguir com seu link da bio.</DialogDescription>
+            <DialogTitle className="text-xl md:text-2xl font-black font-headline tracking-tight uppercase">Link in Bio</DialogTitle>
+            <DialogDescription className="text-xs md:text-sm">Sua vitrine de depoimentos oficial.</DialogDescription>
           </DialogHeader>
-          <div className="px-8 pb-8 space-y-4">
-            <Button 
-              className="w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 bg-primary hover:bg-primary/90 shadow-xl transition-all active:scale-95 group"
-              onClick={() => {
-                const slug = userData?.companySlug || userData?.companyName?.toLowerCase().replace(/\s+/g, '-') || '';
-                router.push(`/pp/${slug}`); 
-                setIsPublicPageChoiceOpen(false);
-              }}
-            >
-              <div className="flex items-center gap-2">
-                <Eye className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                <span className="text-lg font-black uppercase tracking-tight">Visualizar Agora</span>
-              </div>
-              <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Ver como seu cliente enxerga</span>
-            </Button>
-            <Button 
-              variant="outline"
-              className="w-full h-20 rounded-2xl flex flex-col items-center justify-center gap-1 border-primary/20 text-primary hover:bg-primary/5 transition-all active:scale-95 group"
-              onClick={() => {
-                router.push('/ppeditor');
-                setIsPublicPageChoiceOpen(false);
-              }}
-            >
-              <div className="flex items-center gap-2">
-                {isPremiumUser ? (
-                  <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
-                ) : (
-                  <Lock className="w-5 h-5 text-muted-foreground" />
-                )}
-                <span className="text-lg font-black uppercase tracking-tight">Editar / Configurar</span>
-              </div>
-              <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Personalizar textos, cores e seções</span>
-            </Button>
-            <Button 
-              variant="link" 
-              className="w-full text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary/70 h-auto p-0"
-              onClick={() => {
-                copyToClipboard(publicPageLink, "Link da Página Pública");
-              }}
-            >
-              <Copy className="w-3 h-3 mr-1" /> Copiar Link da Página
-            </Button>
-          </div>
-          <DialogFooter className="p-4 bg-muted/30 border-t text-center flex justify-center">
-            <p className="text-[10px] font-black uppercase text-muted-foreground tracking-widest opacity-60">Dica: Use seu link da bio no Instagram para converter mais.</p>
+          <ScrollArea className="flex-1 px-6 md:px-8">
+            <div className="pb-8 space-y-4">
+              <Button 
+                className="w-full h-24 md:h-20 rounded-2xl flex flex-col items-center justify-center gap-1 bg-primary hover:bg-primary/90 shadow-xl transition-all active:scale-95 group"
+                onClick={() => {
+                  const slug = userData?.companySlug || userData?.companyName?.toLowerCase().replace(/\s+/g, '-') || '';
+                  router.push(`/pp/${slug}`); 
+                  setIsPublicPageChoiceOpen(false);
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <Eye className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  <span className="text-lg font-black uppercase tracking-tight">Visualizar</span>
+                </div>
+                <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Ver como seu cliente enxerga</span>
+              </Button>
+              <Button 
+                variant="outline"
+                className="w-full h-24 md:h-20 rounded-2xl flex flex-col items-center justify-center gap-1 border-primary/20 text-primary hover:bg-primary/5 transition-all active:scale-95 group"
+                onClick={() => {
+                  router.push('/ppeditor');
+                  setIsPublicPageChoiceOpen(false);
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  {isPremiumUser ? (
+                    <Settings className="w-5 h-5 group-hover:rotate-90 transition-transform duration-500" />
+                  ) : (
+                    <Lock className="w-5 h-5 text-muted-foreground" />
+                  )}
+                  <span className="text-lg font-black uppercase tracking-tight">Configurar</span>
+                </div>
+                <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Customizar temas e depoimentos</span>
+              </Button>
+              <button 
+                className="w-full py-2 text-[10px] font-black uppercase tracking-widest text-primary hover:opacity-70 transition-opacity flex items-center justify-center gap-1"
+                onClick={() => {
+                  copyToClipboard(publicPageLink, "Link da Página Pública");
+                }}
+              >
+                <Copy className="w-3 h-3" /> Copiar Link da Página
+              </button>
+            </div>
+          </ScrollArea>
+          <DialogFooter className="p-5 bg-muted/30 border-t text-center flex justify-center shrink-0">
+            <p className="text-[9px] font-black uppercase text-muted-foreground tracking-widest opacity-60">Dica: Use o Link in Bio no seu perfil do Instagram.</p>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -1278,13 +1288,13 @@ export default function DashPage() {
       
       {/* Diálogos de Google Maps e QR Code */}
       <Dialog open={isGoogleMapsDialogOpen} onOpenChange={setIsGoogleMapsDialogOpen}>
-        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
+        <DialogContent className="rounded-[2.5rem] w-[95vw] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-6 pb-2 pt-10 shrink-0 bg-background">
-            <DialogTitle className="text-2xl font-black font-headline flex items-center gap-2">
+            <DialogTitle className="text-xl md:text-2xl font-black font-headline flex items-center gap-2">
               {configMode === 'business' ? <Fingerprint className="w-6 h-6 text-primary" /> : <MapPinned className="w-6 h-6 text-primary" />} 
-              {configMode === 'location' ? 'Localização' : (configMode === 'business' ? 'Identidade de Marca' : 'Perfil Comercial')}
+              {configMode === 'location' ? 'Localização' : (configMode === 'business' ? 'Identidade' : 'Perfil Comercial')}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs md:text-sm">
               {configMode === 'location' ? 'Defina a cidade onde seu negócio opera.' : (configMode === 'business' ? 'Personalize o nome e o link da sua página.' : 'Conecte sua empresa ao Google Business.')}
             </DialogDescription>
           </DialogHeader>
@@ -1352,7 +1362,7 @@ export default function DashPage() {
       </Dialog>
       
       <Dialog open={isQrDialogOpenManual} onOpenChange={setIsQrDialogOpenManual}>
-        <DialogContent className="rounded-[2.5rem] sm:max-w-[420px] border-none shadow-2xl p-0 overflow-hidden bg-background flex flex-col max-h-[90vh]">
+        <DialogContent className="rounded-[2.5rem] w-[95vw] sm:max-w-[420px] border-none shadow-2xl p-0 overflow-hidden bg-background flex flex-col max-h-[90vh]">
           <div className="h-2 bg-primary w-full shrink-0" />
           <div className="flex-1 overflow-y-auto scrollbar-hide">
             <DialogHeader className="p-6 pb-2 text-center shrink-0">
