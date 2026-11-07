@@ -2,7 +2,7 @@
 /**
  * @fileOverview Agente de Inteligência Artificial para Suporte Estratégico Proova.
  * 
- * - supportAiAction - Função exportada que aciona o suporte inteligente utilizando ai.generate diretamente.
+ * - supportAiAction - Função exportada que aciona o suporte inteligente utilizando ai.generate.
  */
 
 import { ai } from '@/ai/genkit';
@@ -23,18 +23,18 @@ const SupportAiOutputSchema = z.object({
 export type SupportAiOutput = z.infer<typeof SupportAiOutputSchema>;
 
 /**
- * Função de ação que processa a dúvida do usuário utilizando ai.generate.
- * Esta abordagem é mais direta e evita erros de registro de ação no plugin googleai.
+ * Definição formal do Prompt para garantir o registro correto no Genkit.
  */
-export async function supportAiAction(input: SupportAiInput): Promise<SupportAiOutput> {
-  try {
-    const { output } = await ai.generate({
-      system: `Você é o "Especialista Proova", o assistente de suporte inteligente da plataforma Proova.
-Sua missão é ajudar o usuário ${input.userName || 'Membro'} (Plano: ${input.membershipStatus || 'Base'}) a dominar o mercado através da prova social.
+const supportPrompt = ai.definePrompt({
+  name: 'supportPrompt',
+  input: { schema: SupportAiInputSchema },
+  output: { schema: SupportAiOutputSchema },
+  system: `Você é o "Especialista Proova", o assistente de suporte inteligente da plataforma Proova.
+Sua missão é ajudar o usuário de nome {{userName}} (Plano: {{membershipStatus}}) a dominar o mercado através da prova social.
 
 ### CONHECIMENTO ESTRATÉGICO PROOVA:
 1. **G-Boost**: Sistema que detecta elogios 5 estrelas e convida o cliente a avaliar no Google Maps. Isso aumenta o SEO Local.
-2. **Reputation Shield**: Filtro de feedbacks críticos (1-3 estrelas) enviados para o Inbox Privado.
+2. **Reputation Shield**: Filtro de feedbacks críticos (1-3 estrelas) enviados para o Inbox Privado para resolução interna.
 3. **Página Pública (PP)**: Vitrine de depoimentos oficial para o "Link da Bio".
 4. **Widgets (Murais)**: Murais embutíveis para sites.
 5. **Social Cards**: Gerador de posts para Instagram.
@@ -43,10 +43,19 @@ Sua missão é ajudar o usuário ${input.userName || 'Membro'} (Plano: ${input.m
 ### REGRAS DE ATENDIMENTO:
 - Seja executivo, encorajador e direto.
 - Sugira upgrades para recursos premium (Gold/Enterprise) quando apropriado.
-- Nunca invente funcionalidades.
-- Respostas concisas e profissionais.`,
-      prompt: input.message,
-      output: { schema: SupportAiOutputSchema }
+- Se o usuário perguntar sobre "G-Boost", explique que ele aumenta o SEO Local.
+- Nunca invente funcionalidades. Respostas concisas e profissionais.`,
+  prompt: `{{{message}}}`,
+});
+
+/**
+ * Função de ação que processa a dúvida do usuário.
+ * Especificamos explicitamente o modelo gemini-1.5-flash para máxima compatibilidade.
+ */
+export async function supportAiAction(input: SupportAiInput): Promise<SupportAiOutput> {
+  try {
+    const { output } = await supportPrompt(input, {
+      model: 'googleai/gemini-1.5-flash',
     });
 
     if (!output) {
