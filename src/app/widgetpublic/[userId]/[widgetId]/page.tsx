@@ -104,12 +104,11 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
       <Card 
         key={t.id}
         className={cn(
-          "rounded-2xl p-4 transition-all duration-700 w-full max-w-full bg-white dark:bg-black text-black dark:text-white",
+          "rounded-2xl p-4 transition-all duration-700 w-full max-w-full bg-white dark:bg-black text-black dark:text-white border-none",
           layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-4 duration-700" : "animate-in fade-in slide-in-from-right-4 duration-700"),
           layout === 'popup' && !isAnimating && "animate-in fade-in zoom-in-90 duration-1000"
         )}
         style={{ 
-          border: hasSecondary ? `2px solid ${secondaryColor}` : '1px solid rgba(0,0,0,0.05)',
           boxShadow: hasSecondary 
             ? `0 0 20px ${secondaryColor}50, 0 10px 30px -10px rgba(0,0,0,0.15)` 
             : `0 10px 30px -10px ${themeColor}15`,
