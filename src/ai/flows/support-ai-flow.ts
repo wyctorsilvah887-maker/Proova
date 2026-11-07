@@ -8,7 +8,6 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import { PRIMARY_MODEL } from '@/ai/genkit';
 
 const SupportAiInputSchema = z.object({
   message: z.string().describe('A mensagem ou dúvida enviada pelo usuário no chat.'),
@@ -26,7 +25,6 @@ export type SupportAiOutput = z.infer<typeof SupportAiOutputSchema>;
 
 const prompt = ai.definePrompt({
   name: 'supportAiPrompt',
-  model: PRIMARY_MODEL,
   input: { schema: SupportAiInputSchema },
   output: { schema: SupportAiOutputSchema },
   prompt: `Você é o "Especialista Proova", o assistente de suporte inteligente da plataforma Proova.

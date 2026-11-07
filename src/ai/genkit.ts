@@ -1,20 +1,11 @@
-
-import { genkit } from 'genkit';
-import { googleAI } from '@genkit-ai/google-genai';
+import {genkit} from 'genkit';
+import {googleAI} from '@genkit-ai/google-genai';
 
 /**
- * Inicializa a instância global do Genkit.
- * Configurado para ler explicitamente a API KEY do arquivo .env
+ * Configuração central do Genkit para o Hall Black Club.
+ * Utiliza o modelo Gemini 2.5 Flash conforme solicitado.
  */
 export const ai = genkit({
-  plugins: [
-    googleAI({
-      // Forçamos o uso da chave do ambiente para garantir a comunicação
-      apiKey: process.env.GOOGLE_GENAI_API_KEY || process.env.GEMINI_API_KEY,
-    }),
-  ],
+  plugins: [googleAI()],
+  model: 'googleai/gemini-2.5-flash',
 });
-
-// Modelo estável e de alta performance para produção
-export const PRIMARY_MODEL = 'googleai/gemini-1.5-flash';
-export const geminiModel = PRIMARY_MODEL;
