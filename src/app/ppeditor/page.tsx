@@ -68,7 +68,6 @@ import {
   getDoc, 
   writeBatch 
 } from 'firebase/firestore';
-import { signOut } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from '@/hooks/use-toast';
 import Link from 'next/link';
@@ -91,14 +90,6 @@ import {
 } from "@/components/ui/accordion";
 import { Slider } from '@/components/ui/slider';
 import Cropper from 'react-easy-crop';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
 import { useTheme } from 'next-themes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -227,14 +218,13 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
     <Card 
       key={`${t.id}-${muralIndex}`}
       className={cn(
-        "rounded-[1.5rem] p-5 transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white mb-6",
+        "rounded-[1.5rem] p-5 transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white mb-6 border-none",
         !isPopup && "animate-in fade-in duration-700 ease-out fill-both",
         !isPopup && (side === 'left' ? "slide-in-from-left-8" : "slide-in-from-right-8"),
         isPopup && !isAnimating && "animate-in fade-in slide-in-from-bottom-10 duration-1000",
         isPopup && isAnimating && "animate-out fade-out slide-out-to-top-10 duration-1000"
       )}
       style={{ 
-        border: hasSecondary ? `2px solid ${secondaryColor}` : '1px solid rgba(0,0,0,0.05)',
         boxShadow: hasSecondary 
           ? `0 0 25px ${secondaryColor}50, 0 10px 30px -10px rgba(0,0,0,0.15)` 
           : `0 20px 40px -20px ${themeColor}25`,
