@@ -476,12 +476,12 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
               <div className="w-full flex items-center justify-center min-h-[450px]">
                 {/* 
                   Mural Oficial Proova embutido via script de linha única 
-                  Esta ferramenta exibe depoimentos reais em tempo real.
+                  Utilizando strategy 'afterInteractive' para maior resiliência no carregamento.
                 */}
                 <div id="proova-mural-landing" className="w-full">
                   <Script 
                     src="https://www.useproova.online/widget.js?id=primeiromuralproova&user=EE6Mqdqq4Pc4maNgFy7rNq52ms13" 
-                    strategy="lazyOnload" 
+                    strategy="afterInteractive" 
                   />
                 </div>
               </div>

@@ -11,7 +11,6 @@ service cloud.firestore {
     }
 
     // Regras para Slugs Globais (Cartório de Nomes)
-    // Permite que qualquer pessoa verifique se um slug existe, mas apenas usuários logados reservem nomes.
     match /slugs/{slug} {
       allow read: if true;
       allow create: if request.auth != null;
@@ -24,32 +23,32 @@ service cloud.firestore {
       allow create, list: if true;
     }
 
-    // Regras para Estatísticas de Conversão (Rastreamento de LP)
+    // Regras para Estatísticas de Conversão
     match /platform_stats/{statsId} {
-      allow read: if true;
-      allow write: if true; 
+      allow read, write: if true; 
     }
 
     // Regras para a coleção de usuários e subcoleções
     match /users/{userId} {
-      allow create: if true;
+      // Leitura pública necessária para identificar a empresa e carregar widgets
       allow get, list: if true;
+      allow create: if true;
       
       allow update: if (request.auth != null && request.auth.uid == userId) || 
-        (request.resource.data.diff(resource.data).affectedKeys().hasAny(['testimonialsCount', 'googleRedirectCount', 'membershipStatus', 'trialUsed', 'trialStartedAt']));
+        (request.resource.data.diff(resource.data).affectedKeys().hasAny(['testimonialsCount', 'googleRedirectCount', 'membershipStatus', 'trialUsed', 'trialStartedAt', 'ppVisitCount', 'whatsappClickCount']));
       
       allow delete: if request.auth != null && request.auth.uid == userId;
       
-      // Página Pública Independente (Subcoleção)
-      // Leitura é pública para que os visitantes acessem a PP. Escrita apenas pelo dono.
+      // Página Pública (PP)
       match /pp/{slug} {
         allow read: if true;
         allow write: if request.auth != null && request.auth.uid == userId;
       }
 
-      // Depoimentos Públicos (Fila de Curadoria e Mural)
+      // Depoimentos Públicos (Abertos para leitura de widgets externos)
       match /testimonials/{testimonialId} {
-        allow create, read: if true; 
+        allow read: if true;
+        allow create: if true;
         allow update, delete: if request.auth != null && (request.auth.uid == userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
       }
 
@@ -59,7 +58,7 @@ service cloud.firestore {
         allow read, update, delete: if request.auth != null && request.auth.uid == userId;
       }
 
-      // Configurações de Widgets
+      // Configurações de Widgets (Abertos para leitura do script oficial)
       match /widgets/{widgetId} {
         allow read: if true;
         allow update, create, delete: if request.auth != null && request.auth.uid == userId;
