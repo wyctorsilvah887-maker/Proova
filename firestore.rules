@@ -72,6 +72,14 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
     
+    // Suporte para Collection Group (Essencial para o funcionamento do Widget Oficial Proova)
+    match /{path=**}/testimonials/{testimonial} {
+      allow read: if true;
+    }
+    match /{path=**}/widgets/{widget} {
+      allow read: if true;
+    }
+
     // Regra Mestra para Administradores
     match /{document=**} {
       allow read, write: if request.auth != null && 
