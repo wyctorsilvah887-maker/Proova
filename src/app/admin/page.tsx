@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -13,7 +12,7 @@ import {
   TrendingUp, CreditCard, AlertCircle, Copy, Hash, Calendar,
   BarChart3, MousePointer2, ExternalLink, Gem, ArrowLeft,
   Settings, Handshake, Save, CheckCircle2, CircleDashed, Rocket,
-  MousePointer, Headphones
+  MousePointer, Headphones, Ticket
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -692,7 +691,7 @@ export default function AdminPage() {
       </footer>
 
       {/* User Detail Sheet */}
-      <Sheet open={isDetailOpen} onOpenChange={setIsUserDetailOpen}>
+      <Sheet open={isDetailOpen} onOpenChange={setIsDetailOpen}>
         <SheetContent className="sm:max-w-md w-full overflow-y-auto">
           <SheetHeader className="pb-6">
             <div className="flex items-center gap-3 mb-2">
