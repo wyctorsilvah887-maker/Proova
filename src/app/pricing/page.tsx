@@ -139,7 +139,7 @@ export default function PricingPage() {
           "Tudo do Gold + Recursos Exclusivos",
           "Vídeo Reviews 4K de Alto Impacto",
           "Depoimentos Ativos Ilimitados",
-          "Suporte Prioritário Via WhatsApp",
+          "Suporte VIP Dedicado no App",
           "Design de Página Ultra Customizado",
           "Analytics Avançado de Conversão"
         ]
