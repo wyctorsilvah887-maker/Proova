@@ -2,8 +2,9 @@
 /**
  * @fileOverview Agente de Inteligência Artificial para Suporte Estratégico Proova.
  * 
- * Este flow processa dúvidas de usuários sobre a plataforma Proova,
- * utilizando a base de conhecimento de estratégia, planos e funcionalidades.
+ * - supportAiAction - Função exportada que aciona o fluxo de suporte.
+ * - SupportAiInput - Schema de entrada para a dúvida do usuário.
+ * - SupportAiOutput - Schema de saída com a resposta da IA.
  */
 
 import { ai } from '@/ai/genkit';
@@ -22,6 +23,13 @@ const SupportAiOutputSchema = z.object({
 });
 
 export type SupportAiOutput = z.infer<typeof SupportAiOutputSchema>;
+
+/**
+ * Função de ação do servidor que aciona o fluxo Genkit.
+ */
+export async function supportAiAction(input: SupportAiInput): Promise<SupportAiOutput> {
+  return supportAiFlow(input);
+}
 
 const prompt = ai.definePrompt({
   name: 'supportAiPrompt',
@@ -49,7 +57,20 @@ Sua missão é ajudar o usuário {{{userName}}} (Plano: {{{membershipStatus}}}) 
 Dúvida do Usuário: {{{message}}}`,
 });
 
-export async function supportAiAction(input: SupportAiInput): Promise<SupportAiOutput> {
-  const { output } = await prompt(input);
-  return output!;
-}
+/**
+ * Fluxo oficial que encapsula a chamada do prompt para registro correto no plugin googleai.
+ */
+const supportAiFlow = ai.defineFlow(
+  {
+    name: 'supportAiFlow',
+    inputSchema: SupportAiInputSchema,
+    outputSchema: SupportAiOutputSchema,
+  },
+  async (input) => {
+    const { output } = await prompt(input);
+    if (!output) {
+      throw new Error('A IA não gerou uma resposta válida para o suporte.');
+    }
+    return output;
+  }
+);
