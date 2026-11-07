@@ -229,19 +229,28 @@ export default function WidgetsPage() {
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center">
-          <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
+        <div className="flex items-center gap-4">
+          <Link href="/dash">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 select-none"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          </Link>
+          <div className="flex items-center group -ml-2">
             <div className="relative w-[160px] h-[52px] md:w-[240px] md:h-[78px] transition-transform group-hover:scale-105">
               <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
               <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
-          </Link>
+          </div>
         </div>
         <div className="ml-auto flex items-center gap-2 md:gap-4">
           <ThemeToggle className="hidden sm:flex" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
+              <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
                 <div className="flex flex-col items-end">
                   <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] md:max-w-[200px] transition-colors group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Minha Empresa'}
@@ -318,18 +327,9 @@ export default function WidgetsPage() {
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-8 max-w-7xl mx-auto w-full pt-24 md:pt-32">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div className="flex items-center gap-3">
-            <Link href="/dash">
-              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 text-muted-foreground hover:text-primary transition-all">
-                <ArrowLeft className="w-5 h-5" />
-              </Button>
-            </Link>
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Meus Murais</h1>
-              </div>
-              <p className="text-sm text-muted-foreground">Gerencie e publique murais de depoimentos no seu site</p>
-            </div>
+          <div className="space-y-0.5">
+            <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Meus Murais</h1>
+            <p className="text-sm text-muted-foreground">Gerencie e publique murais de depoimentos no seu site</p>
           </div>
           <Button onClick={() => setIsCreateDialogOpen(true)} className="w-full sm:w-auto h-12 rounded-xl shadow-lg font-bold gap-2 text-sm" size="lg">
             <Plus className="w-5 h-5" /> Novo Mural
