@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -126,39 +125,34 @@ export default function SupportPage() {
   }
 
   return (
-    <div className="h-screen bg-muted/30 flex flex-col font-body text-foreground overflow-hidden">
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-4 md:px-6 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center gap-4 flex-1">
+    <div className="h-[100dvh] flex flex-col font-body text-foreground overflow-hidden bg-muted/30">
+      {/* HEADER ADAPTÁVEL */}
+      <header className="bg-background border-b h-16 md:h-24 flex items-center px-4 md:px-6 shrink-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
+        <div className="flex items-center gap-2 md:gap-4 flex-1">
           <Link href="/dash">
             <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 text-muted-foreground hover:text-primary transition-all bg-transparent hover:bg-transparent shadow-none border-none">
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
-          <div className="flex items-center group -ml-2">
-            <div className="relative w-[160px] h-[55px] md:w-[320px] md:h-[105px]">
+          <div className="flex items-center group">
+            <div className="relative w-[140px] h-[40px] md:w-[280px] md:h-[90px]">
               <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
               <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </div>
         </div>
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle />
+          <ThemeToggle className="hidden sm:flex" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
-                <div className="flex flex-col items-end">
+              <Button variant="ghost" className="h-10 md:h-12 px-1 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
+                <div className="hidden sm:flex flex-col items-end">
                   <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Empresa'}
                   </span>
-                  <div className="flex flex-col items-end gap-0">
-                    <span className={cn(
-                      "text-[8px] uppercase tracking-widest font-black leading-tight",
-                      userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
-                    )}>
-                      {membershipLabel}
-                    </span>
-                    {isMapsLinkValid && <span className="text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
-                  </div>
+                  <span className="text-[8px] uppercase tracking-widest font-black text-muted-foreground leading-tight">
+                    {membershipLabel}
+                  </span>
                 </div>
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
               </Button>
@@ -169,10 +163,6 @@ export default function SupportPage() {
               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Layout className="mr-2 h-4 w-4 text-primary" />
-                <span>Meus Murais</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
@@ -185,20 +175,21 @@ export default function SupportPage() {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col pt-24 md:pt-32 pb-4 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto w-full min-h-0">
-        <div className="flex-1 bg-background border rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative">
+      {/* CHAT CONTAINER PRINCIPAL */}
+      <main className="flex-1 flex flex-col w-full max-w-5xl mx-auto min-h-0 md:p-4 lg:p-6">
+        <div className="flex-1 bg-background md:border md:rounded-[2rem] md:shadow-2xl flex flex-col overflow-hidden relative border-none">
           
-          {/* Header do Chat */}
-          <div className="p-6 border-b bg-muted/5 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shadow-inner">
-                <Headphones className="w-6 h-6" />
+          {/* Header do Chat Interno */}
+          <div className="px-4 py-3 md:p-6 border-b bg-muted/5 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-primary/10 text-primary flex items-center justify-center shadow-inner">
+                <Headphones className="w-5 h-5 md:w-6 md:h-6" />
               </div>
               <div>
-                <h1 className="text-lg font-black font-headline tracking-tight uppercase">Suporte Técnico</h1>
-                <div className="flex items-center gap-1.5">
-                   <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                   <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Time Online</span>
+                <h2 className="text-sm md:text-lg font-black font-headline tracking-tight uppercase leading-none">Suporte Proova</h2>
+                <div className="flex items-center gap-1.5 mt-1">
+                   <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-green-500 animate-pulse" />
+                   <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Time Online</span>
                 </div>
               </div>
             </div>
@@ -208,58 +199,58 @@ export default function SupportPage() {
             </div>
           </div>
 
-          {/* Área de Mensagens */}
-          <ScrollArea ref={scrollRef} className="flex-1 p-6 md:p-10">
-            <div className="space-y-8 pb-10">
+          {/* Área de Mensagens com Scroll */}
+          <ScrollArea ref={scrollRef} className="flex-1 px-4 py-6 md:p-10">
+            <div className="space-y-6 md:space-y-8 pb-10">
               {/* Mensagem Inicial do Sistema */}
               <div className="flex justify-start animate-in fade-in slide-in-from-left-4 duration-700">
-                <div className="flex gap-3 max-w-[85%] sm:max-w-[70%]">
-                  <div className="h-8 w-8 rounded-xl bg-primary flex items-center justify-center text-white shrink-0 mt-1 shadow-lg">
+                <div className="flex gap-2 md:gap-3 max-w-[90%] sm:max-w-[80%]">
+                  <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-white shrink-0 mt-1 shadow-lg">
                     <Sparkles className="w-4 h-4" />
                   </div>
                   <div className="space-y-1">
-                    <div className="bg-muted/50 border rounded-[1.5rem] rounded-tl-none p-4 shadow-sm">
-                      <p className="text-sm font-medium leading-relaxed">
+                    <div className="bg-muted/50 border rounded-2xl rounded-tl-none p-3 md:p-4 shadow-sm">
+                      <p className="text-xs md:text-sm font-medium leading-relaxed">
                         Olá, <strong>{userData?.name?.split(' ')[0]}</strong>! 👋 <br />
-                        Bem-vindo ao suporte de elite do Proova. Como podemos ajudar a escalar sua prova social hoje?
+                        Bem-vindo ao canal direto Proova. Como podemos ajudar sua marca hoje?
                       </p>
                     </div>
-                    <span className="text-[8px] font-black uppercase text-muted-foreground ml-2">Sistema Proova</span>
+                    <span className="text-[8px] font-black uppercase text-muted-foreground ml-1">Assistente Proova</span>
                   </div>
                 </div>
               </div>
 
-              {/* Histórico do Firebase */}
+              {/* Histórico Dinâmico */}
               {messages && messages.map((msg: any) => (
                 <div key={msg.id} className={cn(
                   "flex animate-in fade-in zoom-in-95 duration-500",
                   msg.sender === 'user' ? "justify-end" : "justify-start"
                 )}>
                   <div className={cn(
-                    "flex gap-3 max-w-[85%] sm:max-w-[70%]",
+                    "flex gap-2 md:gap-3 max-w-[90%] sm:max-w-[80%]",
                     msg.sender === 'user' ? "flex-row-reverse" : "flex-row"
                   )}>
                     <div className={cn(
-                      "h-8 w-8 rounded-xl flex items-center justify-center shrink-0 mt-1 shadow-md",
+                      "h-8 w-8 rounded-lg flex items-center justify-center shrink-0 mt-1 shadow-md",
                       msg.sender === 'user' ? "bg-muted text-muted-foreground" : "bg-primary text-white"
                     )}>
                       {msg.sender === 'user' ? <User className="w-4 h-4" /> : <Headphones className="w-4 h-4" />}
                     </div>
                     <div className="space-y-1">
                       <div className={cn(
-                        "p-4 shadow-sm border",
+                        "p-3 md:p-4 shadow-sm border",
                         msg.sender === 'user' 
-                          ? "bg-primary text-white rounded-[1.5rem] rounded-tr-none border-transparent" 
-                          : "bg-muted/50 rounded-[1.5rem] rounded-tl-none"
+                          ? "bg-primary text-white rounded-2xl rounded-tr-none border-transparent" 
+                          : "bg-muted/50 rounded-2xl rounded-tl-none"
                       )}>
-                        <p className="text-sm font-medium leading-relaxed">{msg.text}</p>
+                        <p className="text-xs md:text-sm font-medium leading-relaxed whitespace-pre-wrap">{msg.text}</p>
                       </div>
                       <div className={cn(
-                        "flex items-center gap-1.5 px-2",
+                        "flex items-center gap-1.5 px-1",
                         msg.sender === 'user' ? "justify-end" : "justify-start"
                       )}>
                         <span className="text-[8px] font-black uppercase text-muted-foreground opacity-60">
-                          {msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 'Enviando...'}
+                          {msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '...'}
                         </span>
                         {msg.sender === 'user' && <CheckCheck className="w-3 h-3 text-primary opacity-40" />}
                       </div>
@@ -276,38 +267,40 @@ export default function SupportPage() {
             </div>
           </ScrollArea>
 
-          {/* Footer do Input */}
-          <div className="p-6 border-t bg-background shrink-0">
-             <form onSubmit={handleSendMessage} className="flex items-center gap-3">
+          {/* Footer de Entrada (Input) */}
+          <div className="p-3 md:p-6 border-t bg-background shrink-0">
+             <form onSubmit={handleSendMessage} className="flex items-center gap-2 md:gap-3">
                <div className="relative flex-1 group">
                  <Input 
                    value={message}
                    onChange={(e) => setMessage(e.target.value)}
-                   placeholder="Descreva sua dúvida ou problema..."
-                   className="h-14 rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 pr-12 text-sm font-medium transition-all"
+                   placeholder="Digite sua mensagem..."
+                   className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 pr-10 text-xs md:text-sm font-medium transition-all"
                    disabled={isSending}
                  />
-                 <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-30 group-focus-within:opacity-60 transition-opacity">
-                   Enter para enviar
+                 <div className="absolute right-3 top-1/2 -translate-y-1/2 hidden md:block">
+                   <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground opacity-30 group-focus-within:opacity-60 transition-opacity">
+                     Enter
+                   </div>
                  </div>
                </div>
                <Button 
                 type="submit" 
                 size="icon" 
-                className="h-14 w-14 rounded-2xl shadow-xl transition-all active:scale-90 bg-primary hover:bg-primary/90 shrink-0"
+                className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl shadow-xl transition-all active:scale-90 bg-primary hover:bg-primary/90 shrink-0"
                 disabled={!message.trim() || isSending}
                >
                  {isSending ? <Loader2 className="animate-spin w-5 h-5" /> : <Send className="w-5 h-5" />}
                </Button>
              </form>
-             <p className="text-[9px] text-center mt-4 uppercase tracking-[0.3em] font-black text-muted-foreground opacity-40">
-               Suporte Proova v2.1 • Criptografia de Ponta a Ponta Ativa
+             <p className="text-[8px] md:text-[9px] text-center mt-3 uppercase tracking-[0.2em] font-black text-muted-foreground opacity-40">
+               Suporte Proova v2.1 • Criptografia Ativa
              </p>
           </div>
         </div>
       </main>
 
-      <footer className="py-6 border-t mt-auto text-center opacity-30">
+      <footer className="hidden md:block py-4 text-center opacity-30 shrink-0">
         <p className="text-[8px] font-black uppercase tracking-[0.4em]">Powered by Proova Technology</p>
       </footer>
     </div>
