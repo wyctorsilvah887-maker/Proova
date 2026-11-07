@@ -40,7 +40,8 @@ import {
   X,
   MessageCircle,
   Link2,
-  Bell
+  Bell,
+  ExternalLink
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -100,6 +101,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useTheme } from 'next-themes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 type LayoutType = 'grid' | 'mural' | 'carousel' | 'popup';
 
@@ -308,8 +310,6 @@ const PublicPageSettings = ({
   customSections, setCustomSections,
   onFileSelect,
   isUploading,
-  handleSave,
-  isSaving,
   isGoldPlan,
   logoInputRef,
   currentSlug, setSlugEdit,
@@ -349,17 +349,13 @@ const PublicPageSettings = ({
           <Link href="/dash">
             <Button variant="ghost" size="sm" className="gap-2 px-0 text-muted-foreground hover:text-primary hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 transition-all h-8">
               <ArrowLeft className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Dash</span>
+              <span className="text-[10px] font-black uppercase tracking-widest">Painel Dash</span>
             </Button>
           </Link>
           {onClose && (
             <Button variant="ghost" size="icon" onClick={onClose} className="lg:hidden h-8 w-8 rounded-full"><X className="w-4 h-4" /></Button>
           )}
         </div>
-        <Button onClick={handleSave} disabled={isSaving || isUploading} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm bg-primary hover:bg-primary/90 text-white">
-          {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
-          Salvar Página
-        </Button>
       </div>
 
       <Tabs defaultValue="geral" className="w-full flex-1 flex flex-col min-h-0">
@@ -827,7 +823,7 @@ export default function PPEditorPage() {
         <div className="flex items-center gap-3 flex-1">
           <Link href="/dash">
             <Button variant="ghost" size="sm" className="h-10 px-2 gap-2 text-muted-foreground hover:text-primary hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 rounded-xl shadow-none">
-               <ArrowLeft className="w-4 h-4" /><span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Voltar</span>
+               <ArrowLeft className="w-4 h-4" /><span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Painel Dash</span>
             </Button>
           </Link>
           <div className="flex items-center group -ml-2">
@@ -838,188 +834,159 @@ export default function PPEditorPage() {
           </div>
         </div>
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <Button onClick={handleSave} disabled={isSaving || isUploading} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg bg-primary hover:bg-primary/90 text-white transition-all active:scale-95">{isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar</Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl focus:ring-0 focus-visible:ring-0 outline-none data-[state=open]:bg-transparent shadow-none hover:bg-transparent">
-                <div className="flex flex-col items-end">
-                  <span className="text-[10px] md:text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] transition-colors group-hover:text-primary leading-tight">
-                    {userData?.companyName || 'Minha Empresa'}
-                  </span>
-                  <div className="flex flex-col items-end gap-0">
-                    <span className={cn(
-                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
-                      isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground"
-                    )}>
-                      {membershipLabel}
-                    </span>
-                    {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
-                  </div>
-                </div>
-                <div className="h-7 w-7 md:h-8 md:w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
-                  <User className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary group-hover:text-white" />
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl bg-background border">
-              <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-widest text-muted-foreground">Minha Conta</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold py-2.5 cursor-pointer">
-                <TrendingUp className="mr-2 h-4 w-4 text-primary" />Dash
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl font-bold py-2.5 cursor-pointer">
-                <Gem className="mr-2 h-4 w-4 text-primary" />Upgrade
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl font-bold py-2.5 opacity-70">
-                <Handshake className="mr-2 h-4 w-4 text-primary" /><span>Parceiros</span><Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl font-bold py-2.5 cursor-pointer">
-                {theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}Tema
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive font-bold py-2.5 cursor-pointer">
-                <LogOut className="mr-2 h-4 w-4" />Sair
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button 
+            variant="outline"
+            className="flex h-10 md:h-12 px-3 md:px-6 rounded-xl font-bold gap-2 border-primary/20 text-primary hover:bg-primary/5 shadow-sm transition-all active:scale-95"
+            onClick={() => window.open(`/pp/${activeSlug}`, '_blank')}
+          >
+            <ExternalLink className="w-4 h-4" />
+            <span className="hidden xs:inline">Abrir Página</span>
+          </Button>
+          <Button 
+            onClick={handleSave} 
+            disabled={isSaving || isUploading} 
+            className="flex h-10 md:h-12 px-3 md:px-6 rounded-xl font-bold gap-2 shadow-lg bg-primary hover:bg-primary/90 text-white transition-all active:scale-95"
+          >
+            {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar
+          </Button>
+          <ThemeToggle />
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-8 space-y-8 max-w-5xl mx-auto w-full pt-24 md:pt-32">
-        <Sheet>
-          <aside className="hidden lg:flex w-80 bg-background border-r flex-col shrink-0 h-full">
-            <PublicPageSettings 
-              themeColor={themeColor} setThemeColor={setThemeColor} secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
-              layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
-              heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
-              testimonialsTitle={testimonialsTitle} setTestimonialsTitle={setTestimonialsTitle}
-              footerText={footerText} setFooterText={setFooterText} showLogo={showLogo} setShowLogo={setShowLogo}
-              whatsappEnabled={whatsappEnabled} setWhatsappEnabled={setWhatsappEnabled}
-              whatsappNumber={whatsappNumber} setWhatsappNumber={setWhatsappNumber}
-              externalSiteUrl={externalSiteUrl} setExternalSiteUrl={setExternalSiteUrl}
-              externalSiteButtonText={externalSiteButtonText} setExternalSiteButtonText={setExternalSiteButtonText}
-              customSections={customSections} setCustomSections={setCustomSections} onFileSelect={onFileSelect}
-              isUploading={isUploading} handleSave={handleSave} isSaving={isSaving} isGoldPlan={isGoldPlan}
-              logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
-            />
-          </aside>
+      <main className="flex-1 flex overflow-hidden relative w-full h-full pt-24 md:pt-32">
+        <aside className="hidden lg:flex w-80 bg-background border-r flex-col shrink-0 h-full">
+          <PublicPageSettings 
+            themeColor={themeColor} setThemeColor={setThemeColor} secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
+            layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
+            heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
+            testimonialsTitle={testimonialsTitle} setTestimonialsTitle={setTestimonialsTitle}
+            footerText={footerText} setFooterText={setFooterText} showLogo={showLogo} setShowLogo={setShowLogo}
+            whatsappEnabled={whatsappEnabled} setWhatsappEnabled={setWhatsappEnabled}
+            whatsappNumber={whatsappNumber} setWhatsappNumber={setWhatsappNumber}
+            externalSiteUrl={externalSiteUrl} setExternalSiteUrl={setExternalSiteUrl}
+            externalSiteButtonText={externalSiteButtonText} setExternalSiteButtonText={setExternalSiteButtonText}
+            customSections={customSections} setCustomSections={setCustomSections} onFileSelect={onFileSelect}
+            isUploading={isUploading} isGoldPlan={isGoldPlan}
+            logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
+          />
+        </aside>
 
-          <div className="flex-1 overflow-y-auto bg-muted/10 p-4 sm:p-8">
-            <div className="max-w-5xl mx-auto space-y-8 pb-32">
-              <div className="flex items-center justify-between">
+        <div className="flex-1 overflow-y-auto bg-muted/10 p-4 sm:p-8">
+          <div className="max-w-5xl mx-auto space-y-8 pb-32">
+            <div className="flex items-center justify-between">
+              <Sheet>
                 <SheetTrigger asChild>
-                  <button className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 hover:text-primary transition-colors animate-pulse outline-none"><Monitor className="w-4 h-4" /> EDITAR</button>
+                  <button className="text-[10px] lg:hidden font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 hover:text-primary transition-colors animate-pulse outline-none"><Monitor className="w-4 h-4" /> CONFIGURAR PÁGINA</button>
                 </SheetTrigger>
-                <div className="flex items-center gap-2 bg-background border px-3 py-1 rounded-full shadow-sm">
-                   <span className="text-[10px] font-bold opacity-50 uppercase">Link:</span>
-                   <span className="text-[10px] font-mono font-black text-primary">/pp/{activeSlug}</span>
-                </div>
-              </div>
-
-              <div className="relative bg-background rounded-[2.5rem] shadow-2xl min-h-[600px] flex flex-col overflow-hidden ring-1 ring-primary/5">
-                <div className="flex-1 flex flex-col pt-24 pb-12">
-                  <div className="px-8 sm:px-12 text-center space-y-6 mb-12">
-                    {logoUrl && (
-                      <div className="mx-auto w-20 h-20 relative"><img src={logoUrl} className="w-full h-full object-cover rounded-[2.5rem] shadow-lg border-2 border-background" alt="Logo" /></div>
-                    )}
-                    <div className="space-y-4">
-                      <div className="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] max-w-4xl mx-auto text-foreground" dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${userData?.companyName}` }} />
-                      {heroSubtitle && <div className="text-foreground text-sm font-bold max-w-2xl mx-auto italic leading-relaxed" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />}
-                    </div>
-                  </div>
-
-                  <div className="w-full mb-12">
-                    {customSections.map((section: CustomSection) => (
-                      <div key={section.id} className={cn("py-16 px-8 sm:px-12 text-center space-y-4 mb-12", section.variant === 'accent' ? "text-white" : (section.variant === 'dark' ? "bg-black text-white" : "bg-muted/5"))} style={{ backgroundColor: section.variant === 'accent' ? themeColor : undefined }}>
-                        <div className="max-w-3xl mx-auto space-y-4">
-                          <h2 className="text-2xl sm:text-4xl font-black tracking-tight">{section.title}</h2>
-                          {section.subtitle && <div className="text-[11px] font-bold leading-relaxed" dangerouslySetInnerHTML={{ __html: section.subtitle }} />}
-                          <p className="text-xs sm:text-sm leading-relaxed opacity-90 font-medium">{section.content}</p>
-                          {section.buttonText && <div className="pt-4"><Button className={cn("h-11 px-8 rounded-xl font-bold shadow-lg", section.variant === 'accent' ? "bg-white text-black" : "")} style={{ backgroundColor: section.variant !== 'accent' ? themeColor : undefined }}>{section.buttonText} <ArrowRight className="w-4 h-4" /></Button></div>}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {testimonialsTitle && (
-                    <div className="text-center pb-8 px-8">
-                       <h2 className="text-xl sm:text-2xl font-black font-headline uppercase tracking-widest" style={{ color: themeColor }}>{testimonialsTitle}</h2>
-                    </div>
-                  )}
-
-                  <div className={cn(
-                    "px-6 sm:px-12 w-full max-w-[1400px] mx-auto py-12 pb-32",
-                    (layout === 'popup' || layout === 'carousel') ? "max-w-md mx-auto flex flex-col gap-12" : (
-                      layout === 'mural' 
-                        ? "grid grid-cols-1 sm:grid-cols-2 gap-12" 
-                        : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12"
-                    )
-                  )}>
-                    {visibleTestimonialsPreview.length > 0 ? visibleTestimonialsPreview.map((t, i) => (
-                      <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12 flex justify-center">
-                        <TestimonialCard t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} isPopup={layout === 'popup'} isAnimating={isAnimating} />
-                      </div>
-                    )) : <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos abaixo.</div>}
-                  </div>
-
-                  <div className="mt-auto pt-16 px-8 text-center space-y-2 opacity-50">
-                    <p className="text-[9px] font-black uppercase tracking-widest">© {footerText || `${new Date().getFullYear()} ${userData?.companyName}`}</p>
-                    {showLogo && <span className="text-[7px] font-black tracking-[0.2em]">POWERED BY PROOVA</span>}
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-12 border-t">
-                <Accordion type="single" collapsible className="w-full">
-                  <AccordionItem value="selection" className="border-none">
-                    <AccordionTrigger className="hover:no-underline py-0 group">
-                      <div className="flex items-center justify-between w-full pr-6">
-                        <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 group-hover:text-primary transition-colors"><MessageSquare className="w-4 h-4" /> Depoimentos Aprovados ({approvedTestimonials?.length || 0})</h2>
-                        <Badge variant="outline" className="text-[9px] h-5 font-black uppercase">{selectedIds.length} / {isEnterprise ? '∞' : SELECTION_LIMIT} ATIVOS</Badge>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="pt-6">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
-                        {approvedTestimonials?.map((t: any) => {
-                          const isSelected = selectedIds.includes(t.id);
-                          return (
-                            <div key={t.id} onClick={() => toggleSelection(t.id)} className={cn("cursor-pointer transition-all rounded-xl border-2 p-4 bg-background group", isSelected ? "border-primary bg-primary/5" : "border-transparent shadow-sm hover:border-primary/20")}>
-                              <div className="flex items-start gap-3">
-                                <div className={cn("mt-1 w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors", isSelected ? "bg-primary border-primary" : "border-muted-foreground/30")}>{isSelected && <Check className="w-2.5 h-2.5 text-white" />}</div>
-                                <div className="flex-1 min-w-0">
-                                  <span className="font-bold text-[11px] block truncate group-hover:text-primary transition-colors">{t.userName}</span>
-                                  {t.text && t.text !== '(Depoimento em Vídeo)' && <p className="text-[10px] text-muted-foreground italic line-clamp-1 mt-1">"{t.text}"</p>}
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
+                <SheetContent side="left" className="p-0 w-80 border-none">
+                  <SheetHeader className="sr-only"><SheetTitle>Configurações</SheetTitle><SheetDescription>Ajuste sua página.</SheetDescription></SheetHeader>
+                  <PublicPageSettings 
+                    themeColor={themeColor} setThemeColor={setThemeColor} secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
+                    layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
+                    heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
+                    testimonialsTitle={testimonialsTitle} setTestimonialsTitle={setTestimonialsTitle}
+                    footerText={footerText} setFooterText={setFooterText} showLogo={showLogo} setShowLogo={setShowLogo}
+                    whatsappEnabled={whatsappEnabled} setWhatsappEnabled={setWhatsappEnabled}
+                    whatsappNumber={whatsappNumber} setWhatsappNumber={setWhatsappNumber}
+                    externalSiteUrl={externalSiteUrl} setExternalSiteUrl={setExternalSiteUrl}
+                    externalSiteButtonText={externalSiteButtonText} setExternalSiteButtonText={setExternalSiteButtonText}
+                    customSections={customSections} setCustomSections={setCustomSections} onFileSelect={onFileSelect}
+                    isUploading={isUploading} isGoldPlan={isGoldPlan}
+                    logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
+                  />
+                </SheetContent>
+              </Sheet>
+              <div className="flex items-center gap-2 bg-background border px-3 py-1 rounded-full shadow-sm ml-auto">
+                 <span className="text-[10px] font-bold opacity-50 uppercase">Link:</span>
+                 <span className="text-[10px] font-mono font-black text-primary">/pp/{activeSlug}</span>
               </div>
             </div>
+
+            <div className="relative bg-background rounded-[2.5rem] shadow-2xl min-h-[600px] flex flex-col overflow-hidden ring-1 ring-primary/5">
+              <div className="flex-1 flex flex-col pt-24 pb-12">
+                <div className="px-8 sm:px-12 text-center space-y-6 mb-12">
+                  {logoUrl && (
+                    <div className="mx-auto w-20 h-20 relative"><img src={logoUrl} className="w-full h-full object-cover rounded-[2.5rem] shadow-lg border-2 border-background" alt="Logo" /></div>
+                  )}
+                  <div className="space-y-4">
+                    <div className="text-4xl sm:text-6xl font-black tracking-tighter leading-[1.1] max-w-4xl mx-auto text-foreground" dangerouslySetInnerHTML={{ __html: heroTitle || `O que dizem sobre ${userData?.companyName}` }} />
+                    {heroSubtitle && <div className="text-foreground text-sm font-bold max-w-2xl mx-auto italic leading-relaxed" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />}
+                  </div>
+                </div>
+
+                <div className="w-full mb-12">
+                  {customSections.map((section: CustomSection) => (
+                    <div key={section.id} className={cn("py-16 px-8 sm:px-12 text-center space-y-4 mb-12", section.variant === 'accent' ? "text-white" : (section.variant === 'dark' ? "bg-black text-white" : "bg-muted/5"))} style={{ backgroundColor: section.variant === 'accent' ? themeColor : undefined }}>
+                      <div className="max-w-3xl mx-auto space-y-4">
+                        <h2 className="text-2xl sm:text-4xl font-black tracking-tight">{section.title}</h2>
+                        {section.subtitle && <div className="text-[11px] font-bold leading-relaxed" dangerouslySetInnerHTML={{ __html: section.subtitle }} />}
+                        <p className="text-xs sm:text-sm leading-relaxed opacity-90 font-medium">{section.content}</p>
+                        {section.buttonText && <div className="pt-4"><Button className={cn("h-11 px-8 rounded-xl font-bold shadow-lg", section.variant === 'accent' ? "bg-white text-black" : "")} style={{ backgroundColor: section.variant !== 'accent' ? themeColor : undefined }}>{section.buttonText} <ArrowRight className="w-4 h-4" /></Button></div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {testimonialsTitle && (
+                  <div className="text-center pb-8 px-8">
+                     <h2 className="text-xl sm:text-2xl font-black font-headline uppercase tracking-widest" style={{ color: themeColor }}>{testimonialsTitle}</h2>
+                  </div>
+                )}
+
+                <div className={cn(
+                  "px-6 sm:px-12 w-full max-w-[1400px] mx-auto py-12 pb-32",
+                  (layout === 'popup' || layout === 'carousel') ? "max-w-md mx-auto flex flex-col gap-12" : (
+                    layout === 'mural' 
+                      ? "grid grid-cols-1 sm:grid-cols-2 gap-12" 
+                      : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12"
+                  )
+                )}>
+                  {visibleTestimonialsPreview.length > 0 ? visibleTestimonialsPreview.map((t, i) => (
+                    <div key={`${t.id}-${muralIndex}-${i}`} className="mb-12 flex justify-center">
+                      <TestimonialCard t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} isPopup={layout === 'popup'} isAnimating={isAnimating} />
+                    </div>
+                  )) : <div className="col-span-full py-12 text-center opacity-20 italic text-sm">Selecione depoimentos abaixo.</div>}
+                </div>
+
+                <div className="mt-auto pt-16 px-8 text-center space-y-2 opacity-50">
+                  <p className="text-[9px] font-black uppercase tracking-widest">© {footerText || `${new Date().getFullYear()} ${userData?.companyName}`}</p>
+                  {showLogo && <span className="text-[7px] font-black tracking-[0.2em]">POWERED BY PROOVA</span>}
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-12 border-t">
+              <Accordion type="single" collapsible className="w-full">
+                <AccordionItem value="selection" className="border-none">
+                  <AccordionTrigger className="hover:no-underline py-0 group">
+                    <div className="flex items-center justify-between w-full pr-6">
+                      <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 group-hover:text-primary transition-colors"><MessageSquare className="w-4 h-4" /> Depoimentos Aprovados ({approvedTestimonials?.length || 0})</h2>
+                      <Badge variant="outline" className="text-[9px] h-5 font-black uppercase">{selectedIds.length} / {isEnterprise ? '∞' : SELECTION_LIMIT} ATIVOS</Badge>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="pt-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                      {approvedTestimonials?.map((t: any) => {
+                        const isSelected = selectedIds.includes(t.id);
+                        return (
+                          <div key={t.id} onClick={() => toggleSelection(t.id)} className={cn("cursor-pointer transition-all rounded-xl border-2 p-4 bg-background group", isSelected ? "border-primary bg-primary/5" : "border-transparent shadow-sm hover:border-primary/20")}>
+                            <div className="flex items-start gap-3">
+                              <div className={cn("mt-1 w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors", isSelected ? "bg-primary border-primary" : "border-muted-foreground/30")}>{isSelected && <Check className="w-2.5 h-2.5 text-white" />}</div>
+                              <div className="flex-1 min-w-0">
+                                <span className="font-bold text-[11px] block truncate group-hover:text-primary transition-colors">{t.userName}</span>
+                                {t.text && t.text !== '(Depoimento em Vídeo)' && <p className="text-[10px] text-muted-foreground italic line-clamp-1 mt-1">"{t.text}"</p>}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+            </div>
           </div>
-          <SheetContent side="left" className="p-0 w-80 border-none">
-            <SheetHeader className="sr-only"><SheetTitle>Configurações</SheetTitle><SheetDescription>Ajuste sua página.</SheetDescription></SheetHeader>
-             <PublicPageSettings 
-              themeColor={themeColor} setThemeColor={setThemeColor} secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
-              layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
-              heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
-              testimonialsTitle={testimonialsTitle} setTestimonialsTitle={setTestimonialsTitle}
-              footerText={footerText} setFooterText={setFooterText} showLogo={showLogo} setShowLogo={setShowLogo}
-              whatsappEnabled={whatsappEnabled} setWhatsappEnabled={setWhatsappEnabled}
-              whatsappNumber={whatsappNumber} setWhatsappNumber={setWhatsappNumber}
-              externalSiteUrl={externalSiteUrl} setExternalSiteUrl={setExternalSiteUrl}
-              externalSiteButtonText={externalSiteButtonText} setExternalSiteButtonText={setExternalSiteButtonText}
-              customSections={customSections} setCustomSections={setCustomSections} onFileSelect={onFileSelect}
-              isUploading={isUploading} handleSave={handleSave} isSaving={isSaving} isGoldPlan={isGoldPlan}
-              logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
-              onClose={() => {}}
-            />
-          </SheetContent>
-        </Sheet>
+        </div>
       </main>
 
       <Dialog open={!!tempImage} onOpenChange={(open) => !open && setTempImage(null)}>
