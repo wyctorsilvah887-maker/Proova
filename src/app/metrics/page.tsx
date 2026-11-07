@@ -388,7 +388,7 @@ export default function MetricsPage() {
 
           <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem] bg-primary/5 border border-primary/10">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-              <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary">Conversão Estimada</CardTitle>
+              <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary">Conversão G-Boost Estimada</CardTitle>
               <TrendingUp className="w-4 h-4 text-primary" />
             </CardHeader>
             <CardContent className="px-4 md:px-6 pb-4">
