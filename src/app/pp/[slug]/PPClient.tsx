@@ -60,7 +60,7 @@ export default function PPClient({ slug }: { slug: string }) {
           setTargetUserId(uId);
           setCompanyName(userQuerySnap.docs[0].data().companyName);
 
-          // Rastreamento de Visita Unica por Sessão
+          // Rastreamento de Visita Única por Sessão
           const hasVisited = sessionStorage.getItem(`pp_visited_${uId}`);
           if (!hasVisited) {
             trackPPVisit(uId);
@@ -220,7 +220,12 @@ export default function PPClient({ slug }: { slug: string }) {
 
   const handleWhatsappClick = () => {
     if (targetUserId) {
-      trackWhatsappClick(targetUserId);
+      // Rastreamento de Clique Único por Sessão (Lead Único)
+      const hasClicked = sessionStorage.getItem(`pp_whatsapp_clicked_${targetUserId}`);
+      if (!hasClicked) {
+        trackWhatsappClick(targetUserId);
+        sessionStorage.setItem(`pp_whatsapp_clicked_${targetUserId}`, 'true');
+      }
     }
   };
 
