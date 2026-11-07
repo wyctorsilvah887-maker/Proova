@@ -105,19 +105,16 @@ export default function AdminPage() {
 
   const { data: paymentEvents, loading: eventsLoading } = useCollection(paymentEventsQuery);
 
-  // Busca estatísticas de tickets de suporte pendentes
   const ticketsQuery = useMemo(() => {
     if (!db || !isAdminVerified) return null;
     return collection(db, 'support_tickets');
   }, [db, isAdminVerified]);
   const { data: ticketsList } = useCollection(ticketsQuery);
 
-  // Busca estatísticas globais da Landing Page
   const statsRef = useMemo(() => (db && isAdminVerified ? doc(db, 'platform_stats', 'landing_page') : null), [db, isAdminVerified]);
   const { data: statsData } = useDoc(statsRef);
   const visitorCount = (statsData as any)?.visitorCount || 0;
 
-  // Métrica de Onboarding/Setup
   const setupMetrics = useMemo(() => {
     if (!leadsList) return { completed: 0, percentage: 0 };
     
@@ -135,7 +132,6 @@ export default function AdminPage() {
     return { completed: completedCount, percentage };
   }, [leadsList]);
 
-  // Cálculo da Taxa de Conversão da Landing Page
   const lpConversionRate = useMemo(() => {
     if (!visitorCount || !leadsList || leadsList.length === 0) return 0;
     return Math.round((leadsList.length / visitorCount) * 100);
@@ -691,7 +687,7 @@ export default function AdminPage() {
       </footer>
 
       {/* User Detail Sheet */}
-      <Sheet open={isDetailOpen} onOpenChange={setIsDetailOpen}>
+      <Sheet open={isDetailOpen} onOpenChange={setIsUserDetailOpen}>
         <SheetContent className="sm:max-w-md w-full overflow-y-auto">
           <SheetHeader className="pb-6">
             <div className="flex items-center gap-3 mb-2">
