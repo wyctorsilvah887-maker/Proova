@@ -216,12 +216,15 @@ export default function SupportPage() {
 
       localStorage.removeItem(`proova_support_v1_${user.uid}`);
       setLocalMessages([]);
+      setIsPendingClosure(false);
       
-      toast({ title: "Atendimento Encerrado", description: "Histórico limpo com sucesso." });
-      router.push('/dash');
+      toast({ title: "Atendimento Encerrado", description: "O Consultor Proova foi reiniciado." });
+      // O chat permanece aberto, não redirecionamos mais para /dash
     } catch (err: any) {
       console.error(err);
       toast({ variant: "destructive", title: "Erro ao encerrar", description: "Não foi possível limpar os dados agora." });
+      setIsEndingChat(false);
+    } finally {
       setIsEndingChat(false);
     }
   };

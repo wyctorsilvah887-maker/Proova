@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, useRef, use } from 'react';
@@ -166,9 +165,10 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
 
       await batch.commit();
       toast({ title: "Atendimento Concluído", description: "O ticket foi resolvido e o bot reativado." });
-      router.push('/admin/support');
+      // O admin permanece na página para ver o histórico final, se desejar
     } catch (err) {
       toast({ variant: "destructive", title: "Erro ao concluir" });
+    } finally {
       setIsResolving(false);
     }
   };
