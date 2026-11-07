@@ -26,6 +26,7 @@ export type SupportAiOutput = z.infer<typeof SupportAiOutputSchema>;
 
 const prompt = ai.definePrompt({
   name: 'supportAiPrompt',
+  model: PRIMARY_MODEL,
   input: { schema: SupportAiInputSchema },
   output: { schema: SupportAiOutputSchema },
   prompt: `Você é o "Especialista Proova", o assistente de suporte inteligente da plataforma Proova.
@@ -51,6 +52,6 @@ Dúvida do Usuário: {{{message}}}`,
 });
 
 export async function supportAiAction(input: SupportAiInput): Promise<SupportAiOutput> {
-  const { output } = await prompt(input, { model: PRIMARY_MODEL });
+  const { output } = await prompt(input);
   return output!;
 }

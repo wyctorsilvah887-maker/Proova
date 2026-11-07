@@ -15,6 +15,6 @@ export const ai = genkit({
   ],
 });
 
-// Modelos de elite para copywriting e lógica
-export const PRIMARY_MODEL = 'googleai/gemini-2.5-flash';
+// Modelo estável e de alta performance para produção
+export const PRIMARY_MODEL = 'googleai/gemini-1.5-flash';
 export const geminiModel = PRIMARY_MODEL;
