@@ -8,12 +8,9 @@ import {
   Send, 
   Loader2, 
   User, 
-  Headphones, 
   CheckCheck, 
   Clock,
   Sparkles,
-  ShieldCheck,
-  MessageSquare,
   LogOut,
   TrendingUp,
   Layout,
@@ -29,15 +26,14 @@ import {
   Shield,
   Lock,
   Zap,
-  Bot
+  Bot,
+  Headphones
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from '@/components/ui/badge';
 import { useUser, useFirestore, useCollection, useDoc, useAuth } from '@/firebase';
-import { collection, addDoc, serverTimestamp, query, orderBy, limit, doc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, orderBy, limit, doc, where, Timestamp } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -63,21 +59,54 @@ export default function SupportPage() {
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [isAiThinking, setIsAiThinking] = useState(false);
+  const [localMessages, setLocalMessages] = useState<any[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
+  // Filtro de 24 horas para o query de mensagens
   const messagesQuery = useMemo(() => {
     if (!db || !user) return null;
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
     return query(
       collection(db, 'users', user.uid, 'support_messages'),
+      where('createdAt', '>=', Timestamp.fromDate(twentyFourHoursAgo)),
       orderBy('createdAt', 'asc'),
       limit(100)
     );
   }, [db, user]);
 
-  const { data: messages, loading: messagesLoading } = useCollection(messagesQuery);
+  const { data: remoteMessages, loading: messagesLoading } = useCollection(messagesQuery);
+
+  // Carregar cache local ao montar
+  useEffect(() => {
+    if (user) {
+      const cached = localStorage.getItem(`proova_support_cache_${user.uid}`);
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          // Filtrar mensagens expiradas no cache também
+          const now = Date.now();
+          const validMessages = parsed.filter((m: any) => {
+            const time = m.createdAt?.seconds ? m.createdAt.seconds * 1000 : Date.now();
+            return (now - time) < (24 * 60 * 60 * 1000);
+          });
+          setLocalMessages(validMessages);
+        } catch (e) {
+          console.error("Erro ao ler cache de suporte:", e);
+        }
+      }
+    }
+  }, [user]);
+
+  // Sincronizar mensagens remotas com cache local
+  useEffect(() => {
+    if (remoteMessages && user) {
+      setLocalMessages(remoteMessages);
+      localStorage.setItem(`proova_support_cache_${user.uid}`, JSON.stringify(remoteMessages));
+    }
+  }, [remoteMessages, user]);
 
   useEffect(() => {
     if (!authLoading && !user) router.replace('/login');
@@ -90,7 +119,7 @@ export default function SupportPage() {
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
       }
     }
-  }, [messages, isAiThinking]);
+  }, [localMessages, isAiThinking]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,14 +130,14 @@ export default function SupportPage() {
     setMessage('');
 
     try {
-      // 1. Salva mensagem do usuário
+      // 1. Salva mensagem do usuário no Firestore
       await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
         text: userMsg,
         sender: 'user',
         createdAt: serverTimestamp()
       });
 
-      // 2. Aciona IA
+      // 2. Aciona IA do Genkit
       setIsAiThinking(true);
       const aiResponse = await supportAiAction({
         message: userMsg,
@@ -116,7 +145,7 @@ export default function SupportPage() {
         membershipStatus: userData?.membershipStatus || 'base'
       });
 
-      // 3. Salva resposta da IA
+      // 3. Salva resposta da IA no Firestore
       await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
         text: aiResponse.response,
         sender: 'support',
@@ -124,13 +153,14 @@ export default function SupportPage() {
       });
 
     } catch (err) {
-      console.error("Falha na comunicação com IA:", err);
+      console.error("Falha estratégica no suporte IA:", err);
     } finally {
       setIsSending(false);
       setIsAiThinking(false);
     }
   };
 
+  const isMapsLinkValid = !!userData?.googleMapsUrl;
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
     if (status === 'enterprise') return 'ENTERPRISE';
@@ -173,9 +203,15 @@ export default function SupportPage() {
                   <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Empresa'}
                   </span>
-                  <span className="text-[8px] uppercase tracking-widest font-black text-muted-foreground leading-tight">
-                    {membershipLabel}
-                  </span>
+                  <div className="flex flex-col items-end gap-0">
+                    <span className={cn(
+                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
+                      userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
+                    )}>
+                      {membershipLabel}
+                    </span>
+                    {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
+                  </div>
                 </div>
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
               </Button>
@@ -235,36 +271,38 @@ export default function SupportPage() {
                 <h2 className="text-sm md:text-lg font-black font-headline tracking-tight uppercase leading-none">Consultor Proova IA</h2>
                 <div className="flex items-center gap-1.5 mt-1">
                    <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-green-500 animate-pulse" />
-                   <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Expert Estratégico Online</span>
+                   <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Estrategista Online</span>
                 </div>
               </div>
             </div>
             <div className="hidden sm:flex flex-col items-end opacity-40">
-              <span className="text-[9px] font-black uppercase tracking-widest">Suporte IA</span>
-              <span className="text-[10px] font-mono font-bold">PROOVA-GEN-AI</span>
+              <span className="text-[9px] font-black uppercase tracking-widest">Sessão Temporária</span>
+              <span className="text-[10px] font-mono font-bold">Expires in 24h</span>
             </div>
           </div>
 
           <ScrollArea ref={scrollRef} className="flex-1 px-4 py-6 md:p-10">
             <div className="space-y-6 md:space-y-8 pb-10">
-              <div className="flex justify-start animate-in fade-in slide-in-from-left-4 duration-700">
-                <div className="flex gap-2 md:gap-3 max-w-[90%] sm:max-w-[80%]">
-                  <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-white shrink-0 mt-1 shadow-lg">
-                    <Sparkles className="w-4 h-4" />
-                  </div>
-                  <div className="space-y-1">
-                    <div className="bg-muted/50 border rounded-2xl rounded-tl-none p-3 md:p-4 shadow-sm">
-                      <p className="text-xs md:text-sm font-medium leading-relaxed">
-                        Olá, <strong>{userData?.name?.split(' ')[0]}</strong>! 👋 <br />
-                        Eu sou a IA do Proova. Como posso ajudar sua marca a converter mais hoje?
-                      </p>
+              {localMessages.length === 0 && !messagesLoading && (
+                <div className="flex justify-start animate-in fade-in slide-in-from-left-4 duration-700">
+                  <div className="flex gap-2 md:gap-3 max-w-[90%] sm:max-w-[80%]">
+                    <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-white shrink-0 mt-1 shadow-lg">
+                      <Sparkles className="w-4 h-4" />
                     </div>
-                    <span className="text-[8px] font-black uppercase text-muted-foreground ml-1">Assistente Proova</span>
+                    <div className="space-y-1">
+                      <div className="bg-muted/50 border rounded-2xl rounded-tl-none p-3 md:p-4 shadow-sm">
+                        <p className="text-xs md:text-sm font-medium leading-relaxed">
+                          Olá, <strong>{userData?.name?.split(' ')[0]}</strong>! 👋 <br />
+                          Eu sou o Consultor Proova. Como posso ajudar sua marca a dominar o mercado hoje?
+                        </p>
+                      </div>
+                      <span className="text-[8px] font-black uppercase text-muted-foreground ml-1">Assistente Estratégico</span>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
-              {messages && messages.map((msg: any) => (
+              {localMessages.map((msg: any) => (
                 <div key={msg.id} className={cn(
                   "flex animate-in fade-in zoom-in-95 duration-500",
                   msg.sender === 'user' ? "justify-end" : "justify-start"
@@ -317,7 +355,7 @@ export default function SupportPage() {
                 </div>
               )}
 
-              {messagesLoading && (
+              {messagesLoading && localMessages.length === 0 && (
                 <div className="flex justify-center py-10 opacity-20">
                   <Loader2 className="animate-spin w-8 h-8" />
                 </div>
@@ -331,7 +369,7 @@ export default function SupportPage() {
                  <Input 
                    value={message}
                    onChange={(e) => setMessage(e.target.value)}
-                   placeholder="Tire suas dúvidas estratégicas aqui..."
+                   placeholder="Dúvidas sobre estratégia ou configuração?"
                    className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 pr-10 text-xs md:text-sm font-medium transition-all"
                    disabled={isSending || isAiThinking}
                  />
@@ -351,15 +389,16 @@ export default function SupportPage() {
                </Button>
              </form>
              <p className="text-[8px] md:text-[9px] text-center mt-3 uppercase tracking-[0.2em] font-black text-muted-foreground opacity-40">
-               Suporte Proova IA • Resposta Instantânea
+               O Histórico deste chat é temporário e expira em 24 horas.
              </p>
           </div>
         </div>
       </main>
 
       <footer className="hidden md:block py-4 text-center opacity-30 shrink-0">
-        <p className="text-[8px] font-black uppercase tracking-[0.4em]">Powered by Proova Gen-AI</p>
+        <p className="text-[8px] font-black uppercase tracking-[0.4em]">Powered by Proova Intelligent Support</p>
       </footer>
     </div>
   );
 }
+
