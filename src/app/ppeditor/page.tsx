@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -95,7 +94,6 @@ import { Slider } from '@/components/ui/slider';
 import Cropper from 'react-easy-crop';
 import { useTheme } from 'next-themes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ThemeToggle } from '@/components/theme-toggle';
 
 type LayoutType = 'grid' | 'mural' | 'carousel' | 'popup';
 
@@ -220,15 +218,14 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
     <Card 
       key={`${t.id}-${muralIndex}`}
       className={cn(
-        "rounded-[1.5rem] p-5 transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white mb-6",
+        "rounded-[1.5rem] p-5 transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white mb-6 border-none",
         !isPopup && "animate-in fade-in duration-700 ease-out fill-both",
         isPopup && !isAnimating && "animate-in fade-in slide-in-from-bottom-10 duration-1000",
         isPopup && isAnimating && "animate-out fade-out slide-out-to-top-10 duration-1000"
       )}
       style={{ 
-        border: 'none',
         boxShadow: hasSecondary 
-          ? `0 0 25px ${secondaryColor}60, 0 15px 40px -10px rgba(0,0,0,0.2)` 
+          ? `0 0 25px ${secondaryColor}70, 0 15px 40px -10px rgba(0,0,0,0.2)` 
           : `0 20px 40px -20px ${themeColor}25`,
       }}
     >
@@ -947,7 +944,6 @@ export default function PPEditorPage() {
           >
             {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar
           </Button>
-          <ThemeToggle />
         </div>
       </header>
 
