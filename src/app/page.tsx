@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useRef, forwardRef } from "react";
@@ -30,7 +29,8 @@ import {
   Building2,
   Rocket,
   Shield,
-  ChevronDown
+  ChevronDown,
+  Gem
 } from "lucide-react";
 import { 
   Sheet, 
