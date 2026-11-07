@@ -9,8 +9,7 @@ import {
   Loader2, 
   User, 
   CheckCheck, 
-  Clock,
-  Sparkles,
+  Bot,
   LogOut,
   TrendingUp,
   Layout,
@@ -19,14 +18,10 @@ import {
   Handshake,
   Sun,
   Moon,
-  Search,
-  ChevronRight,
-  Plus,
-  X,
-  Shield,
   Lock,
+  Shield,
   Zap,
-  Bot,
+  Sparkles,
   Headphones
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -47,7 +42,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { supportAiAction } from '@/ai/flows/support-ai-flow';
+import { getConsultantResponse } from '@/lib/consultant-rules';
 
 export default function SupportPage() {
   const { user, loading: authLoading } = useUser();
@@ -65,7 +60,7 @@ export default function SupportPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
-  // Filtro de 24 horas para o query de mensagens
+  // Filtro de 24 horas para o query de mensagens no Firestore
   const messagesQuery = useMemo(() => {
     if (!db || !user) return null;
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -73,38 +68,39 @@ export default function SupportPage() {
       collection(db, 'users', user.uid, 'support_messages'),
       where('createdAt', '>=', Timestamp.fromDate(twentyFourHoursAgo)),
       orderBy('createdAt', 'asc'),
-      limit(100)
+      limit(50)
     );
   }, [db, user]);
 
   const { data: remoteMessages, loading: messagesLoading } = useCollection(messagesQuery);
 
-  // Carregar cache local ao montar
+  // Sistema de Cache Local e Retenção
   useEffect(() => {
     if (user) {
-      const cached = localStorage.getItem(`proova_support_cache_${user.uid}`);
+      const cacheKey = `proova_support_v1_${user.uid}`;
+      const cached = localStorage.getItem(cacheKey);
       if (cached) {
         try {
           const parsed = JSON.parse(cached);
-          // Filtrar mensagens expiradas no cache também
           const now = Date.now();
+          // Filtra mensagens expiradas (24h) no cache
           const validMessages = parsed.filter((m: any) => {
             const time = m.createdAt?.seconds ? m.createdAt.seconds * 1000 : Date.now();
             return (now - time) < (24 * 60 * 60 * 1000);
           });
           setLocalMessages(validMessages);
         } catch (e) {
-          console.error("Erro ao ler cache de suporte:", e);
+          console.error("Erro no cache:", e);
         }
       }
     }
   }, [user]);
 
-  // Sincronizar mensagens remotas com cache local
+  // Sincroniza Firestore -> Cache Local
   useEffect(() => {
     if (remoteMessages && user) {
       setLocalMessages(remoteMessages);
-      localStorage.setItem(`proova_support_cache_${user.uid}`, JSON.stringify(remoteMessages));
+      localStorage.setItem(`proova_support_v1_${user.uid}`, JSON.stringify(remoteMessages));
     }
   }, [remoteMessages, user]);
 
@@ -112,6 +108,7 @@ export default function SupportPage() {
     if (!authLoading && !user) router.replace('/login');
   }, [user, authLoading, router]);
 
+  // Scroll automático para a última mensagem
   useEffect(() => {
     if (scrollRef.current) {
       const scrollContainer = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
@@ -130,31 +127,32 @@ export default function SupportPage() {
     setMessage('');
 
     try {
-      // 1. Salva mensagem do usuário no Firestore
+      // 1. Salva mensagem do usuário
       await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
         text: userMsg,
         sender: 'user',
         createdAt: serverTimestamp()
       });
 
-      // 2. Aciona IA do Genkit
+      // 2. Simula pensamento do Consultor (Motor de Regras Local)
       setIsAiThinking(true);
-      const aiResponse = await supportAiAction({
-        message: userMsg,
-        userName: userData?.name || 'Membro Proova',
-        membershipStatus: userData?.membershipStatus || 'base'
-      });
-
-      // 3. Salva resposta da IA no Firestore
-      await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
-        text: aiResponse.response,
-        sender: 'support',
-        createdAt: serverTimestamp()
-      });
+      
+      // Delay artificial para humanizar a interface
+      setTimeout(async () => {
+        const botResponse = getConsultantResponse(userMsg);
+        
+        await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
+          text: botResponse,
+          sender: 'support',
+          createdAt: serverTimestamp()
+        });
+        
+        setIsAiThinking(false);
+        setIsSending(false);
+      }, 1200);
 
     } catch (err) {
-      console.error("Falha estratégica no suporte IA:", err);
-    } finally {
+      console.error("Erro no suporte local:", err);
       setIsSending(false);
       setIsAiThinking(false);
     }
@@ -239,19 +237,6 @@ export default function SupportPage() {
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Upgrade</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="rounded-xl font-bold py-2.5 opacity-50 cursor-not-allowed">
-                <Handshake className="mr-2 h-4 w-4 text-primary" />
-                <span>Parceiros</span>
-                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
-              </DropdownMenuItem>
-              {userData?.isAdmin && (
-                <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                  <Shield className="mr-2 h-4 w-4 text-primary" />
-                  <span>Administração</span>
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
             </DropdownMenuContent>
@@ -268,16 +253,16 @@ export default function SupportPage() {
                 <Bot className="w-5 h-5 md:w-6 md:h-6" />
               </div>
               <div>
-                <h2 className="text-sm md:text-lg font-black font-headline tracking-tight uppercase leading-none">Consultor Proova IA</h2>
+                <h2 className="text-sm md:text-lg font-black font-headline tracking-tight uppercase leading-none">Consultor Proova v1.0</h2>
                 <div className="flex items-center gap-1.5 mt-1">
                    <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-green-500 animate-pulse" />
-                   <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Estrategista Online</span>
+                   <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Analista Online</span>
                 </div>
               </div>
             </div>
             <div className="hidden sm:flex flex-col items-end opacity-40">
               <span className="text-[9px] font-black uppercase tracking-widest">Sessão Temporária</span>
-              <span className="text-[10px] font-mono font-bold">Expires in 24h</span>
+              <span className="text-[10px] font-mono font-bold">Reseta em 24h</span>
             </div>
           </div>
 
@@ -293,7 +278,7 @@ export default function SupportPage() {
                       <div className="bg-muted/50 border rounded-2xl rounded-tl-none p-3 md:p-4 shadow-sm">
                         <p className="text-xs md:text-sm font-medium leading-relaxed">
                           Olá, <strong>{userData?.name?.split(' ')[0]}</strong>! 👋 <br />
-                          Eu sou o Consultor Proova. Como posso ajudar sua marca a dominar o mercado hoje?
+                          Sou o Consultor Estratégico. Como posso ajudar você a vender mais hoje? Use termos como **G-Boost**, **Mural** ou **Planos**.
                         </p>
                       </div>
                       <span className="text-[8px] font-black uppercase text-muted-foreground ml-1">Assistente Estratégico</span>
@@ -354,12 +339,6 @@ export default function SupportPage() {
                   </div>
                 </div>
               )}
-
-              {messagesLoading && localMessages.length === 0 && (
-                <div className="flex justify-center py-10 opacity-20">
-                  <Loader2 className="animate-spin w-8 h-8" />
-                </div>
-              )}
             </div>
           </ScrollArea>
 
@@ -369,13 +348,13 @@ export default function SupportPage() {
                  <Input 
                    value={message}
                    onChange={(e) => setMessage(e.target.value)}
-                   placeholder="Dúvidas sobre estratégia ou configuração?"
+                   placeholder="Digite uma palavra-chave (ex: G-Boost)..."
                    className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 pr-10 text-xs md:text-sm font-medium transition-all"
                    disabled={isSending || isAiThinking}
                  />
                  <div className="absolute right-3 top-1/2 -translate-y-1/2 hidden md:block">
                    <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground opacity-30 group-focus-within:opacity-60 transition-opacity">
-                     Enter
+                     Enviar
                    </div>
                  </div>
                </div>
@@ -389,16 +368,15 @@ export default function SupportPage() {
                </Button>
              </form>
              <p className="text-[8px] md:text-[9px] text-center mt-3 uppercase tracking-[0.2em] font-black text-muted-foreground opacity-40">
-               O Histórico deste chat é temporário e expira em 24 horas.
+               Histórico local de 24h. Suporte imediato sem IA externa.
              </p>
           </div>
         </div>
       </main>
 
       <footer className="hidden md:block py-4 text-center opacity-30 shrink-0">
-        <p className="text-[8px] font-black uppercase tracking-[0.4em]">Powered by Proova Intelligent Support</p>
+        <p className="text-[8px] font-black uppercase tracking-[0.4em]">Powered by Proova Rules Engine v1.0</p>
       </footer>
     </div>
   );
 }
-
