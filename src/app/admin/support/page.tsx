@@ -219,7 +219,7 @@ export default function AdminSupportPage() {
                             variant="ghost" 
                             size="icon" 
                             className="h-8 w-8 rounded-xl text-primary hover:bg-primary/10"
-                            onClick={() => window.open(`/admin/support/${ticket.userId}`, '_blank')}
+                            onClick={() => router.push(`/admin/support/${ticket.userId}`)}
                             title="Entrar no Chat"
                           >
                             <MessageSquare className="w-3.5 h-3.5" />
