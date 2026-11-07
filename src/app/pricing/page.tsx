@@ -178,7 +178,6 @@ export default function PricingPage() {
     ];
   }, [user, checkoutLinks, status]);
 
-  // Bloqueio de renderização até que os dados estejam prontos
   const isDataReady = !authLoading && (!user || effectiveUserData);
 
   if (!isDataReady) {
@@ -218,7 +217,6 @@ export default function PricingPage() {
           
           {user && (
             <div className="flex items-center gap-2 md:gap-4">
-              {/* Desktop Identity Info */}
               <div className="hidden lg:flex flex-col items-end mr-1">
                 <span className="text-[11px] font-bold truncate max-w-[150px] leading-tight group-hover:text-primary transition-colors">
                   {effectiveUserData?.companyName || 'Minha Empresa'}
@@ -237,13 +235,15 @@ export default function PricingPage() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="h-12 px-1 md:px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
-                    {/* Mobile Identity Info */}
                     <div className="lg:hidden flex flex-col items-end">
                       <span className="text-[10px] font-bold truncate max-w-[80px] leading-tight">
                         {effectiveUserData?.companyName || 'Empresa'}
                       </span>
                       <div className="flex flex-col items-end">
-                        <span className="text-[7px] uppercase tracking-widest font-black leading-tight text-muted-foreground">
+                        <span className={cn(
+                          "text-[7px] uppercase tracking-widest font-black leading-tight",
+                          status === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
+                        )}>
                           {membershipLabel}
                         </span>
                         {isMapsLinkValid && <span className="text-[5px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
@@ -450,7 +450,6 @@ export default function PricingPage() {
           </Accordion>
         </section>
 
-        {/* CTA Section - Apenas para Visitantes */}
         {!user && (
           <section className="mt-24">
              <div className="bg-zinc-950 text-white rounded-[2.5rem] p-10 md:p-16 text-center space-y-8 relative overflow-hidden shadow-2xl">

@@ -109,11 +109,11 @@ export default function WidgetsPage() {
 
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
-    if (status === 'enterprise') return 'Membro Enterprise';
-    if (status === 'gold') return 'Membro Gold';
-    if (status === 'trial') return 'Período Trial';
-    if (status === 'expired') return 'Plano Expirado';
-    return 'Plano Base';
+    if (status === 'enterprise') return 'ENTERPRISE';
+    if (status === 'gold') return 'GOLD';
+    if (status === 'trial') return 'TRIAL';
+    if (status === 'expired') return 'EXPIRADO';
+    return 'PLANO BASE';
   }, [userData]);
 
   const filteredWidgets = useMemo(() => {
@@ -256,7 +256,7 @@ export default function WidgetsPage() {
           <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-0" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
+              <Button variant="ghost" className="h-12 px-1 md:px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
                 <div className="flex flex-col items-end">
                   <span className="text-[10px] md:text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] transition-colors group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Minha Empresa'}
@@ -271,7 +271,7 @@ export default function WidgetsPage() {
                     {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
                   </div>
                 </div>
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4 text-primary group-hover:text-white" /></div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
@@ -326,9 +326,9 @@ export default function WidgetsPage() {
               )}
 
               <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
@@ -467,7 +467,6 @@ export default function WidgetsPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Confirmação de Exclusão */}
       <AlertDialog open={!!widgetToDelete} onOpenChange={() => setWidgetToDelete(null)}>
         <AlertDialogContent className="rounded-[2.5rem] border-none shadow-2xl p-8">
           <AlertDialogHeader className="space-y-4">

@@ -614,9 +614,8 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </Tabs>
-    </div>
-  );
+      </div>
+    );
 };
 
 export default function PPEditorPage() {
@@ -817,6 +816,8 @@ export default function PPEditorPage() {
     return currentSelection;
   }, [currentSelection, layout, muralIndex]);
 
+  const membershipLabel = isEnterprise ? 'ENTERPRISE' : (isGoldPlan ? 'GOLD' : 'PLANO BASE');
+
   if (authLoading || userDataLoading || testimonialsLoading) return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
 
   return (
@@ -849,7 +850,7 @@ export default function PPEditorPage() {
                       "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
                       isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground"
                     )}>
-                      {isEnterprise ? 'ENTERPRISE' : (isGoldPlan ? 'GOLD' : 'PLANO BASE')}
+                      {membershipLabel}
                     </span>
                     {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
                   </div>
