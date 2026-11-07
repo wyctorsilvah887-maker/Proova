@@ -25,7 +25,8 @@ import {
   Lock,
   Sparkles,
   ChevronDown,
-  Handshake
+  Handshake,
+  BadgeCheck
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useUser, useAuth, useFirestore, useDoc } from '@/firebase';
@@ -323,6 +324,16 @@ export default function PricingPage() {
                     plan.highlight ? "bg-primary text-white" : "bg-card text-card-foreground hover:bg-muted/30 border"
                   )}
                 >
+                  {/* Current Plan Indicator - Instagram style verified badge */}
+                  {plan.id === status && (
+                    <div className="absolute top-2 right-2 z-20 animate-in fade-in zoom-in duration-500">
+                      <BadgeCheck className={cn(
+                        "w-6 h-6",
+                        plan.highlight ? "text-white fill-white/20" : "text-green-500 fill-green-500/10"
+                      )} />
+                    </div>
+                  )}
+
                   <CollapsibleTrigger asChild>
                     <div className="p-6 cursor-pointer select-none">
                       <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
