@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useRef, forwardRef } from "react";
@@ -461,11 +462,11 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
           </div>
 
           <div className={cn(
-            "relative transition-all duration-1000 delay-500 flex flex-col",
+            "relative transition-all duration-1000 delay-500 flex flex-col items-center",
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           )}>
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
-            <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card p-4 sm:p-8 ring-1 ring-primary/10 h-[600px] flex flex-col items-center justify-center">
+            <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card p-4 sm:p-8 ring-1 ring-primary/10 h-[600px] w-full flex flex-col items-center justify-center">
               <iframe 
                 src="/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova" 
                 width="100%" 
@@ -475,15 +476,15 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
               ></iframe>
             </Card>
             
-            <div className="mt-6 text-center animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-1000">
+            <div className="mt-8 text-center animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-1000 relative z-20">
               <a 
                 href="https://www.useproova.online/c/proova" 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center justify-center gap-2 group cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 group cursor-pointer text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-all py-2 px-4 rounded-full bg-background/50 backdrop-blur-sm border border-border/50 shadow-sm"
               >
                 Quer aparecer na nossa página? Deixe sua experiência usando o Proova
-                <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </a>
             </div>
           </div>
