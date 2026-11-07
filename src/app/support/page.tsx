@@ -85,8 +85,8 @@ export default function SupportPage() {
           const now = Date.now();
           // Filtra mensagens expiradas (24h) no cache
           const validMessages = parsed.filter((m: any) => {
-            const time = m.createdAt?.seconds ? m.createdAt.seconds * 1000 : Date.now();
-            return (now - time) < (24 * 60 * 60 * 1000);
+            const time = m.createdAt?.seconds ? m.createdAt.seconds * 1000 : (m.createdAt || Date.now());
+            return (now - Number(time)) < (24 * 60 * 60 * 1000);
           });
           setLocalMessages(validMessages);
         } catch (e) {
@@ -134,10 +134,9 @@ export default function SupportPage() {
         createdAt: serverTimestamp()
       });
 
-      // 2. Simula pensamento do Consultor (Motor de Regras Local)
+      // 2. Processa resposta na Árvore de Decisão
       setIsAiThinking(true);
       
-      // Delay artificial para humanizar a interface
       setTimeout(async () => {
         const botResponse = getConsultantResponse(userMsg);
         
@@ -149,7 +148,7 @@ export default function SupportPage() {
         
         setIsAiThinking(false);
         setIsSending(false);
-      }, 1200);
+      }, 1000);
 
     } catch (err) {
       console.error("Erro no suporte local:", err);
@@ -256,12 +255,12 @@ export default function SupportPage() {
                 <h2 className="text-sm md:text-lg font-black font-headline tracking-tight uppercase leading-none">Consultor Proova v1.0</h2>
                 <div className="flex items-center gap-1.5 mt-1">
                    <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-green-500 animate-pulse" />
-                   <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Analista Online</span>
+                   <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Árvore de Decisão Ativa</span>
                 </div>
               </div>
             </div>
             <div className="hidden sm:flex flex-col items-end opacity-40">
-              <span className="text-[9px] font-black uppercase tracking-widest">Sessão Temporária</span>
+              <span className="text-[9px] font-black uppercase tracking-widest">Retenção de Dados</span>
               <span className="text-[10px] font-mono font-bold">Reseta em 24h</span>
             </div>
           </div>
@@ -276,9 +275,8 @@ export default function SupportPage() {
                     </div>
                     <div className="space-y-1">
                       <div className="bg-muted/50 border rounded-2xl rounded-tl-none p-3 md:p-4 shadow-sm">
-                        <p className="text-xs md:text-sm font-medium leading-relaxed">
-                          Olá, <strong>{userData?.name?.split(' ')[0]}</strong>! 👋 <br />
-                          Sou o Consultor Estratégico. Como posso ajudar você a vender mais hoje? Use termos como **G-Boost**, **Mural** ou **Planos**.
+                        <p className="text-xs md:text-sm font-medium leading-relaxed whitespace-pre-wrap">
+                          Olá, <strong>{userData?.name?.split(' ')[0]}</strong>! 👋 {getConsultantResponse('menu')}
                         </p>
                       </div>
                       <span className="text-[8px] font-black uppercase text-muted-foreground ml-1">Assistente Estratégico</span>
@@ -348,7 +346,7 @@ export default function SupportPage() {
                  <Input 
                    value={message}
                    onChange={(e) => setMessage(e.target.value)}
-                   placeholder="Digite uma palavra-chave (ex: G-Boost)..."
+                   placeholder="Digite o número da opção (ex: 1)..."
                    className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 pr-10 text-xs md:text-sm font-medium transition-all"
                    disabled={isSending || isAiThinking}
                  />
@@ -368,14 +366,14 @@ export default function SupportPage() {
                </Button>
              </form>
              <p className="text-[8px] md:text-[9px] text-center mt-3 uppercase tracking-[0.2em] font-black text-muted-foreground opacity-40">
-               Histórico local de 24h. Suporte imediato sem IA externa.
+               Histórico local de 24h. Use o menu numerado para navegar.
              </p>
           </div>
         </div>
       </main>
 
       <footer className="hidden md:block py-4 text-center opacity-30 shrink-0">
-        <p className="text-[8px] font-black uppercase tracking-[0.4em]">Powered by Proova Rules Engine v1.0</p>
+        <p className="text-[8px] font-black uppercase tracking-[0.4em]">Powered by Proova Decision Tree v1.0</p>
       </footer>
     </div>
   );

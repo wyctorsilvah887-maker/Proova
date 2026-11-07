@@ -1,87 +1,75 @@
 /**
- * @fileOverview Motor de Regras Estratégicas do Proova (Não-IA).
- * Mapeia centenas de variações de palavras-chave para respostas técnicas e conversacionais precisas.
+ * @fileOverview Motor de Árvore de Decisão do Consultor Proova (Não-IA).
+ * Estrutura hierárquica para guiar o usuário através das ferramentas da plataforma.
  */
 
-export const CONSULTANT_DICTIONARY = [
-  // 1. SAUDAÇÕES E CONVERSAÇÃO BÁSICA
-  {
-    keys: ['olá', 'ola', 'oi', 'oie', 'bom dia', 'boa tarde', 'boa noite', 'opa', 'eai', 'tudo bem', 'ajuda', 'ajudar', 'como funciona', 'iniciar', 'começar'],
-    response: "Olá! Eu sou o **Consultor Proova**. Estou aqui para ajudar sua marca a dominar o mercado através da prova social estratégica. Como posso ser útil hoje? \n\nVocê pode me perguntar sobre: **G-Boost**, **Mural**, **Inbox Privado**, **Página Pública**, **Social Cards** ou **Planos**."
-  },
-  {
-    keys: ['obrigado', 'obrigada', 'valeu', 'vlw', 'entendi', 'perfeito', 'show', 'top', 'tchau', 'tchau', 'até logo', 'ate logo'],
-    response: "Disponha! Estou sempre à disposição para acelerar o crescimento da sua autoridade digital. Se precisar de mais alguma coisa, é só chamar. Boas vendas! 🚀"
-  },
+interface TreeBranch {
+  title: string;
+  response: string;
+  keys: string[];
+}
 
-  // 2. G-BOOST (GOOGLE MAPS SEO)
-  {
-    keys: ['gboost', 'g-boost', 'google', 'maps', 'local', 'seo', 'rank', 'ranking', 'perfil da empresa', 'business', 'gmb', 'redirecionamento', 'estrela', '5 estrelas', 'cinco estrelas', 'avaliacao google', 'avaliação google'],
-    response: "O **G-Boost** é o nosso motor de aceleração de SEO Local. \n\n**Como funciona:** Ele detecta automaticamente quando um cliente te dá 5 estrelas no Proova e abre um convite especial para que ele replique esse elogio no seu perfil do Google Maps. \n\n**Resultado:** Isso aumenta drasticamente sua posição nas buscas do Google, fazendo sua empresa aparecer na frente dos concorrentes da região!"
+export const CONSULTANT_TREE: Record<string, TreeBranch> = {
+  '1': {
+    title: 'G-Boost (SEO Google)',
+    keys: ['1', 'gboost', 'google', 'maps', 'seo'],
+    response: "**🚀 G-Boost (Aceleração de SEO Local)**\n\n**O que é:** Um sistema que detecta elogios 5 estrelas e convida o cliente a replicar a nota no seu Google Maps.\n\n**Como funciona:** No fim da avaliação, aparece um botão especial 'Avaliar no Google'.\n\n**Vantagem:** Aumenta seu ranking nas buscas locais e atrai clientes que buscam pelo seu serviço no Google.\n\n*Digite **0** para voltar ao menu principal.*"
   },
-
-  // 3. REPUTATION SHIELD (INBOX PRIVADO)
-  {
-    keys: ['shield', 'reputacao', 'reputação', 'privado', 'inbox', 'critica', 'crítica', 'negativo', 'ruim', 'insatisfeito', 'blindagem', 'proteção', 'proteger', 'esconder', 'filtro', 'segurança', 'conciliação'],
-    response: "O **Reputation Shield** é a sua blindagem digital. \n\n**Estratégia:** Quando um cliente avalia sua empresa com 1 a 3 estrelas, o sistema incentiva que ele envie o comentário para o seu **Inbox Privado**. \n\n**Vantagem:** Isso evita que uma frustração momentânea vire uma reclamação pública no Google. Você resolve o problema do cliente internamente e preserva sua imagem imaculada para o mercado."
+  '2': {
+    title: 'Reputation Shield',
+    keys: ['2', 'shield', 'inbox', 'privado', 'critica'],
+    response: "**🛡️ Reputation Shield (Inbox Privado)**\n\n**O que é:** Sua blindagem contra avaliações negativas públicas.\n\n**Como funciona:** Feedbacks de 1 a 3 estrelas são incentivados ao seu Inbox Privado para resolução interna.\n\n**Vantagem:** Evita que reclamações cheguem ao Google e permite que você recupere o cliente no sigilo.\n\n*Digite **0** para voltar ao menu principal.*"
   },
-
-  // 4. PÁGINA PÚBLICA (LINK IN BIO)
-  {
-    keys: ['pagina', 'página', 'bio', 'pp', 'link', 'vitrine', 'perfil', 'bio do insta', 'instagram link', 'pp profissional', 'slug', 'url personalizada', 'minha pagina', 'minha página'],
-    response: "Sua **Página Pública (PP)** é a sua vitrine de autoridade máxima. \n\n**Uso ideal:** Coloque este link na sua 'Bio do Instagram'. \n\n**Diferencial:** Ao contrário de um link comum, a PP do Proova é otimizada para conversão, exibindo seus melhores depoimentos e facilitando o contato direto via WhatsApp. É a prova social trabalhando 24h por dia para você."
+  '3': {
+    title: 'Widgets e Murais',
+    keys: ['3', 'mural', 'widget', 'site', 'embutir'],
+    response: "**🖼️ Widgets e Murais Inteligentes**\n\n**O que é:** Murais de depoimentos que você instala no seu site em minutos.\n\n**Formatos:** Masonry, Carrossel, Grade ou Popups.\n\n**Dica:** Instale o mural logo abaixo do seu botão de vendas para reduzir a resistência de compra.\n\n*Digite **0** para voltar ao menu principal.*"
   },
-
-  // 5. WIDGETS E MURAIS (PARA O SITE)
-  {
-    keys: ['mural', 'widget', 'site', 'embutir', 'carrossel', 'grid', 'grade', 'masonry', 'layout', 'iframe', 'codigo', 'código', 'instalar', 'colocar no site', 'vendas', 'landing page', 'lp'],
-    response: "Os **Widgets** são os murais inteligentes que você instala no seu site oficial. \n\n**Formatos:** Você pode escolher entre layouts de Grade, Mural Masonry, Carrossel ou até Popups. \n\n**Dica:** Instale o mural logo abaixo do seu botão de vendas para reduzir a resistência de compra do seu cliente no momento decisivo."
+  '4': {
+    title: 'Social Cards',
+    keys: ['4', 'social', 'card', 'instagram', 'story'],
+    response: "**📱 Social Cards (Marketing Viral)**\n\n**O que é:** Gerador automático de artes para Instagram.\n\n**Funcionalidade:** Transforma depoimentos de texto em imagens profissionais para Stories com um clique.\n\n**Efeito:** Gera o 'Efeito Manada' no seu perfil social.\n\n*Digite **0** para voltar ao menu principal.*"
   },
-
-  // 6. SOCIAL CARDS (CONTEÚDO VIRAL)
-  {
-    keys: ['social', 'card', 'instagram', 'story', 'post', 'arte', 'compartilhar', 'gerar imagem', 'imagem de depoimento', 'feed', 'marketing', 'divulgar', 'propaganda', 'banner'],
-    response: "Os **Social Cards** são a ferramenta perfeita para seu marketing diário. \n\n**Funcionalidade:** Com um clique, transformamos qualquer depoimento em uma arte profissional no formato de Story ou Post. \n\n**Efeito:** Postar elogios de clientes reais gera o 'Efeito Manada', atraindo novas pessoas que querem ter a mesma experiência positiva."
+  '5': {
+    title: 'Planos e Upgrade',
+    keys: ['5', 'plano', 'valor', 'preco', 'upgrade'],
+    response: "**💎 Níveis de Estratégia Proova**\n\n1. **Base (Grátis):** 1 Mural e Inbox Privado.\n2. **Gold (R$ 49,90):** Ativa G-Boost, Auto-Publish e Editor VIP.\n3. **Enterprise (R$ 97):** Vídeo Reviews 4K e Suporte VIP.\n\n*Deseja mudar de plano? Acesse a aba **'Upgrade'** no painel.*\n\n*Digite **0** para voltar ao menu principal.*"
   },
-
-  // 7. AUTO-PUBLISH (AUTOMAÇÃO)
-  {
-    keys: ['auto-publish', 'autopublish', 'publicar', 'automatico', 'automático', 'regras', 'configurar regra', 'filtro de postagem', 'postagem automatica'],
-    response: "O **Auto-Publish** é a gestão 'mãos-livres' da sua prova social (Recurso Gold/Enterprise). \n\n**Como funciona:** Você define uma nota mínima (ex: 5 estrelas) e o sistema publica o depoimento automaticamente no seu site e página pública, sem você precisar clicar em nada. É a sua autoridade crescendo no piloto automático."
-  },
-
-  // 8. PLANOS E UPGRADES
-  {
-    keys: ['plano', 'preço', 'valor', 'upgrade', 'gold', 'enterprise', 'pago', 'trial', 'assinar', 'assinatura', 'pagamento', 'cartão', 'comprar', 'custo', 'beneficio', 'grátis', 'gratis'],
-    response: "Temos níveis de estratégia para cada momento do seu negócio: \n\n1. **Base (Grátis):** Ideal para quem está começando.\n2. **Gold (R$ 49,90/mês):** Ativa o G-Boost (Google Maps), Auto-Publish e Editor VIP.\n3. **Enterprise (R$ 97/mês):** O nível elite. Inclui Vídeo Reviews 4K e suporte VIP dedicado. \n\nAcesse a aba **'Upgrade'** no seu painel para ver todos os detalhes!"
-  },
-
-  // 9. VÍDEO REVIEWS (ENTREPRISE)
-  {
-    keys: ['video', 'vídeo', 'camera', 'câmera', 'review', 'vlog', '4k', 'gravar depoimento', 'video depoimento', 'depoimento em video', 'depoimento em vídeo'],
-    response: "Os **Vídeo Reviews** são o 'Ouro Digital' da prova social (Exclusivo Enterprise). \n\n**Poder:** Um vídeo de um cliente satisfeito gera 10x mais confiança que um texto. \n\n**Dica Estratégica:** Ofereça um mimo ou café VIP para clientes que aceitarem gravar um depoimento rápido pelo celular. Isso converte muito mais!"
-  },
-
-  // 10. SETUP E CONFIGURAÇÃO
-  {
-    keys: ['configurar', 'setup', 'passo a passo', 'ajustar', 'arrumar', 'começo', 'inicio', 'primeiros passos', 'onde vou', 'não sei o que fazer', 'tutorial', 'guia'],
-    response: "Para dominar o sistema rapidamente, siga as **Missões de Sucesso** no topo do seu Dashboard: \n\n1. Defina sua Localização.\n2. Vincule seu Google Maps.\n3. Envie seu primeiro Link de Coleta.\n4. Crie seu primeiro Mural.\n\nSe precisar de algo específico, me pergunte sobre um desses termos!"
+  '6': {
+    title: 'Falar com Humano',
+    keys: ['6', 'humano', 'suporte', 'atendimento', 'contato'],
+    response: "**🎧 Suporte Especializado**\n\nSeu histórico está sendo analisado por um consultor estratégico. Em breve você receberá uma notificação aqui ou no seu e-mail de cadastro.\n\n**Tempo médio de resposta:** 2 horas em horário comercial.\n\n*Digite **0** para voltar ao menu principal.*"
   }
-];
+};
+
+const MAIN_MENU = `**Menu Estratégico Proova** 🚀
+Escolha uma opção para dominar o mercado:
+
+1️⃣ **G-Boost** (SEO Google Maps)
+2️⃣ **Reputation Shield** (Inbox Privado)
+3️⃣ **Widgets** (Murais para Site)
+4️⃣ **Social Cards** (Instagram)
+5️⃣ **Planos e Upgrade**
+6️⃣ **Falar com Humano**
+
+*Digite o **número** ou o **nome** da opção.*`;
 
 export function getConsultantResponse(message: string): string {
-  const input = message.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-  
-  // Procura por match no dicionário
-  for (const entry of CONSULTANT_DICTIONARY) {
-    if (entry.keys.some(key => {
-      const normalizedKey = key.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-      return input.includes(normalizedKey);
-    })) {
-      return entry.response;
+  const input = message.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+
+  // Se for 0 ou saudação, mostra o menu
+  if (input === '0' || ['ola', 'oi', 'ajuda', 'menu', 'inicio'].includes(input)) {
+    return MAIN_MENU;
+  }
+
+  // Busca na árvore
+  for (const key in CONSULTANT_TREE) {
+    const branch = CONSULTANT_TREE[key];
+    if (branch.keys.some(k => input.includes(k))) {
+      return branch.response;
     }
   }
 
-  // Resposta padrão aprimorada (Fallback Estratégico)
-  return "Interessante sua dúvida! Para que eu possa ser mais preciso e estratégico, tente usar termos-chave como:\n\n• **G-Boost** (Google Maps SEO)\n• **Inbox Privado** (Filtro de Críticas)\n• **Página Pública** (Link da Bio)\n• **Widgets** (Murais para o Site)\n• **Social Cards** (Posts Instagram)\n• **Planos** (Upgrade Gold/Enterprise)\n\nSe for algo muito específico sobre sua conta, aguarde que um consultor humano analisará seu histórico de mensagens em breve.";
+  // Fallback
+  return `Não identifiquei essa opção. 😕\n\n${MAIN_MENU}`;
 }
