@@ -58,7 +58,6 @@ export default function SocialCardsPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData } = useDoc(userDocRef);
 
-  // Consulta simplificada para evitar erros de índice composto (assim como na página de métricas)
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
     return collection(db, 'users', user.uid, 'testimonials');
@@ -88,7 +87,6 @@ export default function SocialCardsPage() {
   const filteredTestimonials = useMemo(() => {
     if (!rawTestimonials) return [];
     
-    // 1. Filtrar e Ordenar em memória (Resiliente a falta de índices)
     let list = rawTestimonials
       .filter((t: any) => t.status === 'approved')
       .sort((a: any, b: any) => {
@@ -97,7 +95,6 @@ export default function SocialCardsPage() {
         return dateB.getTime() - dateA.getTime();
       });
 
-    // 2. Aplicar busca por texto
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       list = list.filter((t: any) => 
@@ -138,7 +135,7 @@ export default function SocialCardsPage() {
           </Link>
         </div>
 
-        <div className="ml-auto flex items-center gap-2 md:gap-4">
+        <div className="ml-auto flex items-center gap-2 md:gap-6">
           <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0" />
           
           <DropdownMenu>
@@ -191,7 +188,7 @@ export default function SocialCardsPage() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div className="flex items-center group">
+          <div className="flex items-center group shrink-0">
             <div className="relative w-[140px] h-[45px] md:w-[240px] md:h-[78px] transition-transform group-hover:scale-105">
               <Image 
                 src="/Logotipo%20PROOVA%20white%20mode%201.png" 
