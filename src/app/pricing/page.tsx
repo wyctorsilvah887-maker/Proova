@@ -308,6 +308,7 @@ export default function PricingPage() {
           <Accordion type="single" collapsible className="w-full space-y-4">
             {[
               { q: "Preciso de conhecimento técnico para configurar a plataforma?", a: "Não. A configuração é intuitiva e guiada, pronta para usar em poucos minutos." },
+              { q: "Como meus dados e dos meus clientes são protegidos?", a: "Utilizamos criptografia de ponta a ponta e servidores altamente seguros para garantir total privacidade. Nossa infraestrutura é monitorada 24/7 para assegurar a integridade absoluta de todas as informações processadas." },
               { q: "O que é o G-Boost?", a: "O G-Boost detecta elogios nota 5 e convida o cliente a postar no Google Maps automaticamente." },
               { q: "Posso cancelar quando quiser?", a: "Sim. Você tem total controle sobre sua assinatura, sem fidelidade ou multas." },
               { q: "O pagamento é seguro?", a: "Sim. Processamos via Cakto, com criptografia de ponta e checkout 100% verificado." }
