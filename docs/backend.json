@@ -19,15 +19,25 @@
         "membershipStatus": { "type": "string" },
         "isSetupProcessDone": { "type": "boolean", "description": "Indica se o usuário já completou o checklist de onboarding pelo menos uma vez." },
         "testimonialsCount": { "type": "number" },
-        "googleRedirectCount": { "type": "number", "description": "Contagem de cliques para o Google Maps." },
-        "ppVisitCount": { "type": "number", "description": "Contagem de visitas na Página Pública (Link in Bio)." },
-        "whatsappClickCount": { "type": "number", "description": "Contagem de cliques no botão de WhatsApp da PP." },
+        "googleRedirectCount": { "type": "number" },
+        "ppVisitCount": { "type": "number" },
+        "whatsappClickCount": { "type": "number" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "SupportMessage": {
+      "title": "Support Message",
+      "description": "Mensagem de suporte trocada via chat.",
+      "type": "object",
+      "properties": {
+        "text": { "type": "string" },
+        "sender": { "type": "string", "enum": ["user", "support"] },
         "createdAt": { "type": "string", "format": "date-time" }
       }
     },
     "Slug": {
       "title": "Global Slug Registry",
-      "description": "Garante que URLs personalizadas sejam únicas em toda a plataforma.",
+      "description": "Garante que URLs personalizadas sejam únicas.",
       "type": "object",
       "properties": {
         "userId": { "type": "string" },
@@ -37,7 +47,6 @@
     },
     "PublicPage": {
       "title": "PublicPage Configuration",
-      "description": "Configurações exclusivas da Landing Page do usuário.",
       "type": "object",
       "properties": {
         "themeColor": { "type": "string" },
@@ -53,7 +62,11 @@
     },
     "/users/{userId}/pp/{slug}": {
       "schema": "PublicPage",
-      "description": "Configuração da Página Pública independente de widgets."
+      "description": "Configuração da Página Pública."
+    },
+    "/users/{userId}/support_messages/{messageId}": {
+      "schema": "SupportMessage",
+      "description": "Histórico do chat de suporte técnico."
     }
   }
 }

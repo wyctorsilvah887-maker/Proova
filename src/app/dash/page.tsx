@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -76,7 +77,8 @@ import {
   Settings,
   BookOpen,
   Wand2,
-  RefreshCw
+  RefreshCw,
+  Headphones
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -306,7 +308,6 @@ export default function DashPage() {
   const isCollectDone = setupSteps.find(s => s.id === 'collect')?.completed;
   const isGoogleDone = isDigitalBusiness ? true : !!userData?.googleMapsUrl;
 
-  // Efeito para persistir que o setup foi concluído uma vez
   useEffect(() => {
     if (isSetupComplete && userData && !userData.isSetupProcessDone && db && user) {
       updateDoc(doc(db, 'users', user.uid), {
@@ -326,7 +327,6 @@ export default function DashPage() {
 
   useEffect(() => {
     async function runAudit() {
-      // Auditoria ativa se o setup foi concluído pelo menos uma vez
       if ((!isSetupComplete && !userData?.isSetupProcessDone) || !userData) return;
       setIsAuditing(true);
       const results: AuditItem[] = [];
@@ -656,17 +656,13 @@ export default function DashPage() {
                 <span>Meus Murais</span>
                 {!isCollectDone && <Lock className="ml-auto w-3 h-3 opacity-60" />}
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/support')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Headphones className="mr-2 h-4 w-4 text-primary" />
+                <span>Suporte Proova</span>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Upgrade</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => router.push('/pricing')} 
-                className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
-              >
-                <Handshake className="mr-2 h-4 w-4 text-primary" />
-                <span>Serviços de Parceiros</span>
-                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
               </DropdownMenuItem>
               {userData?.isAdmin && (
                 <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
@@ -684,7 +680,6 @@ export default function DashPage() {
       </header>
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-20 md:pt-24">
-        {/* Checklist de Missões - Só aparece se nunca foi concluído ou se ainda está pendente */}
         {(!isSetupComplete && !userData?.isSetupProcessDone) && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="flex items-center justify-between">
@@ -894,13 +889,12 @@ export default function DashPage() {
               <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Inbox Unificado</span>
             </button>
 
-            <Link href="/social-cards" className="w-full">
+            <Link href="/support" className="w-full">
               <button 
-                disabled={approvedTestimonials.length === 0}
-                className="h-24 w-full rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
+                className="h-24 w-full rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
               >
-                <Share2 className="w-5 h-5 text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Social Cards</span>
+                <Headphones className="w-5 h-5 text-primary" />
+                <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Suporte Chat</span>
               </button>
             </Link>
 
@@ -1011,7 +1005,6 @@ export default function DashPage() {
         </section>
       </main>
 
-      {/* Dialog Detalhe do Depoimento */}
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-lg border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[90vh] flex flex-col">
           <div className="h-2 bg-primary w-full shrink-0" />
@@ -1078,7 +1071,6 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
 
-      {/* OTIMIZADO PARA MOBILE: Link de Coleta Choice */}
       <Dialog open={isCollectLinkChoiceOpen} onOpenChange={setIsCollectLinkChoiceOpen}>
         <DialogContent className="rounded-[2.5rem] w-[95vw] max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[90vh] flex flex-col">
           <DialogHeader className="p-8 pb-4 text-center shrink-0">
@@ -1136,7 +1128,6 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
 
-      {/* OTIMIZADO PARA MOBILE: Public Page Choice */}
       <Dialog open={isPublicPageChoiceOpen} onOpenChange={setIsPublicPageChoiceOpen}>
         <DialogContent className="rounded-[2.5rem] w-[95vw] max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[90vh] flex flex-col">
           <DialogHeader className="p-8 pb-4 text-center shrink-0">
@@ -1218,7 +1209,6 @@ export default function DashPage() {
                   backgroundColor: cardVariant === 'dark' ? '#000000' : '#f97316'
                 }}
               >
-                   {/* Decorative Elements */}
                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16" />
                    <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -ml-16 -mb-16" />
 
@@ -1289,7 +1279,6 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
       
-      {/* Diálogos de Google Maps e QR Code */}
       <Dialog open={isGoogleMapsDialogOpen} onOpenChange={setIsGoogleMapsDialogOpen}>
         <DialogContent className="rounded-[2.5rem] w-[95vw] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-6 pb-2 pt-10 shrink-0 bg-background">

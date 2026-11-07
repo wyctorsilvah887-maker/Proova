@@ -1,3 +1,4 @@
+
 rules_version = '2';
 
 service cloud.firestore {
@@ -30,7 +31,6 @@ service cloud.firestore {
 
     // Regras para a coleção de usuários e subcoleções
     match /users/{userId} {
-      // Leitura pública necessária para identificar a empresa e carregar widgets
       allow get, list: if true;
       allow create: if true;
       
@@ -39,6 +39,11 @@ service cloud.firestore {
       
       allow delete: if request.auth != null && request.auth.uid == userId;
       
+      // Suporte Técnico (Chat)
+      match /support_messages/{messageId} {
+        allow read, create: if request.auth != null && request.auth.uid == userId;
+      }
+
       // Página Pública (PP)
       match /pp/{slug} {
         allow read: if true;
@@ -72,7 +77,7 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }
     
-    // Suporte para Collection Group (Essencial para o funcionamento do Widget Oficial Proova)
+    // Suporte para Collection Group
     match /{path=**}/testimonials/{testimonial} {
       allow read: if true;
     }
