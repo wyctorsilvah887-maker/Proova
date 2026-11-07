@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -321,7 +320,11 @@ export default function DashPage() {
   const progressPercentage = (completedStepsCount / setupSteps.length) * 100;
   const isSetupComplete = completedStepsCount === setupSteps.length;
   const isCollectDone = setupSteps.find(s => s.id === 'collect')?.completed;
-  const isGoogleDone = isDigitalBusiness ? true : !!userData?.googleMapsUrl;
+  
+  const isGoogleDone = useMemo(() => {
+    if (isDigitalBusiness) return true;
+    return !!userData?.googleMapsUrl;
+  }, [isDigitalBusiness, userData]);
 
   useEffect(() => {
     if (isSetupComplete && userData && !userData.isSetupProcessDone && db && user) {
@@ -359,13 +362,20 @@ export default function DashPage() {
       }
 
       if (pushSupported && permission === 'default') {
+        const vapidKey = process.env.NEXT_PUBLIC_VAPID_KEY;
         results.push({
           id: 'push-inactive',
           label: 'Notificações Desativadas',
           status: 'attention',
           description: 'Ative os alertas para saber instantaneamente quando receber um elogio.',
           actionLabel: 'Ativar Agora',
-          action: () => requestPermission('BNpA6y9_8O6E5R8w... (SUA_VAPID_KEY_AQUI)'), // O USUÁRIO DEVE TROCAR PELA CHAVE DO CONSOLE
+          action: () => {
+            if (!vapidKey) {
+              shadcnToast({ variant: "destructive", title: "Configuração Pendente", description: "O administrador ainda não configurou a VAPID Key no ambiente." });
+              return;
+            }
+            requestPermission(vapidKey);
+          },
           icon: BellRing
         });
       }
