@@ -41,7 +41,8 @@ import {
   MessageCircle,
   Link2,
   Bell,
-  ExternalLink
+  ExternalLink,
+  Zap
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -212,7 +213,6 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
 
 const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0, isPopup = false, isAnimating = false }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number, isPopup?: boolean, isAnimating?: boolean }) => {
   const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent' && secondaryColor !== '';
-  const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
   
   return (
     <Card 
@@ -220,13 +220,12 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
       className={cn(
         "rounded-[1.5rem] p-5 transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white mb-6 border-none",
         !isPopup && "animate-in fade-in duration-700 ease-out fill-both",
-        !isPopup && (side === 'left' ? "slide-in-from-left-8" : "slide-in-from-right-8"),
         isPopup && !isAnimating && "animate-in fade-in slide-in-from-bottom-10 duration-1000",
         isPopup && isAnimating && "animate-out fade-out slide-out-to-top-10 duration-1000"
       )}
       style={{ 
         boxShadow: hasSecondary 
-          ? `0 0 25px ${secondaryColor}50, 0 10px 30px -10px rgba(0,0,0,0.15)` 
+          ? `0 0 25px ${secondaryColor}60, 0 15px 40px -10px rgba(0,0,0,0.2)` 
           : `0 20px 40px -20px ${themeColor}25`,
       }}
     >
@@ -298,9 +297,13 @@ const PublicPageSettings = ({
   externalSiteUrl, setExternalSiteUrl,
   externalSiteButtonText, setExternalSiteButtonText,
   customSections, setCustomSections,
+  autoPublishEnabled, setAutoPublishEnabled,
+  autoPublishMinRating, setAutoPublishMinRating,
+  autoPublishMinChars, setAutoPublishMinChars,
   onFileSelect,
   isUploading,
   isGoldPlan,
+  isEnterprise,
   logoInputRef,
   currentSlug, setSlugEdit,
   onClose
@@ -355,6 +358,9 @@ const PublicPageSettings = ({
             <TabsTrigger value="conteudo" className="text-[10px] font-bold uppercase tracking-widest px-3 flex items-center gap-1.5">
               Conteúdo {!isGoldPlan && <Lock className="w-2.5 h-2.5 opacity-40" />}
             </TabsTrigger>
+            <TabsTrigger value="automacao" className="text-[10px] font-bold uppercase tracking-widest px-3 flex items-center gap-1.5">
+              Automação {!isEnterprise && <Lock className="w-2.5 h-2.5 opacity-40" />}
+            </TabsTrigger>
             <TabsTrigger value="design" className="text-[10px] font-bold uppercase tracking-widest px-3">Layout</TabsTrigger>
             <TabsTrigger value="social" className="text-[10px] font-bold uppercase tracking-widest px-3">Contato/Info</TabsTrigger>
           </TabsList>
@@ -387,7 +393,7 @@ const PublicPageSettings = ({
 
               <div className={cn("space-y-6 pt-6 border-t", !isGoldPlan && "opacity-40 grayscale pointer-events-none")}>
                 <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 ml-1">
-                  <Palette className="w-3 h-3 text-primary" /> Efeito Bordas Neon {!isGoldPlan && <Lock className="w-2.5 h-2.5 ml-1" />}
+                  <Palette className="w-3 h-3 text-primary" /> Efeito Neon (Glow) {!isGoldPlan && <Lock className="w-2.5 h-2.5 ml-1" />}
                 </Label>
                 <div className="flex flex-wrap gap-2">
                   <button 
@@ -496,6 +502,61 @@ const PublicPageSettings = ({
                       <div className="space-y-0.5"><Label className="text-[11px] font-bold">Marca Proova</Label><p className="text-[9px] text-muted-foreground">Exibir "Powered by Proova"</p></div>
                       <Switch checked={showLogo} onCheckedChange={setShowLogo} disabled={!isGoldPlan} />
                     </div>
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="automacao" className="mt-0 space-y-8">
+              {!isEnterprise ? (
+                <div className="py-16 px-4 text-center space-y-6 bg-primary/5 rounded-3xl border border-dashed border-primary/20 m-2">
+                   <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit"><Zap className="w-8 h-8 text-primary" /></div>
+                   <div className="space-y-2">
+                     <h3 className="text-sm font-black uppercase tracking-tight">Recurso Enterprise</h3>
+                     <p className="text-[10px] text-muted-foreground leading-relaxed max-w-[200px] mx-auto">A publicação automática de novos elogios é um recurso exclusivo para membros Enterprise.</p>
+                   </div>
+                   <Button className="w-full font-black uppercase tracking-widest text-[10px] h-11 rounded-xl" onClick={() => router.push('/pricing')}>Mudar para Enterprise</Button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="p-4 rounded-2xl border bg-primary/5 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-0.5">
+                        <Label className="text-xs font-bold">Auto-Publish (Página Pública)</Label>
+                        <p className="text-[9px] text-muted-foreground">Novos elogios aparecem no Link in Bio sem ação manual</p>
+                      </div>
+                      <Switch checked={autoPublishEnabled} onCheckedChange={setAutoPublishEnabled} />
+                    </div>
+                    {autoPublishEnabled && (
+                      <div className="space-y-3 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="space-y-1.5">
+                          <Label className="text-[9px] font-bold uppercase opacity-60">Nota Mínima</Label>
+                          <div className="flex gap-1">
+                            {[4, 5].map((val) => (
+                              <Button 
+                                key={val} 
+                                variant={autoPublishMinRating === val ? 'default' : 'outline'} 
+                                size="sm" 
+                                className="flex-1 h-7 text-[10px] font-bold rounded-lg"
+                                onClick={() => setAutoPublishMinRating(val)}
+                              >
+                                {val} Estrelas
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="space-y-1.5">
+                          <Label className="text-[9px] font-bold uppercase opacity-60">Caracteres Mínimos ({autoPublishMinChars})</Label>
+                          <Input 
+                            type="number" 
+                            value={autoPublishMinChars} 
+                            onChange={(e) => setAutoPublishMinChars(parseInt(e.target.value) || 0)}
+                            className="h-8 text-xs rounded-lg"
+                            min={0}
+                          />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -656,6 +717,9 @@ export default function PPEditorPage() {
   const [externalSiteUrl, setExternalSiteUrl] = useState('');
   const [externalSiteButtonText, setExternalSiteButtonText] = useState('');
   const [customSections, setCustomSections] = useState<CustomSection[]>([]);
+  const [autoPublishEnabled, setAutoPublishEnabled] = useState(false);
+  const [autoPublishMinRating, setAutoPublishMinRating] = useState(5);
+  const [autoPublishMinChars, setAutoPublishMinChars] = useState(0);
   const [slugEdit, setSlugEdit] = useState('');
 
   const [isSaving, setIsSaving] = useState(false);
@@ -694,6 +758,9 @@ export default function PPEditorPage() {
       setExternalSiteUrl(ppData.externalSiteUrl || '');
       setExternalSiteButtonText(ppData.externalSiteButtonText || '');
       setCustomSections(ppData.customSections || []);
+      setAutoPublishEnabled(ppData.autoPublishEnabled || false);
+      setAutoPublishMinRating(ppData.autoPublishMinRating || 5);
+      setAutoPublishMinChars(ppData.autoPublishMinChars || 0);
     }
   }, [ppData]);
 
@@ -741,6 +808,7 @@ export default function PPEditorPage() {
         themeColor, secondaryColor, layout, logoUrl, heroTitle, heroSubtitle, testimonialsTitle, footerText, showLogo,
         whatsappEnabled, whatsappNumber, externalSiteUrl, externalSiteButtonText,
         customSections: customSections || [],
+        autoPublishEnabled, autoPublishMinRating, autoPublishMinChars,
         updatedAt: serverTimestamp()
       }, { merge: true });
       await batch.commit();
@@ -853,8 +921,12 @@ export default function PPEditorPage() {
             whatsappNumber={whatsappNumber} setWhatsappNumber={setWhatsappNumber}
             externalSiteUrl={externalSiteUrl} setExternalSiteUrl={setExternalSiteUrl}
             externalSiteButtonText={externalSiteButtonText} setExternalSiteButtonText={setExternalSiteButtonText}
-            customSections={customSections} setCustomSections={setCustomSections} onFileSelect={onFileSelect}
-            isUploading={isUploading} isGoldPlan={isGoldPlan}
+            customSections={customSections} setCustomSections={setCustomSections} 
+            autoPublishEnabled={autoPublishEnabled} setAutoPublishEnabled={setAutoPublishEnabled}
+            autoPublishMinRating={autoPublishMinRating} setAutoPublishMinRating={setAutoPublishMinRating}
+            autoPublishMinChars={autoPublishMinChars} setAutoPublishMinChars={setAutoPublishMinChars}
+            onFileSelect={onFileSelect}
+            isUploading={isUploading} isGoldPlan={isGoldPlan} isEnterprise={isEnterprise}
             logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
           />
         </aside>
@@ -878,8 +950,12 @@ export default function PPEditorPage() {
                     whatsappNumber={whatsappNumber} setWhatsappNumber={setWhatsappNumber}
                     externalSiteUrl={externalSiteUrl} setExternalSiteUrl={setExternalSiteUrl}
                     externalSiteButtonText={externalSiteButtonText} setExternalSiteButtonText={setExternalSiteButtonText}
-                    customSections={customSections} setCustomSections={setCustomSections} onFileSelect={onFileSelect}
-                    isUploading={isUploading} isGoldPlan={isGoldPlan}
+                    customSections={customSections} setCustomSections={setCustomSections} 
+                    autoPublishEnabled={autoPublishEnabled} setAutoPublishEnabled={setAutoPublishEnabled}
+                    autoPublishMinRating={autoPublishMinRating} setAutoPublishMinRating={setAutoPublishMinRating}
+                    autoPublishMinChars={autoPublishMinChars} setAutoPublishMinChars={setAutoPublishMinChars}
+                    onFileSelect={onFileSelect}
+                    isUploading={isUploading} isGoldPlan={isGoldPlan} isEnterprise={isEnterprise}
                     logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
                   />
                 </SheetContent>
