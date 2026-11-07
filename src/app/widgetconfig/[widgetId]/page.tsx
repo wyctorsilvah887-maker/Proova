@@ -28,7 +28,8 @@ import {
   Lock,
   Zap,
   Settings2,
-  Sparkles
+  Sparkles,
+  ExternalLink
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -370,6 +371,13 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
         </div>
 
         <div className="ml-auto flex items-center gap-2">
+          <Button 
+            variant="outline" 
+            className="hidden sm:flex h-12 px-4 rounded-xl font-bold gap-2 border-primary/20 text-primary hover:bg-primary/5 shadow-sm"
+            onClick={() => window.open(`/widgetpublic/${user?.uid}/${widgetId}`, '_blank')}
+          >
+            <ExternalLink className="w-4 h-4" /> Visualizar
+          </Button>
           <Button onClick={handleSave} disabled={isSaving} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground">
             {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar Mural
           </Button>
