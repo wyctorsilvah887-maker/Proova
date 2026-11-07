@@ -19,8 +19,6 @@ import {
   Copy,
   Layout,
   Palette,
-  HelpCircle,
-  Info,
   ChevronDown,
   LogOut,
   TrendingUp,
@@ -40,7 +38,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useUser, useFirestore, useDoc, useCollection, useAuth } from '@/firebase';
-import { doc, updateDoc, collection, query, where } from 'firebase/firestore';
+import { doc, updateDoc, collection, query, where, getDoc } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { toast } from '@/hooks/use-toast';
 import Link from 'next/link';
@@ -79,6 +77,7 @@ import {
 import { useTheme } from 'next-themes';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 type LayoutType = 'mural' | 'carousel' | 'grid' | 'popup';
 
@@ -102,7 +101,7 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
       <div className="flex flex-col space-y-3">
         <div className="flex items-center gap-2">
           <div className="p-1.5 rounded-full shrink-0" style={{ backgroundColor: secondaryColor && secondaryColor !== '#ffffff' ? `${secondaryColor}30` : `${themeColor}15` }}>
-            <User className="w-3 h-3" style={{ color: themeColor }} />
+            <User className="w-3" style={{ color: themeColor }} />
           </div>
           <p className="font-bold text-[10px] truncate">{t.userName}</p>
         </div>
@@ -152,8 +151,8 @@ const EmbedSettings = ({
       <div className="p-4 border-b bg-muted/10 shrink-0 space-y-4">
         <div className="flex items-center justify-between">
            <Link href="/widgets">
-            <Button variant="ghost" size="sm" className="gap-2 px-0 group">
-              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+            <Button variant="ghost" size="sm" className="gap-2 px-0 text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 select-none h-8">
+              <ArrowLeft className="w-4 h-4" />
               <span className="text-[10px] font-black uppercase tracking-widest">Sair</span>
             </Button>
           </Link>
@@ -162,9 +161,9 @@ const EmbedSettings = ({
           </Button>
         </div>
         
-        <Button onClick={handleSave} disabled={isSaving} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground">
+        <Button onClick={handleSave} disabled={isSaving} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground transition-all active:scale-95">
           {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
-          Salvar Alterações
+          Salvar Mural
         </Button>
       </div>
 
@@ -315,16 +314,34 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const { data: widgetData, loading: widgetLoading } = useDoc(widgetRef);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
-  const { data: userData } = useDoc(userDocRef);
+  const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
-  const membershipStatus = userData?.membershipStatus;
-  const isEnterprise = membershipStatus === 'enterprise';
-  const isGold = membershipStatus === 'gold';
-  const isTrial = membershipStatus === 'trial';
+  const status = useMemo(() => {
+    if (!userData) return 'base';
+    return (userData.membershipStatus || 'base').toLowerCase();
+  }, [userData]);
+
+  const isEnterprise = status === 'enterprise';
+  const isGold = status === 'gold';
+  const isTrial = status === 'trial';
   
   const SELECTION_LIMIT = isEnterprise ? Infinity : ((isGold || isTrial) ? 50 : 5);
   const isGoldPlan = isGold || isTrial || isEnterprise;
   const isPremiumUser = isGoldPlan;
+
+  const isMapsLinkValid = useMemo(() => {
+    if (!userData?.googleMapsUrl) return false;
+    const url = userData.googleMapsUrl.toLowerCase();
+    return url.includes('review') || url.includes('writereview') || url.includes('placeid');
+  }, [userData]);
+
+  const membershipLabel = useMemo(() => {
+    if (status === 'enterprise') return 'ENTERPRISE';
+    if (status === 'gold') return 'GOLD';
+    if (status === 'trial') return 'TRIAL';
+    if (status === 'expired') return 'EXPIRADO';
+    return 'PLANO BASE';
+  }, [status]);
 
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
@@ -343,7 +360,6 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
 
   const [isSaving, setIsSaving] = useState(false);
   const [isCodeDialogOpen, setIsCodeDialogOpen] = useState(false);
-  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [baseUrl, setBaseUrl] = useState('');
   const [muralIndex, setMuralIndex] = useState(0);
   const [showAll, setShowAll] = useState(false);
@@ -438,7 +454,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
 
   const embedCode = `<script src="${baseUrl}/widget.js?id=${widgetId}&user=${user?.uid}" defer></script>`;
 
-  if (authLoading || widgetLoading || testimonialsLoading) {
+  if (authLoading || widgetLoading || testimonialsLoading || (user && !userData)) {
     return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
   }
 
@@ -449,17 +465,31 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
     onClose: () => setIsSidebarOpen(false)
   };
 
-  const membershipLabel = isEnterprise ? 'Membro Enterprise' : (isGold ? 'Membro Gold' : (isTrial ? 'Período Trial' : 'Plano Base'));
-
   return (
     <div className="h-screen flex flex-col font-body w-full overflow-hidden bg-background shrink-0">
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95 shrink-0">
-        <div className="flex items-center gap-3 flex-1">
+      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
+        <div className="flex items-center gap-4">
+          <Link href="/widgets">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 select-none"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          </Link>
+          <div className="flex items-center group -ml-2">
+            <div className="relative w-[160px] h-[52px] md:w-[240px] md:h-[78px] transition-transform group-hover:scale-105">
+              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
+              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+            </div>
+          </div>
+        </div>
+
+        <div className="ml-auto flex items-center gap-2 md:gap-4">
           <button 
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className={cn(
-              "flex flex-col items-center justify-center gap-1 group transition-all text-primary hover:text-primary/80"
-            )}
+            className="flex flex-col items-center justify-center gap-1 group transition-all text-primary hover:text-primary/80 mr-2"
           >
             <div className={cn("h-10 w-10 flex items-center justify-center rounded-xl transition-all", isSidebarOpen ? "bg-primary/10" : "bg-transparent group-hover:bg-primary/5")}>
               <Monitor className="h-6 w-6" />
@@ -467,90 +497,65 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
             <span className="text-[8px] font-black uppercase tracking-widest leading-none">EDITAR</span>
           </button>
 
-          <div className="flex items-center group -ml-2 md:-ml-4">
-            <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
-              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
-              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" priority />
-            </div>
-          </div>
-        </div>
-
-        <div className="ml-auto flex items-center gap-2 md:gap-4">
           <Button 
             onClick={handleSave} 
             disabled={isSaving} 
-            className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground transition-all active:scale-95"
+            className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground transition-all active:scale-95 mr-2"
           >
             {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
-            Salvar Alterações
+            Salvar
           </Button>
 
+          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0" />
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
-                <div className="hidden sm:flex flex-col items-end">
-                  <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
-                    {userData?.companyName || 'Minha Empresa'}
+              <Button variant="ghost" className="h-12 px-1 md:px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
+                <div className="flex flex-col items-end">
+                  <span className="text-[10px] md:text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] transition-colors group-hover:text-primary leading-tight">
+                    {userData?.companyName || 'Empresa'}
                   </span>
-                  <span className={cn(
-                    "text-[8px] uppercase tracking-widest font-black leading-tight",
-                    isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground"
-                  )}>
-                    {membershipLabel}
-                  </span>
+                  <div className="flex flex-col items-end gap-0">
+                    <span className={cn(
+                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
+                      status === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
+                    )}>
+                      {membershipLabel}
+                    </span>
+                    {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
+                  </div>
                 </div>
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
-                  <User className="w-4 h-4" />
+                  <User className="w-4 h-4 text-primary group-hover:text-white" />
                 </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
-              <DropdownMenuLabel className="px-3 py-2">
-                <p className="text-xs font-headline font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</p>
-              </DropdownMenuLabel>
+              <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
-                <span>Dash</span>
+                <span>Dashboard</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
+              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Layout className="mr-2 h-4 w-4 text-primary" />
-                <span>Meus Widgets</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Inbox className="mr-2 h-4 w-4 text-primary" />
-                <span>Inbox Privado</span>
+                <span>Meus Murais</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Planos de Upgrade</span>
               </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => router.push('/pricing')} 
-                className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
-              >
-                <Handshake className="mr-2 h-4 w-4 text-primary" />
-                <span>Serviços de Parceiros</span>
-                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
+              <DropdownMenuSeparator className="mx-1" />
+              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive font-bold py-2.5 cursor-pointer">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sair</span>
               </DropdownMenuItem>
-              
-              {userData?.isAdmin && (
-                <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                  <Shield className="mr-2 h-4 w-4 text-primary" />
-                  <span>Administração</span>
-                </DropdownMenuItem>
-              )}
-
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </header>
 
-      <main className="flex-1 flex overflow-hidden relative w-full h-full">
+      <main className="flex-1 flex overflow-hidden relative w-full h-full pt-24 md:pt-32">
         {/* Desktop Sidebar */}
         <aside className={cn(
           "hidden lg:flex w-80 bg-background border-r flex-col shrink-0 transition-all duration-300 ease-in-out h-full",
@@ -575,7 +580,11 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
           <div className="max-w-4xl mx-auto space-y-8 pb-20">
             <div className="flex flex-col gap-4">
               <Link href="/widgets" className="inline-block group">
-                <Button variant="ghost" size="sm" className="gap-2 px-0 text-muted-foreground hover:text-primary transition-colors">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="gap-2 px-0 text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 select-none"
+                >
                   <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
                   <span className="text-[10px] font-black uppercase tracking-widest">Voltar para a Lista</span>
                 </Button>
@@ -583,9 +592,6 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
               
               <div className="flex items-center justify-between">
                 <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><Eye className="w-4 h-4" /> Preview do Mural</h2>
-                <Button variant="link" size="sm" onClick={() => setIsTutorialOpen(true)} className="text-[10px] font-bold gap-1 text-primary p-0 h-auto">
-                  <Info className="w-3 h-3" /> Ver Tutorial
-                </Button>
               </div>
             </div>
             
@@ -687,31 +693,12 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
                 className="h-16 px-8 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest gap-3"
               >
                 {isSaving ? <Loader2 className="animate-spin h-5 w-5" /> : <Save className="h-5 w-5" />}
-                Salvar Alterações
+                Salvar Mural
               </Button>
             </div>
           )}
         </div>
       </main>
-
-      <Dialog open={isTutorialOpen} onOpenChange={setIsTutorialOpen}>
-        <DialogContent className="rounded-[2.5rem] w-[92vw] sm:w-full sm:max-w-lg border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
-          <DialogHeader className="p-6 md:p-10 pt-10 md:pt-14 pb-4 bg-background shrink-0">
-            <DialogTitle className="text-xl md:text-2xl font-black font-headline flex items-center gap-2">
-              <Settings2 className="w-6 h-6 text-primary" /> Guia de Configuração
-            </DialogTitle>
-            <DialogDescription className="text-xs md:text-sm pl-8">Siga os passos para ativar sua prova social.</DialogDescription>
-          </DialogHeader>
-          <ScrollArea className="flex-1 overflow-y-auto px-5 md:px-10 py-6">
-            <div className="space-y-8">
-              <div className="flex gap-4"><div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0"><Palette className="w-5 h-5" /></div><div className="min-w-0 flex-1"><p className="text-sm font-bold">Estilo e Presets</p><p className="text-xs text-muted-foreground leading-relaxed">Clique no ícone de monitor para abrir as configurações. Use os estilos rápidos para um visual profissional instantâneo.</p></div></div>
-              <div className="flex gap-4"><div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0"><Zap className="w-5 h-5" /></div><div className="min-w-0 flex-1"><p className="text-sm font-bold">Automação Inteligente</p><p className="text-xs text-muted-foreground leading-relaxed">Ative o Auto-Publish para que novos elogios 5 estrelas entrem no seu site sem sua intervenção manual.</p></div></div>
-              <div className="flex gap-4"><div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black shrink-0"><Terminal className="w-5 h-5" /></div><div className="min-w-0 flex-1"><p className="text-sm font-bold">Salvar e Instalar</p><p className="text-xs text-muted-foreground leading-relaxed">O botão de salvar aparece na barra lateral ou flutuando no preview quando a barra está fechada. Copie o snippet gerado e cole no seu site.</p></div></div>
-            </div>
-          </ScrollArea>
-          <DialogFooter className="p-6 md:p-10 pt-4 pb-8 md:pb-10 bg-background border-t shrink-0"><Button className="w-full font-black h-12 rounded-2xl shadow-xl" onClick={() => setIsTutorialOpen(false)}>Começar Agora</Button></DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={isCodeDialogOpen} onOpenChange={setIsCodeDialogOpen}>
         <DialogContent className="rounded-3xl">
