@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, use } from 'react';
@@ -104,6 +103,7 @@ const TestimonialCardPreview = ({
 
   return (
     <Card 
+      key={`${t.id}-${muralIndex}`}
       className={cn(
         "rounded-[1.5rem] p-4 text-left transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white",
         !isPopup && (side === 'left' ? "animate-in fade-in slide-in-from-left-4" : "animate-in fade-in slide-in-from-right-4"),
@@ -111,7 +111,7 @@ const TestimonialCardPreview = ({
         isPopup && isAnimating && "animate-out fade-out zoom-out-95 duration-1000"
       )}
       style={{ 
-        border: hasSecondary ? `2px solid ${secondaryColor}` : '1px solid rgba(0,0,0,0.05)',
+        border: hasSecondary ? 'none' : '1px solid rgba(0,0,0,0.05)',
         boxShadow: hasSecondary 
           ? `0 0 25px ${secondaryColor}50, 0 10px 30px -10px rgba(0,0,0,0.15)` 
           : `0 10px 30px -10px ${themeColor}15`,
@@ -489,7 +489,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
           >
             {isSaving ? <Loader2 className="animate-spin h-3.5 w-3.5 md:h-4 md:w-4" /> : <Save className="h-3.5 w-3.5 md:h-4 md:w-4" />} <span className="hidden xs:inline">Salvar</span>
           </Button>
-          <ThemeToggle />
+          <ThemeToggle className="hidden sm:flex" />
         </div>
       </header>
 
