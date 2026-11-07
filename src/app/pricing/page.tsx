@@ -58,20 +58,43 @@ export default function PricingPage() {
   const { theme, setTheme } = useTheme();
 
   const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
+  const [cachedUserData, setCachedUserData] = useState<any>(null);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData } = useDoc(userDocRef);
 
+  // Sistema de Cache Local para carregamento ultra-rápido
+  useEffect(() => {
+    if (typeof window !== 'undefined' && user) {
+      const cached = localStorage.getItem(`proova_user_profile_${user.uid}`);
+      if (cached) {
+        try {
+          setCachedUserData(JSON.parse(cached));
+        } catch (e) {
+          console.error("Erro ao ler cache:", e);
+        }
+      }
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (userData && user) {
+      localStorage.setItem(`proova_user_profile_${user.uid}`, JSON.stringify(userData));
+    }
+  }, [userData, user]);
+
+  const effectiveUserData = userData || cachedUserData;
+
   const status = useMemo(() => {
     if (!user) return 'guest';
-    return userData?.membershipStatus || 'base';
-  }, [user, userData]);
+    return effectiveUserData?.membershipStatus || 'base';
+  }, [user, effectiveUserData]);
 
   const isMapsLinkValid = useMemo(() => {
-    if (!userData?.googleMapsUrl) return false;
-    const url = userData.googleMapsUrl.toLowerCase();
+    if (!effectiveUserData?.googleMapsUrl) return false;
+    const url = effectiveUserData.googleMapsUrl.toLowerCase();
     return url.includes('review') || url.includes('writereview') || url.includes('placeid');
-  }, [userData]);
+  }, [effectiveUserData]);
 
   const membershipLabel = useMemo(() => {
     if (status === 'enterprise') return 'ENTERPRISE';
@@ -155,10 +178,24 @@ export default function PricingPage() {
     ];
   }, [user, checkoutLinks, status]);
 
+  // Bloqueio de renderização até que os dados estejam prontos
+  const isDataReady = !authLoading && (!user || effectiveUserData);
+
+  if (!isDataReady) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <Loader2 className="animate-spin h-10 w-10 text-primary mx-auto" />
+          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground animate-pulse">Sincronizando Proova...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background font-body text-foreground flex flex-col overflow-x-hidden">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[100] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-1">
           <Link href={user ? "/dash" : "/"}>
             <Button 
               variant="ghost" 
@@ -175,85 +212,102 @@ export default function PricingPage() {
             </div>
           </div>
         </div>
+
         <div className="ml-auto flex items-center gap-2 md:gap-4">
           <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-0" />
           
-          {!authLoading && user && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
-                  <div className="flex flex-col items-end">
-                    <span className="text-[10px] md:text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] transition-colors group-hover:text-primary leading-tight">
-                      {userData?.companyName || 'Minha Empresa'}
-                    </span>
-                    <div className="flex flex-col items-end gap-0">
-                      <span className={cn(
-                        "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
-                        status === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
-                      )}>
-                        {membershipLabel}
+          {user && (
+            <div className="flex items-center gap-2 md:gap-4">
+              {/* Desktop Identity Info */}
+              <div className="hidden lg:flex flex-col items-end mr-1">
+                <span className="text-[11px] font-bold truncate max-w-[150px] leading-tight group-hover:text-primary transition-colors">
+                  {effectiveUserData?.companyName || 'Minha Empresa'}
+                </span>
+                <div className="flex flex-col items-end gap-0">
+                  <span className={cn(
+                    "text-[8px] uppercase tracking-widest font-black leading-tight",
+                    status === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
+                  )}>
+                    {membershipLabel}
+                  </span>
+                  {isMapsLinkValid && <span className="text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
+                </div>
+              </div>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-12 px-1 md:px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
+                    {/* Mobile Identity Info */}
+                    <div className="lg:hidden flex flex-col items-end">
+                      <span className="text-[10px] font-bold truncate max-w-[80px] leading-tight">
+                        {effectiveUserData?.companyName || 'Empresa'}
                       </span>
-                      {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
+                      <div className="flex flex-col items-end">
+                        <span className="text-[7px] uppercase tracking-widest font-black leading-tight text-muted-foreground">
+                          {membershipLabel}
+                        </span>
+                        {isMapsLinkValid && <span className="text-[5px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
+                      </div>
                     </div>
-                  </div>
-                  <div className="h-7 w-7 md:h-8 md:w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
-                    <User className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary group-hover:text-white" />
-                  </div>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl bg-background border">
-                <DropdownMenuLabel className="px-3 py-2">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Minha Conta</p>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator className="mx-1" />
-                
-                <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold py-2.5 cursor-pointer">
-                  <TrendingUp className="mr-2 h-4 w-4 text-primary" />
-                  <span>Dashboard</span>
-                </DropdownMenuItem>
-                
-                <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl font-bold py-2.5 cursor-pointer">
-                  <Layout className="mr-2 h-4 w-4 text-primary" />
-                  <span>Meus Murais</span>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl font-bold py-2.5 cursor-pointer">
-                  <Inbox className="mr-2 h-4 w-4 text-primary" />
-                  <span>Inbox Privado</span>
-                </DropdownMenuItem>
-
-                <DropdownMenuItem 
-                  onClick={() => router.push('/pricing')} 
-                  className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
-                >
-                  <Handshake className="mr-2 h-4 w-4 text-primary" />
-                  <span>Serviços de Parceiros</span>
-                  <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
-                </DropdownMenuItem>
-
-                {userData?.isAdmin && (
-                  <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-bold py-2.5">
-                    <Shield className="mr-2 h-4 w-4 text-primary" />
-                    <span>Administração</span>
+                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
+                      <User className="w-4 h-4 text-primary group-hover:text-white" />
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl bg-background border">
+                  <DropdownMenuLabel className="px-3 py-2">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Minha Conta</p>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="mx-1" />
+                  
+                  <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold py-2.5 cursor-pointer">
+                    <TrendingUp className="mr-2 h-4 w-4 text-primary" />
+                    <span>Dashboard</span>
                   </DropdownMenuItem>
-                )}
+                  
+                  <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl font-bold py-2.5 cursor-pointer">
+                    <Layout className="mr-2 h-4 w-4 text-primary" />
+                    <span>Meus Murais</span>
+                  </DropdownMenuItem>
 
-                <DropdownMenuItem 
-                  onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} 
-                  className="rounded-xl font-bold py-2.5 cursor-pointer"
-                >
-                  {theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}
-                  <span>Alternar Tema</span>
-                </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl font-bold py-2.5 cursor-pointer">
+                    <Inbox className="mr-2 h-4 w-4 text-primary" />
+                    <span>Inbox Privado</span>
+                  </DropdownMenuItem>
 
-                <DropdownMenuSeparator className="mx-1" />
-                
-                <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive font-bold py-2.5 cursor-pointer">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sair</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuItem 
+                    onClick={() => router.push('/pricing')} 
+                    className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
+                  >
+                    <Handshake className="mr-2 h-4 w-4 text-primary" />
+                    <span>Serviços de Parceiros</span>
+                    <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
+                  </DropdownMenuItem>
+
+                  {effectiveUserData?.isAdmin && (
+                    <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl font-bold py-2.5">
+                      <Shield className="mr-2 h-4 w-4 text-primary" />
+                      <span>Administração</span>
+                    </DropdownMenuItem>
+                  )}
+
+                  <DropdownMenuItem 
+                    onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} 
+                    className="rounded-xl font-bold py-2.5 cursor-pointer"
+                  >
+                    {theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}
+                    <span>Alternar Tema</span>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator className="mx-1" />
+                  
+                  <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive font-bold py-2.5 cursor-pointer">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sair</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           )}
         </div>
       </header>
@@ -396,28 +450,31 @@ export default function PricingPage() {
           </Accordion>
         </section>
 
-        <section className="mt-24">
-           <div className="bg-zinc-950 text-white rounded-[2.5rem] p-10 md:p-16 text-center space-y-8 relative overflow-hidden shadow-2xl">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -mr-32 -mt-32" />
-              <div className="relative z-10 space-y-6">
-                <Sparkles className="w-10 h-10 mx-auto text-primary" />
-                <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">Domine seu Mercado.</h2>
-                <p className="text-zinc-400 font-bold text-base md:text-xl max-w-xl mx-auto leading-relaxed">
-                  Não seja apenas mais uma opção. Seja a escolha óbvia do seu setor através da prova social de elite.
-                </p>
-                <div className="pt-4">
-                   <Button size="lg" className="h-14 px-10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] bg-primary text-white hover:bg-primary/90 shadow-2xl transition-all hover:scale-105" onClick={() => router.push('/signup')}>
-                     COMEÇAR MINHA JORNADA
-                   </Button>
+        {/* CTA Section - Apenas para Visitantes */}
+        {!user && (
+          <section className="mt-24">
+             <div className="bg-zinc-950 text-white rounded-[2.5rem] p-10 md:p-16 text-center space-y-8 relative overflow-hidden shadow-2xl">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -mr-32 -mt-32" />
+                <div className="relative z-10 space-y-6">
+                  <Sparkles className="w-10 h-10 mx-auto text-primary" />
+                  <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">Domine seu Mercado.</h2>
+                  <p className="text-zinc-400 font-bold text-base md:text-xl max-w-xl mx-auto leading-relaxed">
+                    Não seja apenas mais uma opção. Seja a escolha óbvia do seu setor através da prova social de elite.
+                  </p>
+                  <div className="pt-4">
+                     <Button size="lg" className="h-14 px-10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] bg-primary text-white hover:bg-primary/90 shadow-2xl transition-all hover:scale-105" onClick={() => router.push('/signup')}>
+                       COMEÇAR MINHA JORNADA
+                     </Button>
+                  </div>
                 </div>
-              </div>
-           </div>
-        </section>
+             </div>
+          </section>
+        )}
       </main>
 
       <footer className="py-20 border-t bg-background/50 flex flex-col items-center gap-8 text-center">
         <div className="relative w-[180px] h-[60px] opacity-30 grayscale">
-          <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain dark:hidden" />
+          <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="dark:hidden object-contain" />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain hidden dark:block" />
         </div>
         <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.3em]">© 2026 PROOVA TECHNOLOGY - ESTRATÉGIA EM REPUTAÇÃO</p>
