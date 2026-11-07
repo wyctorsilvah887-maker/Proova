@@ -47,6 +47,12 @@ import {
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export default function PricingPage() {
   const { user, loading: authLoading } = useUser();
@@ -299,19 +305,27 @@ export default function PricingPage() {
             <p className="text-muted-foreground text-sm font-medium">Esclareça suas dúvidas agora.</p>
           </div>
 
-          <div className="grid gap-4">
+          <Accordion type="single" collapsible className="w-full space-y-4">
             {[
               { q: "Preciso de conhecimento técnico para configurar a plataforma?", a: "Não. A configuração é intuitiva e guiada, pronta para usar em poucos minutos." },
               { q: "O que é o G-Boost?", a: "O G-Boost detecta elogios nota 5 e convida o cliente a postar no Google Maps automaticamente." },
               { q: "Posso cancelar quando quiser?", a: "Sim. Você tem total controle sobre sua assinatura, sem fidelidade ou multas." },
               { q: "O pagamento é seguro?", a: "Sim. Processamos via Cakto, com criptografia de ponta e checkout 100% verificado." }
             ].map((item, idx) => (
-              <Card key={idx} className="border-none bg-muted/20 p-5 rounded-2xl">
-                <p className="text-xs font-black uppercase tracking-tight mb-1 text-primary">{item.q}</p>
-                <p className="text-xs text-muted-foreground font-medium leading-relaxed">{item.a}</p>
-              </Card>
+              <AccordionItem key={idx} value={`item-${idx}`} className="border-none bg-muted/20 px-6 rounded-2xl overflow-hidden transition-all duration-300">
+                <AccordionTrigger className="hover:no-underline py-5 text-left group">
+                  <span className="text-xs font-black uppercase tracking-tight text-primary leading-tight pr-4">
+                    {item.q}
+                  </span>
+                </AccordionTrigger>
+                <AccordionContent className="pb-6">
+                  <p className="text-xs text-muted-foreground font-medium leading-relaxed">
+                    {item.a}
+                  </p>
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </div>
+          </Accordion>
         </section>
 
         <section className="mt-24">
