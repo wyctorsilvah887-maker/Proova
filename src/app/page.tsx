@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useRef, forwardRef } from "react";
@@ -28,7 +29,8 @@ import {
   Target,
   Building2,
   Rocket,
-  Shield
+  Shield,
+  ChevronDown
 } from "lucide-react";
 import { 
   Sheet, 
@@ -39,6 +41,12 @@ import {
   SheetTitle, 
   SheetDescription 
 } from "@/components/ui/sheet";
+import { 
+  Collapsible, 
+  CollapsibleContent, 
+  CollapsibleTrigger 
+} from "@/components/ui/collapsible";
+import { Badge } from "@/components/ui/badge";
 import { useUser, useFirestore } from "@/firebase";
 import { doc, setDoc, increment } from "firebase/firestore";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -116,7 +124,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
                   {[
                     { id: 'valor-reputacao', label: 'Valor da Reputação', icon: TrendingUp },
                     { id: 'metodologia', label: 'Metodologia Proova', icon: ShieldCheck },
-                    { id: 'setores', label: 'Sectores de Atuação', icon: Target },
+                    { id: 'planos', label: 'Planos Estratégicos', icon: Gem },
                   ].map((item) => (
                     <SheetClose asChild key={item.id}>
                       <button 
@@ -506,6 +514,182 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
 VersatilitySection.displayName = "VersatilitySection";
 
 /**
+ * Seção de Planos e Estratégias (Pricing)
+ */
+const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
+  const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
+
+  const plans = [
+    {
+      id: 'base',
+      name: "Plano Base",
+      price: "Grátis",
+      period: "/sempre",
+      description: "Fundação de Reputação",
+      icon: Shield,
+      highlight: false,
+      benefits: [
+        "1 Mural de Depoimentos",
+        "5 Depoimentos Ativos no Link in Bio",
+        "Inbox Privado (Filtro de Feedbacks Críticos)",
+        "QR Code de Balcão",
+        "Link de Coleta Padrão"
+      ]
+    },
+    {
+      id: 'gold',
+      name: "Plano Gold",
+      price: "R$ 49,90",
+      period: "/mês",
+      description: "Aceleração de Vendas",
+      icon: Star,
+      highlight: true,
+      benefits: [
+        "Murais Ilimitados",
+        "50 Depoimentos Ativos",
+        "G-Boost (Ranqueamento no Google Maps)",
+        "Editor VIP Link in Bio",
+        "Auto-Publish (Publicação Automática de Depoimentos)",
+        "Relatórios de Performance Semanais",
+        "Suporte VIP"
+      ]
+    },
+    {
+      id: 'enterprise',
+      name: "Plano Enterprise",
+      price: "R$ 97",
+      period: "/mês",
+      description: "Domínio de Mercado",
+      icon: Zap,
+      highlight: false,
+      benefits: [
+        "Tudo do Gold + Recursos Exclusivos",
+        "Vídeo Reviews 4K de Alto Impacto",
+        "Depoimentos Ativos Ilimitados",
+        "Suporte VIP Dedicado no App",
+        "Design de Página Ultra Customizado",
+        "Análise Preditiva de Conversão"
+      ]
+    }
+  ];
+
+  return (
+    <section id="planos" ref={ref} className="w-full py-24 md:py-32 bg-background overflow-hidden min-h-[500px] border-t">
+      <div className="container px-4 mx-auto max-w-4xl">
+        <div className={cn(
+          "text-center space-y-4 mb-16 transition-all duration-1000",
+          isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-0"
+        )}>
+          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Níveis de Estratégia</h2>
+          <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
+            Escolha o seu Nível de <span className="text-primary italic">Autoridade</span>.
+          </h3>
+          <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Invista na reputação que acelera suas vendas.</p>
+        </div>
+
+        <div className="space-y-4">
+          {plans.map((plan) => {
+            const isExpanded = expandedPlan === plan.id;
+            return (
+              <Collapsible
+                key={plan.id}
+                open={isExpanded}
+                onOpenChange={() => setExpandedPlan(isExpanded ? null : plan.id)}
+                className="w-full"
+              >
+                <Card 
+                  className={cn(
+                    "relative overflow-hidden border-none shadow-xl transition-all duration-300 rounded-3xl",
+                    plan.highlight ? "bg-primary text-white" : "bg-card text-card-foreground hover:bg-muted/30 border"
+                  )}
+                >
+                  <CollapsibleTrigger asChild>
+                    <div className="p-6 cursor-pointer select-none">
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+                        <div className="flex items-center gap-5 flex-1 w-full sm:w-auto">
+                          <div className={cn(
+                            "p-3 rounded-2xl shrink-0 transition-transform duration-500",
+                            plan.highlight ? "bg-white/10" : "bg-primary/10"
+                          )}>
+                            <plan.icon className={cn("w-6 h-6", plan.highlight ? "text-white" : "text-primary")} />
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-xl font-black uppercase tracking-tight">{plan.name}</h3>
+                              {plan.highlight && (
+                                <Badge className="bg-white text-primary text-[8px] font-black uppercase h-4 px-1.5 border-none">POPULAR</Badge>
+                              )}
+                            </div>
+                            <p className={cn("text-[10px] font-bold uppercase tracking-widest opacity-70", plan.highlight ? "text-white" : "text-primary")}>
+                              {plan.description}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between sm:justify-end gap-8 w-full sm:w-auto">
+                          <div className="text-right">
+                            <p className="text-xl font-black leading-none">{plan.price}</p>
+                            <p className="text-[10px] font-bold uppercase opacity-60">{plan.period}</p>
+                          </div>
+                          <div className={cn(
+                            "p-2 rounded-full transition-transform duration-300",
+                            isExpanded && "rotate-180",
+                            plan.highlight ? "bg-white/10" : "bg-muted"
+                          )}>
+                            <ChevronDown className="w-4 h-4" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </CollapsibleTrigger>
+
+                  <CollapsibleContent className="animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className={cn(
+                      "px-6 pb-6 pt-2 space-y-6",
+                      plan.highlight ? "border-t border-white/10" : "border-t border-border"
+                    )}>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
+                        {plan.benefits.map((benefit, idx) => (
+                          <div key={idx} className="flex items-start gap-3">
+                            <div className={cn(
+                              "mt-1 p-0.5 rounded-full shrink-0",
+                              plan.highlight ? "bg-white/20" : "bg-primary/10"
+                            )}>
+                              <Check className="w-3 h-3" />
+                            </div>
+                            <span className="text-xs font-bold leading-relaxed">{benefit}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="pt-4">
+                        <Link href="/signup" className="w-full">
+                          <Button 
+                            className={cn(
+                              "w-full h-14 rounded-2xl text-xs font-black uppercase tracking-widest shadow-2xl transition-all active:scale-95 gap-2",
+                              plan.highlight 
+                                ? "bg-white text-primary hover:bg-zinc-100" 
+                                : "bg-primary text-white hover:bg-primary/90"
+                            )}
+                          >
+                            Garantir Acesso <ArrowRight className="w-4 h-4" />
+                          </Button>
+                        </Link>
+                      </div>
+                    </div>
+                  </CollapsibleContent>
+                </Card>
+              </Collapsible>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+});
+PricingSection.displayName = "PricingSection";
+
+/**
  * Seção de Chamada Final (CTA)
  */
 const CTASection = () => {
@@ -583,12 +767,14 @@ export default function Home() {
   const [isAgitationVisible, setIsAgitationVisible] = useState(false);
   const [isPillarsVisible, setIsPillarsVisible] = useState(false);
   const [isVersatilityVisible, setIsVersatilityVisible] = useState(false);
+  const [isPricingVisible, setIsPricingVisible] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const agitationRef = useRef<HTMLElement>(null);
   const pillarsRef = useRef<HTMLElement>(null);
   const versatilityRef = useRef<HTMLElement>(null);
+  const pricingRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -611,6 +797,7 @@ export default function Home() {
           if (id === 'valor-reputacao') setIsAgitationVisible(true);
           if (id === 'metodologia') setIsPillarsVisible(true);
           if (id === 'setores') setIsVersatilityVisible(true);
+          if (id === 'planos') setIsPricingVisible(true);
         }
       });
     }, observerOptions);
@@ -618,11 +805,13 @@ export default function Home() {
     if (agitationRef.current) observer.observe(agitationRef.current);
     if (pillarsRef.current) observer.observe(pillarsRef.current);
     if (versatilityRef.current) observer.observe(versatilityRef.current);
+    if (pricingRef.current) observer.observe(pricingRef.current);
 
     const fallbackTimer = setTimeout(() => {
       setIsAgitationVisible(true);
       setIsPillarsVisible(true);
       setIsVersatilityVisible(true);
+      setIsPricingVisible(true);
     }, 2500);
 
     return () => {
@@ -701,6 +890,11 @@ export default function Home() {
         <VersatilitySection 
           ref={versatilityRef} 
           isVisible={isVersatilityVisible} 
+        />
+
+        <PricingSection 
+          ref={pricingRef}
+          isVisible={isPricingVisible}
         />
         
         <CTASection />
