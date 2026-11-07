@@ -512,7 +512,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-12 px-1 md:px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
                 <div className="flex flex-col items-end">
-                  <span className="text-[10px] md:text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] transition-colors group-hover:text-primary leading-tight">
+                  <span className="text-[10px] md:text-xs font-bold truncate max-w-[80px] sm:max-w-[150px] transition-colors group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Empresa'}
                   </span>
                   <div className="flex flex-col items-end gap-0">
@@ -533,15 +533,15 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
               <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
+              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold py-2.5 cursor-pointer">
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dashboard</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
+              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl font-bold py-2.5 cursor-pointer">
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Murais</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
+              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl font-bold py-2.5 cursor-pointer">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Planos de Upgrade</span>
               </DropdownMenuItem>
@@ -579,16 +579,19 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
         <div className="flex-1 overflow-y-auto bg-muted/30 p-4 sm:p-8 relative">
           <div className="max-w-4xl mx-auto space-y-8 pb-20">
             <div className="flex flex-col gap-4">
-              <Link href="/widgets" className="inline-block group">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="gap-2 px-0 text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 select-none"
+              <div className="flex items-center justify-between">
+                <button 
+                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                  className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 hover:text-primary transition-colors animate-pulse outline-none"
                 >
-                  <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-                  <span className="text-[10px] font-black uppercase tracking-widest">Voltar para a Lista</span>
-                </Button>
-              </Link>
+                  <Monitor className="w-4 h-4" /> 
+                  EDITAR
+                </button>
+                <div className="flex items-center gap-2 bg-background border px-3 py-1 rounded-full shadow-sm">
+                   <span className="text-[10px] font-bold opacity-50 uppercase">Widget ID:</span>
+                   <span className="text-[10px] font-mono font-black text-primary">{widgetId}</span>
+                </div>
+              </div>
               
               <div className="flex items-center justify-between">
                 <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><Eye className="w-4 h-4" /> Preview do Mural</h2>
