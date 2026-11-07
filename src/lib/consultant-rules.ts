@@ -39,6 +39,11 @@ export const CONSULTANT_TREE: Record<string, TreeBranch> = {
     title: 'Falar com Humano',
     keys: ['6', 'humano', 'suporte', 'atendimento', 'contato'],
     response: "**🎧 Suporte Especializado**\n\nSeu histórico está sendo analisado por um consultor estratégico. Em breve você receberá uma notificação aqui ou no seu e-mail de cadastro.\n\n**Tempo médio de resposta:** 2 horas em horário comercial.\n\n*Digite **0** para voltar ao menu principal.*"
+  },
+  '7': {
+    title: 'Encerrar Chat',
+    keys: ['7', 'encerrar', 'fechar', 'limpar', 'sair'],
+    response: "**⚠️ Solicitação de Encerramento**\n\nVocê escolheu encerrar o atendimento. Para sua segurança e para evitar a perda acidental do seu histórico, **confirme a ação no painel de segurança** que acaba de abrir no centro da sua tela.\n\n*Caso mude de ideia, basta clicar em cancelar no painel.*"
   }
 };
 
@@ -51,6 +56,7 @@ Escolha uma opção para dominar o mercado:
 4️⃣ **Social Cards** (Instagram)
 5️⃣ **Planos e Upgrade**
 6️⃣ **Falar com Humano**
+7️⃣ **Encerrar Chat** (use a qualquer momento para encerrar o chat)
 
 *Digite o **número** ou o **nome** da opção.*`;
 

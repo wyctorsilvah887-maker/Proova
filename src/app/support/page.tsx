@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -224,6 +223,11 @@ export default function SupportPage() {
         
         if (userMsg === '6' || userMsg.toLowerCase().includes('humano')) {
           await handleCreateSupportTicket();
+        }
+
+        // Gatilho para encerrar chat via comando de texto ou número
+        if (userMsg === '7' || userMsg.toLowerCase().includes('encerrar')) {
+          handleOpenConfirmModal();
         }
 
         setIsAiThinking(false);
