@@ -48,6 +48,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function PricingPage() {
   const { user, loading: authLoading } = useUser();
@@ -167,16 +168,18 @@ export default function PricingPage() {
           </div>
         </div>
         <div className="ml-auto flex items-center gap-4">
+          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0" />
+          
           {!authLoading && user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
+                <Button variant="ghost" className="h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
                   <div className="hidden sm:flex flex-col items-end">
                     <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
                       {userData?.companyName || 'Minha Empresa'}
                     </span>
                     <span className={cn(
-                      "text-[8px] uppercase tracking-widest font-black leading-tight",
+                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
                       status === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
                     )}>
                       {membershipLabel}
