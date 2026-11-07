@@ -828,10 +828,10 @@ export default function PPEditorPage() {
                <ArrowLeft className="w-4 h-4" /><span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Voltar</span>
             </Button>
           </Link>
-          <div className="flex items-center group">
+          <div className="flex items-center group -ml-2">
             <div className="relative w-[160px] h-[55px] md:w-[320px] md:h-[105px]">
-              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
-              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" priority />
+              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
+              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </div>
         </div>
@@ -839,17 +839,24 @@ export default function PPEditorPage() {
           <Button onClick={handleSave} disabled={isSaving || isUploading} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg bg-primary hover:bg-primary/90 text-white transition-all active:scale-95">{isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar</Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-10 md:h-12 px-2 gap-2 rounded-xl focus:ring-0 focus-visible:ring-0 outline-none data-[state=open]:bg-transparent shadow-none hover:bg-transparent">
+              <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl focus:ring-0 focus-visible:ring-0 outline-none data-[state=open]:bg-transparent shadow-none hover:bg-transparent">
                 <div className="flex flex-col items-end">
-                  <span className="text-xs font-bold truncate max-w-[120px]">{userData?.companyName}</span>
+                  <span className="text-[10px] md:text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] transition-colors group-hover:text-primary leading-tight">
+                    {userData?.companyName || 'Minha Empresa'}
+                  </span>
                   <div className="flex flex-col items-end gap-0">
-                    <span className={cn("text-[8px] uppercase tracking-widest font-black leading-tight", isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground")}>
+                    <span className={cn(
+                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
+                      isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground"
+                    )}>
                       {isEnterprise ? 'ENTERPRISE' : (isGoldPlan ? 'GOLD' : 'PLANO BASE')}
                     </span>
                     {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
                   </div>
                 </div>
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
+                <div className="h-7 w-7 md:h-8 md:w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
+                  <User className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary group-hover:text-white" />
+                </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl bg-background border">

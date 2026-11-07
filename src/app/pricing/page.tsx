@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -74,12 +74,12 @@ export default function PricingPage() {
   }, [userData]);
 
   const membershipLabel = useMemo(() => {
-    if (status === 'enterprise') return 'Membro Enterprise';
-    if (status === 'gold') return 'Membro Gold';
-    if (status === 'trial') return 'Período Trial';
-    if (status === 'expired') return 'Plano Expirado';
+    if (status === 'enterprise') return 'ENTERPRISE';
+    if (status === 'gold') return 'GOLD';
+    if (status === 'trial') return 'TRIAL';
+    if (status === 'expired') return 'EXPIRADO';
     if (status === 'guest') return 'Visitante';
-    return 'Plano Base';
+    return 'PLANO BASE';
   }, [status]);
 
   const checkoutLinks = useMemo(() => {
@@ -157,31 +157,33 @@ export default function PricingPage() {
 
   return (
     <div className="min-h-screen bg-background font-body text-foreground flex flex-col overflow-x-hidden">
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-4 md:px-8 fixed top-0 w-full z-[100] shadow-sm backdrop-blur-md bg-background/95">
+      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[100] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-4">
           <Link href={user ? "/dash" : "/"}>
             <Button 
               variant="ghost" 
               size="icon" 
-              className="rounded-full text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 select-none"
+              className="text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 select-none"
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
-          <div className="relative w-[180px] h-[60px] md:w-[280px] md:h-[90px] transition-transform hover:scale-105">
-            <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain dark:hidden" priority />
-            <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain hidden dark:block" priority />
+          <div className="flex items-center group -ml-2">
+            <div className="relative w-[160px] h-[52px] md:w-[240px] md:h-[78px] transition-transform group-hover:scale-105">
+              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
+              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+            </div>
           </div>
         </div>
-        <div className="ml-auto flex items-center gap-4">
-          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0" />
+        <div className="ml-auto flex items-center gap-2 md:gap-4">
+          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-0" />
           
           {!authLoading && user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
                   <div className="flex flex-col items-end">
-                    <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] md:max-w-[200px] transition-colors group-hover:text-primary leading-tight">
+                    <span className="text-[10px] md:text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] transition-colors group-hover:text-primary leading-tight">
                       {userData?.companyName || 'Minha Empresa'}
                     </span>
                     <div className="flex flex-col items-end gap-0">

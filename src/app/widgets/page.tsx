@@ -258,7 +258,7 @@ export default function WidgetsPage() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
                 <div className="flex flex-col items-end">
-                  <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] md:max-w-[200px] transition-colors group-hover:text-primary leading-tight">
+                  <span className="text-[10px] md:text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] transition-colors group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Minha Empresa'}
                   </span>
                   <div className="flex flex-col items-end gap-0">
