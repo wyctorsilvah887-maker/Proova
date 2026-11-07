@@ -71,6 +71,10 @@ export default {
           '0%': { transform: 'translateX(0%)' },
           '100%': { transform: 'translateX(-100%)' },
         },
+        'marquee-vertical': {
+          '0%': { transform: 'translateY(0%)' },
+          '100%': { transform: 'translateY(-50%)' },
+        },
         'shine': {
           '0%': { transform: 'translateX(-100%)' },
           '100%': { transform: 'translateX(100%)' },
@@ -99,6 +103,7 @@ export default {
         'accordion-up': 'accordion-up 0.2s ease-out',
         'ripple': 'ripple 2s cubic-bezier(0, 0, 0.2, 1) infinite',
         'marquee': 'marquee 12s linear infinite',
+        'marquee-vertical': 'marquee-vertical 30s linear infinite',
         'shine': 'shine 2s infinite linear',
         'text-shine': 'text-shine 3s linear infinite',
         'float': 'float 6s ease-in-out infinite',
