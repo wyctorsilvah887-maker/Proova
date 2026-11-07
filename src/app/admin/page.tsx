@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -12,7 +13,7 @@ import {
   TrendingUp, CreditCard, AlertCircle, Copy, Hash, Calendar,
   BarChart3, MousePointer2, ExternalLink, Gem, ArrowLeft,
   Settings, Handshake, Save, CheckCircle2, CircleDashed, Rocket,
-  MousePointer
+  MousePointer, Headphones
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -104,6 +105,13 @@ export default function AdminPage() {
   }, [db, user, isAdminVerified]);
 
   const { data: paymentEvents, loading: eventsLoading } = useCollection(paymentEventsQuery);
+
+  // Busca estatísticas de tickets de suporte pendentes
+  const ticketsQuery = useMemo(() => {
+    if (!db || !isAdminVerified) return null;
+    return collection(db, 'support_tickets');
+  }, [db, isAdminVerified]);
+  const { data: ticketsList } = useCollection(ticketsQuery);
 
   // Busca estatísticas globais da Landing Page
   const statsRef = useMemo(() => (db && isAdminVerified ? doc(db, 'platform_stats', 'landing_page') : null), [db, isAdminVerified]);
@@ -227,7 +235,6 @@ export default function AdminPage() {
         title: "Plano Atualizado",
         description: `O status do usuário foi alterado para ${newPlanStatus.toUpperCase()}.`
       });
-      // Update local state to reflect change without re-fetching everything
       setSelectedUser({ ...selectedUser, membershipStatus: newPlanStatus });
     } catch (err: any) {
       toast({
@@ -424,26 +431,6 @@ export default function AdminPage() {
                 <span>Planos de Upgrade</span>
               </DropdownMenuItem>
 
-              <DropdownMenuItem 
-                className="rounded-xl font-bold py-2.5 opacity-50 cursor-not-allowed"
-              >
-                <Handshake className="mr-2 h-4 w-4 text-primary" />
-                <span>Serviços de Parceiros</span>
-                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
-              </DropdownMenuItem>
-
-              <DropdownMenuItem 
-                onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-                className="rounded-xl cursor-pointer font-bold py-2.5"
-              >
-                {theme === 'light' ? (
-                  <Moon className="mr-2 h-4 w-4 text-primary" />
-                ) : (
-                  <Sun className="mr-2 h-4 w-4 text-primary" />
-                )}
-                <span>Alternar Tema</span>
-              </DropdownMenuItem>
-
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => signOut(auth)} className="text-destructive focus:text-destructive rounded-xl cursor-pointer font-bold py-2.5">
                 <LogOut className="mr-2 h-4 w-4" />
@@ -460,13 +447,22 @@ export default function AdminPage() {
             <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Gestão Global</h1>
             <p className="text-muted-foreground text-sm">Controle central de usuários e métricas da plataforma.</p>
           </div>
-          <Button 
-            variant="outline" 
-            className="gap-2 border-primary/20 text-primary hover:bg-primary/5 h-12 rounded-xl font-bold transition-all shadow-sm"
-            onClick={() => router.push('/admin/advanced')}
-          >
-            <Settings className="w-4 h-4" /> Administração Avançada
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button 
+              variant="outline" 
+              className="gap-2 border-primary/20 text-primary hover:bg-primary/5 h-12 rounded-xl font-bold transition-all shadow-sm"
+              onClick={() => router.push('/admin/support')}
+            >
+              <Headphones className="w-4 h-4" /> Fila de Suporte {ticketsList && ticketsList.length > 0 && <Badge className="ml-1 h-4 px-1 text-[8px]">{ticketsList.length}</Badge>}
+            </Button>
+            <Button 
+              variant="outline" 
+              className="gap-2 border-primary/20 text-primary hover:bg-primary/5 h-12 rounded-xl font-bold transition-all shadow-sm"
+              onClick={() => router.push('/admin/advanced')}
+            >
+              <Settings className="w-4 h-4" /> Avisos Globais
+            </Button>
+          </div>
         </header>
 
         <div className="grid gap-4 md:gap-6 grid-cols-2 md:grid-cols-4">
@@ -494,20 +490,20 @@ export default function AdminPage() {
 
           <Card className="border-none shadow-sm overflow-hidden bg-orange-500/5">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-              <CardTitle className="text-xs font-bold uppercase tracking-widest text-orange-600">LP Conversion</CardTitle>
-              <MousePointer className="w-4 h-4 text-orange-600" />
+              <CardTitle className="text-xs font-bold uppercase tracking-widest text-orange-600">Suporte</CardTitle>
+              <Ticket className="w-4 h-4 text-orange-600" />
             </CardHeader>
             <CardContent className="px-4 md:px-6">
-              <div className="text-2xl font-bold text-orange-600">{lpConversionRate}%</div>
+              <div className="text-2xl font-bold text-orange-600">{ticketsList?.length || 0}</div>
               <div className="flex items-center gap-1">
-                <span className="text-[9px] text-orange-600/60 font-bold uppercase">{visitorCount} visitas</span>
+                <span className="text-[9px] text-orange-600/60 font-bold uppercase">Tickets abertos</span>
               </div>
             </CardContent>
           </Card>
 
           <Card className="border-none shadow-sm overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-              <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Alertas</CardTitle>
+              <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Vendas</CardTitle>
               <CreditCard className="w-4 h-4 text-primary" />
             </CardHeader>
             <CardContent className="px-4 md:px-6">

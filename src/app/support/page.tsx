@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -15,14 +16,13 @@ import {
   Layout,
   Inbox,
   Gem,
-  Handshake,
   Sun,
   Moon,
-  Lock,
   Shield,
   Zap,
   Sparkles,
-  Headphones
+  Headphones,
+  Ticket
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,13 +54,13 @@ export default function SupportPage() {
   const [message, setMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [isAiThinking, setIsAiThinking] = useState(false);
+  const [isCreatingTicket, setIsCreatingTicket] = useState(false);
   const [localMessages, setLocalMessages] = useState<any[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
-  // Filtro de 24 horas para o query de mensagens no Firestore
   const messagesQuery = useMemo(() => {
     if (!db || !user) return null;
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -74,7 +74,6 @@ export default function SupportPage() {
 
   const { data: remoteMessages, loading: messagesLoading } = useCollection(messagesQuery);
 
-  // Helper para formatar texto (converte **texto** em span laranja negrito)
   const formatText = (text: string) => {
     if (!text) return "";
     const parts = text.split(/(\*\*.*?\*\*)/g);
@@ -90,7 +89,6 @@ export default function SupportPage() {
     });
   };
 
-  // Sistema de Cache Local e Retenção
   useEffect(() => {
     if (user) {
       const cacheKey = `proova_support_v1_${user.uid}`;
@@ -99,7 +97,6 @@ export default function SupportPage() {
         try {
           const parsed = JSON.parse(cached);
           const now = Date.now();
-          // Filtra mensagens expiradas (24h) no cache
           const validMessages = parsed.filter((m: any) => {
             const time = m.createdAt?.seconds ? m.createdAt.seconds * 1000 : (m.createdAt || Date.now());
             return (now - Number(time)) < (24 * 60 * 60 * 1000);
@@ -112,7 +109,6 @@ export default function SupportPage() {
     }
   }, [user]);
 
-  // Sincroniza Firestore -> Cache Local
   useEffect(() => {
     if (remoteMessages && user) {
       setLocalMessages(remoteMessages);
@@ -124,7 +120,6 @@ export default function SupportPage() {
     if (!authLoading && !user) router.replace('/login');
   }, [user, authLoading, router]);
 
-  // Scroll automático para a última mensagem
   useEffect(() => {
     if (scrollRef.current) {
       const scrollContainer = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
@@ -133,6 +128,45 @@ export default function SupportPage() {
       }
     }
   }, [localMessages, isAiThinking]);
+
+  const handleCreateSupportTicket = async () => {
+    if (!user || !db || !userData) return;
+    setIsCreatingTicket(true);
+    
+    try {
+      const ticketRef = await addDoc(collection(db, 'support_tickets'), {
+        userId: user.uid,
+        userName: userData.name || 'Usuário Proova',
+        membershipStatus: userData.membershipStatus || 'base',
+        createdAt: serverTimestamp(),
+        status: 'open'
+      });
+
+      const plan = (userData.membershipStatus || 'base').toLowerCase();
+      let planMessage = "";
+
+      if (plan === 'enterprise') {
+        planMessage = "Você está na **fila prioritária**.";
+      } else if (plan === 'gold') {
+        planMessage = "Você está na **fila de espera** para o suporte.";
+      } else {
+        planMessage = "Aguarde até **2 horas** em horário comercial para obter sua resposta.";
+      }
+
+      const finalBotMsg = `Seu ticket foi criado com sucesso! 🎟️\nProtocolo: **${ticketRef.id}**\n\n${planMessage}`;
+
+      await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
+        text: finalBotMsg,
+        sender: 'support',
+        createdAt: serverTimestamp()
+      });
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsCreatingTicket(false);
+    }
+  };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -143,14 +177,12 @@ export default function SupportPage() {
     setMessage('');
 
     try {
-      // 1. Salva mensagem do usuário
       await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
         text: userMsg,
         sender: 'user',
         createdAt: serverTimestamp()
       });
 
-      // 2. Processa resposta na Árvore de Decisão
       setIsAiThinking(true);
       
       setTimeout(async () => {
@@ -162,12 +194,17 @@ export default function SupportPage() {
           createdAt: serverTimestamp()
         });
         
+        // Se o usuário selecionou falar com humano (opção 6)
+        if (userMsg === '6' || userMsg.toLowerCase().includes('humano')) {
+          await handleCreateSupportTicket();
+        }
+
         setIsAiThinking(false);
         setIsSending(false);
       }, 1000);
 
     } catch (err) {
-      console.error("Erro no suporte local:", err);
+      console.error(err);
       setIsSending(false);
       setIsAiThinking(false);
     }
@@ -211,7 +248,7 @@ export default function SupportPage() {
           <ThemeToggle className="hidden sm:flex" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-10 md:h-12 px-1 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
+              <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
                 <div className="hidden sm:flex flex-col items-end">
                   <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Empresa'}
@@ -274,10 +311,6 @@ export default function SupportPage() {
                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Árvore de Decisão Ativa</span>
                 </div>
               </div>
-            </div>
-            <div className="hidden sm:flex flex-col items-end opacity-40">
-              <span className="text-[9px] font-black uppercase tracking-widest">Retenção de Dados</span>
-              <span className="text-[10px] font-mono font-bold">Reseta em 24h</span>
             </div>
           </div>
 
@@ -357,30 +390,32 @@ export default function SupportPage() {
           </ScrollArea>
 
           <div className="p-3 md:p-6 border-t bg-background shrink-0">
-             <form onSubmit={handleSendMessage} className="flex items-center gap-2 md:gap-3">
-               <div className="relative flex-1 group">
-                 <Input 
-                   value={message}
-                   onChange={(e) => setMessage(e.target.value)}
-                   placeholder="Digite o número da opção (ex: 1)..."
-                   className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 pr-10 text-xs md:text-sm font-medium transition-all"
-                   disabled={isSending || isAiThinking}
-                 />
-                 <div className="absolute right-3 top-1/2 -translate-y-1/2 hidden md:block">
-                   <div className="text-[8px] font-black uppercase tracking-widest text-muted-foreground opacity-30 group-focus-within:opacity-60 transition-opacity">
-                     Enviar
-                   </div>
-                 </div>
+             {isCreatingTicket ? (
+               <div className="h-12 md:h-14 w-full flex items-center justify-center gap-3 bg-primary/5 rounded-xl md:rounded-2xl border-2 border-primary/20 animate-pulse">
+                 <Loader2 className="w-5 h-5 text-primary animate-spin" />
+                 <span className="text-xs md:text-sm font-black uppercase tracking-widest text-primary">Estou criando seu ticket de suporte...</span>
                </div>
-               <Button 
-                type="submit" 
-                size="icon" 
-                className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl shadow-xl transition-all active:scale-90 bg-primary hover:bg-primary/90 shrink-0"
-                disabled={!message.trim() || isSending || isAiThinking}
-               >
-                 {isSending || isAiThinking ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-               </Button>
-             </form>
+             ) : (
+               <form onSubmit={handleSendMessage} className="flex items-center gap-2 md:gap-3">
+                 <div className="relative flex-1 group">
+                   <Input 
+                     value={message}
+                     onChange={(e) => setMessage(e.target.value)}
+                     placeholder="Digite o número da opção (ex: 1)..."
+                     className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 pr-10 text-xs md:text-sm font-medium transition-all"
+                     disabled={isSending || isAiThinking}
+                   />
+                 </div>
+                 <Button 
+                  type="submit" 
+                  size="icon" 
+                  className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl shadow-xl transition-all active:scale-90 bg-primary hover:bg-primary/90 shrink-0"
+                  disabled={!message.trim() || isSending || isAiThinking}
+                 >
+                   {isSending || isAiThinking ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                 </Button>
+               </form>
+             )}
              <p className="text-[8px] md:text-[9px] text-center mt-3 uppercase tracking-[0.2em] font-black text-muted-foreground opacity-40">
                Histórico local de 24h. Use o menu numerado para navegar.
              </p>
