@@ -67,6 +67,12 @@ export default function PricingPage() {
     return userData?.membershipStatus || 'base';
   }, [user, userData]);
 
+  const isMapsLinkValid = useMemo(() => {
+    if (!userData?.googleMapsUrl) return false;
+    const url = userData.googleMapsUrl.toLowerCase();
+    return url.includes('review') || url.includes('writereview') || url.includes('placeid');
+  }, [userData]);
+
   const membershipLabel = useMemo(() => {
     if (status === 'enterprise') return 'Membro Enterprise';
     if (status === 'gold') return 'Membro Gold';
@@ -178,12 +184,15 @@ export default function PricingPage() {
                     <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
                       {userData?.companyName || 'Minha Empresa'}
                     </span>
-                    <span className={cn(
-                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
-                      status === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
-                    )}>
-                      {membershipLabel}
-                    </span>
+                    <div className="flex flex-col items-end gap-0">
+                      <span className={cn(
+                        "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
+                        status === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
+                      )}>
+                        {membershipLabel}
+                      </span>
+                      {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
+                    </div>
                   </div>
                   <div className="h-7 w-7 md:h-8 md:w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
                     <User className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary group-hover:text-white" />
