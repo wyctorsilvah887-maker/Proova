@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
-import Script from "next/script";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { 
   Star, 
@@ -432,6 +431,25 @@ PillarsSection.displayName = "PillarsSection";
  * Seção de Versatilidade (Setores Atendidos)
  */
 const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
+  useEffect(() => {
+    // Injeção manual do script para maior controle do carregamento no contêiner
+    const script = document.createElement('script');
+    script.src = "https://6000-firebase-studio-1777301707689.cluster-mdgxqvvkkbfpqrfigfiuugu5pk.cloudworkstations.dev/widget.js?id=primeiromuralproova&user=EE6Mqdqq4Pc4maNgFy7rNq52ms13";
+    script.async = true;
+    script.defer = true;
+    
+    const container = document.getElementById('primeiromuralproova');
+    if (container) {
+      container.appendChild(script);
+    }
+
+    return () => {
+      if (container && script.parentNode === container) {
+        container.removeChild(script);
+      }
+    };
+  }, []);
+
   return (
     <section id="setores" ref={ref} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
       <div className="container px-4 mx-auto">
@@ -476,13 +494,13 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
               <div className="w-full flex items-center justify-center min-h-[450px]">
                 {/* 
                   Mural Oficial Proova embutido via script de linha única 
-                  Utilizando strategy 'afterInteractive' para maior resiliência no carregamento.
+                  O contêiner possui o ID correspondente ao widget para injeção automática do script.
                 */}
-                <div id="proova-mural-landing" className="w-full">
-                  <Script 
-                    src="https://6000-firebase-studio-1777301707689.cluster-mdgxqvvkkbfpqrfigfiuugu5pk.cloudworkstations.dev/widget.js?id=primeiromuralproova&user=EE6Mqdqq4Pc4maNgFy7rNq52ms13" 
-                    strategy="afterInteractive" 
-                  />
+                <div id="primeiromuralproova" className="w-full">
+                  <div className="flex flex-col items-center justify-center py-12 text-muted-foreground animate-pulse">
+                    <Loader2 className="w-8 h-8 animate-spin mb-4" />
+                    <p className="text-[10px] font-black uppercase tracking-widest">Carregando Prova Social...</p>
+                  </div>
                 </div>
               </div>
             </Card>
