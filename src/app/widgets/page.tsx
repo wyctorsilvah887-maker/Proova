@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -25,7 +26,8 @@ import {
   Gem,
   Handshake,
   Lock,
-  AlertTriangle
+  AlertTriangle,
+  Headphones
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -119,16 +121,6 @@ export default function WidgetsPage() {
       w.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [widgetsList, searchTerm]);
-
-  const setupProgress = useMemo(() => {
-    if (!userData) return { isCollectDone: false, isSetupComplete: false };
-    const isLocationDone = !!userData.city && !!userData.state;
-    const isGoogleDone = !!userData.googleMapsUrl;
-    const isCollectDone = (userData.testimonialsCount || 0) > 0;
-    const isWidgetDone = !!(widgetsList && widgetsList.length > 0);
-    const isSetupComplete = isLocationDone && isGoogleDone && isCollectDone && isWidgetDone;
-    return { isCollectDone, isSetupComplete };
-  }, [userData, widgetsList]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -271,56 +263,38 @@ export default function WidgetsPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
-              <DropdownMenuLabel className="px-3 py-2">
-                <p className="text-xs font-headline font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</p>
-              </DropdownMenuLabel>
+              <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
               </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setupProgress.isCollectDone && router.push('/widgets')} 
-                className={cn(
-                  "rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary",
-                  !setupProgress.isCollectDone && "opacity-50 grayscale cursor-not-allowed"
-                )}
-              >
+              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Murais</span>
-                {!setupProgress.isCollectDone && <Lock className="ml-auto w-3 h-3 opacity-60" />}
               </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setupProgress.isSetupComplete && router.push('/private')} 
-                className={cn(
-                  "rounded-xl cursor-pointer font-bold py-2.5",
-                  !setupProgress.isSetupComplete && "opacity-50 grayscale cursor-not-allowed"
-                )}
-              >
+              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>
-                {!setupProgress.isSetupComplete && <Lock className="ml-auto w-3 h-3 opacity-60" />}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/support')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Headphones className="mr-2 h-4 w-4 text-primary" />
+                <span>Suporte Proova</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Upgrade</span>
               </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => router.push('/pricing')} 
-                className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
-              >
+              <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Handshake className="mr-2 h-4 w-4 text-primary" />
-                <span>Serviços de Parceiros</span>
-                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
+                <span>Parceiros</span>
               </DropdownMenuItem>
-              
               {userData?.isAdmin && (
                 <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
                   <Shield className="mr-2 h-4 w-4 text-primary" />
                   <span>Administração</span>
                 </DropdownMenuItem>
               )}
-
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
@@ -488,3 +462,4 @@ export default function WidgetsPage() {
     </div>
   );
 }
+

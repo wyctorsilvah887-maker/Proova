@@ -28,7 +28,8 @@ import {
   Globe,
   MessageCircle,
   Zap,
-  TrendingDown
+  TrendingDown,
+  Headphones
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -59,7 +60,7 @@ import {
   Cell
 } from 'recharts';
 import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebase';
-import { doc, collection, query } from 'firebase/firestore';
+import { doc, collection, query, where } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
@@ -275,9 +276,17 @@ export default function MetricsPage() {
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/support')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Headphones className="mr-2 h-4 w-4 text-primary" />
+                <span>Suporte Proova</span>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
-                <span>Planos de Upgrade</span>
+                <span>Upgrade</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Handshake className="mr-2 h-4 w-4 text-primary" />
+                <span>Parceiros</span>
               </DropdownMenuItem>
               
               {userData?.isAdmin && (
@@ -573,3 +582,4 @@ export default function MetricsPage() {
     </div>
   );
 }
+

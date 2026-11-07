@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -25,7 +26,8 @@ import {
   Search,
   ChevronRight,
   Plus,
-  X
+  X,
+  Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -164,10 +166,34 @@ export default function SupportPage() {
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Layout className="mr-2 h-4 w-4 text-primary" />
+                <span>Meus Murais</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Inbox className="mr-2 h-4 w-4 text-primary" />
+                <span>Inbox Privado</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/support')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
+                <Headphones className="mr-2 h-4 w-4 text-primary" />
+                <span>Suporte Proova</span>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Upgrade</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Handshake className="mr-2 h-4 w-4 text-primary" />
+                <span>Parceiros</span>
+              </DropdownMenuItem>
+              {userData?.isAdmin && (
+                <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                  <Shield className="mr-2 h-4 w-4 text-primary" />
+                  <span>Administração</span>
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuSeparator className="mx-1" />
+              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
             </DropdownMenuContent>
@@ -290,7 +316,7 @@ export default function SupportPage() {
                 className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl shadow-xl transition-all active:scale-90 bg-primary hover:bg-primary/90 shrink-0"
                 disabled={!message.trim() || isSending}
                >
-                 {isSending ? <Loader2 className="animate-spin w-5 h-5" /> : <Send className="w-5 h-5" />}
+                 {isSending ? <Loader2 className="w-5 h-5" /> : <Send className="w-5 h-5" />}
                </Button>
              </form>
              <p className="text-[8px] md:text-[9px] text-center mt-3 uppercase tracking-[0.2em] font-black text-muted-foreground opacity-40">
@@ -306,3 +332,4 @@ export default function SupportPage() {
     </div>
   );
 }
+

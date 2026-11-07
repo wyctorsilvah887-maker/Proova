@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -22,7 +23,8 @@ import {
   Moon,
   Lock,
   Shield,
-  BadgeCheck
+  BadgeCheck,
+  Headphones
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -174,10 +176,28 @@ export default function SocialCardsPage() {
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Murais</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Inbox className="mr-2 h-4 w-4 text-primary" />
+                <span>Inbox Privado</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/support')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Headphones className="mr-2 h-4 w-4 text-primary" />
+                <span>Suporte Proova</span>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Upgrade</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Handshake className="mr-2 h-4 w-4 text-primary" />
+                <span>Parceiros</span>
+              </DropdownMenuItem>
+              {userData?.isAdmin && (
+                <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                  <Shield className="mr-2 h-4 w-4 text-primary" />
+                  <span>Administração</span>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 {theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}
@@ -276,3 +296,4 @@ export default function SocialCardsPage() {
     </div>
   );
 }
+

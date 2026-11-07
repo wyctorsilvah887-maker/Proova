@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
@@ -26,7 +27,8 @@ import {
   Sparkles,
   ChevronDown,
   Handshake,
-  BadgeCheck
+  BadgeCheck,
+  Headphones
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useUser, useAuth, useFirestore, useDoc } from '@/firebase';
@@ -241,9 +243,7 @@ export default function PricingPage() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl bg-background border">
-                  <DropdownMenuLabel className="px-3 py-2">
-                    <p className="text-xs font-headline font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</p>
-                  </DropdownMenuLabel>
+                  <DropdownMenuLabel className="px-3 py-2 text-xs font-headline font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
                   <DropdownMenuSeparator className="mx-1" />
                   
                   <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold py-2.5 cursor-pointer">
@@ -261,13 +261,14 @@ export default function PricingPage() {
                     <span>Inbox Privado</span>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem 
-                    onClick={() => router.push('/pricing')} 
-                    className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
-                  >
+                  <DropdownMenuItem onClick={() => router.push('/support')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                    <Headphones className="mr-2 h-4 w-4 text-primary" />
+                    <span>Suporte Proova</span>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
                     <Handshake className="mr-2 h-4 w-4 text-primary" />
-                    <span>Serviços de Parceiros</span>
-                    <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
+                    <span>Parceiros</span>
                   </DropdownMenuItem>
 
                   {effectiveUserData?.isAdmin && (
@@ -480,3 +481,4 @@ export default function PricingPage() {
     </div>
   );
 }
+

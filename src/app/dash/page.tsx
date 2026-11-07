@@ -648,13 +648,13 @@ export default function DashPage() {
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
               </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => isCollectDone && router.push('/widgets')} 
-                className={cn("rounded-xl cursor-pointer font-bold py-2.5", !isCollectDone && "opacity-50 grayscale cursor-not-allowed")}
-              >
+              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Murais</span>
-                {!isCollectDone && <Lock className="ml-auto w-3 h-3 opacity-60" />}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Inbox className="mr-2 h-4 w-4 text-primary" />
+                <span>Inbox Privado</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/support')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Headphones className="mr-2 h-4 w-4 text-primary" />
@@ -663,6 +663,10 @@ export default function DashPage() {
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Upgrade</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Handshake className="mr-2 h-4 w-4 text-primary" />
+                <span>Parceiros</span>
               </DropdownMenuItem>
               {userData?.isAdmin && (
                 <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
@@ -1379,3 +1383,4 @@ export default function DashPage() {
     </div>
   );
 }
+

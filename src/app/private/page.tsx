@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState } from 'react';
@@ -26,7 +27,8 @@ import {
   MessageSquare,
   Handshake,
   Lock,
-  Globe
+  Globe,
+  Headphones
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -275,48 +277,32 @@ export default function PrivateInboxPage() {
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
               </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setupProgress.isCollectDone && router.push('/widgets')} 
-                className={cn(
-                  "rounded-xl cursor-pointer font-bold py-2.5",
-                  !setupProgress.isCollectDone && "opacity-50 grayscale cursor-not-allowed"
-                )}
-              >
+              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Murais</span>
-                {!setupProgress.isCollectDone && <Lock className="ml-auto w-3 h-3 opacity-60" />}
               </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => setupProgress.isSetupComplete && router.push('/private')} 
-                className={cn(
-                  "rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary",
-                  !setupProgress.isSetupComplete && "opacity-50 grayscale cursor-not-allowed"
-                )}
-              >
+              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>
-                {!setupProgress.isSetupComplete && <Lock className="ml-auto w-3 h-3 opacity-60" />}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/support')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Headphones className="mr-2 h-4 w-4 text-primary" />
+                <span>Suporte Proova</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Upgrade</span>
               </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => router.push('/pricing')} 
-                className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
-              >
+              <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Handshake className="mr-2 h-4 w-4 text-primary" />
-                <span>Serviços de Parceiros</span>
-                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
+                <span>Parceiros</span>
               </DropdownMenuItem>
-              
               {userData?.isAdmin && (
                 <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
                   <Shield className="mr-2 h-4 w-4 text-primary" />
                   <span>Administração</span>
                 </DropdownMenuItem>
               )}
-
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
@@ -477,3 +463,4 @@ export default function PrivateInboxPage() {
     </div>
   );
 }
+
