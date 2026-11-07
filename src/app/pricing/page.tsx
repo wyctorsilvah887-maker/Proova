@@ -120,7 +120,8 @@ export default function PricingPage() {
           "G-Boost (Ranqueamento no Google Maps)",
           "Editor VIP Link in Bio",
           "Auto-Publish (Publicação Automática de Depoimentos)",
-          "Relatórios de Performance Semanais"
+          "Relatórios de Performance Semanais",
+          "Suporte VIP"
         ]
       },
       {
