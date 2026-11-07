@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useRef, forwardRef } from "react";
@@ -6,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
+import Script from "next/script";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { 
   Star, 
@@ -215,7 +217,7 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
             isVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
           )}>
             Implemente uma Engenharia de <br className="hidden sm:block" />
-            <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
+            <span className="inline-block relative px-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-orange-400 italic">
               CONFIANÇA
             </span> imediata.
           </h1>
@@ -258,9 +260,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
         )}>
           <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">A Ciência da Reputação Digital</h2>
           <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
-            Seja a <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
-              Referência
-            </span> absoluta do seu mercado.
+            Seja a <span className="text-primary italic">Referência</span> absoluta do seu mercado.
           </h3>
           <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">A ausência de prova social gera incerteza. A incerteza interrompe a venda.</p>
         </div>
@@ -369,9 +369,7 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
           <h3 className={cn(
             "text-3xl md:text-5xl font-black font-headline tracking-tighter"
           )}>
-            O Padrão Ouro em <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
-              Reputação
-            </span>.
+            O Padrão Ouro em <span className="text-primary italic">Reputação</span>.
           </h3>
           <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Uma infraestrutura completa para gerir, proteger e exibir a força da sua marca.</p>
         </div>
@@ -428,41 +426,20 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 PillarsSection.displayName = "PillarsSection";
 
 /**
- * Seção de Versatilidade (Setores Atendidos)
+ * Seção de Versatilidade (Mural embutido)
  */
 const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
-  useEffect(() => {
-    // Injeção manual do script para maior controle do carregamento no contêiner
-    const script = document.createElement('script');
-    script.src = "https://6000-firebase-studio-1777301707689.cluster-mdgxqvvkkbfpqrfigfiuugu5pk.cloudworkstations.dev/widget.js?id=primeiromuralproova&user=EE6Mqdqq4Pc4maNgFy7rNq52ms13";
-    script.async = true;
-    script.defer = true;
-    
-    const container = document.getElementById('primeiromuralproova');
-    if (container) {
-      container.appendChild(script);
-    }
-
-    return () => {
-      if (container && script.parentNode === container) {
-        container.removeChild(script);
-      }
-    };
-  }, []);
-
   return (
     <section id="setores" ref={ref} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
       <div className="container px-4 mx-auto">
         <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-center">
           <div className={cn(
             "space-y-8 transition-all duration-1000",
-            isVisible ? "animate-in fade-in slide-in-from-left-10 opacity-100" : "opacity-0"
+            isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10"
           )}>
             <div className="space-y-4">
               <h2 className="text-3xl md:text-5xl font-black font-headline leading-tight tracking-tight">
-                Consolide sua marca como a <span className="inline-block relative px-2 bg-gradient-to-r from-primary via-white via-primary to-primary bg-[length:200%_auto] bg-clip-text text-transparent animate-text-shine italic">
-                  Única Opção
-                </span> viável.
+                Consolide sua marca como a <span className="text-primary italic">Única Opção</span> viável.
               </h2>
               <p className="text-sm md:text-lg text-muted-foreground font-medium italic">
                 "No mercado moderno, a confiança não é um detalhe — é a moeda que dita o seu volume de vendas."
@@ -487,14 +464,14 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
 
           <div className={cn(
             "relative transition-all duration-1000 delay-500",
-            isVisible ? "animate-in fade-in slide-in-from-right-10 opacity-100" : "opacity-0"
+            isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
           )}>
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
             <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card p-4 sm:p-8 ring-1 ring-primary/10">
               <div className="w-full flex items-center justify-center min-h-[450px]">
                 {/* 
-                  Mural Oficial Proova embutido via script de linha única 
-                  O contêiner possui o ID correspondente ao widget para injeção automática do script.
+                  Mural Oficial Proova: 
+                  O contêiner possui o ID correspondente ao widget para injeção automática do script de linha única.
                 */}
                 <div id="primeiromuralproova" className="w-full">
                   <div className="flex flex-col items-center justify-center py-12 text-muted-foreground animate-pulse">
@@ -577,7 +554,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
       <div className="container px-4 mx-auto max-w-4xl">
         <div className={cn(
           "text-center space-y-4 mb-16 transition-all duration-1000",
-          isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-0"
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         )}>
           <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Níveis de Estratégia</h2>
           <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
@@ -703,14 +680,14 @@ const CTASection = () => {
       <div className="container relative z-10 px-4 mx-auto">
         <div className="max-w-3xl mx-auto text-center space-y-10">
           <div className="space-y-4">
-            <h2 className="text-4xl md:text-7xl font-black font-headline tracking-tighter leading-[1] animate-in fade-in slide-in-from-bottom-10 duration-1000">
+            <h2 className="text-4xl md:text-7xl font-black font-headline tracking-tighter leading-[1]">
               Pronto para elevar o <span className="text-primary italic">Patamar</span> da sua marca?
             </h2>
-            <p className="max-w-lg mx-auto text-base md:text-2xl font-medium text-white/80 animate-in fade-in duration-1000 delay-300">
+            <p className="max-w-lg mx-auto text-base md:text-2xl font-medium text-white/80">
               Assuma a liderança do seu setor através da prova social estratégica.
             </p>
           </div>
-          <div className="flex flex-col items-center gap-5 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-500">
+          <div className="flex flex-col items-center gap-5">
             <Link href="/pricing" className="w-full sm:w-auto">
               <Button size="lg" variant="secondary" className="w-full sm:w-auto h-16 md:h-20 px-12 rounded-2xl text-sm md:text-xl font-black shadow-2xl hover:scale-105 transition-all bg-white text-black hover:bg-white/90">
                 GARANTIR MEU ACESSO ESTRATÉGICO
@@ -866,6 +843,12 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
+      {/* Script Oficial Proova (Linha Única) */}
+      <Script 
+        src="https://6000-firebase-studio-1777301707689.cluster-mdgxqvvkkbfpqrfigfiuugu5pk.cloudworkstations.dev/widget.js?id=primeiromuralproova&user=EE6Mqdqq4Pc4maNgFy7rNq52ms13" 
+        strategy="afterInteractive"
+      />
+
       <Navigation 
         isScrolled={isScrolled} 
         isMenuOpen={isMenuOpen} 
