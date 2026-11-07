@@ -367,7 +367,7 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
           <h3 className={cn(
             "text-3xl md:text-5xl font-black font-headline tracking-tighter"
           )}>
-            O Padrão Ouro em <span className="text-primary italic">Reputação</span>.
+            O Padrão Ouro em <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto]">Reputação</span>.
           </h3>
           <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Uma infraestrutura completa para gerir, proteger e exibir a força da sua marca.</p>
         </div>
@@ -437,7 +437,7 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
           )}>
             <div className="space-y-4">
               <h2 className="text-3xl md:text-5xl font-black font-headline leading-tight tracking-tight">
-                Consolide sua marca como a <span className="text-primary italic">Única Opção</span> viável.
+                Consolide sua marca como a <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto]">Única Opção</span> viável.
               </h2>
               <p className="text-sm md:text-lg text-muted-foreground font-medium italic">
                 "No mercado moderno, a confiança não é um detalhe — é a moeda que dita o seu volume de vendas."
