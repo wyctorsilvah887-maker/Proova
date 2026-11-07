@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect, use } from 'react';
@@ -97,33 +98,33 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
 
   const TestimonialCard = ({ t, index = 0 }: { t: any, index?: number }) => {
     const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
-    const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
+    const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent' && secondaryColor !== '';
     
     return (
       <Card 
         key={t.id}
         className={cn(
-          "rounded-2xl p-4 border-none transition-all duration-700 w-full max-w-full bg-white dark:bg-black text-black dark:text-white",
+          "rounded-2xl p-4 transition-all duration-700 w-full max-w-full bg-white dark:bg-black text-black dark:text-white",
           layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-4 duration-700" : "animate-in fade-in slide-in-from-right-4 duration-700"),
           layout === 'popup' && !isAnimating && "animate-in fade-in zoom-in-90 duration-1000"
         )}
         style={{ 
-          border: hasSecondary ? `2px solid ${secondaryColor}` : 'none',
+          border: hasSecondary ? `2px solid ${secondaryColor}` : '1px solid rgba(0,0,0,0.05)',
           boxShadow: hasSecondary 
-            ? `0 0 15px ${secondaryColor}40, 0 10px 30px -10px rgba(0,0,0,0.1)` 
+            ? `0 0 20px ${secondaryColor}50, 0 10px 30px -10px rgba(0,0,0,0.15)` 
             : `0 10px 30px -10px ${themeColor}15`,
         }}
       >
         <div className="space-y-3">
           <div className="flex items-center gap-3">
-            <div className="h-7 w-7 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: `${themeColor}40` }}>
-              <User className="w-3.5 h-3.5" style={{ color: themeColor }} />
+            <div className="h-7 w-7 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: hasSecondary ? `${secondaryColor}40` : `${themeColor}40` }}>
+              <User className="w-3.5 h-3.5" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
             </div>
             <div className="min-w-0 flex-1">
               <p className="font-black text-[10px] sm:text-[11px] tracking-tight truncate uppercase leading-none">{t.userName}</p>
               <div className="flex gap-0.5 mt-0.5">
                 {[1, 2, 3, 4, 5].map((s) => (
-                  <Star key={s} className={cn("w-2 h-2 sm:w-2.5 sm:h-2.5 fill-current transition-all duration-700", s <= (t.rating || 5) ? "" : "opacity-10")} style={{ color: themeColor }} />
+                  <Star key={s} className={cn("w-2 h-2 sm:w-2.5 sm:h-2.5 fill-current transition-all duration-700", s <= (t.rating || 5) ? "" : "opacity-10")} style={{ color: hasSecondary ? secondaryColor : themeColor }} />
                 ))}
               </div>
             </div>
@@ -180,7 +181,6 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
             {layout === 'grid' && (
               <div className="relative h-full w-full overflow-hidden">
                 <div className="animate-marquee-vertical flex flex-col gap-6">
-                  {/* Duplicamos a lista para criar o efeito de loop infinito */}
                   {[...filteredTestimonials, ...filteredTestimonials].map((t, i) => (
                     <TestimonialCard key={`${t.id}-${i}`} t={t} index={i} />
                   ))}

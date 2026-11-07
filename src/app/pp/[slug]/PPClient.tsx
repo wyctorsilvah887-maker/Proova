@@ -147,34 +147,34 @@ export default function PPClient({ slug }: { slug: string }) {
   if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
 
   const TestimonialCard = ({ t, index = 0 }: { t: any, index?: number }) => {
-    const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
+    const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent' && secondaryColor !== '';
     const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
 
     return (
       <Card 
         key={`${t.id}-${muralIndex}`}
         className={cn(
-          "rounded-[1.5rem] p-5 border-none shadow-2xl transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white mb-6",
+          "rounded-[1.5rem] p-5 transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white mb-6",
           layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-8 duration-700" : "animate-in fade-in slide-in-from-right-8 duration-700"),
           layout === 'popup' && !isAnimating && "animate-in fade-in zoom-in-90 duration-1000"
         )}
         style={{ 
-          border: hasSecondary ? `2px solid ${secondaryColor}` : 'none',
+          border: hasSecondary ? `2px solid ${secondaryColor}` : '1px solid rgba(0,0,0,0.05)',
           boxShadow: hasSecondary 
-            ? `0 0 20px ${secondaryColor}30, 0 15px 35px -10px rgba(0,0,0,0.1)` 
+            ? `0 0 25px ${secondaryColor}50, 0 10px 30px -10px rgba(0,0,0,0.15)` 
             : `0 20px 40px -20px ${themeColor}25`,
         }}
       >
         <div className="space-y-4">
           <div className="flex items-center gap-4">
-            <div className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: `${themeColor}40` }}>
-              <User className="w-4 h-4" style={{ color: themeColor }} />
+            <div className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: hasSecondary ? `${secondaryColor}40` : `${themeColor}40` }}>
+              <User className="w-4 h-4" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-black text-xs tracking-tight truncate uppercase leading-none">{t.userName}</p>
               <div className="flex gap-0.5 mt-1">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className={cn("w-3 h-3 fill-current transition-all", i < (t.rating || 5) ? "" : "opacity-10")} style={{ color: themeColor }} />
+                  <Star key={i} className={cn("w-3 h-3 fill-current transition-all", i < (t.rating || 5) ? "" : "opacity-10")} style={{ color: hasSecondary ? secondaryColor : themeColor }} />
                 ))}
               </div>
             </div>
@@ -220,7 +220,6 @@ export default function PPClient({ slug }: { slug: string }) {
 
   const handleWhatsappClick = () => {
     if (targetUserId) {
-      // Rastreamento de Clique Único por Sessão (Lead Único)
       const hasClicked = sessionStorage.getItem(`pp_whatsapp_clicked_${targetUserId}`);
       if (!hasClicked) {
         trackWhatsappClick(targetUserId);

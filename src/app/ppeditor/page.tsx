@@ -220,36 +220,36 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
 };
 
 const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0, isPopup = false, isAnimating = false }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number, isPopup?: boolean, isAnimating?: boolean }) => {
-  const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
+  const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent' && secondaryColor !== '';
   const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
   
   return (
     <Card 
       key={`${t.id}-${muralIndex}`}
       className={cn(
-        "rounded-[1.5rem] p-5 border-none shadow-2xl transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white mb-6",
+        "rounded-[1.5rem] p-5 transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white mb-6",
         !isPopup && "animate-in fade-in duration-700 ease-out fill-both",
         !isPopup && (side === 'left' ? "slide-in-from-left-8" : "slide-in-from-right-8"),
         isPopup && !isAnimating && "animate-in fade-in slide-in-from-bottom-10 duration-1000",
         isPopup && isAnimating && "animate-out fade-out slide-out-to-top-10 duration-1000"
       )}
       style={{ 
-        border: hasSecondary ? `2px solid ${secondaryColor}` : 'none',
+        border: hasSecondary ? `2px solid ${secondaryColor}` : '1px solid rgba(0,0,0,0.05)',
         boxShadow: hasSecondary 
-          ? `0 0 20px ${secondaryColor}30, 0 15px 35px -10px rgba(0,0,0,0.1)` 
+          ? `0 0 25px ${secondaryColor}50, 0 10px 30px -10px rgba(0,0,0,0.15)` 
           : `0 20px 40px -20px ${themeColor}25`,
       }}
     >
       <div className="space-y-4">
         <div className="flex items-center gap-4">
-          <div className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: `${themeColor}40` }}>
-            <User className="w-4 h-4" style={{ color: themeColor }} />
+          <div className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: hasSecondary ? `${secondaryColor}40` : `${themeColor}40` }}>
+            <User className="w-4 h-4" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-black text-xs tracking-tight truncate uppercase leading-none">{t.userName}</p>
             <div className="flex gap-0.5 mt-1">
               {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} className={cn("w-3 h-3 fill-current transition-all", i < (t.rating || 5) ? "" : "opacity-10")} style={{ color: themeColor }} />
+                <Star key={i} className={cn("w-3 h-3 fill-current transition-all", i < (t.rating || 5) ? "" : "opacity-10")} style={{ color: hasSecondary ? secondaryColor : themeColor }} />
               ))}
             </div>
           </div>
@@ -812,8 +812,6 @@ export default function PPEditorPage() {
     
     return currentSelection;
   }, [currentSelection, layout, muralIndex]);
-
-  const membershipLabel = isEnterprise ? 'ENTERPRISE' : (isGoldPlan ? 'GOLD' : 'PLANO BASE');
 
   if (authLoading || userDataLoading || testimonialsLoading) return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
 

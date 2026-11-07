@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect, use } from 'react';
@@ -99,33 +100,33 @@ const TestimonialCardPreview = ({
   muralIndex?: number 
 }) => {
   const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
-  const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
+  const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent' && secondaryColor !== '';
 
   return (
     <Card 
       className={cn(
-        "rounded-[1.5rem] p-4 border-none shadow-xl text-left transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white",
+        "rounded-[1.5rem] p-4 text-left transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white",
         !isPopup && (side === 'left' ? "animate-in fade-in slide-in-from-left-4" : "animate-in fade-in slide-in-from-right-4"),
         isPopup && !isAnimating && "animate-in fade-in zoom-in-95 duration-1000",
         isPopup && isAnimating && "animate-out fade-out zoom-out-95 duration-1000"
       )}
       style={{ 
-        border: hasSecondary ? `2px solid ${secondaryColor}` : 'none',
+        border: hasSecondary ? `2px solid ${secondaryColor}` : '1px solid rgba(0,0,0,0.05)',
         boxShadow: hasSecondary 
-          ? `0 0 15px ${secondaryColor}40, 0 10px 30px -10px rgba(0,0,0,0.1)` 
+          ? `0 0 25px ${secondaryColor}50, 0 10px 30px -10px rgba(0,0,0,0.15)` 
           : `0 10px 30px -10px ${themeColor}15`,
       }}
     >
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <div className="h-7 w-7 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: `${themeColor}40` }}>
-            <User className="w-3.5 h-3.5" style={{ color: themeColor }} />
+          <div className="h-7 w-7 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: hasSecondary ? `${secondaryColor}40` : `${themeColor}40` }}>
+            <User className="w-3.5 h-3.5" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-black text-[11px] tracking-tight truncate uppercase leading-none">{t.userName}</p>
             <div className="flex gap-0.5 mt-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
-                <Star key={i} className={cn("w-2.5 h-2.5 fill-current", i < (t.rating || 5) ? "" : "opacity-10")} style={{ color: themeColor }} />
+                <Star key={i} className={cn("w-2.5 h-2.5 fill-current", i < (t.rating || 5) ? "" : "opacity-10")} style={{ color: hasSecondary ? secondaryColor : themeColor }} />
               ))}
             </div>
           </div>
