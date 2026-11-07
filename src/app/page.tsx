@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
+import Script from "next/script";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { 
   Star, 
@@ -431,24 +432,6 @@ PillarsSection.displayName = "PillarsSection";
  * Seção de Versatilidade (Setores Atendidos)
  */
 const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
-  const demonstrationTestimonials = [
-    {
-      initials: "RB",
-      text: "A implementação do G-Boost foi um divisor de águas na nossa estratégia de SEO local. O volume de contatos via Maps cresceu exponencialmente.",
-      label: "Performance Comercial Verificada"
-    },
-    {
-      initials: "ML",
-      text: "O Reputation Shield nos permitiu profissionalizar a gestão de crises. Resolvemos intercorrências de forma discreta e eficiente no canal privado.",
-      label: "Compliance e Gestão de Marca"
-    },
-    {
-      initials: "JP",
-      text: "Nossos murais agora transmitem a autoridade que a marca exige. A Proova elevou o nível da nossa prova social em todos os pontos de contato.",
-      label: "Autoridade Visual de Elite"
-    }
-  ];
-
   return (
     <section id="setores" ref={ref} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
       <div className="container px-4 mx-auto">
@@ -489,20 +472,18 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
             isVisible ? "animate-in fade-in slide-in-from-right-10 opacity-100" : "opacity-0"
           )}>
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
-            <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card p-6 ring-1 ring-primary/10">
-              <div className="space-y-4 p-2">
-                 {demonstrationTestimonials.map((t, i) => (
-                   <div key={i} className="bg-background p-6 rounded-[2rem] border shadow-sm flex flex-col gap-4">
-                      <div className="flex gap-1">
-                        {[1, 2, 3, 4, 5].map((s) => <Star key={s} className="w-3 h-3 fill-yellow-400 text-yellow-400" />)}
-                      </div>
-                      <p className="text-xs md:text-sm italic font-bold leading-relaxed">"{t.text}"</p>
-                      <div className="flex items-center gap-3 border-t pt-4">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-black text-primary">{t.initials}</div>
-                        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">{t.label}</span>
-                      </div>
-                   </div>
-                 ))}
+            <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card p-4 sm:p-8 ring-1 ring-primary/10">
+              <div className="w-full flex items-center justify-center min-h-[450px]">
+                {/* 
+                  Mural Oficial Proova embutido via script de linha única 
+                  Esta ferramenta exibe depoimentos reais em tempo real.
+                */}
+                <div id="proova-mural-landing" className="w-full">
+                  <Script 
+                    src="https://www.useproova.online/widget.js?id=primeiromuralproova&user=EE6Mqdqq4Pc4maNgFy7rNq52ms13" 
+                    strategy="lazyOnload" 
+                  />
+                </div>
               </div>
             </Card>
           </div>
