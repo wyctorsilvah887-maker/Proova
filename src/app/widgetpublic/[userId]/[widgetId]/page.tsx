@@ -15,8 +15,7 @@ import {
 
 /**
  * Página pública do Widget (Embed VIP)
- * Renderiza o mural de depoimentos com o visual Premium Minimalista (Referência Wyctor).
- * Otimizada para temas menores e dispositivos móveis.
+ * Otimizada para ser "miúda" e ultra-minimalista.
  */
 export default function WidgetPublicPage({ params }: { params: Promise<{ userId: string, widgetId: string }> }) {
   const { userId, widgetId } = use(params);
@@ -103,39 +102,38 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
       <Card 
         key={t.id}
         className={cn(
-          "rounded-3xl p-6 sm:p-10 border-none shadow-2xl transition-all duration-700 hover:scale-[1.02] w-full max-w-full ring-1 ring-white/5",
+          "rounded-2xl p-4 sm:p-5 border-none shadow-xl transition-all duration-700 hover:scale-[1.02] w-full max-w-full ring-1 ring-white/5",
           layout === 'grid' && "animate-in fade-in zoom-in-95 duration-500",
-          layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-8 duration-700" : "animate-in fade-in slide-in-from-right-8 duration-700"),
+          layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-4 duration-700" : "animate-in fade-in slide-in-from-right-4 duration-700"),
           layout === 'popup' && !isAnimating && "animate-in fade-in zoom-in-90 duration-1000"
         )}
         style={{ 
           backgroundColor: secondaryColor || '#111111',
-          boxShadow: `0 30px 70px -20px ${themeColor}20`,
+          boxShadow: `0 15px 35px -10px ${themeColor}15`,
         }}
       >
-        <div className="space-y-6 sm:space-y-8">
-          <div className="flex flex-col gap-4 sm:gap-6">
-            <div className="flex items-center gap-4">
-              <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-full border-2 flex items-center justify-center shrink-0" style={{ borderColor: themeColor }}>
-                <User className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: themeColor }} />
-              </div>
-              <p className="font-black text-base sm:text-xl text-white tracking-tighter truncate uppercase flex-1">{t.userName}</p>
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="h-7 w-7 rounded-full border flex items-center justify-center shrink-0" style={{ borderColor: `${themeColor}40` }}>
+              <User className="w-3.5 h-3.5" style={{ color: themeColor }} />
             </div>
-            
-            <div className="flex gap-1">
-              {[1, 2, 3, 4, 5].map((s) => (
-                <Star key={s} className={cn("w-4 h-4 sm:w-6 sm:h-6 fill-current transition-all duration-700", s <= (t.rating || 5) ? "drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" : "opacity-10")} style={{ color: themeColor }} />
-              ))}
+            <div className="min-w-0 flex-1">
+              <p className="font-black text-[11px] sm:text-xs text-white tracking-tight truncate uppercase">{t.userName}</p>
+              <div className="flex gap-0.5 mt-0.5">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <Star key={s} className={cn("w-2.5 h-2.5 fill-current transition-all duration-700", s <= (t.rating || 5) ? "" : "opacity-10")} style={{ color: themeColor }} />
+                ))}
+              </div>
             </div>
           </div>
 
           {t.videoUrl && (
-            <div className="relative aspect-video rounded-2xl overflow-hidden bg-black shadow-3xl ring-1 ring-white/10 group">
+            <div className="relative aspect-video rounded-xl overflow-hidden bg-black shadow-2xl ring-1 ring-white/10 group">
                <video src={t.videoUrl} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" muted loop playsInline autoPlay />
-               <div className="absolute bottom-4 left-4">
-                 <div className="bg-black/60 backdrop-blur-xl px-4 py-1.5 rounded-full border border-white/10 shadow-2xl">
-                   <p className="text-[8px] sm:text-[10px] text-white font-black uppercase tracking-[0.25em] flex items-center gap-2">
-                     <Play className="w-2.5 h-2.5 fill-white" /> Vídeo Review
+               <div className="absolute bottom-2 left-2">
+                 <div className="bg-black/60 backdrop-blur-xl px-2 py-1 rounded-full border border-white/10 shadow-2xl">
+                   <p className="text-[6px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
+                     <Play className="w-1.5 h-1.5 fill-white" /> Vídeo
                    </p>
                  </div>
                </div>
@@ -144,22 +142,22 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
 
           {t.text && t.text !== '(Depoimento em Vídeo)' && (
             <div className="relative">
-              <p className="text-zinc-200 font-bold text-sm sm:text-2xl leading-relaxed italic tracking-tight drop-shadow-sm">
+              <p className="text-zinc-300 font-bold text-[11px] sm:text-[13px] leading-relaxed italic tracking-tight">
                 "{t.text}"
               </p>
             </div>
           )}
 
-          <div className="pt-6 sm:pt-8 border-t border-white/5 flex items-center justify-between">
-            <div className="flex items-center gap-2 text-zinc-500">
-               <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-50" />
-               <span className="text-[8px] sm:text-[11px] font-black uppercase tracking-[0.3em]">
-                 {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Recent Post'}
+          <div className="pt-3 border-t border-white/5 flex items-center justify-between">
+            <div className="flex items-center gap-1.5 text-zinc-500">
+               <Clock className="w-2.5 h-2.5 opacity-50" />
+               <span className="text-[7px] font-black uppercase tracking-widest">
+                 {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Agora'}
                </span>
             </div>
-            <div className="flex items-center gap-2 opacity-30">
-               <CheckCircle2 className="w-3 h-3 text-green-500" />
-               <span className="text-[7px] sm:text-[9px] font-black uppercase tracking-widest text-zinc-400">Verificado</span>
+            <div className="flex items-center gap-1 opacity-40">
+               <CheckCircle2 className="w-2.5 h-2.5 text-green-500" />
+               <span className="text-[6px] font-black uppercase tracking-widest text-zinc-400">Verificado</span>
             </div>
           </div>
         </div>
@@ -168,17 +166,17 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   };
 
   return (
-    <div className="min-h-screen h-screen bg-transparent p-4 sm:p-10 font-body overflow-hidden">
+    <div className="min-h-screen h-screen bg-transparent p-4 sm:p-6 font-body overflow-hidden">
       <div className="w-full h-full flex flex-col items-center justify-center">
         {filteredTestimonials.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center opacity-10 py-20 animate-pulse">
-            <Star className="w-16 h-16 mb-6" />
-            <p className="text-[12px] font-black uppercase tracking-[0.4em]">Aguardando Prova Social de Elite</p>
+          <div className="flex-1 flex flex-col items-center justify-center opacity-10 py-10 animate-pulse">
+            <Star className="w-10 h-10 mb-4" />
+            <p className="text-[10px] font-black uppercase tracking-[0.3em]">Aguardando Prova Social</p>
           </div>
         ) : (
           <div className="w-full max-w-full">
             {layout === 'grid' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-12">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {visibleTestimonials.map((t, i) => (
                   <TestimonialCard key={t.id} t={t} index={i} />
                 ))}
@@ -187,8 +185,8 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
 
             {layout === 'mural' && (
               <div className={cn(
-                "grid gap-10 sm:gap-16 transition-all duration-700",
-                visibleTestimonials.length > 1 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 max-w-lg mx-auto"
+                "grid gap-6 transition-all duration-700",
+                visibleTestimonials.length > 1 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 max-w-xs mx-auto"
               )}>
                 {visibleTestimonials.map((t, i) => (
                   <div key={`${t.id}-${muralIndex}`} className="flex justify-center">
@@ -199,11 +197,11 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
             )}
 
             {layout === 'carousel' && (
-              <div className="w-full flex items-center justify-center py-10">
-                <Carousel setApi={setApi} opts={{ loop: true }} className="w-full max-w-[320px] sm:max-w-xl mx-auto">
+              <div className="w-full flex items-center justify-center py-6">
+                <Carousel setApi={setApi} opts={{ loop: true }} className="w-full max-w-[280px] sm:max-w-md mx-auto">
                   <CarouselContent>
                     {filteredTestimonials.map((t, i) => (
-                      <CarouselItem key={t.id} className="p-4 basis-full">
+                      <CarouselItem key={t.id} className="p-2 basis-full">
                         <TestimonialCard t={t} index={i} />
                       </CarouselItem>
                     ))}
@@ -213,7 +211,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
             )}
 
             {layout === 'popup' && (
-              <div className="flex items-center justify-center w-full max-w-lg mx-auto animate-in fade-in zoom-in slide-in-from-bottom-12 duration-1000">
+              <div className="flex items-center justify-center w-full max-w-xs mx-auto animate-in fade-in zoom-in slide-in-from-bottom-8 duration-1000">
                 <TestimonialCard t={filteredTestimonials[muralIndex]} />
               </div>
             )}

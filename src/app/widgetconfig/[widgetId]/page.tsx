@@ -28,7 +28,9 @@ import {
   Zap,
   Settings2,
   Sparkles,
-  ExternalLink
+  ExternalLink,
+  Lock,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -81,28 +83,34 @@ type LayoutType = 'mural' | 'carousel' | 'grid' | 'popup';
 const TestimonialCardPreview = ({ t, themeColor, secondaryColor }: { t: any, themeColor: string, secondaryColor: string }) => {
   return (
     <Card 
-      className="rounded-3xl p-6 border-none shadow-2xl text-left ring-1 ring-white/5 transition-all hover:scale-[1.02]"
+      className="rounded-3xl p-6 border-none shadow-2xl text-left ring-1 ring-white/5 transition-all hover:scale-[1.02] bg-zinc-900"
       style={{ 
         backgroundColor: secondaryColor || '#111111',
       }}
     >
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-full border flex items-center justify-center shrink-0" style={{ borderColor: themeColor }}>
+          <div className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0" style={{ borderColor: `${themeColor}40` }}>
             <User className="w-4 h-4" style={{ color: themeColor }} />
           </div>
-          <p className="font-black text-sm text-white tracking-tight truncate flex-1">{t.userName}</p>
-        </div>
-        
-        <div className="flex gap-0.5">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Star key={i} className="w-4 h-4 fill-current" style={{ color: themeColor }} />
-          ))}
+          <div className="flex-1 min-w-0">
+            <p className="font-black text-sm text-white tracking-tight truncate uppercase leading-none">{t.userName}</p>
+            <div className="flex gap-0.5 mt-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star key={i} className="w-3.5 h-3.5 fill-current" style={{ color: themeColor }} />
+              ))}
+            </div>
+          </div>
         </div>
 
         {t.text && t.text !== '(Depoimento em Vídeo)' && (
-          <p className="italic text-xs leading-relaxed text-zinc-300 font-medium">"{t.text}"</p>
+          <p className="italic text-sm leading-relaxed text-zinc-300 font-medium tracking-tight">"{t.text}"</p>
         )}
+        
+        <div className="pt-3 border-t border-white/5 flex items-center justify-between opacity-40">
+           <span className="text-[8px] font-black uppercase tracking-widest text-zinc-400">Verificado</span>
+           <CheckCircle2 className="w-3 h-3 text-green-500" />
+        </div>
       </div>
     </Card>
   );
@@ -129,15 +137,13 @@ const EmbedSettings = ({
             <span className="text-[10px] font-black uppercase tracking-widest">Sair</span>
           </Button>
         </Link>
-        <Button variant="ghost" size="sm" onClick={onClose} className="lg:hidden text-muted-foreground">
-          Fechar
-        </Button>
+        <Button variant="ghost" size="sm" onClick={onClose} className="lg:hidden text-muted-foreground h-8 w-8 rounded-full"><X className="w-4 h-4" /></Button>
       </div>
 
       <ScrollArea className="flex-1">
         <div className="p-4 space-y-8 pb-10">
           <div className="space-y-4">
-            <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2">
+            <Label className="text-[10px] font-black uppercase tracking-widest text-primary flex items-center gap-2 ml-1">
               <Zap className="w-3 h-3" /> Automação Inteligente
             </Label>
             
@@ -145,7 +151,7 @@ const EmbedSettings = ({
               <div className="flex items-center justify-between">
                 <div className="space-y-0.5">
                   <Label className="text-xs font-bold">Auto-Publish</Label>
-                  <p className="text-[9px] text-muted-foreground">Publicar novos elogios sem aprovação manual</p>
+                  <p className="text-[9px] text-muted-foreground">Publicar novos elogios automaticamente</p>
                 </div>
                 <Switch checked={autoPublishEnabled} onCheckedChange={setAutoPublishEnabled} />
               </div>
@@ -184,7 +190,7 @@ const EmbedSettings = ({
           </div>
 
           <div className="space-y-4 pt-4 border-t">
-            <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Formato do Mural</Label>
+            <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-1">Formato do Mural</Label>
             <div className="grid grid-cols-1 gap-2">
               {[
                 { id: 'grid', icon: Layout, label: 'Grade Padrão', isGold: false },
@@ -217,8 +223,8 @@ const EmbedSettings = ({
 
           <div className="space-y-6 pt-4 border-t">
             <div className="space-y-4">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                <Palette className="w-3 h-3 text-primary" /> Cor da Marca (Estrelas/Destaque)
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2 ml-1">
+                <Palette className="w-3 h-3 text-primary" /> Cor da Marca
               </Label>
               <div className="flex flex-wrap gap-2">
                 {colors.map((color) => (
@@ -230,7 +236,7 @@ const EmbedSettings = ({
 
           <div className="space-y-6 pt-4 border-t">
             <div className="space-y-4">
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2 ml-1">
                 <Palette className="w-3 h-3 text-primary" /> Cor de Fundo do Card
               </Label>
               <div className="flex flex-wrap gap-2">
@@ -376,12 +382,17 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
     onClose: () => setIsSidebarOpen(false)
   };
 
+  const isMapsLinkValid = !!userData?.googleMapsUrl;
+  const membershipLabelDisplay = isEnterprise ? 'ENTERPRISE' : (isGold ? 'GOLD' : (isTrial ? 'TRIAL' : 'PLANO BASE'));
+
   return (
     <div className="h-screen flex flex-col font-body w-full overflow-hidden bg-background">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 flex-1">
           <Link href="/widgets">
-            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary transition-all border-none shadow-none"><ArrowLeft className="w-5 h-5" /></Button>
+            <Button variant="ghost" size="sm" className="h-10 px-2 gap-2 text-muted-foreground hover:text-primary hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 rounded-xl shadow-none">
+               <ArrowLeft className="w-4 h-4" /><span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Voltar</span>
+            </Button>
           </Link>
           <div className="relative w-[160px] h-[52px] md:w-[240px] md:h-[78px]">
             <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
@@ -402,14 +413,14 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
             disabled={isSaving} 
             className="flex h-9 md:h-12 px-3 md:px-6 rounded-xl font-bold gap-1.5 md:gap-2 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground text-[10px] md:text-sm"
           >
-            {isSaving ? <Loader2 className="animate-spin h-3.5 w-3.5 md:h-4 md:w-4" /> : <Save className="h-3.5 w-3.5 md:h-4 md:w-4" />} <span className="hidden xs:inline">Salvar</span><span className="xs:hidden">Salvar</span>
+            {isSaving ? <Loader2 className="animate-spin h-3.5 w-3.5 md:h-4 md:w-4" /> : <Save className="h-3.5 w-3.5 md:h-4 md:w-4" />} <span className="hidden xs:inline">Salvar</span>
           </Button>
           <ThemeToggle />
         </div>
       </header>
 
       <main className="flex-1 flex overflow-hidden relative w-full h-full pt-24 md:pt-32">
-        <aside className={cn("hidden lg:flex w-80 bg-background border-r flex-col h-full", !isSidebarOpen && "w-0 opacity-0 -ml-80")}>
+        <aside className={cn("hidden lg:flex w-80 bg-background border-r flex-col h-full transition-all duration-300", !isSidebarOpen && "w-0 opacity-0 -ml-80")}>
           <EmbedSettings {...sidebarProps} />
         </aside>
 
@@ -417,7 +428,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
           <SheetContent side="left" className="p-0 w-80 border-none">
             <SheetHeader className="sr-only">
               <SheetTitle>Configurações do Mural</SheetTitle>
-              <SheetDescription>Ajuste o layout, automações e cores do seu mural de depoimentos.</SheetDescription>
+              <SheetDescription>Ajuste o layout, automações e cores do seu mural.</SheetDescription>
             </SheetHeader>
             <EmbedSettings {...sidebarProps} />
           </SheetContent>
@@ -457,13 +468,13 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
                       {approvedTestimonials?.map((t: any) => {
                         const isSelected = selectedIds.includes(t.id);
                         return (
-                          <div key={t.id} onClick={() => toggleSelection(t.id)} className={cn("cursor-pointer transition-all rounded-xl border-2 p-4 bg-background", isSelected ? "border-primary bg-primary/5" : "border-transparent shadow-sm hover:border-primary/20")}>
+                          <div key={t.id} onClick={() => toggleSelection(t.id)} className={cn("cursor-pointer transition-all rounded-xl border-2 p-4 bg-background group", isSelected ? "border-primary bg-primary/5" : "border-transparent shadow-sm hover:border-primary/20")}>
                             <div className="flex items-start gap-3">
-                              <div className={cn("mt-1 w-4 h-4 rounded-md border flex items-center justify-center shrink-0", isSelected ? "bg-primary border-primary" : "border-muted-foreground/30")}>
+                              <div className={cn("mt-1 w-4 h-4 rounded-md border flex items-center justify-center shrink-0 transition-colors", isSelected ? "bg-primary border-primary" : "border-muted-foreground/30")}>
                                 {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <span className="font-bold text-[11px] block truncate">{t.userName}</span>
+                                <span className="font-bold text-[11px] block truncate group-hover:text-primary transition-colors">{t.userName}</span>
                                 {t.text && t.text !== '(Depoimento em Vídeo)' && <p className="text-[10px] text-muted-foreground italic line-clamp-1 mt-1">"{t.text}"</p>}
                               </div>
                             </div>
@@ -487,9 +498,9 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
             <DialogDescription>Copie o código abaixo e cole no seu site.</DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <div className="relative bg-muted/50 rounded-xl p-4 border border-primary/20">
+            <div className="relative bg-muted/50 rounded-xl p-4 border border-primary/20 group">
               <pre className="text-[10px] font-mono text-foreground break-all whitespace-pre-wrap">{embedCode}</pre>
-              <Button size="icon" variant="secondary" className="absolute top-2 right-2 h-8 w-8" onClick={() => { navigator.clipboard.writeText(embedCode); toast({ title: "Copiado!" }); }}><Copy className="h-4 w-4" /></Button>
+              <Button size="icon" variant="secondary" className="absolute top-2 right-2 h-8 w-8 hover:bg-primary hover:text-white transition-all" onClick={() => { navigator.clipboard.writeText(embedCode); toast({ title: "Copiado!" }); }}><Copy className="h-4 w-4" /></Button>
             </div>
           </div>
           <DialogFooter><Button className="w-full font-black h-12 rounded-xl" onClick={() => setIsCodeDialogOpen(false)}>Concluído</Button></DialogFooter>
