@@ -74,6 +74,22 @@ export default function SupportPage() {
 
   const { data: remoteMessages, loading: messagesLoading } = useCollection(messagesQuery);
 
+  // Helper para formatar texto (converte **texto** em span laranja negrito)
+  const formatText = (text: string) => {
+    if (!text) return "";
+    const parts = text.split(/(\*\*.*?\*\*)/g);
+    return parts.map((part, index) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return (
+          <span key={index} className="text-primary font-black">
+            {part.substring(2, part.length - 2)}
+          </span>
+        );
+      }
+      return part;
+    });
+  };
+
   // Sistema de Cache Local e Retenção
   useEffect(() => {
     if (user) {
@@ -276,7 +292,7 @@ export default function SupportPage() {
                     <div className="space-y-1">
                       <div className="bg-muted/50 border rounded-2xl rounded-tl-none p-3 md:p-4 shadow-sm">
                         <p className="text-xs md:text-sm font-medium leading-relaxed whitespace-pre-wrap">
-                          Olá, <strong>{userData?.name?.split(' ')[0]}</strong>! 👋 {getConsultantResponse('menu')}
+                          Olá, <span className="text-primary font-black">{userData?.name?.split(' ')[0]}</span>! 👋 {formatText(getConsultantResponse('menu'))}
                         </p>
                       </div>
                       <span className="text-[8px] font-black uppercase text-muted-foreground ml-1">Assistente Estratégico</span>
@@ -307,7 +323,7 @@ export default function SupportPage() {
                           ? "bg-primary text-white rounded-2xl rounded-tr-none border-transparent shadow-lg shadow-primary/20" 
                           : "bg-muted/50 rounded-2xl rounded-tl-none"
                       )}>
-                        <p className="text-xs md:text-sm font-medium leading-relaxed whitespace-pre-wrap">{msg.text}</p>
+                        <p className="text-xs md:text-sm font-medium leading-relaxed whitespace-pre-wrap">{formatText(msg.text)}</p>
                       </div>
                       <div className={cn(
                         "flex items-center gap-1.5 px-1",
