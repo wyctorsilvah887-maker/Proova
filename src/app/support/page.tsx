@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -57,14 +56,6 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogDescription, 
-  DialogFooter 
-} from '@/components/ui/dialog';
 import { getConsultantResponse } from '@/lib/consultant-rules';
 import { toast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
@@ -81,8 +72,7 @@ export default function SupportPage() {
   const [isAiThinking, setIsAiThinking] = useState(false);
   const [isCreatingTicket, setIsCreatingTicket] = useState(false);
   const [isEndingChat, setIsEndingChat] = useState(false);
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [confirmationInput, setConfirmationInput] = useState('');
+  const [isPendingClosure, setIsPendingClosure] = useState(false);
   const [localMessages, setLocalMessages] = useState<any[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -206,76 +196,8 @@ export default function SupportPage() {
     }
   };
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!message.trim() || !user || !db || isSending) return;
-
-    const userMsg = message.trim();
-    setIsSending(true);
-    setMessage('');
-
-    try {
-      await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
-        text: userMsg,
-        sender: 'user',
-        createdAt: serverTimestamp()
-      });
-
-      setIsAiThinking(true);
-      
-      setTimeout(async () => {
-        const botResponse = getConsultantResponse(userMsg);
-        
-        await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
-          text: botResponse,
-          sender: 'support',
-          createdAt: serverTimestamp()
-        });
-        
-        if (userMsg === '6' || userMsg.toLowerCase().includes('humano')) {
-          await handleCreateSupportTicket();
-        }
-
-        if (userMsg === '7' || userMsg.toLowerCase().includes('encerrar')) {
-          handleOpenConfirmModal();
-        }
-
-        setIsAiThinking(false);
-        setIsSending(false);
-      }, 1000);
-
-    } catch (err) {
-      console.error(err);
-      setIsSending(false);
-      setIsAiThinking(false);
-    }
-  };
-
-  const handleOpenConfirmModal = () => {
-    setConfirmationInput('');
-    setIsConfirmModalOpen(true);
-  };
-
-  const handleEndChatConfirmed = async () => {
+  const handleFinalCleanup = async () => {
     if (!user || !db || isEndingChat) return;
-
-    const validConfirmations = [
-      'sim', 'claro', 'com certeza', 'sim, tenho certeza', 
-      'pode fechar', 'confirmar', 'quero fechar', 'certeza', 
-      'ok', 'pode', 'fechar chat', 'fechar', 'estou ciente', 
-      'concordo', 'prosseguir', 'confirmado'
-    ];
-
-    const normalizedInput = confirmationInput.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-
-    if (!validConfirmations.some(word => normalizedInput.includes(word)) || normalizedInput.length < 2) {
-      toast({ 
-        variant: "destructive", 
-        title: "Confirmação Necessária", 
-        description: "Para sua segurança, digite 'SIM' ou uma confirmação válida para encerrar." 
-      });
-      return;
-    }
 
     setIsEndingChat(true);
     try {
@@ -295,13 +217,82 @@ export default function SupportPage() {
       setLocalMessages([]);
       
       toast({ title: "Atendimento Encerrado", description: "Histórico limpo com sucesso." });
-      setIsConfirmModalOpen(false);
       router.push('/dash');
     } catch (err: any) {
       console.error(err);
       toast({ variant: "destructive", title: "Erro ao encerrar", description: "Não foi possível limpar os dados agora." });
-    } finally {
       setIsEndingChat(false);
+    }
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim() || !user || !db || isSending) return;
+
+    const userMsg = message.trim();
+    setIsSending(true);
+    setMessage('');
+
+    try {
+      // Registrar mensagem do usuário
+      await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
+        text: userMsg,
+        sender: 'user',
+        createdAt: serverTimestamp()
+      });
+
+      setIsAiThinking(true);
+      
+      // Lógica de Encerramento Pendente
+      if (isPendingClosure) {
+        const normalizedInput = userMsg.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+        const validConfirmations = ['sim', 'claro', 'com certeza', 'pode fechar', 'confirmar', 'quero fechar', 'certeza', 'ok', 'pode', 'fechar', 'concordo', 'prosseguir', 'confirmado'];
+        
+        setTimeout(async () => {
+          if (validConfirmations.some(word => normalizedInput.includes(word)) && normalizedInput.length >= 2) {
+            await handleFinalCleanup();
+          } else {
+            setIsPendingClosure(false);
+            await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
+              text: "Solicitação de encerramento cancelada. O atendimento continua ativo. Como posso ajudar?",
+              sender: 'support',
+              createdAt: serverTimestamp()
+            });
+          }
+          setIsAiThinking(false);
+          setIsSending(false);
+        }, 1000);
+        return;
+      }
+
+      // Lógica Padrão da Árvore de Decisão
+      setTimeout(async () => {
+        const botResponse = getConsultantResponse(userMsg);
+        
+        await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
+          text: botResponse,
+          sender: 'support',
+          createdAt: serverTimestamp()
+        });
+        
+        const normalizedInput = userMsg.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+        
+        if (userMsg === '6' || normalizedInput.includes('humano')) {
+          await handleCreateSupportTicket();
+        }
+
+        if (userMsg === '7' || normalizedInput.includes('encerrar')) {
+          setIsPendingClosure(true);
+        }
+
+        setIsAiThinking(false);
+        setIsSending(false);
+      }, 1000);
+
+    } catch (err) {
+      console.error(err);
+      setIsSending(false);
+      setIsAiThinking(false);
     }
   };
 
@@ -415,17 +406,6 @@ export default function SupportPage() {
                 </div>
               </div>
             </div>
-            
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={handleOpenConfirmModal}
-              disabled={isEndingChat || (localMessages.length === 0 && !isAiThinking)}
-              className="h-9 px-3 rounded-xl gap-2 text-destructive border-destructive/20 hover:bg-destructive/5 font-bold transition-all text-[10px] uppercase tracking-widest"
-            >
-              {isEndingChat ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3 h-3" />}
-              Encerrar Atendimento
-            </Button>
           </div>
 
           <ScrollArea ref={scrollRef} className="flex-1 px-4 py-6 md:p-10">
@@ -515,8 +495,11 @@ export default function SupportPage() {
                    <Input 
                      value={message}
                      onChange={(e) => setMessage(e.target.value)}
-                     placeholder="Digite o número da opção (ex: 1)..."
-                     className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 pr-10 text-xs md:text-sm font-medium transition-all"
+                     placeholder={isPendingClosure ? "Digite SIM ou CONCORDO para encerrar..." : "Digite o número da opção (ex: 1)..."}
+                     className={cn(
+                       "h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 pr-10 text-xs md:text-sm font-medium transition-all",
+                       isPendingClosure && "border-destructive/30 focus:ring-destructive/20 text-center uppercase tracking-widest font-black"
+                     )}
                      disabled={isSending || isAiThinking || isEndingChat}
                    />
                  </div>
@@ -526,7 +509,7 @@ export default function SupportPage() {
                   className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl shadow-xl transition-all active:scale-90 bg-primary hover:bg-primary/90 shrink-0"
                   disabled={!message.trim() || isSending || isAiThinking || isEndingChat}
                  >
-                   {isSending || isAiThinking ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                   {isSending || isAiThinking || isEndingChat ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
                  </Button>
                </form>
              )}
@@ -540,59 +523,6 @@ export default function SupportPage() {
       <footer className="hidden md:block py-4 text-center opacity-30 shrink-0">
         <p className="text-[8px] font-black uppercase tracking-[0.4em]">Powered by Proova Decision Tree v1.0</p>
       </footer>
-
-      <Dialog open={isConfirmModalOpen} onOpenChange={setIsConfirmModalOpen}>
-        <DialogContent className="rounded-[2rem] border-none shadow-2xl p-0 overflow-hidden bg-background max-w-md w-[95vw]">
-          <div className="h-1.5 bg-destructive w-full" />
-          <div className="p-8 space-y-6">
-            <DialogHeader className="space-y-4">
-              <div className="mx-auto bg-destructive/10 p-4 rounded-full w-fit animate-bounce">
-                <AlertTriangle className="w-8 h-8 text-destructive" />
-              </div>
-              <div className="space-y-1 text-center">
-                <DialogTitle className="text-xl md:text-2xl font-black font-headline uppercase tracking-tight">Encerrar Atendimento?</DialogTitle>
-                <DialogDescription className="text-sm font-medium leading-relaxed">
-                  Isso apagará permanentemente o seu histórico de mensagens e tickets ativos. 
-                </DialogDescription>
-              </div>
-            </DialogHeader>
-
-            <div className="space-y-3">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">
-                Para confirmar, digite "SIM" ou "CONCORDO":
-              </Label>
-              <Input 
-                value={confirmationInput}
-                onChange={(e) => setConfirmationInput(e.target.value)}
-                placeholder="Digite aqui..."
-                className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-destructive/20 font-black text-center uppercase tracking-widest"
-                onKeyDown={(e) => e.key === 'Enter' && handleEndChatConfirmed()}
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <Button 
-                variant="outline" 
-                onClick={() => setIsConfirmModalOpen(false)}
-                className="h-12 rounded-xl font-bold border-muted-foreground/10 hover:bg-muted/50"
-              >
-                Cancelar
-              </Button>
-              <Button 
-                onClick={handleEndChatConfirmed}
-                disabled={isEndingChat || !confirmationInput.trim()}
-                variant="destructive"
-                className="h-12 rounded-xl font-black uppercase tracking-widest shadow-lg shadow-destructive/20"
-              >
-                {isEndingChat ? <Loader2 className="w-4 h-4 animate-spin" /> : "Encerrar Agora"}
-              </Button>
-            </div>
-          </div>
-          <div className="p-4 bg-muted/30 border-t text-center">
-             <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Ação irreversível de limpeza de dados</p>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

@@ -43,7 +43,7 @@ export const CONSULTANT_TREE: Record<string, TreeBranch> = {
   '7': {
     title: 'Encerrar Chat',
     keys: ['7', 'encerrar', 'fechar', 'limpar', 'sair'],
-    response: "**⚠️ Solicitação de Encerramento**\n\nVocê escolheu encerrar o atendimento. Para sua segurança e para evitar a perda acidental do seu histórico, **confirme a ação no painel de segurança** que acaba de abrir no centro da sua tela.\n\n*Caso mude de ideia, basta clicar em cancelar no painel.*"
+    response: "**⚠️ Confirmação de Encerramento**\n\nVocê escolheu encerrar o atendimento. Isso apagará permanentemente o seu histórico de mensagens e tickets ativos.\n\nPara confirmar, digite **SIM** ou **CONCORDO** aqui no chat.\n\n*Qualquer outra mensagem cancelará o encerramento.*"
   }
 };
 
