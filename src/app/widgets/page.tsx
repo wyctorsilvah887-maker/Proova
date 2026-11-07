@@ -28,7 +28,8 @@ import {
   Gem,
   Info,
   Handshake,
-  Lock
+  Lock,
+  AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,6 +51,16 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useUser, useFirestore, useCollection, useAuth, useDoc } from '@/firebase';
 import { collection, setDoc, serverTimestamp, doc, deleteDoc, getDoc } from 'firebase/firestore';
 import { toast } from '@/hooks/use-toast';
@@ -70,6 +81,7 @@ export default function WidgetsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreating, setIsCreating] = useState(false);
   const [selectedWidget, setSelectedWidget] = useState<any>(null);
+  const [widgetToDelete, setWidgetToDelete] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
@@ -186,12 +198,17 @@ export default function WidgetsPage() {
     }
   };
 
-  const handleDeleteWidget = async (widgetId: string) => {
-    if (!db || !user) return;
-    const widgetRef = doc(db, 'users', user.uid, 'widgets', widgetId);
-    deleteDoc(widgetRef).then(() => {
+  const handleConfirmDelete = async () => {
+    if (!db || !user || !widgetToDelete) return;
+    
+    try {
+      const widgetRef = doc(db, 'users', user.uid, 'widgets', widgetToDelete.id);
+      await deleteDoc(widgetRef);
       toast({ title: "Mural Removido", description: "O mural foi excluído com sucesso." });
-    });
+      setWidgetToDelete(null);
+    } catch (e) {
+      toast({ variant: "destructive", title: "Erro na exclusão", description: "Não foi possível remover o mural agora." });
+    }
   };
 
   const copyToClipboard = (text: string, description: string = "Código de instalação") => {
@@ -231,7 +248,7 @@ export default function WidgetsPage() {
                     {userData?.companyName || 'Minha Empresa'}
                   </span>
                   <span className={cn(
-                    "text-[8px] uppercase tracking-widest font-black leading-tight",
+                    "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
                     userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
                   )}>
                     {membershipLabel}
@@ -304,7 +321,7 @@ export default function WidgetsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-3">
             <Link href="/dash">
-              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 text-muted-foreground hover:text-primary transition-colors">
+              <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 text-muted-foreground hover:text-primary transition-all">
                 <ArrowLeft className="w-5 h-5" />
               </Button>
             </Link>
@@ -367,7 +384,7 @@ export default function WidgetsPage() {
                         variant="ghost" 
                         size="icon" 
                         className="text-destructive h-10 w-10 hover:bg-destructive/10 rounded-xl"
-                        onClick={() => handleDeleteWidget(w.id)}
+                        onClick={() => setWidgetToDelete(w)}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -411,8 +428,8 @@ export default function WidgetsPage() {
 
       <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
         <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[105px]">
-          <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain object-left dark:hidden" priority />
-          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain object-left hidden dark:block" priority />
+          <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority />
+          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority />
         </div>
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
@@ -446,6 +463,30 @@ export default function WidgetsPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Confirmação de Exclusão */}
+      <AlertDialog open={!!widgetToDelete} onOpenChange={() => setWidgetToDelete(null)}>
+        <AlertDialogContent className="rounded-[2rem] border-none shadow-2xl p-8">
+          <AlertDialogHeader className="space-y-4">
+            <div className="mx-auto bg-destructive/10 p-4 rounded-full w-fit">
+              <AlertTriangle className="w-8 h-8 text-destructive" />
+            </div>
+            <AlertDialogTitle className="text-2xl font-black font-headline text-center">Excluir Mural?</AlertDialogTitle>
+            <AlertDialogDescription className="text-center text-muted-foreground font-medium">
+              Esta ação é permanente. O mural <span className="font-bold text-foreground">"{widgetToDelete?.name}"</span> deixará de aparecer no seu site imediatamente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex flex-col sm:flex-row gap-3 mt-6">
+            <AlertDialogCancel className="h-12 rounded-xl font-bold border-muted-foreground/10 hover:bg-muted/50 mt-0">Cancelar</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleConfirmDelete}
+              className="h-12 rounded-xl font-bold bg-destructive hover:bg-destructive/90 text-white shadow-lg"
+            >
+              Excluir Mural Permanentemente
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
