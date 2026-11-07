@@ -9,7 +9,6 @@ import { toast } from './use-toast';
 
 /**
  * Hook para gerenciar permissões e tokens de Notificação Push (FCM).
- * Corrigido para registrar o Service Worker e garantir o salvamento do token.
  */
 export function useNotifications(userId: string | undefined) {
   const [permission, setPermission] = useState<NotificationPermission>('default');
@@ -36,18 +35,25 @@ export function useNotifications(userId: string | undefined) {
       if (status === 'granted') {
         const { messaging, firestore } = initializeFirebase();
         
-        // 2. Registrar o Service Worker explicitamente
-        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-        console.log("Service Worker registrado com sucesso:", registration);
+        if (!messaging) {
+          throw new Error("Messaging não inicializado.");
+        }
 
-        // 3. Obter o token passando o registro do SW
-        const token = await getToken(messaging!, { 
+        // 2. Registrar o Service Worker explicitamente para garantir que ele exista
+        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+          scope: '/'
+        });
+        
+        console.log("Service Worker registrado para FCM:", registration);
+
+        // 3. Obter o token
+        const token = await getToken(messaging, { 
           vapidKey,
           serviceWorkerRegistration: registration
         });
         
         if (token) {
-          console.log("Token FCM Gerado:", token);
+          console.log("Token FCM Gerado com sucesso:", token);
           
           // 4. Salva o token no perfil do usuário no Firestore
           const userRef = doc(firestore, 'users', userId);
@@ -58,18 +64,18 @@ export function useNotifications(userId: string | undefined) {
           
           toast({
             title: "Notificações Ativas!",
-            description: "Você receberá alertas de novos depoimentos e suporte.",
+            description: "Este dispositivo agora receberá seus alertas estratégicos.",
           });
         } else {
-          console.warn("Não foi possível obter o token FCM.");
+          throw new Error("Token não gerado pelo Firebase.");
         }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro crítico ao configurar Notificações Push:", error);
       toast({
         variant: "destructive",
         title: "Falha nas Notificações",
-        description: "Não conseguimos registrar seu dispositivo para alertas.",
+        description: "Certifique-se de que o arquivo SW está acessível e a VAPID Key está correta.",
       });
     }
   };

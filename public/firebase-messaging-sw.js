@@ -1,9 +1,8 @@
 
-importScripts('https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/11.0.1/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.9.0/firebase-messaging-compat.js');
 
-// Configuração idêntica ao src/firebase/config.ts
-// Estes dados são públicos e seguros para estarem aqui.
+// Configuração idêntica à do app para que o SW possa se comunicar com o FCM
 firebase.initializeApp({
   apiKey: "AIzaSyC0fZYE2DoAtkj3iz-ngO-79XCnL6lQAgc",
   authDomain: "studio-1166590320-ddf7e.firebaseapp.com",
@@ -15,14 +14,16 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Handler para notificações em background
+// Escutador para mensagens em background (aba fechada)
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Mensagem em background recebida: ', payload);
   
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: '/Logotipo%20PROOVA%20white%20mode%201.png'
+    icon: '/maskable_icon_x192 (6).png',
+    badge: '/favicon-32x32.png',
+    data: payload.data
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
