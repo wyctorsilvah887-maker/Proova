@@ -51,9 +51,20 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
   const [isSending, setIsSending] = useState(false);
   const [isResolving, setIsResolving] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const targetUserRef = useMemo(() => (db ? doc(db, 'users', userId) : null), [db, userId]);
   const { data: targetUserData, loading: userLoading } = useDoc(targetUserRef);
+
+  // Ticket para monitorar digitação e presença
+  const ticketQuery = useMemo(() => {
+    if (!db || !userId) return null;
+    return query(collection(db, 'support_tickets'), where('userId', '==', userId), limit(1));
+  }, [db, userId]);
+
+  const { data: tickets } = useCollection(ticketQuery);
+  const activeTicket = tickets?.[0] as any;
+  const isUserTyping = activeTicket?.isUserTyping === true;
 
   const messagesQuery = useMemo(() => {
     if (!db || !userId) return null;
@@ -66,7 +77,6 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
 
   const { data: messages, loading: messagesLoading } = useCollection(messagesQuery);
 
-  // Efeito para marcar presença do suporte e notificar o usuário
   useEffect(() => {
     if (!db || !userId || !adminUser) return;
 
@@ -77,13 +87,11 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
 
       if (!snap.empty) {
         const ticketDoc = snap.docs[0];
-        // Atualiza o ticket para indicar que o suporte entrou
         await updateDoc(ticketDoc.ref, { 
           isSupportInChat: true,
           supportEnteredAt: serverTimestamp()
         });
 
-        // Envia mensagem de sistema e e-mail (apenas na primeira vez que abre ou via lógica simples)
         if (!ticketDoc.data().supportEnteredAt) {
           await addDoc(collection(db, 'users', userId, 'support_messages'), {
             text: "Um consultor humano acaba de entrar no chat para te atender. 🎧",
@@ -98,13 +106,15 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
 
     setPresence();
 
-    // Limpa a presença ao sair
     return () => {
       const clearPresence = async () => {
         const q = query(collection(db, 'support_tickets'), where('userId', '==', userId), limit(1));
         const snap = await getDocs(q);
         if (!snap.empty) {
-          await updateDoc(snap.docs[0].ref, { isSupportInChat: false });
+          await updateDoc(snap.docs[0].ref, { 
+            isSupportInChat: false,
+            isSupportTyping: false 
+          });
         }
       };
       clearPresence();
@@ -116,7 +126,21 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
       const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
       if (viewport) viewport.scrollTop = viewport.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, isUserTyping]);
+
+  const handleTyping = () => {
+    if (!activeTicket || !db) return;
+
+    if (!activeTicket.isSupportTyping) {
+      updateDoc(doc(db, 'support_tickets', activeTicket.id), { isSupportTyping: true });
+    }
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+    typingTimeoutRef.current = setTimeout(() => {
+      updateDoc(doc(db, 'support_tickets', activeTicket.id), { isSupportTyping: false });
+    }, 3000);
+  };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,6 +149,10 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
     const text = message.trim();
     setIsSending(true);
     setMessage('');
+
+    if (activeTicket) {
+      updateDoc(doc(db, 'support_tickets', activeTicket.id), { isSupportTyping: false });
+    }
 
     try {
       await addDoc(collection(db, 'users', userId, 'support_messages'), {
@@ -149,7 +177,6 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
       
       const batch = writeBatch(db);
       
-      // 1. Enviar mensagem de encerramento
       const messagesRef = collection(db, 'users', userId, 'support_messages');
       batch.set(doc(messagesRef), {
         text: "O atendimento humano foi concluído com sucesso. ✅\nO **Consultor Proova** foi reativado para te auxiliar. Como posso ajudar?",
@@ -158,14 +185,12 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
         isSystem: true
       });
 
-      // 2. Remover o ticket
       if (!snap.empty) {
         batch.delete(snap.docs[0].ref);
       }
 
       await batch.commit();
       toast({ title: "Atendimento Concluído", description: "O ticket foi resolvido e o bot reativado." });
-      // O admin permanece na página para ver o histórico final, se desejar
     } catch (err) {
       toast({ variant: "destructive", title: "Erro ao concluir" });
     } finally {
@@ -253,6 +278,24 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
                   </div>
                 </div>
               ))}
+
+              {isUserTyping && (
+                <div className="flex justify-start animate-in fade-in slide-in-from-left-2 duration-300">
+                  <div className="flex gap-2 md:gap-3 items-center">
+                    <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground shrink-0 mt-1 shadow-md">
+                      <User className="w-4 h-4" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="bg-muted/50 px-4 py-2 rounded-full flex gap-1 items-center">
+                        <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-pulse" />
+                        <div className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-pulse [animation-delay:0.2s]" />
+                        <div className="w-1.5 h-1.5 bg-primary/80 rounded-full animate-pulse [animation-delay:0.4s]" />
+                      </div>
+                      <span className="text-[8px] font-black uppercase text-muted-foreground ml-1">Usuário está digitando...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </ScrollArea>
 
@@ -260,7 +303,10 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
              <form onSubmit={handleSendMessage} className="flex items-center gap-2 md:gap-3">
                <Input 
                  value={message}
-                 onChange={(e) => setMessage(e.target.value)}
+                 onChange={(e) => {
+                   setMessage(e.target.value);
+                   handleTyping();
+                 }}
                  placeholder="Digite sua resposta técnica ou estratégica..."
                  className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs md:text-sm font-medium"
                  disabled={isSending || isResolving}

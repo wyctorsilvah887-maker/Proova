@@ -41,7 +41,8 @@ import {
   Timestamp, 
   getDocs, 
   deleteDoc, 
-  writeBatch 
+  writeBatch,
+  updateDoc 
 } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import Link from 'next/link';
@@ -75,11 +76,12 @@ export default function SupportPage() {
   const [isPendingClosure, setIsPendingClosure] = useState(false);
   const [localMessages, setLocalMessages] = useState<any[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
-  // Monitoramento de tickets ativos para bolinhas de status e desativação do robô
+  // Monitoramento de tickets ativos para bolinhas de status e digitação
   const supportTicketQuery = useMemo(() => {
     if (!db || !user) return null;
     return query(collection(db, 'support_tickets'), where('userId', '==', user.uid), limit(1));
@@ -88,6 +90,7 @@ export default function SupportPage() {
   const { data: activeTickets } = useCollection(supportTicketQuery);
   const activeTicket = activeTickets?.[0] as any;
   const isHumanSupportPresent = activeTicket?.isSupportInChat === true;
+  const isSupportTyping = activeTicket?.isSupportTyping === true;
 
   const messagesQuery = useMemo(() => {
     if (!db || !user) return null;
@@ -155,7 +158,21 @@ export default function SupportPage() {
         scrollContainer.scrollTop = scrollContainer.scrollHeight;
       }
     }
-  }, [localMessages, isAiThinking]);
+  }, [localMessages, isAiThinking, isSupportTyping]);
+
+  const handleTyping = () => {
+    if (!activeTicket || !db) return;
+
+    if (!activeTicket.isUserTyping) {
+      updateDoc(doc(db, 'support_tickets', activeTicket.id), { isUserTyping: true });
+    }
+
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+
+    typingTimeoutRef.current = setTimeout(() => {
+      updateDoc(doc(db, 'support_tickets', activeTicket.id), { isUserTyping: false });
+    }, 3000);
+  };
 
   const handleCreateSupportTicket = async () => {
     if (!user || !db || !userData) return;
@@ -168,7 +185,9 @@ export default function SupportPage() {
         membershipStatus: userData.membershipStatus || 'base',
         createdAt: serverTimestamp(),
         status: 'open',
-        isSupportInChat: false
+        isSupportInChat: false,
+        isUserTyping: false,
+        isSupportTyping: false
       });
 
       const plan = (userData.membershipStatus || 'base').toLowerCase();
@@ -219,11 +238,9 @@ export default function SupportPage() {
       setIsPendingClosure(false);
       
       toast({ title: "Atendimento Encerrado", description: "O Consultor Proova foi reiniciado." });
-      // O chat permanece aberto, não redirecionamos mais para /dash
     } catch (err: any) {
       console.error(err);
       toast({ variant: "destructive", title: "Erro ao encerrar", description: "Não foi possível limpar os dados agora." });
-      setIsEndingChat(false);
     } finally {
       setIsEndingChat(false);
     }
@@ -237,15 +254,18 @@ export default function SupportPage() {
     setIsSending(true);
     setMessage('');
 
+    // Reset typing status immediately on send
+    if (activeTicket) {
+      updateDoc(doc(db, 'support_tickets', activeTicket.id), { isUserTyping: false });
+    }
+
     try {
-      // Registrar mensagem do usuário
       await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
         text: userMsg,
         sender: 'user',
         createdAt: serverTimestamp()
       });
 
-      // Se houver suporte humano no chat, o robô não responde
       if (isHumanSupportPresent) {
         setIsSending(false);
         return;
@@ -253,7 +273,6 @@ export default function SupportPage() {
 
       setIsAiThinking(true);
       
-      // Lógica de Encerramento Pendente
       if (isPendingClosure) {
         const normalizedInput = userMsg.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
         const validConfirmations = ['sim', 'claro', 'com certeza', 'pode fechar', 'confirmar', 'quero fechar', 'certeza', 'ok', 'pode', 'fechar', 'concordo', 'prosseguir', 'confirmado'];
@@ -275,7 +294,6 @@ export default function SupportPage() {
         return;
       }
 
-      // Lógica Padrão da Árvore de Decisão
       setTimeout(async () => {
         const botResponse = getConsultantResponse(userMsg);
         
@@ -488,6 +506,24 @@ export default function SupportPage() {
                   </div>
                 </div>
               )}
+
+              {isSupportTyping && (
+                <div className="flex justify-start animate-in fade-in slide-in-from-left-2 duration-300">
+                  <div className="flex gap-2 md:gap-3 items-center">
+                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
+                      <Headphones className="w-4 h-4 animate-bounce" />
+                    </div>
+                    <div className="space-y-1">
+                      <div className="bg-muted/30 px-4 py-2 rounded-full flex gap-1 items-center">
+                        <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-pulse" />
+                        <div className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-pulse [animation-delay:0.2s]" />
+                        <div className="w-1.5 h-1.5 bg-primary/80 rounded-full animate-pulse [animation-delay:0.4s]" />
+                      </div>
+                      <span className="text-[8px] font-black uppercase text-primary/60 ml-1">Suporte está digitando...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </ScrollArea>
 
@@ -502,7 +538,10 @@ export default function SupportPage() {
                  <div className="relative flex-1 group">
                    <Input 
                      value={message}
-                     onChange={(e) => setMessage(e.target.value)}
+                     onChange={(e) => {
+                       setMessage(e.target.value);
+                       handleTyping();
+                     }}
                      placeholder={isPendingClosure ? "Digite SIM ou CONCORDO para encerrar..." : (isHumanSupportPresent ? "Digite sua mensagem para o consultor..." : "Digite o número da opção (ex: 1)...")}
                      className={cn(
                        "h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 pr-10 text-xs md:text-sm font-medium transition-all",
