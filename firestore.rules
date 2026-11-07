@@ -15,8 +15,9 @@ service cloud.firestore {
     match /support_tickets/{ticketId} {
       allow create: if request.auth != null;
       // Leitura permitida para o dono do ticket ou administradores
+      // Simplificado para garantir funcionamento da listagem (query)
       allow read: if request.auth != null && (
-        (resource != null && resource.data.userId == request.auth.uid) ||
+        resource.data.userId == request.auth.uid ||
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true
       );
       // Atualização permitida apenas para administradores (marcar presença, mudar status)
@@ -24,7 +25,7 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
       // Deleção permitida para o dono (encerrar chat) ou administradores
       allow delete: if request.auth != null && (
-        (resource != null && resource.data.userId == request.auth.uid) ||
+        resource.data.userId == request.auth.uid ||
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true
       );
     }
