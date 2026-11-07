@@ -62,6 +62,7 @@ import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function MetricsPage() {
   const { user, loading: authLoading } = useUser();
@@ -81,7 +82,12 @@ export default function MetricsPage() {
     return status === 'gold' || status === 'enterprise' || status === 'trial';
   }, [userData]);
 
-  // Consulta simplificada para evitar erros de índice composto no Firebase
+  const isMapsLinkValid = useMemo(() => {
+    if (!userData?.googleMapsUrl) return false;
+    const url = userData.googleMapsUrl.toLowerCase();
+    return url.includes('review') || url.includes('writereview') || url.includes('placeid');
+  }, [userData]);
+
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
     return collection(db, 'users', user.uid, 'testimonials');
@@ -118,7 +124,6 @@ export default function MetricsPage() {
   };
 
   const stats = useMemo(() => {
-    // Garantimos que os dados brutos existam antes de calcular
     if (!rawTestimonials) return { 
       total: 0, 
       avgRating: "0.0", 
@@ -127,7 +132,6 @@ export default function MetricsPage() {
       growth: 0 
     };
 
-    // Filtramos apenas os aprovados e ordenamos por data em memória
     const approved = rawTestimonials
       .filter((t: any) => t.status === 'approved')
       .sort((a: any, b: any) => {
@@ -234,6 +238,7 @@ export default function MetricsPage() {
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
+          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 h-12 px-2 rounded-xl hover:bg-primary/5 group transition-all outline-none shadow-none focus-visible:ring-0">
@@ -241,12 +246,15 @@ export default function MetricsPage() {
                   <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[150px] transition-colors group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Minha Empresa'}
                   </span>
-                  <span className={cn(
-                    "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
-                    userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
-                  )}>
-                    {membershipLabel}
-                  </span>
+                  <div className="flex flex-col items-end gap-0">
+                    <span className={cn(
+                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
+                      userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
+                    )}>
+                      {membershipLabel}
+                    </span>
+                    {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
+                  </div>
                 </div>
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
                   <User className="w-4 h-4" />
@@ -271,14 +279,6 @@ export default function MetricsPage() {
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Planos de Upgrade</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={() => router.push('/pricing')} 
-                className="rounded-xl cursor-pointer font-bold py-2.5 opacity-70"
-              >
-                <Handshake className="mr-2 h-4 w-4 text-primary" />
-                <span>Serviços de Parceiros</span>
-                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
               </DropdownMenuItem>
               
               {userData?.isAdmin && (
@@ -519,7 +519,7 @@ export default function MetricsPage() {
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority />
         </div>
-        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology - Business Intelligence v1.0</p>
+        <p className="text-[9px] text-muted-foreground uppercase font-black opacity-60">© 2026 Proova Technology - Business Intelligence v1.0</p>
       </footer>
     </div>
   );
