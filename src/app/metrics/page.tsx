@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState } from 'react';
@@ -284,9 +283,10 @@ export default function MetricsPage() {
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Upgrade</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
+              <DropdownMenuItem className="rounded-xl font-bold py-2.5 opacity-50 cursor-not-allowed">
                 <Handshake className="mr-2 h-4 w-4 text-primary" />
                 <span>Parceiros</span>
+                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
               </DropdownMenuItem>
               
               {userData?.isAdmin && (
@@ -302,7 +302,7 @@ export default function MetricsPage() {
                 <span>Alternar Tema</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5">
+              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-bold font-bold py-2.5">
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Sair</span>
               </DropdownMenuItem>
@@ -582,4 +582,3 @@ export default function MetricsPage() {
     </div>
   );
 }
-

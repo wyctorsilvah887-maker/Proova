@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -664,9 +663,10 @@ export default function DashPage() {
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Upgrade</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
+              <DropdownMenuItem className="rounded-xl font-bold py-2.5 opacity-50 cursor-not-allowed">
                 <Handshake className="mr-2 h-4 w-4 text-primary" />
                 <span>Parceiros</span>
+                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
               </DropdownMenuItem>
               {userData?.isAdmin && (
                 <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
@@ -1383,4 +1383,3 @@ export default function DashPage() {
     </div>
   );
 }
-

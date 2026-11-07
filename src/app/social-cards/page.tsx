@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -141,7 +140,7 @@ export default function SocialCardsPage() {
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-0" />
+          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent focus-visible:ring-0" />
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -188,9 +187,10 @@ export default function SocialCardsPage() {
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Upgrade</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
+              <DropdownMenuItem className="rounded-xl font-bold py-2.5 opacity-50 cursor-not-allowed">
                 <Handshake className="mr-2 h-4 w-4 text-primary" />
                 <span>Parceiros</span>
+                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
               </DropdownMenuItem>
               {userData?.isAdmin && (
                 <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
@@ -296,4 +296,3 @@ export default function SocialCardsPage() {
     </div>
   );
 }
-

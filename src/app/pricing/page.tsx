@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
@@ -266,9 +265,10 @@ export default function PricingPage() {
                     <span>Suporte Proova</span>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem onClick={() => router.push('/partners')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                  <DropdownMenuItem className="rounded-xl font-bold py-2.5 opacity-50 cursor-not-allowed">
                     <Handshake className="mr-2 h-4 w-4 text-primary" />
                     <span>Parceiros</span>
+                    <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
                   </DropdownMenuItem>
 
                   {effectiveUserData?.isAdmin && (
@@ -481,4 +481,3 @@ export default function PricingPage() {
     </div>
   );
 }
-
