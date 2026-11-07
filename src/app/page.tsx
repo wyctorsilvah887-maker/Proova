@@ -215,7 +215,7 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
             isVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
           )}>
             Implemente uma Engenharia de <br className="hidden sm:block" />
-            <span className="inline-block relative px-2 bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto]">
+            <span className="inline-block relative px-3 bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto]">
               CONFIANÇA
             </span> imediata.
           </h1>
@@ -258,7 +258,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
         )}>
           <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">A Ciência da Reputação Digital</h2>
           <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
-            Seja a <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto]">Referência</span> absoluta do seu mercado.
+            Seja a <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-3">Referência</span> absoluta do seu mercado.
           </h3>
           <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">A ausência de prova social gera incerteza. A incerteza interrompe a venda.</p>
         </div>
@@ -367,7 +367,7 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
           <h3 className={cn(
             "text-3xl md:text-5xl font-black font-headline tracking-tighter"
           )}>
-            O Padrão Ouro em <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto]">Reputação</span>.
+            O Padrão Ouro em <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-3">Reputação</span>.
           </h3>
           <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Uma infraestrutura completa para gerir, proteger e exibir a força da sua marca.</p>
         </div>
@@ -437,7 +437,7 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
           )}>
             <div className="space-y-4">
               <h2 className="text-3xl md:text-5xl font-black font-headline leading-tight tracking-tight">
-                Consolide sua marca como a <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto]">Única Opção</span> viável.
+                Consolide sua marca como a <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-3">Única Opção</span> viável.
               </h2>
               <p className="text-sm md:text-lg text-muted-foreground font-medium italic">
                 "No mercado moderno, a confiança não é um detalhe — é a moeda que dita o seu volume de vendas."
