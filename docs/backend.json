@@ -18,6 +18,10 @@
         "isAdmin": { "type": "boolean" },
         "membershipStatus": { "type": "string" },
         "isSetupProcessDone": { "type": "boolean", "description": "Indica se o usuário já completou o checklist de onboarding pelo menos uma vez." },
+        "testimonialsCount": { "type": "number" },
+        "googleRedirectCount": { "type": "number", "description": "Contagem de cliques para o Google Maps." },
+        "ppVisitCount": { "type": "number", "description": "Contagem de visitas na Página Pública (Link in Bio)." },
+        "whatsappClickCount": { "type": "number", "description": "Contagem de cliques no botão de WhatsApp da PP." },
         "createdAt": { "type": "string", "format": "date-time" }
       }
     },

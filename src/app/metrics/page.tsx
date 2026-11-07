@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState } from 'react';
@@ -23,7 +24,11 @@ import {
   ChevronDown,
   Mail,
   Lock,
-  Shield
+  Shield,
+  Globe,
+  MessageCircle,
+  Zap,
+  TrendingDown
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -128,8 +133,7 @@ export default function MetricsPage() {
       total: 0, 
       avgRating: "0.0", 
       chartData: [], 
-      pieData: [],
-      growth: 0 
+      pieData: []
     };
 
     const approved = rawTestimonials
@@ -189,22 +193,17 @@ export default function MetricsPage() {
     };
   }, [rawTestimonials, period]);
 
+  const ppConversionRate = useMemo(() => {
+    const visits = userData?.ppVisitCount || 0;
+    const clicks = userData?.whatsappClickCount || 0;
+    if (visits === 0) return 0;
+    return Math.round((clicks / visits) * 100);
+  }, [userData]);
+
   const chartConfig: ChartConfig = {
     count: {
       label: "Depoimentos",
       color: "hsl(var(--primary))",
-    },
-    stars5: {
-      label: "5 Estrelas",
-      color: "hsl(var(--primary))",
-    },
-    stars4: {
-      label: "4 Estrelas",
-      color: "rgba(249, 115, 22, 0.6)",
-    },
-    starsRest: {
-      label: "Outros",
-      color: "rgba(249, 115, 22, 0.2)",
     }
   };
 
@@ -303,7 +302,7 @@ export default function MetricsPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-8 space-y-8 max-w-7xl mx-auto w-full pt-24 md:pt-32">
+      <main className="flex-1 p-4 md:p-8 space-y-12 max-w-7xl mx-auto w-full pt-24 md:pt-32">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex flex-col gap-4">
             <Link 
@@ -320,7 +319,7 @@ export default function MetricsPage() {
                 </div>
                 Proova Analytics
               </h1>
-              <p className="text-xs md:text-sm text-muted-foreground font-medium">O ROI da sua confiança em números reais.</p>
+              <p className="text-xs md:text-sm text-muted-foreground font-medium">Análise de impacto e conversão da sua autoridade digital.</p>
             </div>
           </div>
 
@@ -347,58 +346,110 @@ export default function MetricsPage() {
             >
               {isSendingReport ? <Loader2 className="w-3 h-3 animate-spin" /> : <Mail className="w-3 h-3" />} 
               {!isPremiumUser && <Lock className="w-2.5 h-2.5" />} 
-              Disparar Relatório Completo por E-mail
+              Relatório Completo por E-mail
             </button>
           </div>
         </header>
 
-        <div className="grid gap-4 md:gap-6 grid-cols-2 lg:grid-cols-4">
-          <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-              <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Volume Total</CardTitle>
-              <MessageSquare className="w-4 h-4 text-primary" />
-            </CardHeader>
-            <CardContent className="px-4 md:px-6 pb-4">
-              <div className="text-2xl font-black">{stats.total}</div>
-              <p className="text-[9px] text-muted-foreground uppercase font-bold">Depoimentos aprovados</p>
-            </CardContent>
-          </Card>
+        {/* SECTION 1: Elogios e G-Boost */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-2">
+            <Zap className="w-4 h-4 text-primary" />
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Performance G-Boost</h2>
+          </div>
+          <div className="grid gap-4 md:gap-6 grid-cols-2 lg:grid-cols-4">
+            <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
+                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Volume Total</CardTitle>
+                <MessageSquare className="w-4 h-4 text-primary" />
+              </CardHeader>
+              <CardContent className="px-4 md:px-6 pb-4">
+                <div className="text-2xl font-black">{stats.total}</div>
+                <p className="text-[9px] text-muted-foreground uppercase font-bold">Depoimentos aprovados</p>
+              </CardContent>
+            </Card>
 
-          <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-              <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Média Geral</CardTitle>
-              <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-            </CardHeader>
-            <CardContent className="px-4 md:px-6 pb-4">
-              <div className="text-2xl font-black">{stats.avgRating}</div>
-              <p className="text-[9px] text-muted-foreground uppercase font-bold">Estrelas (Rating)</p>
-            </CardContent>
-          </Card>
+            <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
+                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Média Geral</CardTitle>
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              </CardHeader>
+              <CardContent className="px-4 md:px-6 pb-4">
+                <div className="text-2xl font-black">{stats.avgRating}</div>
+                <p className="text-[9px] text-muted-foreground uppercase font-bold">Estrelas (Rating)</p>
+              </CardContent>
+            </Card>
 
-          <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-              <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">G-Boost</CardTitle>
-              <MousePointer2 className="w-4 h-4 text-primary" />
-            </CardHeader>
-            <CardContent className="px-4 md:px-6 pb-4">
-              <div className="text-2xl font-black">{userData?.googleRedirectCount || 0}</div>
-              <p className="text-[9px] text-muted-foreground uppercase font-bold">Cliques no Maps</p>
-            </CardContent>
-          </Card>
+            <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
+                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Cliques no Maps</CardTitle>
+                <MousePointer2 className="w-4 h-4 text-primary" />
+              </CardHeader>
+              <CardContent className="px-4 md:px-6 pb-4">
+                <div className="text-2xl font-black">{userData?.googleRedirectCount || 0}</div>
+                <p className="text-[9px] text-muted-foreground uppercase font-bold">Encaminhados G-Boost</p>
+              </CardContent>
+            </Card>
 
-          <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem] bg-primary/5 border border-primary/10">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-              <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary">Conversão G-Boost Estimada</CardTitle>
-              <TrendingUp className="w-4 h-4 text-primary" />
-            </CardHeader>
-            <CardContent className="px-4 md:px-6 pb-4">
-              <div className="text-2xl font-black text-primary">
-                {userData?.googleRedirectCount && stats.total && stats.total > 0 ? ((userData.googleRedirectCount / stats.total) * 100).toFixed(0) : 0}%
-              </div>
-              <p className="text-[9px] text-primary/60 uppercase font-bold">Elogios vs Cliques</p>
-            </CardContent>
-          </Card>
-        </div>
+            <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem] bg-primary/5 border border-primary/10">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
+                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary">Conversão G-Boost Estimada</CardTitle>
+                <TrendingUp className="w-4 h-4 text-primary" />
+              </CardHeader>
+              <CardContent className="px-4 md:px-6 pb-4">
+                <div className="text-2xl font-black text-primary">
+                  {userData?.googleRedirectCount && stats.total && stats.total > 0 ? ((userData.googleRedirectCount / stats.total) * 100).toFixed(0) : 0}%
+                </div>
+                <p className="text-[9px] text-primary/60 uppercase font-bold">Elogios vs Cliques</p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+
+        {/* SECTION 2: Link in Bio Performance */}
+        <section className="space-y-6">
+          <div className="flex items-center gap-2">
+            <Globe className="w-4 h-4 text-primary" />
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Performance Link in Bio</h2>
+          </div>
+          <div className="grid gap-4 md:gap-6 grid-cols-2 lg:grid-cols-4">
+            <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
+                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Visitas Link in Bio</CardTitle>
+                <Globe className="w-4 h-4 text-primary" />
+              </CardHeader>
+              <CardContent className="px-4 md:px-6 pb-4">
+                <div className="text-2xl font-black">{userData?.ppVisitCount || 0}</div>
+                <p className="text-[9px] text-muted-foreground uppercase font-bold">Visualizações da página</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
+                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Cliques WhatsApp</CardTitle>
+                <MessageCircle className="w-4 h-4 text-green-500" />
+              </CardHeader>
+              <CardContent className="px-4 md:px-6 pb-4">
+                <div className="text-2xl font-black">{userData?.whatsappClickCount || 0}</div>
+                <p className="text-[9px] text-muted-foreground uppercase font-bold">Intenções de contato</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem] bg-green-500/5 border border-green-500/10 col-span-2">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
+                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-green-600">Conversão Link in Bio</CardTitle>
+                <TrendingUp className="w-4 h-4 text-green-600" />
+              </CardHeader>
+              <CardContent className="px-4 md:px-6 pb-4">
+                <div className="flex items-end gap-3">
+                  <div className="text-3xl font-black text-green-600">{ppConversionRate}%</div>
+                  <Badge variant="outline" className="mb-1 text-[8px] font-black uppercase bg-green-500/10 text-green-600 border-none">Taxa de Lead</Badge>
+                </div>
+                <p className="text-[9px] text-green-600/60 uppercase font-bold mt-1">Visitas que se tornaram contatos reais</p>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
 
         <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
           <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden bg-background p-6 md:p-8">
@@ -407,7 +458,7 @@ export default function MetricsPage() {
                  <div className="bg-primary/10 p-2 rounded-xl text-primary"><Calendar className="w-5 h-5" /></div>
                  <CardTitle className="text-lg font-black font-headline">Fluxo de Coleta</CardTitle>
               </div>
-              <CardDescription className="text-xs">Número de novos elogios recebidos por dia no período.</CardDescription>
+              <CardDescription className="text-xs">Volume diário de novos elogios capturados.</CardDescription>
             </CardHeader>
             <CardContent className="p-0 h-[300px]">
               <ChartContainer config={chartConfig} className="h-full w-full">
@@ -438,35 +489,33 @@ export default function MetricsPage() {
             <CardHeader className="p-0 mb-8">
               <div className="flex items-center gap-3 mb-2">
                  <div className="bg-primary/10 p-2 rounded-xl text-primary"><Star className="w-5 h-5" /></div>
-                 <CardTitle className="text-lg font-black font-headline">Índice de Satisfação</CardTitle>
+                 <CardTitle className="text-lg font-black font-headline">Qualidade da Reputação</CardTitle>
               </div>
-              <CardDescription className="text-xs">Distribuição percentual das notas enviadas pelos seus clientes.</CardDescription>
+              <CardDescription className="text-xs">Distribuição percentual das notas enviadas.</CardDescription>
             </CardHeader>
             <CardContent className="p-0 flex flex-col sm:flex-row items-center justify-center gap-8 h-[300px]">
               {stats.pieData.length > 0 ? (
                 <>
                   <div className="relative w-[200px] h-[200px]">
-                    <ChartContainer config={chartConfig} className="h-full w-full">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={stats.pieData}
-                            innerRadius={60}
-                            outerRadius={80}
-                            paddingAngle={5}
-                            dataKey="value"
-                          >
-                            {stats.pieData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.color} />
-                            ))}
-                          </Pie>
-                          <ChartTooltip content={<ChartTooltipContent />} />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </ChartContainer>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={stats.pieData}
+                          innerRadius={60}
+                          outerRadius={80}
+                          paddingAngle={5}
+                          dataKey="value"
+                        >
+                          {stats.pieData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <ChartTooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
                     <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                        <span className="text-3xl font-black">{stats.avgRating}</span>
-                       <span className="text-[9px] uppercase font-black text-muted-foreground">SCORE</span>
+                       <span className="text-[9px] uppercase font-black text-muted-foreground tracking-widest">SCORE</span>
                     </div>
                   </div>
                   <div className="space-y-3">
@@ -496,17 +545,17 @@ export default function MetricsPage() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                <div className="space-y-1">
                  <h3 className="font-black uppercase tracking-widest text-xs flex items-center gap-2">
-                   <Gem className="w-4 h-4 text-primary" /> Dica de Reputação
+                   <Gem className="w-4 h-4 text-primary" /> Consultoria Proova
                  </h3>
                  <p className="text-sm text-muted-foreground max-w-2xl">
-                   {Number(stats.avgRating) >= 4.8 
-                     ? "Sua nota é excelente! Que tal investir em novos murais para converter os visitantes do seu site ainda mais rápido?" 
-                     : "Sua nota está boa, mas lembre-se: clientes 5 estrelas são os que mais tendem a te recomendar. Foi em pedir o G-Boost para eles."}
+                   {ppConversionRate < 10 && userData?.ppVisitCount > 50 
+                     ? "Notamos muitas visitas no seu Link in Bio, mas poucos contatos. Tente mudar o título hero para algo mais chamativo ou reorganize seus melhores depoimentos no topo." 
+                     : "Sua performance está estável. Continue gerando novos Social Cards para manter o tráfego fluindo do Instagram para a sua Página Pública."}
                  </p>
                </div>
-               <Link href="/widgets">
+               <Link href="/ppeditor">
                  <button className="h-12 px-8 bg-primary text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg active:scale-95">
-                   Gerenciar Meus Murais
+                   Otimizar Link in Bio
                  </button>
                </Link>
             </div>
@@ -519,7 +568,7 @@ export default function MetricsPage() {
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority />
         </div>
-        <p className="text-[9px] text-muted-foreground uppercase font-black opacity-60">© 2026 Proova Technology - Business Intelligence v1.0</p>
+        <p className="text-[9px] text-muted-foreground uppercase font-black opacity-60">© 2026 Proova Technology - Business Intelligence v1.1</p>
       </footer>
     </div>
   );

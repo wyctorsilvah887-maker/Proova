@@ -24,6 +24,7 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { trackPPVisit, trackWhatsappClick } from '@/app/actions/stats-actions';
 
 export default function PPClient({ slug }: { slug: string }) {
   const db = useFirestore();
@@ -55,8 +56,16 @@ export default function PPClient({ slug }: { slug: string }) {
         const q = query(usersRef, where('companySlug', '==', decodedSlug), limit(1));
         const userQuerySnap = await getDocs(q);
         if (!userQuerySnap.empty) {
-          setTargetUserId(userQuerySnap.docs[0].id);
+          const uId = userQuerySnap.docs[0].id;
+          setTargetUserId(uId);
           setCompanyName(userQuerySnap.docs[0].data().companyName);
+
+          // Rastreamento de Visita Unica por Sessão
+          const hasVisited = sessionStorage.getItem(`pp_visited_${uId}`);
+          if (!hasVisited) {
+            trackPPVisit(uId);
+            sessionStorage.setItem(`pp_visited_${uId}`, 'true');
+          }
         }
       } catch (err) {
         console.error("Erro ao resolver slug:", err);
@@ -209,6 +218,12 @@ export default function PPClient({ slug }: { slug: string }) {
     );
   };
 
+  const handleWhatsappClick = () => {
+    if (targetUserId) {
+      trackWhatsappClick(targetUserId);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background font-body flex flex-col relative overflow-x-hidden text-foreground">
       {!isStandalone && (
@@ -337,6 +352,7 @@ export default function PPClient({ slug }: { slug: string }) {
           href={`https://wa.me/${whatsappNumber.replace(/\D/g, '')}`} 
           target="_blank" 
           rel="noopener noreferrer" 
+          onClick={handleWhatsappClick}
           className="fixed bottom-6 right-6 z-[100] bg-[#25D366] text-white p-4 rounded-full shadow-[0_15px_30px_rgba(37,211,102,0.4)] hover:scale-110 active:scale-95 transition-all flex items-center justify-center group"
           title="Fale conosco via WhatsApp"
         >
