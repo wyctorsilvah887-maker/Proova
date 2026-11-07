@@ -79,7 +79,7 @@ export default function SupportPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
-  // Monitoramento de tickets ativos para bolinhas de status
+  // Monitoramento de tickets ativos para bolinhas de status e desativação do robô
   const supportTicketQuery = useMemo(() => {
     if (!db || !user) return null;
     return query(collection(db, 'support_tickets'), where('userId', '==', user.uid), limit(1));
@@ -87,6 +87,7 @@ export default function SupportPage() {
 
   const { data: activeTickets } = useCollection(supportTicketQuery);
   const activeTicket = activeTickets?.[0] as any;
+  const isHumanSupportPresent = activeTicket?.isSupportInChat === true;
 
   const messagesQuery = useMemo(() => {
     if (!db || !user) return null;
@@ -241,6 +242,12 @@ export default function SupportPage() {
         createdAt: serverTimestamp()
       });
 
+      // Se houver suporte humano no chat, o robô não responde
+      if (isHumanSupportPresent) {
+        setIsSending(false);
+        return;
+      }
+
       setIsAiThinking(true);
       
       // Lógica de Encerramento Pendente
@@ -391,17 +398,19 @@ export default function SupportPage() {
           <div className="px-4 py-3 md:p-6 border-b bg-muted/5 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3 md:gap-4">
               <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-primary/10 text-primary flex items-center justify-center shadow-inner relative">
-                <Bot className="w-5 h-5 md:w-6 md:h-6" />
+                {isHumanSupportPresent ? <Headphones className="w-5 h-5 md:w-6 md:h-6" /> : <Bot className="w-5 h-5 md:w-6 md:h-6" />}
                 {activeTicket && (
-                  <div className={cn("absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-background", activeTicket.isSupportInChat ? "bg-green-500 animate-pulse" : "bg-red-500")} />
+                  <div className={cn("absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-background", isHumanSupportPresent ? "bg-green-500 animate-pulse" : "bg-red-500")} />
                 )}
               </div>
               <div>
-                <h2 className="text-sm md:text-lg font-black font-headline tracking-tight uppercase leading-none">Consultor Proova v1.0</h2>
+                <h2 className="text-sm md:text-lg font-black font-headline tracking-tight uppercase leading-none">
+                  {isHumanSupportPresent ? "Atendimento Humano" : "Consultor Proova v1.0"}
+                </h2>
                 <div className="flex items-center gap-1.5 mt-1">
-                   <div className={cn("h-1.5 w-1.5 md:h-2 md:w-2 rounded-full", activeTicket?.isSupportInChat ? "bg-green-500 animate-pulse" : "bg-green-500/40")} />
+                   <div className={cn("h-1.5 w-1.5 md:h-2 md:w-2 rounded-full", isHumanSupportPresent ? "bg-green-500 animate-pulse" : "bg-green-500/40")} />
                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                     {activeTicket?.isSupportInChat ? "Suporte Humano Ativo" : "Árvore de Decisão Ativa"}
+                     {isHumanSupportPresent ? "Conectado agora" : "Árvore de Decisão Ativa"}
                    </span>
                 </div>
               </div>
@@ -435,8 +444,7 @@ export default function SupportPage() {
                 )}>
                   <div className={cn(
                     "flex gap-2 md:gap-3 max-w-[90%] sm:max-w-[80%]",
-                    msg.sender === 'user' ? "flex-row-reverse" : "flex-row"
-                  )}>
+                    msg.sender === 'user' ? "flex-row-reverse" : "flex-row")}>
                     <div className={cn(
                       "h-8 w-8 rounded-lg flex items-center justify-center shrink-0 mt-1 shadow-md",
                       msg.sender === 'user' ? "bg-muted text-muted-foreground" : (msg.isSystem ? "bg-primary/20 text-primary" : "bg-primary text-white")
@@ -452,10 +460,7 @@ export default function SupportPage() {
                       )}>
                         <p className="text-xs md:text-sm font-medium leading-relaxed whitespace-pre-wrap">{formatText(msg.text)}</p>
                       </div>
-                      <div className={cn(
-                        "flex items-center gap-1.5 px-1",
-                        msg.sender === 'user' ? "justify-end" : "justify-start"
-                      )}>
+                      <div className={cn("flex items-center gap-1.5 px-1", msg.sender === 'user' ? "justify-end" : "justify-start")}>
                         <span className="text-[8px] font-black uppercase text-muted-foreground opacity-60">
                           {msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '...'}
                         </span>
@@ -495,7 +500,7 @@ export default function SupportPage() {
                    <Input 
                      value={message}
                      onChange={(e) => setMessage(e.target.value)}
-                     placeholder={isPendingClosure ? "Digite SIM ou CONCORDO para encerrar..." : "Digite o número da opção (ex: 1)..."}
+                     placeholder={isPendingClosure ? "Digite SIM ou CONCORDO para encerrar..." : (isHumanSupportPresent ? "Digite sua mensagem para o consultor..." : "Digite o número da opção (ex: 1)...")}
                      className={cn(
                        "h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 pr-10 text-xs md:text-sm font-medium transition-all",
                        isPendingClosure && "border-destructive/30 focus:ring-destructive/20 text-center uppercase tracking-widest font-black"
@@ -514,7 +519,7 @@ export default function SupportPage() {
                </form>
              )}
              <p className="text-[8px] md:text-[9px] text-center mt-3 uppercase tracking-[0.2em] font-black text-muted-foreground opacity-40">
-               Histórico local de 24h. Use o menu numerado para navegar.
+               {isHumanSupportPresent ? "Chat direto com consultor humano ativado." : "Histórico local de 24h. Use o menu numerado para navegar."}
              </p>
           </div>
         </div>
