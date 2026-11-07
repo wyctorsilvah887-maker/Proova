@@ -141,7 +141,7 @@ export default function PricingPage() {
           "Depoimentos Ativos Ilimitados",
           "Suporte VIP Dedicado no App",
           "Design de Página Ultra Customizado",
-          "Analytics Avançado de Conversão"
+          "Análise Preditiva de Conversão"
         ]
       }
     ];
