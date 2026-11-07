@@ -3,7 +3,7 @@ import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { initializeFirestore, getFirestore, Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
 import { getStorage, FirebaseStorage } from 'firebase/storage';
-import { getMessaging, Messaging, isSupported } from 'firebase/messaging';
+import { getMessaging, Messaging } from 'firebase/messaging';
 import { firebaseConfig } from './config';
 
 /**
@@ -34,12 +34,14 @@ export function initializeFirebase(): {
   const auth = getAuth(app);
   const storage = getStorage(app);
   
-  // Messaging só funciona no cliente
+  // Messaging só pode ser inicializado se estivermos no ambiente do navegador
   let messaging: Messaging | null = null;
   if (typeof window !== 'undefined') {
-    isSupported().then(yes => {
-      if (yes) messaging = getMessaging(app);
-    });
+    try {
+      messaging = getMessaging(app);
+    } catch (e) {
+      console.warn("Falha ao inicializar Firebase Messaging no ambiente atual.");
+    }
   }
   
   return { app, firestore, auth, storage, messaging };

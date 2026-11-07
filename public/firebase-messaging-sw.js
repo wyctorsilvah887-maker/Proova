@@ -1,13 +1,9 @@
 
-/*
-* Service Worker para Notificações Push do Proova.
-* Este arquivo lida com as mensagens em segundo plano.
-*/
+importScripts('https://www.gstatic.com/firebasejs/11.0.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/11.0.1/firebase-messaging-compat.js');
 
-importScripts('https://www.gstatic.com/firebasejs/11.9.1/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/11.9.1/firebase-messaging-compat.js');
-
-// Configurações do Firebase extraídas do config.ts
+// Configuração idêntica ao src/firebase/config.ts
+// Estes dados são públicos e seguros para estarem aqui.
 firebase.initializeApp({
   apiKey: "AIzaSyC0fZYE2DoAtkj3iz-ngO-79XCnL6lQAgc",
   authDomain: "studio-1166590320-ddf7e.firebaseapp.com",
@@ -19,15 +15,14 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Captura mensagens em plano de fundo
+// Handler para notificações em background
 messaging.onBackgroundMessage((payload) => {
-  console.log('[firebase-messaging-sw.js] Mensagem recebida em background: ', payload);
+  console.log('[firebase-messaging-sw.js] Mensagem em background recebida: ', payload);
   
-  const notificationTitle = payload.notification.title || 'Novo Alerta Proova';
+  const notificationTitle = payload.notification.title;
   const notificationOptions = {
-    body: payload.notification.body || 'Você tem uma nova atualização na plataforma.',
-    icon: '/maskable_icon_x192 (6).png',
-    badge: '/maskable_icon_x192 (6).png'
+    body: payload.notification.body,
+    icon: '/Logotipo%20PROOVA%20white%20mode%201.png'
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
