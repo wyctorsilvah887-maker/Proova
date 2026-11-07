@@ -2,7 +2,7 @@
 /**
  * @fileOverview Agente de Inteligência Artificial para Suporte Estratégico Proova.
  * 
- * - supportAiAction - Função exportada que aciona o suporte inteligente.
+ * - supportAiAction - Função exportada que aciona o suporte inteligente utilizando ai.generate diretamente.
  */
 
 import { ai } from '@/ai/genkit';
@@ -23,15 +23,14 @@ const SupportAiOutputSchema = z.object({
 export type SupportAiOutput = z.infer<typeof SupportAiOutputSchema>;
 
 /**
- * Definição do Prompt Estratégico.
- * O Genkit utiliza Handlebars para interpolar as variáveis do input.
+ * Função de ação que processa a dúvida do usuário utilizando ai.generate.
+ * Esta abordagem é mais direta e evita erros de registro de ação no plugin googleai.
  */
-const supportPrompt = ai.definePrompt({
-  name: 'supportPrompt',
-  input: { schema: SupportAiInputSchema },
-  output: { schema: SupportAiOutputSchema },
-  system: `Você é o "Especialista Proova", o assistente de suporte inteligente da plataforma Proova.
-Sua missão é ajudar o usuário {{{userName}}} (Plano: {{{membershipStatus}}}) a dominar o mercado através da prova social.
+export async function supportAiAction(input: SupportAiInput): Promise<SupportAiOutput> {
+  try {
+    const { output } = await ai.generate({
+      system: `Você é o "Especialista Proova", o assistente de suporte inteligente da plataforma Proova.
+Sua missão é ajudar o usuário ${input.userName || 'Membro'} (Plano: ${input.membershipStatus || 'Base'}) a dominar o mercado através da prova social.
 
 ### CONHECIMENTO ESTRATÉGICO PROOVA:
 1. **G-Boost**: Sistema que detecta elogios 5 estrelas e convida o cliente a avaliar no Google Maps. Isso aumenta o SEO Local.
@@ -46,25 +45,19 @@ Sua missão é ajudar o usuário {{{userName}}} (Plano: {{{membershipStatus}}}) 
 - Sugira upgrades para recursos premium (Gold/Enterprise) quando apropriado.
 - Nunca invente funcionalidades.
 - Respostas concisas e profissionais.`,
-  prompt: `Dúvida do Usuário: {{{message}}}`,
-});
+      prompt: input.message,
+      output: { schema: SupportAiOutputSchema }
+    });
 
-/**
- * Função de ação que chama o prompt registrado.
- */
-export async function supportAiAction(input: SupportAiInput): Promise<SupportAiOutput> {
-  try {
-    const { output } = await supportPrompt(input);
-    
     if (!output) {
-      throw new Error('A IA não gerou uma resposta.');
+      throw new Error('A IA não gerou uma resposta válida.');
     }
-    
+
     return output;
   } catch (error) {
-    console.error('Erro no fluxo de suporte IA:', error);
+    console.error('Erro crítico no suporte IA:', error);
     return { 
-      response: "Olá! No momento estou passando por uma atualização técnica. Por favor, tente novamente em alguns instantes ou aguarde um consultor humano." 
+      response: "Olá! No momento estou passando por uma atualização técnica para melhorar meu atendimento. Por favor, tente novamente em alguns instantes ou se for algo urgente, aguarde um consultor humano." 
     };
   }
 }
