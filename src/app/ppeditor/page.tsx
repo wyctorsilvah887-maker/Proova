@@ -614,8 +614,9 @@ const PublicPageSettings = ({
             </TabsContent>
           </div>
         </ScrollArea>
-      </div>
-    );
+      </Tabs>
+    </div>
+  );
 };
 
 export default function PPEditorPage() {
@@ -825,7 +826,7 @@ export default function PPEditorPage() {
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-3 flex-1">
           <Link href="/dash">
-            <Button variant="ghost" size="sm" className="h-10 px-2 gap-2 text-muted-foreground hover:text-primary hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 transition-all rounded-xl shadow-none">
+            <Button variant="ghost" size="sm" className="h-10 px-2 gap-2 text-muted-foreground hover:text-primary hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 rounded-xl shadow-none">
                <ArrowLeft className="w-4 h-4" /><span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Voltar</span>
             </Button>
           </Link>
@@ -869,7 +870,7 @@ export default function PPEditorPage() {
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl font-bold py-2.5 cursor-pointer">
                 <Gem className="mr-2 h-4 w-4 text-primary" />Upgrade
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-bold py-2.5 opacity-70">
+              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl font-bold py-2.5 opacity-70">
                 <Handshake className="mr-2 h-4 w-4 text-primary" /><span>Parceiros</span><Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl font-bold py-2.5 cursor-pointer">

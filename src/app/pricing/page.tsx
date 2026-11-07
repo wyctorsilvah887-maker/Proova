@@ -87,7 +87,7 @@ export default function PricingPage() {
 
   const status = useMemo(() => {
     if (!user) return 'guest';
-    return effectiveUserData?.membershipStatus || 'base';
+    return (effectiveUserData?.membershipStatus || 'base').toLowerCase();
   }, [user, effectiveUserData]);
 
   const isMapsLinkValid = useMemo(() => {
@@ -194,7 +194,7 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-background font-body text-foreground flex flex-col overflow-x-hidden">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[100] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center gap-4 flex-1">
+        <div className="flex items-center gap-4">
           <Link href={user ? "/dash" : "/"}>
             <Button 
               variant="ghost" 
@@ -217,36 +217,21 @@ export default function PricingPage() {
           
           {user && (
             <div className="flex items-center gap-2 md:gap-4">
-              <div className="hidden lg:flex flex-col items-end mr-1">
-                <span className="text-[11px] font-bold truncate max-w-[150px] leading-tight group-hover:text-primary transition-colors">
-                  {effectiveUserData?.companyName || 'Minha Empresa'}
-                </span>
-                <div className="flex flex-col items-end gap-0">
-                  <span className={cn(
-                    "text-[8px] uppercase tracking-widest font-black leading-tight",
-                    status === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
-                  )}>
-                    {membershipLabel}
-                  </span>
-                  {isMapsLinkValid && <span className="text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
-                </div>
-              </div>
-
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="h-12 px-1 md:px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
-                    <div className="lg:hidden flex flex-col items-end">
-                      <span className="text-[10px] font-bold truncate max-w-[80px] leading-tight">
+                    <div className="flex flex-col items-end">
+                      <span className="text-[10px] md:text-xs font-bold truncate max-w-[80px] sm:max-w-[150px] transition-colors group-hover:text-primary leading-tight">
                         {effectiveUserData?.companyName || 'Empresa'}
                       </span>
-                      <div className="flex flex-col items-end">
+                      <div className="flex flex-col items-end gap-0">
                         <span className={cn(
-                          "text-[7px] uppercase tracking-widest font-black leading-tight",
+                          "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
                           status === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
                         )}>
                           {membershipLabel}
                         </span>
-                        {isMapsLinkValid && <span className="text-[5px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
+                        {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
                       </div>
                     </div>
                     <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
