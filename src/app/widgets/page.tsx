@@ -101,6 +101,12 @@ export default function WidgetsPage() {
     return status === 'gold' || status === 'enterprise' || status === 'trial';
   }, [userData]);
 
+  const isMapsLinkValid = useMemo(() => {
+    if (!userData?.googleMapsUrl) return false;
+    const url = userData.googleMapsUrl.toLowerCase();
+    return url.includes('review') || url.includes('writereview') || url.includes('placeid');
+  }, [userData]);
+
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
     if (status === 'enterprise') return 'Membro Enterprise';
@@ -247,7 +253,7 @@ export default function WidgetsPage() {
           </div>
         </div>
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle className="hidden sm:flex" />
+          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-0" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
@@ -255,12 +261,15 @@ export default function WidgetsPage() {
                   <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] md:max-w-[200px] transition-colors group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Minha Empresa'}
                   </span>
-                  <span className={cn(
-                    "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
-                    userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
-                  )}>
-                    {membershipLabel}
-                  </span>
+                  <div className="flex flex-col items-end gap-0">
+                    <span className={cn(
+                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
+                      userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
+                    )}>
+                      {membershipLabel}
+                    </span>
+                    {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
+                  </div>
                 </div>
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
               </Button>
