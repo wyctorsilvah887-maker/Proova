@@ -425,7 +425,7 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 PillarsSection.displayName = "PillarsSection";
 
 /**
- * Seção de Versatilidade (Mural embutido)
+ * Seção de Versatilidade (Mural embuido)
  */
 const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   return (
@@ -462,8 +462,8 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
           </div>
 
           <div className={cn(
-            "relative transition-all duration-1000 delay-500",
-            isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
+            "relative transition-all duration-1000 delay-500 flex flex-col",
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           )}>
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
             <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card p-4 sm:p-8 ring-1 ring-primary/10 h-[600px] flex flex-col items-center justify-center">
@@ -474,17 +474,17 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
                 style={{ border: 'none' }} 
                 allowtransparency="true"
               ></iframe>
-              
-              <div className="mt-8 text-center animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-700">
-                <Link 
-                  href="/c/proova" 
-                  className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center justify-center gap-2 group"
-                >
-                  Quer aparecer na nossa página? Deixe sua experiência usando o Proova
-                  <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
             </Card>
+            
+            <div className="mt-6 text-center animate-in fade-in slide-in-from-bottom-2 duration-1000 delay-1000">
+              <Link 
+                href="https://www.useproova.online/c/proova" 
+                className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors flex items-center justify-center gap-2 group"
+              >
+                Quer aparecer na nossa página? Deixe sua experiência usando o Proova
+                <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
           </div>
         </div>
       </div>

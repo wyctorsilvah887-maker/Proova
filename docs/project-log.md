@@ -2,16 +2,15 @@
 # Proova - Log de Desenvolvimento
 
 ## 📝 Histórico de Alterações Recentes
-- **Auto-Curadoria (Fila de Revisão) - [FINALIZADO]:** Implementado motor de regras que filtra depoimentos de alta qualidade (nota + tamanho + palavras positivas) e os envia para uma fila de aprovação manual no Dashboard. Adicionada notificação por e-mail via Resend para novos itens qualificados.
-- **Consultor Proova 2.0 (Scanner de Saúde Digital) - [FINALIZADO]:** Implementada auditoria técnica automatizada que verifica Place ID, validade do link de avaliação, completude do perfil no Google (fotos/horários) e balanço de depoimentos. Agora o sistema entrega diagnósticos com status OK/Atenção/Crítico e ações recomendadas.
-- **Sincronização Inteligente (Auto-Publish) - [FINALIZADO]:** Implementada lógica de publicação automática em widgets baseada em regras de nota e texto, permitindo uma gestão "mãos-livres" da prova social.
-- **Automação de Performance (Analytics Mail) - [FINALIZADO]:** Implementada geração de relatórios semanais comparativos enviando métricas de crescimento e depoimento destaque via Resend.
-- **Gamificação do Onboarding (Quest System) - [FINALIZADO]:** Implementada jornada de desbloqueio sequencial. Agora ferramentas como o Google Maps e o Kit de Marketing são liberados como recompensas de missões, tornando o aprendizado do produto muito mais fluido.
-- **Otimização de Tutorial Mobile - [FINALIZADO]:** Implementada correção crítica no sistema de rolagem do Tutorial no Dashboard com `ScrollArea` e layout flexível.
+- **Acesso Direto à Coleta (Landing Page) - [FINALIZADO]:** Adicionado link estratégico discreto na Landing Page (`/c/proova`) para capturar depoimentos de clientes da própria plataforma Proova, reforçando a autoridade da marca.
+- **Segurança de Suporte (Ajuste de Regras) - [FINALIZADO]:** Implementada permissão explícita de `list` na coleção de tickets de suporte, resolvendo o erro de permissão negada encontrado em ambientes de produção.
+- **Suporte Humanizado de Elite - [FINALIZADO]:** Implementada a interface `/admin/support/[userId]`, permitindo que administradores respondam em tempo real. Adicionadas notificações por e-mail e indicadores visuais de presença (bolinhas verde/vermelha) no Dashboard.
+- **Auto-Curadoria (Fila de Revisão) - [FINALIZADO]:** Implementado motor de regras que filtra depoimentos de alta qualidade e os envia para uma fila de aprovação.
+- **Consultor Proova 2.0 (Scanner de Saúde Digital) - [FINALIZADO]:** Auditoria técnica automatizada de perfis Google.
+- **Otimização de Tutorial Mobile - [FINALIZADO]:** Correção crítica no sistema de rolagem do Tutorial.
 
 ## 🚀 Próximos Marcos Técnicos
 - [ ] Implementação de **Insights de Sentimento** (Actionable AI).
 - [ ] **ROI da Confiança**: Cálculo de valor gerado por prova social.
 - [ ] **Daily Pick**: Notificação diária do melhor depoimento para o Instagram.
-- [ ] Implementação de Depoimentos em Vídeo.
 - [ ] Ativação da Moderação Automática com Genkit (Shield).

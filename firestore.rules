@@ -14,13 +14,17 @@ service cloud.firestore {
     // Regras para Tickets de Suporte Global
     match /support_tickets/{ticketId} {
       allow create: if request.auth != null;
-      // Leitura permitida para o dono do ticket ou administradores
-      // Simplificado para garantir funcionamento da listagem (query)
-      allow read: if request.auth != null && (
+      // Permissão para listar baseada no userId para evitar erro de 'list permission denied' no dashboard
+      allow list: if request.auth != null && (
+        request.query.filters.userId == request.auth.uid ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true
+      );
+      // Leitura pontual permitida para o dono do ticket ou administradores
+      allow get: if request.auth != null && (
         resource.data.userId == request.auth.uid ||
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true
       );
-      // Atualização permitida apenas para administradores (marcar presença, mudar status)
+      // Atualização permitida apenas para administradores
       allow update: if request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
       // Deleção permitida para o dono (encerrar chat) ou administradores
