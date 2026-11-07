@@ -137,7 +137,7 @@ export default function PricingPage() {
         disabled: status === 'enterprise',
         benefits: [
           "Tudo do Gold + Recursos Exclusivos",
-          "Vídeo Reviews 4K (Até 30s)",
+          "Vídeo Reviews 4K de Alto Impacto",
           "Depoimentos Ativos Ilimitados",
           "Suporte Prioritário Via WhatsApp",
           "Design de Página Ultra Customizado",
