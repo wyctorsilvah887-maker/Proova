@@ -242,7 +242,7 @@ export default function PricingPage() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl bg-background border">
                   <DropdownMenuLabel className="px-3 py-2">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Minha Conta</p>
+                    <p className="text-xs font-headline font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</p>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator className="mx-1" />
                   
@@ -346,7 +346,10 @@ export default function PricingPage() {
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <h3 className="text-xl font-black uppercase tracking-tight">{plan.name}</h3>
+                              <h3 className={cn(
+                                "text-xl font-black uppercase tracking-tight",
+                                plan.id === 'gold' && "inline-block bg-clip-text text-transparent bg-gradient-to-r from-white via-orange-200 to-white animate-text-shine bg-[length:200%_auto]"
+                              )}>{plan.name}</h3>
                               {plan.highlight && (
                                 <Badge className="bg-white text-primary text-[8px] font-black uppercase h-4 px-1.5 border-none">POPULAR</Badge>
                               )}
@@ -470,7 +473,7 @@ export default function PricingPage() {
       <footer className="py-20 border-t bg-background/50 flex flex-col items-center gap-8 text-center">
         <div className="relative w-[180px] h-[60px] opacity-30 grayscale">
           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="dark:hidden object-contain" />
-          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain hidden dark:block" />
+          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="hidden dark:block" />
         </div>
         <p className="text-[9px] text-muted-foreground font-black uppercase tracking-[0.3em]">© 2026 PROOVA TECHNOLOGY - ESTRATÉGIA EM REPUTAÇÃO</p>
       </footer>
