@@ -15,9 +15,8 @@ import {
 
 /**
  * Página pública do Widget (Embed VIP)
- * Renderiza apenas o mural de depoimentos de forma limpa e otimizada para ser usada em Iframes.
+ * Renderiza o mural de depoimentos com visual Premium VIP.
  * Otimizada para temas menores e dispositivos móveis.
- * Sem scroll e com centralização estratégica.
  */
 export default function WidgetPublicPage({ params }: { params: Promise<{ userId: string, widgetId: string }> }) {
   const { userId, widgetId } = use(params);
@@ -32,13 +31,11 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   useEffect(() => {
     if (!db || !userId || !widgetId) return;
 
-    // Escuta as configurações do widget
     const widgetRef = doc(db, 'users', userId, 'widgets', widgetId);
     const unsubWidget = onSnapshot(widgetRef, (docSnap) => {
       if (docSnap.exists()) setWidgetData(docSnap.data());
     });
 
-    // Escuta os depoimentos aprovados
     const testimonialsRef = collection(db, 'users', userId, 'testimonials');
     const tQuery = query(testimonialsRef, where('status', '==', 'approved'));
     const unsubTestimonials = onSnapshot(tQuery, (snapshot) => {
@@ -58,7 +55,6 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   const themeColor = widgetData?.themeColor || '#f97316';
   const secondaryColor = widgetData?.secondaryColor || '';
 
-  // Lógica de rotação para layouts dinâmicos (Mural e Popup)
   useEffect(() => {
     if ((layout === 'mural' || layout === 'popup') && filteredTestimonials.length > 0) {
       const interval = setInterval(() => {
@@ -72,7 +68,6 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
     }
   }, [layout, filteredTestimonials]);
 
-  // Lógica de auto-scroll para Carrossel
   useEffect(() => {
     if (!api || layout !== 'carousel') return;
     const interval = setInterval(() => api.scrollNext(), 5000);
@@ -108,44 +103,42 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
       <Card 
         key={t.id}
         className={cn(
-          "rounded-[1.5rem] sm:rounded-[2.5rem] p-5 sm:p-8 border-none shadow-2xl transition-all duration-700 hover:scale-[1.02] w-full max-w-full",
+          "rounded-[2.5rem] p-6 sm:p-10 border-none shadow-[0_20px_60px_-15px_rgba(0,0,0,0.6)] transition-all duration-700 hover:scale-[1.02] w-full max-w-full ring-1 ring-white/5",
           layout === 'grid' && "animate-in fade-in zoom-in-95 duration-500",
           layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-8 duration-700" : "animate-in fade-in slide-in-from-right-8 duration-700"),
           layout === 'popup' && !isAnimating && "animate-in fade-in zoom-in-90 duration-1000"
         )}
         style={{ 
           backgroundColor: secondaryColor || '#111111',
-          boxShadow: `0 20px 40px -20px ${themeColor}25`,
+          boxShadow: `0 30px 70px -20px ${themeColor}30, 0 20px 40px -20px rgba(0,0,0,0.5)`,
         }}
       >
-        <div className="space-y-4 sm:space-y-6">
+        <div className="space-y-6 sm:space-y-8">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="h-8 w-8 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl flex items-center justify-center text-white font-black text-[10px] sm:text-sm shadow-lg rotate-3 shrink-0" style={{ backgroundColor: themeColor }}>
-                {t.userName?.substring(0, 2).toUpperCase()}
-              </div>
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="h-2.5 w-2.5 rounded-full animate-pulse shadow-[0_0_10px_rgba(255,255,255,0.4)]" style={{ backgroundColor: themeColor }} />
               <div className="min-w-0">
-                <p className="font-black text-[11px] sm:text-sm text-white tracking-tight truncate max-w-[80px] sm:max-w-[120px]">{t.userName}</p>
-                <div className="flex items-center gap-1">
-                   <CheckCircle2 className="w-2 h-2 sm:w-2.5 sm:h-2.5 text-green-500 fill-green-500/20" />
-                   <span className="text-[7px] sm:text-[9px] font-black uppercase tracking-widest text-zinc-500">Verificado</span>
+                <p className="font-black text-[13px] sm:text-lg text-white tracking-tighter truncate max-w-[120px] sm:max-w-[180px] uppercase">{t.userName}</p>
+                <div className="flex items-center gap-1.5">
+                   <CheckCircle2 className="w-3 h-3 text-green-500 fill-green-500/10" />
+                   <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Feedback Verificado</span>
                 </div>
               </div>
             </div>
-            <div className="flex gap-0.5">
+            <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((s) => (
-                <Star key={s} className={cn("w-2.5 h-2.5 sm:w-3 sm:h-3", s <= (t.rating || 5) ? "fill-current" : "opacity-20")} style={{ color: themeColor }} />
+                <Star key={s} className={cn("w-3.5 h-3.5 sm:w-5 sm:h-5 fill-current transition-all duration-700", s <= (t.rating || 5) ? "drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]" : "opacity-10")} style={{ color: themeColor }} />
               ))}
             </div>
           </div>
 
           {t.videoUrl && (
-            <div className="relative aspect-video rounded-2xl sm:rounded-3xl overflow-hidden bg-black shadow-2xl ring-1 ring-white/10">
-               <video src={t.videoUrl} className="w-full h-full object-cover" muted loop playsInline autoPlay />
-               <div className="absolute bottom-2 left-2 sm:bottom-3 sm:left-3">
-                 <div className="bg-white/10 backdrop-blur-md px-2 py-0.5 sm:px-3 sm:py-1 rounded-full border border-white/10">
-                   <p className="text-[6px] sm:text-[8px] text-white font-black uppercase tracking-widest flex items-center gap-1 sm:gap-1.5">
-                     <Play className="w-1.5 h-1.5 sm:w-2 sm:h-2 fill-white" /> Vídeo
+            <div className="relative aspect-video rounded-[2rem] overflow-hidden bg-black shadow-3xl ring-1 ring-white/10 group">
+               <video src={t.videoUrl} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" muted loop playsInline autoPlay />
+               <div className="absolute bottom-4 left-4">
+                 <div className="bg-black/60 backdrop-blur-xl px-4 py-1.5 rounded-full border border-white/10 shadow-2xl">
+                   <p className="text-[8px] sm:text-[10px] text-white font-black uppercase tracking-[0.25em] flex items-center gap-2">
+                     <Play className="w-2.5 h-2.5 fill-white" /> Cinema Review
                    </p>
                  </div>
                </div>
@@ -153,20 +146,25 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
           )}
 
           {t.text && t.text !== '(Depoimento em Vídeo)' && (
-            <div className="relative">
-              <span className="absolute -top-2 -left-1 sm:-top-3 sm:-left-2 text-3xl sm:text-5xl opacity-10 font-serif select-none pointer-events-none" style={{ color: themeColor }}>“</span>
-              <p className="text-zinc-200 font-medium text-xs sm:text-base leading-relaxed italic relative z-10 px-1 sm:px-2">
+            <div className="relative px-2">
+              <span className="absolute -top-6 -left-3 text-6xl sm:text-8xl opacity-[0.03] font-serif select-none pointer-events-none italic" style={{ color: themeColor }}>“</span>
+              <p className="text-zinc-200 font-bold text-sm sm:text-xl leading-relaxed italic relative z-10 tracking-tight drop-shadow-sm">
                 {t.text}
               </p>
             </div>
           )}
 
-          <div className="pt-4 sm:pt-5 border-t border-white/5 flex items-center justify-between">
-            <span className="text-[7px] sm:text-[9px] font-black text-zinc-500 uppercase tracking-[0.2em] flex items-center gap-1 sm:gap-1.5">
-              <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-              {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Hoje'}
-            </span>
-            <div className="h-1 w-1 sm:h-1.5 sm:w-1.5 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
+          <div className="pt-6 sm:pt-8 border-t border-white/5 flex items-center justify-between">
+            <div className="flex items-center gap-2 text-zinc-500">
+               <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 opacity-50" />
+               <span className="text-[8px] sm:text-[11px] font-black uppercase tracking-[0.3em]">
+                 {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Recent Post'}
+               </span>
+            </div>
+            <div className="flex items-center gap-1">
+               <div className="h-1 w-4 rounded-full opacity-20" style={{ backgroundColor: themeColor }} />
+               <div className="h-1 w-1 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
+            </div>
           </div>
         </div>
       </Card>
@@ -174,17 +172,17 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   };
 
   return (
-    <div className="min-h-screen h-screen bg-transparent p-2 sm:p-4 font-body overflow-hidden">
+    <div className="min-h-screen h-screen bg-transparent p-4 sm:p-10 font-body overflow-hidden">
       <div className="w-full h-full flex flex-col items-center justify-center">
         {filteredTestimonials.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center opacity-10 py-20">
-            <Star className="w-12 h-12 mb-4" />
-            <p className="text-[10px] font-black uppercase tracking-widest">Aguardando Prova Social</p>
+          <div className="flex-1 flex flex-col items-center justify-center opacity-10 py-20 animate-pulse">
+            <Star className="w-16 h-16 mb-6" />
+            <p className="text-[12px] font-black uppercase tracking-[0.4em]">Aguardando Prova Social de Elite</p>
           </div>
         ) : (
           <div className="w-full max-w-full">
             {layout === 'grid' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 sm:gap-12">
                 {visibleTestimonials.map((t, i) => (
                   <TestimonialCard key={t.id} t={t} index={i} />
                 ))}
@@ -193,8 +191,8 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
 
             {layout === 'mural' && (
               <div className={cn(
-                "grid gap-4 sm:gap-10 transition-all duration-500",
-                visibleTestimonials.length > 1 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 max-w-sm mx-auto"
+                "grid gap-10 sm:gap-16 transition-all duration-700",
+                visibleTestimonials.length > 1 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 max-w-lg mx-auto"
               )}>
                 {visibleTestimonials.map((t, i) => (
                   <div key={`${t.id}-${muralIndex}`} className="flex justify-center">
@@ -205,19 +203,21 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
             )}
 
             {layout === 'carousel' && (
-              <Carousel setApi={setApi} opts={{ loop: true }} className="w-full max-w-[280px] sm:max-w-md mx-auto">
-                <CarouselContent>
-                  {filteredTestimonials.map((t, i) => (
-                    <CarouselItem key={t.id} className="p-2 basis-full">
-                      <TestimonialCard t={t} index={i} />
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-              </Carousel>
+              <div className="w-full flex items-center justify-center py-10">
+                <Carousel setApi={setApi} opts={{ loop: true }} className="w-full max-w-[320px] sm:max-w-xl mx-auto">
+                  <CarouselContent>
+                    {filteredTestimonials.map((t, i) => (
+                      <CarouselItem key={t.id} className="p-4 basis-full">
+                        <TestimonialCard t={t} index={i} />
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                </Carousel>
+              </div>
             )}
 
             {layout === 'popup' && (
-              <div className="flex items-center justify-center w-full max-w-sm mx-auto animate-in fade-in zoom-in duration-700">
+              <div className="flex items-center justify-center w-full max-w-lg mx-auto animate-in fade-in zoom-in slide-in-from-bottom-12 duration-1000">
                 <TestimonialCard t={filteredTestimonials[muralIndex]} />
               </div>
             )}

@@ -82,26 +82,30 @@ type LayoutType = 'mural' | 'carousel' | 'grid' | 'popup';
 const TestimonialCardPreview = ({ t, themeColor, secondaryColor }: { t: any, themeColor: string, secondaryColor: string }) => {
   return (
     <Card 
-      className="rounded-[2.5rem] p-6 border-none shadow-xl text-left"
+      className="rounded-[2.5rem] p-7 border-none shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] text-left ring-1 ring-white/5 transition-all hover:scale-[1.02]"
       style={{ 
         backgroundColor: secondaryColor || '#111111',
-        boxShadow: `0 10px 30px -15px ${themeColor}30`,
       }}
     >
-      <div className="space-y-4">
+      <div className="space-y-5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <p className="font-bold text-xs text-white truncate max-w-[100px]">{t.userName}</p>
+             <div className="h-2 w-2 rounded-full animate-pulse" style={{ backgroundColor: themeColor }} />
+             <p className="font-black text-xs text-white tracking-tight truncate max-w-[120px]">{t.userName}</p>
           </div>
           <div className="flex gap-0.5">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} className="w-2.5 h-2.5 fill-current" style={{ color: themeColor }} />
+              <Star key={i} className="w-3 h-3 fill-current drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]" style={{ color: themeColor }} />
             ))}
           </div>
         </div>
         {t.text && t.text !== '(Depoimento em Vídeo)' && (
-          <p className="italic text-[10px] line-clamp-3 text-zinc-300">"{t.text}"</p>
+          <p className="italic text-[11px] leading-relaxed text-zinc-300 font-medium">"{t.text}"</p>
         )}
+        <div className="pt-2 flex items-center gap-2 opacity-30">
+          <CheckCircle2 className="w-3 h-3 text-green-500" />
+          <span className="text-[8px] font-black uppercase tracking-widest text-white">Verificado</span>
+        </div>
       </div>
     </Card>
   );
@@ -114,7 +118,6 @@ const EmbedSettings = ({
   autoPublishEnabled, setAutoPublishEnabled,
   autoPublishMinRating, setAutoPublishMinRating,
   autoPublishMinChars, setAutoPublishMinChars,
-  handleSave, isSaving,
   isGoldPlan,
   onClose
 }: any) => {
@@ -122,22 +125,15 @@ const EmbedSettings = ({
 
   return (
     <div className="flex flex-col w-full h-full overflow-hidden bg-background border-r">
-      <div className="p-4 border-b bg-muted/10 shrink-0 space-y-4">
-        <div className="flex items-center justify-between">
-           <Link href="/widgets">
-            <Button variant="ghost" size="sm" className="gap-2 px-0 text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 select-none h-8">
-              <ArrowLeft className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Sair</span>
-            </Button>
-          </Link>
-          <Button variant="ghost" size="sm" onClick={onClose} className="lg:hidden text-muted-foreground">
-            Fechar
+      <div className="p-4 border-b bg-muted/10 shrink-0 flex items-center justify-between">
+        <Link href="/widgets">
+          <Button variant="ghost" size="sm" className="gap-2 px-0 text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 select-none h-8">
+            <ArrowLeft className="w-4 h-4" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Sair</span>
           </Button>
-        </div>
-        
-        <Button onClick={handleSave} disabled={isSaving} className="w-full shadow-lg h-12 rounded-xl font-bold gap-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground transition-all active:scale-95">
-          {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
-          Salvar Mural
+        </Link>
+        <Button variant="ghost" size="sm" onClick={onClose} className="lg:hidden text-muted-foreground">
+          Fechar
         </Button>
       </div>
 
@@ -379,7 +375,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const sidebarProps = { 
     layout, setLayout, themeColor, setThemeColor, secondaryColor, setSecondaryColor,
     autoPublishEnabled, setAutoPublishEnabled, autoPublishMinRating, setAutoPublishMinRating, autoPublishMinChars, setAutoPublishMinChars,
-    handleSave, isSaving, isGoldPlan,
+    isGoldPlan,
     onClose: () => setIsSidebarOpen(false)
   };
 
@@ -440,13 +436,13 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
               </div>
             </div>
             
-            <div className="relative border shadow-xl bg-muted/20 p-8 rounded-[2rem] min-h-[400px] flex items-center justify-center ring-1 ring-primary/5">
+            <div className="relative border shadow-2xl bg-muted/20 p-8 md:p-12 rounded-[3rem] min-h-[400px] flex items-center justify-center ring-1 ring-primary/5">
               <div className="w-full max-w-2xl">
                 {currentSelection.length > 0 ? (
-                  <div className={cn("grid gap-4", layout === 'grid' || layout === 'mural' ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1")}>
+                  <div className={cn("grid gap-6", layout === 'grid' || layout === 'mural' ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1")}>
                     {currentSelection.slice(0, 4).map((t: any) => <TestimonialCardPreview key={t.id} t={t} themeColor={themeColor} secondaryColor={secondaryColor} />)}
                   </div>
-                ) : <div className="text-center opacity-30 italic text-sm">Selecione depoimentos abaixo.</div>}
+                ) : <div className="text-center opacity-30 italic text-sm">Selecione depoimentos abaixo para gerar a visualização.</div>}
               </div>
             </div>
 
