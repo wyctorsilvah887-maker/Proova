@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, use, useRef } from 'react';
+import { useState, useMemo, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, 
@@ -15,14 +15,12 @@ import {
   Play,
   CheckCircle2,
   Monitor,
-  Terminal,
   Copy,
   Layout,
   Palette,
   ChevronDown,
   LogOut,
   TrendingUp,
-  Inbox,
   Gem,
   Shield,
   Sun,
@@ -30,12 +28,11 @@ import {
   Lock,
   Zap,
   Settings2,
-  Sparkles,
-  Handshake
+  Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { useUser, useFirestore, useDoc, useCollection, useAuth } from '@/firebase';
 import { doc, updateDoc, collection, query, where, getDoc } from 'firebase/firestore';
@@ -81,37 +78,30 @@ import { ThemeToggle } from '@/components/theme-toggle';
 
 type LayoutType = 'mural' | 'carousel' | 'grid' | 'popup';
 
-const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex = 0 }: { t: any, themeColor: string, secondaryColor: string, index?: number, muralIndex?: number }) => {
-  const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
-
+const TestimonialCardPreview = ({ t, themeColor }: { t: any, themeColor: string }) => {
   return (
     <Card 
-      key={`${t.id}-${muralIndex}`}
-      className={cn(
-        "bg-card shadow-xl border-none text-left overflow-hidden p-4 transition-all duration-700",
-        "border-t-4 animate-in duration-700 ease-out fill-both",
-        side === 'left' ? "slide-in-from-left-full fade-in" : "slide-in-from-right-full fade-in"
-      )} 
+      className="bg-[#111111] rounded-[2.5rem] p-6 border-none shadow-xl text-left"
       style={{ 
-        borderTopColor: themeColor,
         boxShadow: `0 10px 30px -15px ${themeColor}30`,
-        backgroundColor: secondaryColor && secondaryColor !== '#ffffff' ? `${secondaryColor}20` : undefined
       }}
     >
-      <div className="flex flex-col space-y-3">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 rounded-full shrink-0" style={{ backgroundColor: secondaryColor && secondaryColor !== '#ffffff' ? `${secondaryColor}30` : `${themeColor}15` }}>
-            <User className="w-3" style={{ color: themeColor }} />
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-2xl flex items-center justify-center text-white font-black text-sm rotate-3 shrink-0" style={{ backgroundColor: themeColor }}>
+              {t.userName?.substring(0, 2).toUpperCase()}
+            </div>
+            <p className="font-bold text-xs text-white truncate max-w-[100px]">{t.userName}</p>
           </div>
-          <p className="font-bold text-[10px] truncate">{t.userName}</p>
-        </div>
-        <div className="flex gap-0.5">
-          {Array.from({ length: t.rating || 5 }).map((_, i) => (
-            <Star key={i} className="fill-primary text-primary w-2.5 h-2.5" style={{ color: themeColor, fill: themeColor }} />
-          ))}
+          <div className="flex gap-0.5">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star key={i} className="w-2.5 h-2.5 fill-current" style={{ color: themeColor }} />
+            ))}
+          </div>
         </div>
         {t.text && t.text !== '(Depoimento em Vídeo)' && (
-          <p className="italic text-[10px] line-clamp-3 text-foreground/80">"{t.text}"</p>
+          <p className="italic text-[10px] line-clamp-3 text-zinc-300">"{t.text}"</p>
         )}
       </div>
     </Card>
@@ -121,7 +111,6 @@ const TestimonialCard = ({ t, themeColor, secondaryColor, index = 0, muralIndex 
 const EmbedSettings = ({ 
   layout, setLayout, 
   themeColor, setThemeColor,
-  secondaryColor, setSecondaryColor,
   autoPublishEnabled, setAutoPublishEnabled,
   autoPublishMinRating, setAutoPublishMinRating,
   autoPublishMinChars, setAutoPublishMinChars,
@@ -130,21 +119,6 @@ const EmbedSettings = ({
   onClose
 }: any) => {
   const colors = ['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff'];
-  
-  const presets = [
-    { name: 'Classic', primary: '#f97316', secondary: '#ffffff' },
-    { name: 'Midnight', primary: '#D4AF37', secondary: '#000000' },
-    { name: 'Ocean', primary: '#3b82f6', secondary: '#f8fafc' },
-    { name: 'Forest', primary: '#10b981', secondary: '#064e3b' },
-  ];
-
-  const applyPreset = (p: any) => {
-    setThemeColor(p.primary);
-    if (isGoldPlan) {
-      setSecondaryColor(p.secondary);
-    }
-    toast({ title: `Tema ${p.name} aplicado!` });
-  };
 
   return (
     <div className="flex flex-col w-full h-full overflow-hidden bg-background border-r">
@@ -217,28 +191,6 @@ const EmbedSettings = ({
           </div>
 
           <div className="space-y-4 pt-4 border-t">
-            <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-              <Sparkles className="w-3 h-3 text-primary" /> Estilos Rápidos (Presets)
-            </Label>
-            <div className="grid grid-cols-2 gap-2">
-              {presets.map((p) => (
-                <Button 
-                  key={p.name}
-                  variant="outline"
-                  className="h-10 text-[10px] font-black uppercase tracking-widest rounded-xl border-muted-foreground/10 hover:border-primary transition-all p-0 overflow-hidden relative group"
-                  onClick={() => applyPreset(p)}
-                >
-                  <div className="absolute inset-0 flex">
-                    <div className="flex-1" style={{ backgroundColor: p.primary }} />
-                    <div className="flex-1" style={{ backgroundColor: p.secondary }} />
-                  </div>
-                  <span className="relative z-10 bg-background/80 px-2 py-0.5 rounded-full shadow-sm border border-border group-hover:bg-background transition-colors">{p.name}</span>
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-4 pt-4 border-t">
             <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Formato do Mural</Label>
             <div className="grid grid-cols-1 gap-2">
               {[
@@ -273,25 +225,11 @@ const EmbedSettings = ({
           <div className="space-y-6 pt-4 border-t">
             <div className="space-y-4">
               <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                <Palette className="w-3 h-3 text-primary" /> Cor Principal
+                <Palette className="w-3 h-3 text-primary" /> Cor da Marca
               </Label>
               <div className="flex flex-wrap gap-2">
                 {colors.map((color) => (
                   <button key={color} onClick={() => setThemeColor(color)} className={cn("w-7 h-7 rounded-full border-2 transition-transform", themeColor === color ? "border-foreground scale-110 shadow-sm" : "border-transparent opacity-80 shadow-inner")} style={{ backgroundColor: color }} />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-6 pt-4 border-t">
-            <div className={cn("space-y-4", !isGoldPlan && "opacity-40 grayscale pointer-events-none")}>
-              <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                <Palette className="w-3 h-3 text-primary" /> Cor Secundária (Gold)
-                {!isGoldPlan && <Lock className="w-2.5 h-2.5" />}
-              </Label>
-              <div className="flex flex-wrap gap-2">
-                {colors.map((color) => (
-                  <button key={color} onClick={() => setSecondaryColor(color)} className={cn("w-7 h-7 rounded-full border-2 transition-transform", secondaryColor === color ? "border-foreground scale-110 shadow-sm" : "border-transparent opacity-80 shadow-inner")} style={{ backgroundColor: color }} />
                 ))}
               </div>
             </div>
@@ -327,21 +265,6 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   
   const SELECTION_LIMIT = isEnterprise ? Infinity : ((isGold || isTrial) ? 50 : 5);
   const isGoldPlan = isGold || isTrial || isEnterprise;
-  const isPremiumUser = isGoldPlan;
-
-  const isMapsLinkValid = useMemo(() => {
-    if (!userData?.googleMapsUrl) return false;
-    const url = userData.googleMapsUrl.toLowerCase();
-    return url.includes('review') || url.includes('writereview') || url.includes('placeid');
-  }, [userData]);
-
-  const membershipLabel = useMemo(() => {
-    if (status === 'enterprise') return 'ENTERPRISE';
-    if (status === 'gold') return 'GOLD';
-    if (status === 'trial') return 'TRIAL';
-    if (status === 'expired') return 'EXPIRADO';
-    return 'PLANO BASE';
-  }, [status]);
 
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
@@ -353,7 +276,6 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [layout, setLayout] = useState<LayoutType>('grid'); 
   const [themeColor, setThemeColor] = useState('#f97316');
-  const [secondaryColor, setSecondaryColor] = useState('#ffffff');
   const [autoPublishEnabled, setAutoPublishEnabled] = useState(false);
   const [autoPublishMinRating, setAutoPublishMinRating] = useState(5);
   const [autoPublishMinChars, setAutoPublishMinChars] = useState(0);
@@ -361,8 +283,6 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   const [isSaving, setIsSaving] = useState(false);
   const [isCodeDialogOpen, setIsCodeDialogOpen] = useState(false);
   const [baseUrl, setBaseUrl] = useState('');
-  const [muralIndex, setMuralIndex] = useState(0);
-  const [showAll, setShowAll] = useState(false);
   
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -382,43 +302,15 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
       setSelectedIds(widgetData.selectedTestimonialIds || []);
       setLayout(widgetData.layout || 'grid');
       setThemeColor(widgetData.themeColor || '#f97316');
-      setSecondaryColor(widgetData.secondaryColor || '#ffffff');
       setAutoPublishEnabled(widgetData.autoPublishEnabled || false);
       setAutoPublishMinRating(widgetData.autoPublishMinRating || 5);
-      setAutoPublishMinChars(widgetData.autoPublishMinChars || 0);
+      autoPublishMinChars !== undefined && setAutoPublishMinChars(widgetData.autoPublishMinChars || 0);
     }
   }, [widgetData]);
-
-  useEffect(() => {
-    if (!authLoading && !user) router.replace('/login');
-  }, [user, authLoading, router]);
-
-  useEffect(() => {
-    if (layout === 'mural' && selectedIds.length > 0) {
-      const interval = setInterval(() => setMuralIndex(prev => (prev + 1) % selectedIds.length), 6000);
-      return () => clearInterval(interval);
-    }
-  }, [layout, selectedIds]);
 
   const currentSelection = useMemo(() => {
     return approvedTestimonials?.filter(t => selectedIds.includes(t.id)) || [];
   }, [approvedTestimonials, selectedIds]);
-
-  const visibleTestimonials = useMemo(() => {
-    if (layout !== 'mural' || currentSelection.length === 0) return currentSelection.slice(0, 4);
-    const slice = [];
-    const count = Math.min(4, currentSelection.length);
-    for (let i = 0; i < count; i++) {
-      const idx = (muralIndex + i) % currentSelection.length;
-      slice.push(currentSelection[idx]);
-    }
-    return slice;
-  }, [currentSelection, muralIndex, layout]);
-
-  const displayedTestimonialsSelection = useMemo(() => {
-    if (!approvedTestimonials) return [];
-    return showAll ? approvedTestimonials : approvedTestimonials.slice(0, 10);
-  }, [approvedTestimonials, showAll]);
 
   const handleSave = async () => {
     if (!widgetRef) return;
@@ -427,7 +319,6 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
       selectedTestimonialIds: selectedIds,
       layout,
       themeColor,
-      secondaryColor,
       autoPublishEnabled,
       autoPublishMinRating,
       autoPublishMinChars
@@ -444,7 +335,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
         toast({
           variant: "destructive",
           title: `Limite de Seleção`,
-          description: `Seu plano atual permite até ${SELECTION_LIMIT} depoimentos ativos por mural.`,
+          description: `Seu plano permite até ${SELECTION_LIMIT} depoimentos por mural.`,
         });
         return prev;
       }
@@ -452,160 +343,66 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
     });
   };
 
-  const embedCode = `<script src="${baseUrl}/widget.js?id=${widgetId}&user=${user?.uid}" defer></script>`;
+  const embedCode = `<iframe src="${baseUrl}/widgetpublic/${user?.uid}/${widgetId}" width="100%" height="600px" style="border:none;" allowtransparency="true"></iframe>`;
 
   if (authLoading || widgetLoading || testimonialsLoading || (user && !userData)) {
     return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
   }
 
   const sidebarProps = { 
-    layout, setLayout, themeColor, setThemeColor, secondaryColor, setSecondaryColor, 
+    layout, setLayout, themeColor, setThemeColor, 
     autoPublishEnabled, setAutoPublishEnabled, autoPublishMinRating, setAutoPublishMinRating, autoPublishMinChars, setAutoPublishMinChars,
     handleSave, isSaving, isGoldPlan,
     onClose: () => setIsSidebarOpen(false)
   };
 
   return (
-    <div className="h-screen flex flex-col font-body w-full overflow-hidden bg-background shrink-0">
+    <div className="h-screen flex flex-col font-body w-full overflow-hidden bg-background">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-4">
           <Link href="/widgets">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 select-none"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-primary transition-all border-none shadow-none"><ArrowLeft className="w-5 h-5" /></Button>
           </Link>
-          <div className="flex items-center group -ml-2">
-            <div className="relative w-[160px] h-[52px] md:w-[240px] md:h-[78px] transition-transform group-hover:scale-105">
-              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
-              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
-            </div>
+          <div className="relative w-[160px] h-[52px] md:w-[240px] md:h-[78px]">
+            <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
+            <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
           </div>
         </div>
 
-        <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <Button 
-            onClick={handleSave} 
-            disabled={isSaving} 
-            className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground transition-all active:scale-95 mr-2"
-          >
-            {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />}
-            Salvar
+        <div className="ml-auto flex items-center gap-2">
+          <Button onClick={handleSave} disabled={isSaving} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground">
+            {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar Mural
           </Button>
-
-          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0" />
-          
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-12 px-1 md:px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
-                <div className="flex flex-col items-end">
-                  <span className="text-[10px] md:text-xs font-bold truncate max-w-[80px] sm:max-w-[150px] transition-colors group-hover:text-primary leading-tight">
-                    {userData?.companyName || 'Empresa'}
-                  </span>
-                  <div className="flex flex-col items-end gap-0">
-                    <span className={cn(
-                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
-                      status === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
-                    )}>
-                      {membershipLabel}
-                    </span>
-                    {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
-                  </div>
-                </div>
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
-                  <User className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary group-hover:text-white" />
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
-              <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold py-2.5 cursor-pointer">
-                <TrendingUp className="mr-2 h-4 w-4 text-primary" />
-                <span>Dashboard</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl font-bold py-2.5 cursor-pointer">
-                <Layout className="mr-2 h-4 w-4 text-primary" />
-                <span>Meus Murais</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl font-bold py-2.5 cursor-pointer">
-                <Gem className="mr-2 h-4 w-4 text-primary" />
-                <span>Planos de Upgrade</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive font-bold py-2.5 cursor-pointer">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sair</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ThemeToggle />
         </div>
       </header>
 
       <main className="flex-1 flex overflow-hidden relative w-full h-full pt-24 md:pt-32">
-        {/* Desktop Sidebar */}
-        <aside className={cn(
-          "hidden lg:flex w-80 bg-background border-r flex-col shrink-0 transition-all duration-300 ease-in-out h-full",
-          !isSidebarOpen && "w-0 opacity-0 -ml-80 pointer-events-none"
-        )}>
+        <aside className={cn("hidden lg:flex w-80 bg-background border-r flex-col h-full", !isSidebarOpen && "w-0 opacity-0 -ml-80")}>
           <EmbedSettings {...sidebarProps} />
         </aside>
 
-        {/* Mobile Sidebar */}
         <Sheet open={isSidebarOpen && isMobile} onOpenChange={setIsSidebarOpen}>
-          <SheetContent side="left" className="p-0 w-80 border-none">
-            <SheetHeader className="sr-only">
-              <SheetTitle>Configurações do Mural</SheetTitle>
-              <SheetDescription>Ajuste as regras e visual do seu widget.</SheetDescription>
-            </SheetHeader>
-            <EmbedSettings {...sidebarProps} />
-          </SheetContent>
+          <SheetContent side="left" className="p-0 w-80 border-none"><EmbedSettings {...sidebarProps} /></SheetContent>
         </Sheet>
 
-        {/* Main Workspace Area */}
-        <div className="flex-1 overflow-y-auto bg-muted/30 p-4 sm:p-8 relative">
+        <div className="flex-1 overflow-y-auto bg-muted/30 p-4 sm:p-8">
           <div className="max-w-4xl mx-auto space-y-8 pb-20">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-between">
-                <button 
-                  onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                  className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 hover:text-primary transition-colors animate-pulse outline-none"
-                >
-                  <Monitor className="w-4 h-4" /> 
-                  EDITAR
-                </button>
-                <div className="flex items-center gap-2 bg-background border px-3 py-1 rounded-full shadow-sm">
-                   <span className="text-[10px] font-bold opacity-50 uppercase">Widget ID:</span>
-                   <span className="text-[10px] font-mono font-black text-primary">{widgetId}</span>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2"><Eye className="w-4 h-4" /> Preview do Mural</h2>
+            <div className="flex items-center justify-between">
+              <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 hover:text-primary transition-colors outline-none"><Monitor className="w-4 h-4" /> EDITAR</button>
+              <div className="flex items-center gap-2 bg-background border px-3 py-1 rounded-full shadow-sm">
+                <span className="text-[10px] font-bold opacity-50 uppercase">Widget ID:</span>
+                <span className="text-[10px] font-mono font-black text-primary">{widgetId}</span>
               </div>
             </div>
             
             <div className="relative border shadow-xl bg-muted/20 p-8 rounded-[2rem] min-h-[400px] flex items-center justify-center ring-1 ring-primary/5">
               <div className="w-full max-w-2xl">
-                {visibleTestimonials.length > 0 ? (
-                  <div className={cn(
-                    "w-full",
-                    layout === 'grid' || layout === 'mural' ? "grid grid-cols-1 md:grid-cols-2 gap-4" : "flex justify-center"
-                  )}>
-                    {layout === 'popup' ? (
-                      <TestimonialCard t={visibleTestimonials[0]} themeColor={themeColor} secondaryColor={secondaryColor} />
-                    ) : (
-                      visibleTestimonials.map((t: any, i) => (
-                        <TestimonialCard key={`${t.id}-${muralIndex}-${i}`} t={t} themeColor={themeColor} secondaryColor={secondaryColor} index={i} muralIndex={muralIndex} />
-                      ))
-                    )}
+                {currentSelection.length > 0 ? (
+                  <div className={cn("grid gap-4", layout === 'grid' || layout === 'mural' ? "grid-cols-1 md:grid-cols-2" : "grid-cols-1")}>
+                    {currentSelection.slice(0, 4).map((t: any) => <TestimonialCardPreview key={t.id} t={t} themeColor={themeColor} />)}
                   </div>
-                ) : (
-                  <div className="text-center opacity-30 italic text-sm">Selecione depoimentos abaixo ou ative o Auto-Publish.</div>
-                )}
+                ) : <div className="text-center opacity-30 italic text-sm">Selecione depoimentos abaixo.</div>}
               </div>
             </div>
 
@@ -614,82 +411,34 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
                 <AccordionItem value="testimonials" className="border-none">
                   <AccordionTrigger className="hover:no-underline py-0 group">
                     <div className="flex items-center justify-between w-full pr-6">
-                      <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 group-hover:text-primary transition-colors">
-                        <MessageSquare className="w-4 h-4" /> Depoimentos Disponíveis ({approvedTestimonials?.length || 0})
-                      </h2>
-                      <Badge variant="outline" className={cn("text-[9px] h-5 font-black uppercase px-2", selectedIds.length >= SELECTION_LIMIT && !isGoldPlan ? "text-destructive border-destructive" : "text-primary border-primary/20")}>
-                        {selectedIds.length} / {isEnterprise ? '∞' : SELECTION_LIMIT} ATIVOS
-                      </Badge>
+                      <h2 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2 group-hover:text-primary transition-colors"><MessageSquare className="w-4 h-4" /> Depoimentos Disponíveis</h2>
+                      <Badge variant="outline" className="text-[9px] h-5 font-black uppercase px-2">{selectedIds.length} / {isEnterprise ? '∞' : SELECTION_LIMIT} ATIVOS</Badge>
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="pt-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {displayedTestimonialsSelection.map((t: any) => {
+                      {approvedTestimonials?.map((t: any) => {
                         const isSelected = selectedIds.includes(t.id);
-                        const isAtLimit = selectedIds.length >= SELECTION_LIMIT && !isGoldPlan;
-                        const isDisabled = !isSelected && isAtLimit;
-
                         return (
-                          <div 
-                            key={t.id} 
-                            onClick={() => !isDisabled && toggleSelection(t.id)} 
-                            className={cn(
-                              "cursor-pointer transition-all rounded-xl border-2 p-4 bg-background relative", 
-                              isSelected ? "border-primary bg-primary/5 shadow-md" : "border-transparent shadow-sm hover:border-muted-foreground/10",
-                              isDisabled && "opacity-40 cursor-not-allowed grayscale"
-                            )}
-                          >
+                          <div key={t.id} onClick={() => toggleSelection(t.id)} className={cn("cursor-pointer transition-all rounded-xl border-2 p-4 bg-background", isSelected ? "border-primary bg-primary/5" : "border-transparent shadow-sm hover:border-primary/20")}>
                             <div className="flex items-start gap-3">
                               <div className={cn("mt-1 w-4 h-4 rounded-md border flex items-center justify-center shrink-0", isSelected ? "bg-primary border-primary" : "border-muted-foreground/30")}>
                                 {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
                               </div>
                               <div className="flex-1 min-w-0">
                                 <span className="font-bold text-[11px] block truncate">{t.userName}</span>
-                                {t.text && t.text !== '(Depoimento em Vídeo)' && (
-                                  <p className="text-[10px] text-muted-foreground italic line-clamp-1 mt-1">"{t.text}"</p>
-                                )}
+                                {t.text && t.text !== '(Depoimento em Vídeo)' && <p className="text-[10px] text-muted-foreground italic line-clamp-1 mt-1">"{t.text}"</p>}
                               </div>
                             </div>
-                            {isDisabled && (
-                              <div className="absolute inset-0 flex items-center justify-center bg-background/20 rounded-xl">
-                                <Lock className="w-4 h-4 text-muted-foreground/50" />
-                              </div>
-                            )}
                           </div>
                         );
                       })}
-
-                      {!showAll && (approvedTestimonials?.length || 0) > 10 && (
-                        <div className="col-span-full mt-6 flex justify-center">
-                          <Button 
-                            variant="outline" 
-                            onClick={() => setShowAll(true)} 
-                            className="rounded-full gap-2 border-primary/20 text-primary hover:bg-primary/5 font-bold h-11 px-8"
-                          >
-                            Mostrar Todos <ChevronDown className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      )}
                     </div>
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
             </div>
           </div>
-
-          {/* Floating Save Button - Only visible when sidebar is closed */}
-          {!isSidebarOpen && (
-            <div className="fixed bottom-8 right-8 z-[70] animate-in fade-in zoom-in duration-300">
-              <Button 
-                onClick={handleSave} 
-                disabled={isSaving}
-                className="h-16 px-8 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase tracking-widest gap-3"
-              >
-                {isSaving ? <Loader2 className="animate-spin h-5 w-5" /> : <Save className="h-5 w-5" />}
-                Salvar Mural
-              </Button>
-            </div>
-          )}
         </div>
       </main>
 
@@ -697,16 +446,16 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
         <DialogContent className="rounded-3xl">
           <DialogHeader className="text-center">
             <div className="mx-auto bg-green-100 p-3 rounded-full w-fit mb-4 text-green-600"><CheckCircle2 className="w-8 h-8" /></div>
-            <DialogTitle className="text-2xl font-black font-headline">Configuração Salva!</DialogTitle>
+            <DialogTitle className="text-2xl font-black font-headline">Mural Pronto!</DialogTitle>
+            <DialogDescription>Copie o código abaixo e cole no seu site.</DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 block">Snippet de Instalação</Label>
             <div className="relative bg-muted/50 rounded-xl p-4 border border-primary/20">
               <pre className="text-[10px] font-mono text-foreground break-all whitespace-pre-wrap">{embedCode}</pre>
               <Button size="icon" variant="secondary" className="absolute top-2 right-2 h-8 w-8" onClick={() => { navigator.clipboard.writeText(embedCode); toast({ title: "Copiado!" }); }}><Copy className="h-4 w-4" /></Button>
             </div>
           </div>
-          <DialogFooter><Button className="w-full font-black h-12 rounded-xl" onClick={() => setIsCodeDialogOpen(false)}>Fechar</Button></DialogFooter>
+          <DialogFooter><Button className="w-full font-black h-12 rounded-xl" onClick={() => setIsCodeDialogOpen(false)}>Concluído</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

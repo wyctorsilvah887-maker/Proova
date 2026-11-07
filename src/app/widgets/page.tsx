@@ -15,18 +15,14 @@ import {
   LogOut,
   Shield,
   Copy,
-  Terminal,
   CheckCircle2,
-  Monitor,
   TrendingUp,
-  ExternalLink,
   ChevronRight,
   Search,
   Inbox,
   Sun,
   Moon,
   Gem,
-  Info,
   Handshake,
   Lock,
   AlertTriangle
@@ -253,12 +249,12 @@ export default function WidgetsPage() {
           </div>
         </div>
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-0" />
+          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-12 px-1 md:px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
                 <div className="flex flex-col items-end">
-                  <span className="text-[10px] md:text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] transition-colors group-hover:text-primary leading-tight">
+                  <span className="text-[10px] md:text-xs font-bold truncate max-w-[80px] sm:max-w-[150px] transition-colors group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Minha Empresa'}
                   </span>
                   <div className="flex flex-col items-end gap-0">
@@ -409,7 +405,7 @@ export default function WidgetsPage() {
                       className="h-14 sm:h-12 rounded-xl text-xs font-black uppercase tracking-widest gap-2 bg-muted/50 hover:bg-muted shadow-sm justify-between px-4"
                       onClick={() => { setSelectedWidget(w); setIsDialogOpen(true); }}
                     >
-                      <span className="flex items-center gap-2"><Code className="w-4 h-4" /> Obter Código</span>
+                      <span className="flex items-center gap-2"><Code className="w-4 h-4" /> Incorporar no Site</span>
                       <Copy className="w-3.5 h-3.5 opacity-30" />
                     </Button>
                   </div>
@@ -442,13 +438,13 @@ export default function WidgetsPage() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="rounded-3xl">
           <DialogHeader>
-            <DialogTitle>Código de Instalação</DialogTitle>
-            <DialogDescription>Copie e cole este script no seu site para exibir o mural.</DialogDescription>
+            <DialogTitle>Código de Incorporação</DialogTitle>
+            <DialogDescription>Copie e cole este código no seu site para exibir o mural instantaneamente.</DialogDescription>
           </DialogHeader>
           <div className="py-4">
              <div className="relative bg-muted/50 rounded-xl p-4 border group">
-                <pre className="text-[10px] font-mono whitespace-pre-wrap break-all">{selectedWidget ? `<script src="${baseUrl}/widget.js?id=${selectedWidget.id}&user=${user?.uid}" defer></script>` : ''}</pre>
-                <Button size="icon" variant="secondary" className="absolute top-2 right-2 h-8 w-8" onClick={() => { navigator.clipboard.writeText(selectedWidget ? `<script src="${baseUrl}/widget.js?id=${selectedWidget.id}&user=${user?.uid}" defer></script>` : ''); toast({ title: "Copiado!" }); }}><Copy className="h-4 w-4" /></Button>
+                <pre className="text-[10px] font-mono whitespace-pre-wrap break-all">{selectedWidget ? `<iframe src="${baseUrl}/widgetpublic/${user?.uid}/${selectedWidget.id}" width="100%" height="600px" style="border:none;" allowtransparency="true"></iframe>` : ''}</pre>
+                <Button size="icon" variant="secondary" className="absolute top-2 right-2 h-8 w-8" onClick={() => { navigator.clipboard.writeText(selectedWidget ? `<iframe src="${baseUrl}/widgetpublic/${user?.uid}/${selectedWidget.id}" width="100%" height="600px" style="border:none;" allowtransparency="true"></iframe>` : ''); toast({ title: "Copiado!" }); }}><Copy className="h-4 w-4" /></Button>
              </div>
           </div>
         </DialogContent>
