@@ -373,13 +373,17 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
         <div className="ml-auto flex items-center gap-2">
           <Button 
             variant="outline" 
-            className="hidden sm:flex h-12 px-4 rounded-xl font-bold gap-2 border-primary/20 text-primary hover:bg-primary/5 shadow-sm"
+            className="flex h-9 md:h-12 px-2 md:px-4 rounded-xl font-bold gap-1.5 md:gap-2 border-primary/20 text-primary hover:bg-primary/5 shadow-sm text-[10px] md:text-sm"
             onClick={() => window.open(`/widgetpublic/${user?.uid}/${widgetId}`, '_blank')}
           >
-            <ExternalLink className="w-4 h-4" /> Visualizar
+            <ExternalLink className="w-3.5 h-3.5 md:w-4 md:h-4" /> <span className="hidden xs:inline">Visualizar</span>
           </Button>
-          <Button onClick={handleSave} disabled={isSaving} className="hidden sm:flex h-12 px-6 rounded-xl font-bold gap-2 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground">
-            {isSaving ? <Loader2 className="animate-spin h-4 w-4" /> : <Save className="h-4 w-4" />} Salvar Mural
+          <Button 
+            onClick={handleSave} 
+            disabled={isSaving} 
+            className="flex h-9 md:h-12 px-3 md:px-6 rounded-xl font-bold gap-1.5 md:gap-2 shadow-lg bg-primary hover:bg-primary/90 text-primary-foreground text-[10px] md:text-sm"
+          >
+            {isSaving ? <Loader2 className="animate-spin h-3.5 w-3.5 md:h-4 md:w-4" /> : <Save className="h-3.5 w-3.5 md:h-4 md:w-4" />} <span className="hidden xs:inline">Salvar</span><span className="xs:hidden">Salvar</span>
           </Button>
           <ThemeToggle />
         </div>
