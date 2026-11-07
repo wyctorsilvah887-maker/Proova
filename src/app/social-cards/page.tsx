@@ -122,27 +122,30 @@ export default function SocialCardsPage() {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-4 md:px-8 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center gap-4 flex-1">
+      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
+        <div className="flex items-center gap-3 flex-1">
           <Link href="/dash">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="rounded-full h-10 w-10 text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 select-none"
-            >
-              <ArrowLeft className="w-5 h-5" />
+            <Button variant="ghost" size="sm" className="h-10 px-2 gap-2 text-muted-foreground hover:text-primary hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 rounded-xl shadow-none">
+               <ArrowLeft className="w-4 h-4" />
+               <span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Voltar</span>
             </Button>
           </Link>
+          <div className="flex items-center group -ml-2">
+            <div className="relative w-[160px] h-[55px] md:w-[320px] md:h-[105px]">
+              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
+              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+            </div>
+          </div>
         </div>
 
-        <div className="ml-auto flex items-center gap-2 md:gap-6">
-          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0" />
+        <div className="ml-auto flex items-center gap-2 md:gap-4">
+          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-0" />
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-12 px-1 md:px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
+              <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl focus:ring-0 focus-visible:ring-0 outline-none data-[state=open]:bg-transparent shadow-none hover:bg-transparent">
                 <div className="flex flex-col items-end">
-                  <span className="text-[10px] md:text-xs font-bold truncate max-w-[70px] sm:max-w-[120px] transition-colors group-hover:text-primary leading-tight">
+                  <span className="text-[10px] md:text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] transition-colors group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Minha Empresa'}
                   </span>
                   <div className="flex flex-col items-end gap-0">
@@ -155,8 +158,8 @@ export default function SocialCardsPage() {
                     {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
                   </div>
                 </div>
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
-                  <User className="w-4 h-4 text-primary group-hover:text-white" />
+                <div className="h-7 w-7 md:h-8 md:w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
+                  <User className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary group-hover:text-white" />
                 </div>
               </Button>
             </DropdownMenuTrigger>
@@ -187,25 +190,6 @@ export default function SocialCardsPage() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-
-          <div className="flex items-center group shrink-0">
-            <div className="relative w-[140px] h-[45px] md:w-[240px] md:h-[78px] transition-transform group-hover:scale-105">
-              <Image 
-                src="/Logotipo%20PROOVA%20white%20mode%201.png" 
-                alt="Logo" 
-                fill 
-                className="object-contain object-right dark:hidden" 
-                priority 
-              />
-              <Image 
-                src="/Logotipo%20PROOVA%20dark%20mode%201.png" 
-                alt="Logo" 
-                fill 
-                className="object-contain object-right hidden dark:block" 
-                priority 
-              />
-            </div>
-          </div>
         </div>
       </header>
 
