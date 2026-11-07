@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -628,7 +627,7 @@ export default function DashPage() {
           </Link>
         </div>
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle className="hidden sm:flex" />
+          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-0" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
@@ -1011,14 +1010,6 @@ export default function DashPage() {
           </div>
         </section>
       </main>
-
-      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
-        <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[105px]">
-          <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority />
-          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="hidden dark:block object-contain" priority />
-        </div>
-        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
-      </footer>
 
       {/* Dialog Detalhe do Depoimento */}
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
