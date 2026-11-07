@@ -180,8 +180,8 @@ export default function PricingPage() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
-                  <div className="hidden sm:flex flex-col items-end">
-                    <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
+                  <div className="flex flex-col items-end">
+                    <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[120px] md:max-w-[200px] transition-colors group-hover:text-primary leading-tight">
                       {userData?.companyName || 'Minha Empresa'}
                     </span>
                     <div className="flex flex-col items-end gap-0">
@@ -230,7 +230,7 @@ export default function PricingPage() {
                 </DropdownMenuItem>
 
                 {userData?.isAdmin && (
-                  <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                  <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-bold py-2.5">
                     <Shield className="mr-2 h-4 w-4 text-primary" />
                     <span>Administração</span>
                   </DropdownMenuItem>

@@ -641,6 +641,12 @@ export default function PPEditorPage() {
   const isGoldPlan = isEnterprise || userData?.membershipStatus === 'gold' || userData?.membershipStatus === 'trial';
   const SELECTION_LIMIT = isEnterprise ? Infinity : (isGoldPlan ? 50 : 5);
 
+  const isMapsLinkValid = useMemo(() => {
+    if (!userData?.googleMapsUrl) return false;
+    const url = userData.googleMapsUrl.toLowerCase();
+    return url.includes('review') || url.includes('writereview') || url.includes('placeid');
+  }, [userData]);
+
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
     return query(collection(db, 'users', user.uid, 'testimonials'), where('status', '==', 'approved'));
@@ -834,9 +840,14 @@ export default function PPEditorPage() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-10 md:h-12 px-2 gap-2 rounded-xl focus:ring-0 focus-visible:ring-0 outline-none data-[state=open]:bg-transparent shadow-none hover:bg-transparent">
-                <div className="hidden sm:flex flex-col items-end">
+                <div className="flex flex-col items-end">
                   <span className="text-xs font-bold truncate max-w-[120px]">{userData?.companyName}</span>
-                  <span className={cn("text-[8px] uppercase tracking-widest font-black", isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground")}>{isEnterprise ? 'Enterprise' : (isGoldPlan ? 'Gold' : 'Base')}</span>
+                  <div className="flex flex-col items-end gap-0">
+                    <span className={cn("text-[8px] uppercase tracking-widest font-black leading-tight", isEnterprise ? "text-primary animate-pulse" : "text-muted-foreground")}>
+                      {isEnterprise ? 'ENTERPRISE' : (isGoldPlan ? 'GOLD' : 'PLANO BASE')}
+                    </span>
+                    {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
+                  </div>
                 </div>
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
               </Button>
