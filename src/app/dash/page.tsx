@@ -1228,7 +1228,7 @@ export default function DashPage() {
                   copyToClipboard(publicPageLink, "Link da Página Pública");
                 }}
               >
-                <Copy className="w-3 h-3" /> Copiar Link da Página
+                <Copy className="w-3.5 h-3.5" /> Copiar Link da Página
               </button>
             </div>
           </ScrollArea>
@@ -1284,7 +1284,7 @@ export default function DashPage() {
                         </div>
                         
                         <div className="relative w-full max-w-[90%]">
-                          <平和 className="absolute -top-4 -left-3 w-6 h-6 text-white opacity-20 rotate-180" />
+                          <Quote className="absolute -top-4 -left-3 w-6 h-6 text-white opacity-20 rotate-180" />
                           <div className="bg-white/5 backdrop-blur-xl p-6 sm:p-8 rounded-[2rem] border border-white/10 shadow-2xl ring-1 ring-white/5">
                             <p className={cn(
                               "font-black font-headline leading-tight italic drop-shadow-md tracking-tight transition-all duration-1000 text-white",
@@ -1294,7 +1294,7 @@ export default function DashPage() {
                               "{selectedTestimonialForShare?.text}"
                             </p>
                           </div>
-                          <平和 className="absolute -bottom-4 -right-3 w-6 h-6 text-white opacity-20" />
+                          <Quote className="absolute -bottom-4 -right-3 w-6 h-6 text-white opacity-20" />
                         </div>
                       </div>
 
