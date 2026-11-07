@@ -425,7 +425,7 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 PillarsSection.displayName = "PillarsSection";
 
 /**
- * Seção de Versatilidade (Mural embuido)
+ * Seção de Versatilidade (Mural embutido via Iframe)
  */
 const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   return (
@@ -466,11 +466,11 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           )}>
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
-            <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card p-4 sm:p-8 ring-1 ring-primary/10 h-[600px] w-full flex flex-col items-center justify-center">
+            <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card ring-1 ring-primary/10 w-full h-[600px]">
               <iframe 
-                src="/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova" 
+                src="https://www.useproova.online/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova" 
                 width="100%" 
-                height="500px" 
+                height="600px" 
                 style={{ border: 'none' }} 
                 allowtransparency="true"
               ></iframe>
