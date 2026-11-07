@@ -84,7 +84,6 @@ export default function WidgetsPage() {
   const [widgetToDelete, setWidgetToDelete] = useState<any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [baseUrl, setBaseUrl] = useState('');
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
@@ -239,7 +238,7 @@ export default function WidgetsPage() {
           </Link>
         </div>
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle />
+          <ThemeToggle className="hidden sm:flex" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-12 px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10">
@@ -309,7 +308,7 @@ export default function WidgetsPage() {
               )}
 
               <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
             </DropdownMenuContent>
@@ -328,9 +327,6 @@ export default function WidgetsPage() {
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Meus Murais</h1>
-                <Button variant="link" size="sm" onClick={() => setIsTutorialOpen(true)} className="text-[10px] font-bold gap-1 text-primary p-0 h-auto">
-                  <Info className="w-3 h-3" /> Tutorial
-                </Button>
               </div>
               <p className="text-sm text-muted-foreground">Gerencie e publique murais de depoimentos no seu site</p>
             </div>
@@ -443,9 +439,7 @@ export default function WidgetsPage() {
           <div className="py-4">
              <div className="relative bg-muted/50 rounded-xl p-4 border group">
                 <pre className="text-[10px] font-mono whitespace-pre-wrap break-all">{selectedWidget ? `<script src="${baseUrl}/widget.js?id=${selectedWidget.id}&user=${user?.uid}" defer></script>` : ''}</pre>
-                <Button size="icon" variant="secondary" className="absolute top-2 right-2 h-8 w-8" onClick={() => { navigator.clipboard.writeText(selectedWidget ? `<script src="${baseUrl}/widget.js?id=${selectedWidget.id}&user=${user?.uid}" defer></script>` : ''); toast({ title: "Copiado!" }); }}>
-                   <Copy className="h-4 w-4" />
-                </Button>
+                <Button size="icon" variant="secondary" className="absolute top-2 right-2 h-8 w-8" onClick={() => { navigator.clipboard.writeText(selectedWidget ? `<script src="${baseUrl}/widget.js?id=${selectedWidget.id}&user=${user?.uid}" defer></script>` : ''); toast({ title: "Copiado!" }); }}><Copy className="h-4 w-4" /></Button>
              </div>
           </div>
         </DialogContent>
