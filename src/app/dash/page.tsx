@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -170,6 +171,15 @@ export default function DashPage() {
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
+
+  // Sistema de Notificações de Suporte em Tempo Real
+  const supportTicketQuery = useMemo(() => {
+    if (!db || !user) return null;
+    return query(collection(db, 'support_tickets'), where('userId', '==', user.uid), limit(1));
+  }, [db, user]);
+
+  const { data: activeTickets } = useCollection(supportTicketQuery);
+  const activeTicket = activeTickets?.[0] as any;
 
   const isPremiumUser = useMemo(() => {
     const status = userData?.membershipStatus;
@@ -630,12 +640,15 @@ export default function DashPage() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
-                <div className="flex flex-col items-end">
+                <div className="flex flex-col items-end relative">
                   <span className="text-[10px] md:text-xs font-bold truncate max-w-[70px] sm:max-w-[120px] leading-tight transition-colors group-hover:text-primary">{userData?.companyName || 'Minha Empresa'}</span>
                   <div className="flex flex-col items-end gap-0">
                     <span className={cn("text-[6px] sm:text-[8px] uppercase tracking-widest font-black leading-tight", userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground")}>{membershipLabel}</span>
                     {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
                   </div>
+                  {activeTicket && (
+                    <div className={cn("absolute -top-1 -right-4 h-2 w-2 rounded-full", activeTicket.isSupportInChat ? "bg-green-500 animate-ping" : "bg-red-500")} />
+                  )}
                 </div>
                 <div className="h-7 w-7 md:h-8 md:w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-3.5 h-3.5 md:w-4 md:h-4" /></div>
               </Button>
@@ -655,9 +668,12 @@ export default function DashPage() {
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/support')} className="rounded-xl cursor-pointer font-bold py-2.5">
+              <DropdownMenuItem onClick={() => router.push('/support')} className="rounded-xl cursor-pointer font-bold py-2.5 relative">
                 <Headphones className="mr-2 h-4 w-4 text-primary" />
                 <span>Suporte Proova</span>
+                {activeTicket && (
+                  <div className={cn("absolute right-3 h-2 w-2 rounded-full", activeTicket.isSupportInChat ? "bg-green-500 animate-pulse" : "bg-red-500")} />
+                )}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Gem className="mr-2 h-4 w-4 text-primary" />
@@ -895,10 +911,13 @@ export default function DashPage() {
 
             <Link href="/support" className="w-full">
               <button 
-                className="h-24 w-full rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
+                className="h-24 w-full rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 relative"
               >
                 <Headphones className="w-5 h-5 text-primary" />
                 <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Suporte Chat</span>
+                {activeTicket && (
+                  <div className={cn("absolute top-2 right-2 h-3 w-3 rounded-full border-2 border-background", activeTicket.isSupportInChat ? "bg-green-500 animate-pulse" : "bg-red-500")} />
+                )}
               </button>
             </Link>
 

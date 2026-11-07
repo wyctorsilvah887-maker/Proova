@@ -9,7 +9,7 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@
 import { 
   Shield, ArrowLeft, Loader2, Headphones, User, Clock, 
   Trash2, CheckCircle2, Ticket, ExternalLink, BadgeCheck,
-  Search, Filter
+  Search, Filter, MessageSquare
 } from 'lucide-react';
 import { useFirestore, useUser, useCollection, useDoc } from '@/firebase';
 import { collection, query, doc, deleteDoc, orderBy, updateDoc } from 'firebase/firestore';
@@ -143,7 +143,7 @@ export default function AdminSupportPage() {
                 <TableHeader>
                   <TableRow className="bg-muted/20">
                     <TableHead className="text-[10px] uppercase font-black">Usuário / Plano</TableHead>
-                    <TableHead className="text-[10px] uppercase font-black">Protocolo / UID</TableHead>
+                    <TableHead className="text-[10px] uppercase font-black">Status / Presença</TableHead>
                     <TableHead className="text-[10px] uppercase font-black">Abertura</TableHead>
                     <TableHead className="text-[10px] uppercase font-black text-right">Ações</TableHead>
                   </TableRow>
@@ -171,9 +171,11 @@ export default function AdminSupportPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-mono font-bold text-primary">#{ticket.id}</span>
-                          <span className="text-[9px] text-muted-foreground truncate max-w-[120px]">UID: {ticket.userId}</span>
+                        <div className="flex items-center gap-2">
+                           <div className={cn("h-2.5 w-2.5 rounded-full", ticket.isSupportInChat ? "bg-green-500 animate-pulse" : "bg-red-500")} />
+                           <span className="text-[10px] font-bold uppercase tracking-tight">
+                             {ticket.isSupportInChat ? "Suporte no Chat" : "Aguardando Resposta"}
+                           </span>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -193,10 +195,10 @@ export default function AdminSupportPage() {
                             variant="ghost" 
                             size="icon" 
                             className="h-8 w-8 rounded-xl text-primary hover:bg-primary/10"
-                            onClick={() => window.open(`/admin/chat/${ticket.userId}`, '_blank')}
-                            title="Ver Histórico de Chat"
+                            onClick={() => window.open(`/admin/support/${ticket.userId}`, '_blank')}
+                            title="Entrar no Chat"
                           >
-                            <ExternalLink className="w-3.5 h-3.5" />
+                            <MessageSquare className="w-3.5 h-3.5" />
                           </Button>
                           <Button 
                             variant="ghost" 

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -88,6 +89,15 @@ export default function SupportPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
+  // Monitoramento de tickets ativos para bolinhas de status
+  const supportTicketQuery = useMemo(() => {
+    if (!db || !user) return null;
+    return query(collection(db, 'support_tickets'), where('userId', '==', user.uid), limit(1));
+  }, [db, user]);
+
+  const { data: activeTickets } = useCollection(supportTicketQuery);
+  const activeTicket = activeTickets?.[0] as any;
+
   const messagesQuery = useMemo(() => {
     if (!db || !user) return null;
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
@@ -166,7 +176,8 @@ export default function SupportPage() {
         userName: userData.name || 'Usuário Proova',
         membershipStatus: userData.membershipStatus || 'base',
         createdAt: serverTimestamp(),
-        status: 'open'
+        status: 'open',
+        isSupportInChat: false
       });
 
       const plan = (userData.membershipStatus || 'base').toLowerCase();
@@ -225,7 +236,6 @@ export default function SupportPage() {
           await handleCreateSupportTicket();
         }
 
-        // Gatilho para encerrar chat via comando de texto ou número
         if (userMsg === '7' || userMsg.toLowerCase().includes('encerrar')) {
           handleOpenConfirmModal();
         }
@@ -334,7 +344,7 @@ export default function SupportPage() {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
-                <div className="hidden sm:flex flex-col items-end">
+                <div className="hidden sm:flex flex-col items-end relative">
                   <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Empresa'}
                   </span>
@@ -347,6 +357,9 @@ export default function SupportPage() {
                     </span>
                     {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
                   </div>
+                  {activeTicket && (
+                    <div className={cn("absolute -top-1 -right-4 h-2 w-2 rounded-full", activeTicket.isSupportInChat ? "bg-green-500 animate-ping" : "bg-red-500")} />
+                  )}
                 </div>
                 <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
               </Button>
@@ -386,14 +399,19 @@ export default function SupportPage() {
           
           <div className="px-4 py-3 md:p-6 border-b bg-muted/5 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3 md:gap-4">
-              <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-primary/10 text-primary flex items-center justify-center shadow-inner">
+              <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-primary/10 text-primary flex items-center justify-center shadow-inner relative">
                 <Bot className="w-5 h-5 md:w-6 md:h-6" />
+                {activeTicket && (
+                  <div className={cn("absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-background", activeTicket.isSupportInChat ? "bg-green-500 animate-pulse" : "bg-red-500")} />
+                )}
               </div>
               <div>
                 <h2 className="text-sm md:text-lg font-black font-headline tracking-tight uppercase leading-none">Consultor Proova v1.0</h2>
                 <div className="flex items-center gap-1.5 mt-1">
-                   <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-green-500 animate-pulse" />
-                   <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Árvore de Decisão Ativa</span>
+                   <div className={cn("h-1.5 w-1.5 md:h-2 md:w-2 rounded-full", activeTicket?.isSupportInChat ? "bg-green-500 animate-pulse" : "bg-green-500/40")} />
+                   <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                     {activeTicket?.isSupportInChat ? "Suporte Humano Ativo" : "Árvore de Decisão Ativa"}
+                   </span>
                 </div>
               </div>
             </div>
@@ -441,16 +459,16 @@ export default function SupportPage() {
                   )}>
                     <div className={cn(
                       "h-8 w-8 rounded-lg flex items-center justify-center shrink-0 mt-1 shadow-md",
-                      msg.sender === 'user' ? "bg-muted text-muted-foreground" : "bg-primary text-white"
+                      msg.sender === 'user' ? "bg-muted text-muted-foreground" : (msg.isSystem ? "bg-primary/20 text-primary" : "bg-primary text-white")
                     )}>
-                      {msg.sender === 'user' ? <User className="w-4 h-4" /> : <Bot className="w-4 h-4" />}
+                      {msg.sender === 'user' ? <User className="w-4 h-4" /> : (msg.isSystem ? <Shield className="w-4 h-4" /> : <Bot className="w-4 h-4" />)}
                     </div>
                     <div className="space-y-1">
                       <div className={cn(
                         "p-3 md:p-4 shadow-sm border",
                         msg.sender === 'user' 
                           ? "bg-primary text-white rounded-2xl rounded-tr-none border-transparent shadow-lg shadow-primary/20" 
-                          : "bg-muted/50 rounded-2xl rounded-tl-none"
+                          : (msg.isSystem ? "bg-primary/5 rounded-2xl border-dashed italic text-primary" : "bg-muted/50 rounded-2xl rounded-tl-none")
                       )}>
                         <p className="text-xs md:text-sm font-medium leading-relaxed whitespace-pre-wrap">{formatText(msg.text)}</p>
                       </div>
@@ -523,7 +541,6 @@ export default function SupportPage() {
         <p className="text-[8px] font-black uppercase tracking-[0.4em]">Powered by Proova Decision Tree v1.0</p>
       </footer>
 
-      {/* Modal de Confirmação para Encerrar */}
       <Dialog open={isConfirmModalOpen} onOpenChange={setIsConfirmModalOpen}>
         <DialogContent className="rounded-[2rem] border-none shadow-2xl p-0 overflow-hidden bg-background max-w-md w-[95vw]">
           <div className="h-1.5 bg-destructive w-full" />
