@@ -32,7 +32,8 @@ import {
   Sparkles,
   Zap,
   Link2,
-  Info
+  Info,
+  AlertCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,6 +48,11 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import { 
+  Alert, 
+  AlertDescription, 
+  AlertTitle 
+} from "@/components/ui/alert";
 import { useUser, useFirestore, useDoc, useAuth } from '@/firebase';
 import { doc, updateDoc, serverTimestamp, getDoc, writeBatch } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
@@ -402,6 +408,14 @@ export default function SettingsPage() {
                                 <Input value={state} maxLength={2} onChange={(e) => setState(e.target.value.toUpperCase())} className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-black text-xs uppercase text-center" placeholder="SP" />
                              </div>
                           </div>
+                          
+                          <Alert variant="destructive" className="bg-destructive/5 border-destructive/20 rounded-2xl animate-in fade-in zoom-in duration-500">
+                            <AlertCircle className="h-4 w-4" />
+                            <AlertTitle className="text-[10px] font-black uppercase tracking-tight">Aviso de Localização</AlertTitle>
+                            <AlertDescription className="text-[10px] leading-relaxed font-medium">
+                              Se você alterar a cidade ou o estado, será necessário pesquisar e vincular sua empresa novamente no <b>G-Boost</b>. Esses dados são essenciais para identificarmos seu local no Google.
+                            </AlertDescription>
+                          </Alert>
                        </div>
                     </div>
                  </CardContent>
