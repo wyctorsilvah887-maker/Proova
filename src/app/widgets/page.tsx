@@ -58,7 +58,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from "@/AlertDialog";
+} from "@/components/ui/alert-dialog";
 import { useUser, useFirestore, useCollection, useAuth, useDoc } from '@/firebase';
 import { collection, setDoc, serverTimestamp, doc, deleteDoc, getDoc } from 'firebase/firestore';
 import { toast } from '@/hooks/use-toast';
@@ -262,7 +262,7 @@ export default function WidgetsPage() {
                 <Settings className="mr-2 h-4 w-4 text-primary" />
                 <span>Configurações</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
+              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Murais</span>
               </DropdownMenuItem>
