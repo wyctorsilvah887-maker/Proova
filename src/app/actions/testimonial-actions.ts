@@ -81,6 +81,7 @@ export async function submitTestimonialAction(data: {
   rating: number;
   text: string;
   videoUrl?: string;
+  photoUrl?: string;
 }) {
   try {
     await checkRateLimit('submit_testimonial');
@@ -96,6 +97,7 @@ export async function submitTestimonialAction(data: {
       rating: data.rating,
       text: data.text.trim(),
       videoUrl: data.videoUrl || null,
+      photoUrl: data.photoUrl || null,
       status: initialStatus,
       createdAt: serverTimestamp(),
     };
