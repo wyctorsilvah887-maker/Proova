@@ -28,7 +28,9 @@ import {
   ImageIcon,
   FileVideo,
   Palette,
-  LayoutGrid
+  LayoutGrid,
+  MessageCircle,
+  Smartphone
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -56,7 +58,7 @@ export default function ManualPage() {
             <Button 
               variant="ghost" 
               size="icon" 
-              className="rounded-full text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent h-10 w-10"
+              className="rounded-full text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent h-10 w-10 focus-visible:ring-0"
             >
               <ArrowLeft className="w-5 h-5" />
             </Button>
@@ -112,8 +114,8 @@ export default function ManualPage() {
               <TabsTrigger value="cards" className="flex-1 min-w-[120px] rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 py-3">
                  <Share2 className="w-4 h-4" /> Cards
               </TabsTrigger>
-              <TabsTrigger value="widgets" className="flex-1 min-w-[120px] rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 py-3">
-                 <Layout className="w-4 h-4" /> Murais
+              <TabsTrigger value="linkinbio" className="flex-1 min-w-[120px] rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 py-3">
+                 <Globe className="w-4 h-4" /> Link in Bio
               </TabsTrigger>
            </TabsList>
 
@@ -157,7 +159,7 @@ export default function ManualPage() {
                        <p className="text-[10px] font-black uppercase text-primary tracking-widest">Como Configurar:</p>
                        <ol className="text-xs font-bold space-y-2 list-decimal ml-4 text-muted-foreground">
                           <li>Acesse a aba <b>Google</b> nas suas Configurações.</li>
-                          <li>Pesquise pelo nome da sua empresa e selecione o local oficial.</li>
+                          <li>Pesquise pelo nome da sua empresa no motor de busca oficial.</li>
                           <li>Clique em <b>Salvar Alterações</b> e o G-Boost será ativado instantaneamente.</li>
                        </ol>
                     </div>
@@ -211,23 +213,29 @@ export default function ManualPage() {
               </Card>
            </TabsContent>
 
-           <TabsContent value="widgets" className="animate-in fade-in slide-in-from-bottom-4 duration-500 outline-none">
-              <div className="grid gap-6 lg:grid-cols-3">
-                 <Card className="rounded-[2rem] border-none shadow-sm p-8 space-y-4">
-                    <div className="p-3 rounded-xl bg-primary/10 text-primary w-fit"><LayoutGrid className="w-6 h-6" /></div>
-                    <h3 className="font-black uppercase text-sm">Grade Clássica</h3>
-                    <p className="text-xs text-muted-foreground font-medium leading-relaxed">Ideal para páginas de vendas ou rodapés de sites institucionais. Passa solidez e volume.</p>
+           <TabsContent value="linkinbio" className="animate-in fade-in slide-in-from-bottom-4 duration-500 outline-none">
+              <div className="grid gap-6 md:grid-cols-2">
+                 <Card className="rounded-[2rem] border-none shadow-sm overflow-hidden p-8 md:p-12 space-y-6">
+                    <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center"><Globe className="w-7 h-7" /></div>
+                    <h2 className="text-3xl font-black font-headline uppercase tracking-tight">Link in Bio Estratégico</h2>
+                    <p className="text-muted-foreground leading-relaxed">Sua Página Pública é um hub de conversão. Ela reúne seus melhores depoimentos e fornece um caminho direto para o seu WhatsApp.</p>
+                    <div className="grid grid-cols-2 gap-3">
+                       {[
+                          { icon: Palette, label: 'Temas Custom' },
+                          { icon: MessageCircle, label: 'Botão WhatsApp' },
+                          { icon: Smartphone, label: 'Mobile First' },
+                          { icon: LayoutGrid, label: '4 Layouts VIP' },
+                       ].map((feat, i) => (
+                          <div key={i} className="flex items-center gap-2 p-3 rounded-xl bg-muted/20">
+                             <feat.icon className="w-4 h-4 text-primary" />
+                             <span className="text-[9px] font-black uppercase tracking-tight">{feat.label}</span>
+                          </div>
+                       ))}
+                    </div>
                  </Card>
-                 <Card className="rounded-[2rem] border-none shadow-sm p-8 space-y-4">
-                    <div className="p-3 rounded-xl bg-primary/10 text-primary w-fit"><Layout className="w-6 h-6" /></div>
-                    <h3 className="font-black uppercase text-sm">Mural Masonry</h3>
-                    <p className="text-xs text-muted-foreground font-medium leading-relaxed">Estilo Pinterest. Dinâmico e moderno, perfeito para exibir depoimentos com fotos de clientes.</p>
-                 </Card>
-                 <Card className="rounded-[2rem] border-none shadow-sm p-8 space-y-4">
-                    <div className="p-3 rounded-xl bg-primary/10 text-primary w-fit"><Sparkles className="w-6 h-6" /></div>
-                    <h3 className="font-black uppercase text-sm">Popup Social</h3>
-                    <p className="text-xs text-muted-foreground font-medium leading-relaxed">Pequenas notificações que surgem no canto da tela, gerando gatilho de escassez e movimento.</p>
-                 </Card>
+                 <div className="relative aspect-square md:aspect-auto rounded-[2rem] overflow-hidden shadow-xl">
+                    <Image src={images.widgets} alt="Link in Bio Preview" fill className="object-cover" />
+                 </div>
               </div>
            </TabsContent>
         </Tabs>
