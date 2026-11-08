@@ -156,9 +156,9 @@ export default function ManualPage() {
                     <div className="p-6 rounded-2xl bg-muted/30 border border-muted space-y-3">
                        <p className="text-[10px] font-black uppercase text-primary tracking-widest">Como Configurar:</p>
                        <ol className="text-xs font-bold space-y-2 list-decimal ml-4 text-muted-foreground">
-                          <li>Vincule seu Google Place ID em Configurações.</li>
-                          <li>Cole seu link de "writereview" do Google.</li>
-                          <li>Pronto! O Proova cuidará do redirecionamento.</li>
+                          <li>Acesse a aba <b>Google</b> nas suas Configurações.</li>
+                          <li>Pesquise pelo nome da sua empresa e selecione o local oficial.</li>
+                          <li>Clique em <b>Salvar Alterações</b> e o G-Boost será ativado instantaneamente.</li>
                        </ol>
                     </div>
                  </Card>
