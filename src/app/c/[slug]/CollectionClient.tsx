@@ -43,6 +43,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
   const [finalDest, setFinalDest] = useState<'public' | 'private' | null>(null);
   
   const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
+  const [isPhotoChoiceOpen, setIsPhotoChoiceOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordedVideoUrl, setRecordedVideoUrl] = useState<string | null>(null);
   const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
@@ -55,7 +56,9 @@ export default function CollectionClient({ slug }: { slug: string }) {
   const videoPreviewRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const [honeypot, setHoneypot] = useState('');
   const [loadTime] = useState(Date.now());
@@ -143,6 +146,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
       setRecordedPhotoUrl(URL.createObjectURL(file));
       setRecordedVideoUrl(null);
       setVideoBlob(null);
+      setIsPhotoChoiceOpen(false);
     }
   };
 
@@ -214,7 +218,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
   if (submitted) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-muted/20 px-4 font-body py-12">
-        <div className="fixed top-4 right-4"><ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" /></div>
+        <div className="fixed top-4 right-4"><ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent focus:bg-transparent" /></div>
         <Card className="w-full max-w-md text-center shadow-2xl border-none rounded-[2.5rem] overflow-hidden bg-card flex-1 sm:flex-initial">
           <div className="h-2 bg-primary w-full" />
           <CardContent className="pt-12 pb-12 px-8 space-y-8">
@@ -252,7 +256,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col items-center p-4 font-body text-foreground overflow-x-hidden">
-      <div className="fixed top-4 right-4 z-[50]"><ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" /></div>
+      <div className="fixed top-4 right-4 z-[50]"><ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent focus:bg-transparent" /></div>
       
       <div className="w-full max-w-xl flex-1 flex flex-col justify-center py-10 md:py-20 space-y-10">
         <header className="text-center space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
@@ -340,7 +344,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] font-black uppercase tracking-widest ml-1 opacity-60">Seu Nome</Label>
+                    <Label className="text-[9px] font-black uppercase tracking-widest ml-1 opacity-60">Seu nome</Label>
                     <Input placeholder="Seu nome aqui" value={userName} onChange={(e) => setUserName(e.target.value)} required className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold" />
                   </div>
                   <div className="space-y-1.5">
@@ -384,13 +388,14 @@ export default function CollectionClient({ slug }: { slug: string }) {
                           type="button"
                           variant="outline"
                           className="h-24 rounded-2xl flex flex-col gap-2 border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all active:scale-95 group"
-                          onClick={() => photoInputRef.current?.click()}
+                          onClick={() => setIsPhotoChoiceOpen(true)}
                         >
                           <div className="p-2 rounded-xl bg-white dark:bg-zinc-900 shadow-sm transition-transform group-hover:scale-110">
                             <ImageIconLucide className="w-5 h-5 text-primary" />
                           </div>
-                          <span className="text-[10px] font-black uppercase tracking-tight">Foto Galeria</span>
+                          <span className="text-[10px] font-black uppercase tracking-tight">Foto</span>
                           <input type="file" ref={photoInputRef} accept="image/*" className="hidden" onChange={handlePhotoSelect} />
+                          <input type="file" ref={cameraInputRef} accept="image/*" capture="environment" className="hidden" onChange={handlePhotoSelect} />
                         </Button>
                         <Button 
                           type="button"
@@ -477,6 +482,32 @@ export default function CollectionClient({ slug }: { slug: string }) {
                   </Button>
                </div>
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isPhotoChoiceOpen} onOpenChange={setIsPhotoChoiceOpen}>
+        <DialogContent className="rounded-[2.5rem] w-[90vw] max-w-sm border-none shadow-2xl p-0 overflow-hidden bg-background">
+          <DialogHeader className="p-8 pb-2 text-center">
+            <DialogTitle className="text-xl font-black uppercase">Adicionar Foto</DialogTitle>
+          </DialogHeader>
+          <div className="p-6 space-y-4">
+             <Button 
+               className="w-full h-16 rounded-2xl font-black uppercase tracking-widest gap-3 bg-primary"
+               onClick={() => cameraInputRef.current?.click()}
+             >
+                <Camera className="w-5 h-5" /> Tirar Foto
+             </Button>
+             <Button 
+               variant="outline" 
+               className="w-full h-16 rounded-2xl font-black uppercase tracking-widest gap-3 border-primary/20 text-primary"
+               onClick={() => photoInputRef.current?.click()}
+             >
+                <ImageIcon className="w-5 h-5" /> Abrir Galeria
+             </Button>
+          </div>
+          <div className="p-4 bg-muted/30 border-t text-center">
+             <Button variant="ghost" className="text-[10px] font-black uppercase text-muted-foreground" onClick={() => setIsPhotoChoiceOpen(false)}>Cancelar</Button>
           </div>
         </DialogContent>
       </Dialog>
