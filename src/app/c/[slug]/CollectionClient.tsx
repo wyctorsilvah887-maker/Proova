@@ -169,7 +169,9 @@ export default function CollectionClient({ slug }: { slug: string }) {
   if (submitted) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-muted/20 px-4 font-body py-12">
-        <div className="fixed top-4 right-4"><ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent focus:bg-transparent" /></div>
+        <div className="fixed top-4 right-4">
+          <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent focus:bg-transparent" />
+        </div>
         <Card className="w-full max-w-md text-center shadow-2xl border-none rounded-[2.5rem] overflow-hidden bg-card flex-1 sm:flex-initial">
           <div className="h-2 bg-primary w-full" />
           <CardContent className="pt-12 pb-12 px-8 space-y-8">
@@ -203,17 +205,20 @@ export default function CollectionClient({ slug }: { slug: string }) {
     );
   }
 
-  const isEnterprise = membershipStatus === 'enterprise';
-  const shouldShowForm = activeMode === 'text' || (activeMode === 'photo' && recordedPhotoUrl) || (activeMode === 'video' && recordedVideoUrl);
+  const isEnterprise = membershipStatus === 'enterprise' || membershipStatus === 'trial';
+  const hasMedia = !!recordedPhotoUrl || !!recordedVideoUrl;
+  const shouldShowForm = activeMode === 'text' || hasMedia;
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col items-center p-4 font-body text-foreground overflow-x-hidden">
-      <div className="fixed top-4 right-4 z-[50]"><ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent focus:bg-transparent" /></div>
+      <div className="fixed top-4 right-4 z-[50]">
+        <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent focus:bg-transparent" />
+      </div>
       
       {/* Inputs Nativos Ocultos */}
       <input type="file" ref={photoCameraRef} accept="image/*" capture="environment" className="sr-only" onChange={handlePhotoSelect} />
       <input type="file" ref={photoGalleryRef} accept="image/*" className="sr-only" onChange={handlePhotoSelect} />
-      <input type="file" ref={videoInputRef} accept="video/*" className="sr-only" onChange={handleVideoSelect} />
+      <input type="file" ref={videoInputRef} accept="video/*" capture="environment" className="sr-only" onChange={handleVideoSelect} />
 
       <div className="w-full max-w-xl flex-1 flex flex-col justify-start py-10 md:py-20 space-y-8">
         <header className="text-center space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
@@ -245,7 +250,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
           <div className="grid grid-cols-3 gap-3">
             {[
               { id: 'text', label: 'Texto', icon: Type, onClick: () => setActiveMode('text') },
-              { id: 'photo', label: 'Foto', icon: Camera, premium: true, onClick: () => { setActiveMode('photo'); setIsPhotoChoiceOpen(true); } },
+              { id: 'photo', label: 'Foto', icon: Camera, premium: false, onClick: () => { setActiveMode('photo'); setIsPhotoChoiceOpen(true); } },
               { id: 'video', label: 'Vídeo', icon: Video, premium: true, onClick: () => { setActiveMode('video'); videoInputRef.current?.click(); } },
             ].map((opt) => {
               const isLocked = opt.premium && !isEnterprise;
@@ -341,7 +346,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
       <Dialog open={isPhotoChoiceOpen} onOpenChange={setIsPhotoChoiceOpen}>
         <DialogContent className="rounded-[2.5rem] w-[90vw] max-w-sm border-none shadow-2xl p-8 bg-background">
           <DialogHeader className="text-center space-y-3">
-            <DialogTitle className="text-xl font-black uppercase tracking-tight">Captura de Mídia</DialogTitle>
+            <DialogTitle className="text-xl font-black uppercase tracking-tight">Captura de Foto</DialogTitle>
             <DialogDescription className="text-xs font-medium">Como você deseja adicionar sua foto?</DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-1 gap-4 pt-6">
