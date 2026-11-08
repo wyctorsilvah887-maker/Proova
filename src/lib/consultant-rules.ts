@@ -43,11 +43,11 @@ export const CONSULTANT_TREE: Record<string, TreeBranch> = {
   '7': {
     title: 'Encerrar Chat',
     keys: ['7', 'encerrar', 'fechar', 'limpar', 'sair'],
-    response: "**⚠️ Confirmação de Encerramento**\n\nVocê escolheu encerrar o atendimento. Isso apagará permanentemente o seu histórico de mensagens e tickets ativos.\n\nPara confirmar, digite **SIM** ou **CONCORDO** aqui no chat.\n\n*Qualquer outra mensagem cancelará o encerramento.*"
+    response: "**⚠️ Confirmação de Encerramento**\n\nVocê escolheu encerrar o atendimento. Isso apagará permanentemente o seu histórico de mensagens e tickets ativos.\n\nPara confirmar, use o botão **'Encerrar Sessão'** no topo ou digite **SIM** aqui no chat.\n\n*Qualquer outra mensagem cancelará o encerramento.*"
   }
 };
 
-const MAIN_MENU = `**Menu Estratégico Proova** 🚀
+export const getMainMenu = (userName: string) => `Olá, **${userName}**! 👋 **Menu Estratégico Proova** 🚀
 Escolha uma opção para dominar o mercado:
 
 1️⃣ **G-Boost** (SEO Google Maps)
@@ -56,19 +56,16 @@ Escolha uma opção para dominar o mercado:
 4️⃣ **Social Cards** (Instagram)
 5️⃣ **Planos e Upgrade**
 6️⃣ **Falar com Humano**
-7️⃣ **Encerrar Chat** (use a qualquer momento para encerrar o chat)
 
 *Digite o **número** ou o **nome** da opção.*`;
 
-export function getConsultantResponse(message: string): string {
+export function getConsultantResponse(message: string, userName: string = 'Parceiro'): string {
   const input = message.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
 
-  // Se for 0 ou saudação, mostra o menu
   if (input === '0' || ['ola', 'oi', 'ajuda', 'menu', 'inicio'].includes(input)) {
-    return MAIN_MENU;
+    return getMainMenu(userName);
   }
 
-  // Busca na árvore
   for (const key in CONSULTANT_TREE) {
     const branch = CONSULTANT_TREE[key];
     if (branch.keys.some(k => input.includes(k))) {
@@ -76,6 +73,5 @@ export function getConsultantResponse(message: string): string {
     }
   }
 
-  // Fallback
-  return `Não identifiquei essa opção. 😕\n\n${MAIN_MENU}`;
+  return `Não identifiquei essa opção. 😕\n\n${getMainMenu(userName)}`;
 }
