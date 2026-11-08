@@ -8,9 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
-  Star, CheckCircle2, MessageSquare, Loader2, Send, Video, 
-  Globe, X, Camera, ImageIcon, Trash2, Building2, Type, 
-  Play, Clock, MapPin
+  Star, CheckCircle2, Loader2, Send, Video, 
+  Globe, Camera, ImageIcon, Trash2, Building2, Type, 
+  MapPin, X
 } from 'lucide-react';
 import { useFirestore, useStorage } from '@/firebase';
 import { collection, query, where, getDocs, limit, doc } from 'firebase/firestore';
@@ -20,6 +20,13 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
 import { submitTestimonialAction } from '@/app/actions/testimonial-actions';
 import { LoadingScreen } from '@/components/loading-screen';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 
 type CollectionMode = 'text' | 'photo' | 'video' | null;
 
@@ -46,7 +53,10 @@ export default function CollectionClient({ slug }: { slug: string }) {
   const [recordedPhotoUrl, setRecordedPhotoUrl] = useState<string | null>(null);
   const [photoBlob, setPhotoBlob] = useState<Blob | null>(null);
   
-  const photoInputRef = useRef<HTMLInputElement>(null);
+  const [isPhotoChoiceOpen, setIsPhotoChoiceOpen] = useState(false);
+  
+  const photoCameraRef = useRef<HTMLInputElement>(null);
+  const photoGalleryRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
 
   const [honeypot, setHoneypot] = useState('');
@@ -84,6 +94,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
       setRecordedPhotoUrl(URL.createObjectURL(file));
       setRecordedVideoUrl(null);
       setVideoBlob(null);
+      setIsPhotoChoiceOpen(false);
     }
   };
 
@@ -193,19 +204,15 @@ export default function CollectionClient({ slug }: { slug: string }) {
   }
 
   const isEnterprise = membershipStatus === 'enterprise';
-  
-  // Lógica de visibilidade do formulário:
-  // - Modo 'text': aparece sempre
-  // - Modo 'photo': aparece só quando recordedPhotoUrl existe
-  // - Modo 'video': aparece só quando recordedVideoUrl existe
   const shouldShowForm = activeMode === 'text' || (activeMode === 'photo' && recordedPhotoUrl) || (activeMode === 'video' && recordedVideoUrl);
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col items-center p-4 font-body text-foreground overflow-x-hidden">
       <div className="fixed top-4 right-4 z-[50]"><ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent focus:bg-transparent" /></div>
       
-      {/* Inputs Nativos Invisíveis */}
-      <input type="file" ref={photoInputRef} accept="image/*" className="sr-only" onChange={handlePhotoSelect} />
+      {/* Inputs Nativos Ocultos */}
+      <input type="file" ref={photoCameraRef} accept="image/*" capture="environment" className="sr-only" onChange={handlePhotoSelect} />
+      <input type="file" ref={photoGalleryRef} accept="image/*" className="sr-only" onChange={handlePhotoSelect} />
       <input type="file" ref={videoInputRef} accept="video/*" className="sr-only" onChange={handleVideoSelect} />
 
       <div className="w-full max-w-xl flex-1 flex flex-col justify-start py-10 md:py-20 space-y-8">
@@ -238,18 +245,15 @@ export default function CollectionClient({ slug }: { slug: string }) {
           <div className="grid grid-cols-3 gap-3">
             {[
               { id: 'text', label: 'Texto', icon: Type, onClick: () => setActiveMode('text') },
-              { id: 'photo', label: 'Foto', icon: Camera, premium: true, onClick: () => photoInputRef.current?.click() || setActiveMode('photo') },
-              { id: 'video', label: 'Vídeo', icon: Video, premium: true, onClick: () => videoInputRef.current?.click() || setActiveMode('video') },
+              { id: 'photo', label: 'Foto', icon: Camera, premium: true, onClick: () => { setActiveMode('photo'); setIsPhotoChoiceOpen(true); } },
+              { id: 'video', label: 'Vídeo', icon: Video, premium: true, onClick: () => { setActiveMode('video'); videoInputRef.current?.click(); } },
             ].map((opt) => {
               const isLocked = opt.premium && !isEnterprise;
               return (
                 <button
                   key={opt.id}
                   disabled={isLocked}
-                  onClick={() => {
-                    setActiveMode(opt.id as CollectionMode);
-                    opt.onClick();
-                  }}
+                  onClick={opt.onClick}
                   className={cn(
                     "h-24 rounded-2xl flex flex-col items-center justify-center gap-2 border-2 transition-all active:scale-95 group",
                     activeMode === opt.id 
@@ -273,7 +277,6 @@ export default function CollectionClient({ slug }: { slug: string }) {
               <form className="space-y-6">
                 <div className="hidden"><input type="text" value={honeypot} onChange={(e) => setHoneypot(e.target.value)} /></div>
 
-                {/* Preview de Mídia se houver */}
                 {(recordedVideoUrl || recordedPhotoUrl) && (
                   <div className="relative rounded-2xl overflow-hidden border-2 border-primary/20 bg-muted/10 group animate-in zoom-in duration-300">
                     <div className="aspect-video">
@@ -334,6 +337,37 @@ export default function CollectionClient({ slug }: { slug: string }) {
            </div>
         </footer>
       </div>
+
+      <Dialog open={isPhotoChoiceOpen} onOpenChange={setIsPhotoChoiceOpen}>
+        <DialogContent className="rounded-[2.5rem] w-[90vw] max-w-sm border-none shadow-2xl p-8 bg-background">
+          <DialogHeader className="text-center space-y-3">
+            <DialogTitle className="text-xl font-black uppercase tracking-tight">Captura de Mídia</DialogTitle>
+            <DialogDescription className="text-xs font-medium">Como você deseja adicionar sua foto?</DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 gap-4 pt-6">
+            <Button 
+              className="h-16 rounded-2xl gap-3 font-black uppercase tracking-widest shadow-xl text-[11px]"
+              onClick={() => photoCameraRef.current?.click()}
+            >
+              <Camera className="w-5 h-5" /> Tirar Foto Agora
+            </Button>
+            <Button 
+              variant="outline"
+              className="h-16 rounded-2xl gap-3 font-black uppercase tracking-widest border-primary/20 text-primary hover:bg-primary/5 text-[11px]"
+              onClick={() => photoGalleryRef.current?.click()}
+            >
+              <ImageIcon className="w-5 h-5" /> Escolher da Galeria
+            </Button>
+            <Button 
+              variant="ghost"
+              className="mt-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+              onClick={() => { setIsPhotoChoiceOpen(false); setActiveMode(null); }}
+            >
+              Cancelar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
