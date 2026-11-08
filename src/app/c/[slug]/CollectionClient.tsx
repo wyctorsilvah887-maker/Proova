@@ -322,16 +322,19 @@ export default function CollectionClient({ slug }: { slug: string }) {
                   <Textarea placeholder="O que você mais gostou no atendimento de hoje?" className="min-h-[120px] rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 font-medium text-sm leading-relaxed p-4" value={text} onChange={(e) => setText(e.target.value)} />
                 </div>
 
-                {isFormValid && (
-                  <Button 
-                    type="button" 
-                    onClick={handleFinalSubmit} 
-                    disabled={isSubmitting} 
-                    className="w-full h-16 text-base font-black uppercase tracking-widest shadow-2xl rounded-2xl bg-primary hover:bg-primary/90 text-white transition-all active:scale-95 gap-3 animate-in fade-in zoom-in duration-300"
-                  >
-                     {isSubmitting ? <Loader2 className="animate-spin h-6 w-6" /> : <Send className="w-5 h-5" />} Enviar Depoimento
-                  </Button>
-                )}
+                <Button 
+                  type="button" 
+                  onClick={handleFinalSubmit} 
+                  disabled={!isFormValid || isSubmitting} 
+                  className={cn(
+                    "w-full h-16 text-base font-black uppercase tracking-widest shadow-2xl rounded-2xl transition-all active:scale-95 gap-3",
+                    isFormValid 
+                      ? "bg-primary hover:bg-primary/90 text-white animate-in fade-in zoom-in duration-300" 
+                      : "bg-muted text-muted-foreground opacity-50 cursor-not-allowed"
+                  )}
+                >
+                    {isSubmitting ? <Loader2 className="animate-spin h-6 w-6" /> : <Send className="w-5 h-5" />} Enviar Depoimento
+                </Button>
               </form>
             </CardContent>
           </Card>
