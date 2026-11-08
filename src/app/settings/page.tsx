@@ -197,11 +197,11 @@ export default function SettingsPage() {
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent" />
+          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
-                <div className="hidden sm:flex flex-col items-end">
+                <div className="hidden sm:flex flex-col items-end relative">
                   <span className="text-xs font-bold truncate max-w-[120px] group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Minha Empresa'}
                   </span>
@@ -404,12 +404,14 @@ export default function SettingsPage() {
                              </div>
                           </div>
                           
-                          <Alert variant="destructive" className="bg-destructive/5 border-destructive/20 rounded-2xl animate-in fade-in zoom-in duration-500">
-                            <AlertCircle className="h-4 w-4" />
-                            <AlertTitle className="text-[10px] font-black uppercase tracking-tight">Aviso de Localização</AlertTitle>
-                            <AlertDescription className="text-[10px] leading-relaxed font-medium">
-                              Se você alterar a cidade ou o estado, será necessário pesquisar e vincular sua empresa novamente no <b>G-Boost</b>. Esses dados são essenciais para identificarmos seu local no Google.
-                            </AlertDescription>
+                          <Alert variant="destructive" className="bg-destructive/5 border-destructive/20 rounded-2xl animate-in fade-in zoom-in duration-500 w-full overflow-hidden">
+                            <AlertCircle className="h-4 w-4 shrink-0" />
+                            <div className="flex-1 min-w-0">
+                               <AlertTitle className="text-[10px] font-black uppercase tracking-tight">Aviso de Localização</AlertTitle>
+                               <AlertDescription className="text-[10px] leading-relaxed font-medium block break-words">
+                                 Se você alterar a cidade ou o estado, será necessário pesquisar e vincular sua empresa novamente no <b>G-Boost</b>. Esses dados são essenciais para identificarmos seu local no Google.
+                               </AlertDescription>
+                            </div>
                           </Alert>
                        </div>
                     </div>
@@ -464,17 +466,6 @@ export default function SettingsPage() {
            </TabsContent>
         </Tabs>
       </main>
-
-      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center shrink-0">
-        <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[105px]">
-          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain object-center dark:hidden opacity-30 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-700" priority unoptimized />
-          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain object-center hidden dark:block opacity-30 grayscale hover:opacity-100 hover:grayscale-0 transition-all duration-700" priority unoptimized />
-        </div>
-        <div className="space-y-1">
-          <p className="text-[9px] text-muted-foreground uppercase tracking-[0.3em] font-black opacity-60">© 2026 Proova Technology - Creative Studio</p>
-          <p className="text-[8px] text-muted-foreground/40 font-bold uppercase">Account Management Suite v2.1.0-Release</p>
-        </div>
-      </footer>
     </div>
   );
 }
