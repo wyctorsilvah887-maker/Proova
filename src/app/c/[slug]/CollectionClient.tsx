@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { 
   Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, 
@@ -20,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { submitTestimonialAction } from '@/app/actions/testimonial-actions';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { LoadingScreen } from '@/components/loading-screen';
+import { Badge } from '@/components/ui/badge';
 
 export default function CollectionClient({ slug }: { slug: string }) {
   const db = useFirestore();
