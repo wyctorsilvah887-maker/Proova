@@ -10,7 +10,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { 
   Star, CheckCircle2, MessageSquare, Loader2, Send, Video, Search, MapPin, 
   Globe, X, Camera, Square, RefreshCcw, SwitchCamera, Play, Clock, ArrowLeft, 
-  Shield, ImageIcon, Trash2, Image as ImageIconLucide
+  Shield, ImageIcon, Trash2, Image as ImageIconLucide, Building2
 } from 'lucide-react';
 import { useFirestore, useStorage } from '@/firebase';
 import { collection, query, where, getDocs, limit, doc } from 'firebase/firestore';
@@ -19,7 +19,7 @@ import { toast } from '@/hooks/use-toast';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
 import { submitTestimonialAction } from '@/app/actions/testimonial-actions';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { LoadingScreen } from '@/components/loading-screen';
 import { Badge } from '@/components/ui/badge';
 
@@ -42,7 +42,6 @@ export default function CollectionClient({ slug }: { slug: string }) {
   const [membershipStatus, setMembershipStatus] = useState<string | null>(null);
   const [finalDest, setFinalDest] = useState<'public' | 'private' | null>(null);
   
-  const [isGoogleRedirectDialogOpen, setIsGoogleRedirectDialogOpen] = useState(false);
   const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordedVideoUrl, setRecordedVideoUrl] = useState<string | null>(null);
@@ -436,6 +435,9 @@ export default function CollectionClient({ slug }: { slug: string }) {
 
       <Dialog open={isVideoDialogOpen} onOpenChange={(o) => !o && (stopCamera(), setIsVideoDialogOpen(false))}>
         <DialogContent className="fixed inset-0 m-0 h-screen w-screen max-w-none bg-black border-none p-0 flex flex-col z-[101] [&>button]:hidden">
+          <DialogHeader className="sr-only">
+            <DialogTitle>Gravação de Vídeo Depoimento</DialogTitle>
+          </DialogHeader>
           <div className="relative flex-1 flex items-center justify-center">
             {recordedVideoUrl ? (
               <video src={recordedVideoUrl} controls className="w-full h-full object-contain" />
@@ -479,14 +481,5 @@ export default function CollectionClient({ slug }: { slug: string }) {
         </DialogContent>
       </Dialog>
     </div>
-  );
-}
-
-interface Building2Props { className?: string }
-function Building2(props: Building2Props) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
-      <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/>
-    </svg>
   );
 }
