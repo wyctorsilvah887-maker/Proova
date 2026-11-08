@@ -53,7 +53,7 @@ export default function ManualPage() {
   return (
     <div className="min-h-screen bg-muted/30 font-body text-foreground flex flex-col overflow-x-hidden">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center">
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[180px] h-[60px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
               <Image 
@@ -74,15 +74,6 @@ export default function ManualPage() {
               />
             </div>
           </Link>
-          <Link href="/dash">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="rounded-full text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent h-10 w-10 focus-visible:ring-0"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
         </div>
         <div className="ml-auto flex items-center gap-2 md:gap-4">
           <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-0 focus:bg-transparent" />
@@ -92,13 +83,20 @@ export default function ManualPage() {
         </div>
       </header>
 
-      <main className="container max-w-6xl mx-auto p-4 md:p-12 space-y-12 flex-1 pt-24 md:pt-36">
-        <section className="space-y-4 text-center md:text-left">
-           <div className="space-y-2">
-              <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">Manual de Estratégia</h1>
-              <p className="text-muted-foreground text-sm md:text-lg font-medium">Domine as ferramentas que vão consolidar sua autoridade no mercado.</p>
-           </div>
-        </section>
+      <main className="container max-w-6xl mx-auto p-4 md:p-12 space-y-8 flex-1 pt-24 md:pt-36">
+        <div className="flex flex-col gap-6">
+          <Link href="/dash">
+            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-primary transition-colors h-8 px-0 font-bold uppercase tracking-widest text-[10px] hover:bg-transparent active:bg-transparent focus-visible:ring-0">
+              <ArrowLeft className="w-4 h-4" /> Voltar ao Painel
+            </Button>
+          </Link>
+          <section className="space-y-4 text-center md:text-left">
+             <div className="space-y-2">
+                <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">Manual de Estratégia</h1>
+                <p className="text-muted-foreground text-sm md:text-lg font-medium">Domine as ferramentas que vão consolidar sua autoridade no mercado.</p>
+             </div>
+          </section>
+        </div>
 
         <Tabs defaultValue="introducao" className="w-full">
            <TabsList className="bg-background border rounded-2xl h-auto p-1.5 gap-1 mb-8 shadow-sm flex flex-wrap md:flex-row">
