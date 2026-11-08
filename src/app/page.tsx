@@ -70,9 +70,16 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
           <div className="relative w-[200px] h-[66px] md:w-[320px] md:h-[106px] transition-transform group-hover:scale-105">
             <Image 
               src="/logo-proova-landing-white-mode.png" 
-              alt="Logo Proova" 
+              alt="Logo Proova Light" 
               fill 
               className="dark:hidden object-contain object-left" 
+              priority 
+            />
+            <Image 
+              src="/logo-proova-landing-dark-mode.png" 
+              alt="Logo Proova Dark" 
+              fill 
+              className="hidden dark:block object-contain object-left" 
               priority 
             />
           </div>
@@ -674,9 +681,15 @@ const Footer = () => {
         <div className="relative w-[200px] h-[60px] opacity-40 grayscale">
            <Image 
              src="/logo-proova-landing-white-mode.png" 
-             alt="Logo Proova Footer" 
+             alt="Logo Proova Footer Light" 
              fill 
              className="dark:hidden object-contain" 
+           />
+           <Image 
+             src="/logo-proova-landing-dark-mode.png" 
+             alt="Logo Proova Footer Dark" 
+             fill 
+             className="hidden dark:block object-contain" 
            />
         </div>
         <div className="space-y-8">
