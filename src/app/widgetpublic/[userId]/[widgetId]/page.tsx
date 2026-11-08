@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, use } from 'react';
@@ -16,7 +15,8 @@ import {
 
 /**
  * Página pública do Widget (Embed VIP)
- * Otimizada para ser "miúda" e ultra-minimalista, com suporte a Scroll Vertical Infinito no layout Grade.
+ * Otimizada para ser compacta e minimalista, sem cabeçalhos ou rodapés adicionais.
+ * Projetada especificamente para ser embutida via iFrame em sites externos.
  */
 export default function WidgetPublicPage({ params }: { params: Promise<{ userId: string, widgetId: string }> }) {
   const { userId, widgetId } = use(params);

@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, use, useRef } from 'react';
@@ -379,11 +378,6 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
                  </div>
                  
                  <div className="pt-16 pb-12 px-6 min-h-[500px] flex flex-col items-center">
-                    <div className="w-full max-w-2xl text-center space-y-4 mb-16">
-                       <h2 className="text-3xl font-black font-headline tracking-tighter">O que dizem sobre nós</h2>
-                       <p className="text-muted-foreground text-sm font-medium">Experiências reais capturadas em tempo real pela tecnologia Proova.</p>
-                    </div>
-
                     <div className={cn(
                       "w-full",
                       (layout === 'popup' || layout === 'carousel') ? "max-w-md mx-auto" : (
@@ -495,8 +489,8 @@ function AlertCircle(props: any) {
       strokeLinejoin="round"
     >
       <circle cx="12" cy="12" r="10" />
-      <line x1="12" y1="8" x2="12" y2="12" />
-      <line x1="12" y1="16" x2="12.01" y2="16" />
+      <line x1="12" x2="12" y1="8" y2="12" />
+      <line x1="12" x2="12.01" y1="16" y2="16" />
     </svg>
   );
 }
