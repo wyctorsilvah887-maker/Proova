@@ -43,7 +43,8 @@ import {
   ExternalLink,
   Zap,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ListChecks
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -231,7 +232,11 @@ const PublicPageSettings = ({
   isEnterprise,
   logoInputRef,
   currentSlug, setSlugEdit,
-  onClose
+  onClose,
+  approvedTestimonials,
+  selectedIds,
+  toggleSelection,
+  SELECTION_LIMIT
 }: any) => {
   const colors = ['#f97316', '#D4AF37', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#e11d48', '#0d9488', '#7c3aed', '#475569', '#000000', '#ffffff'];
   const router = useRouter();
@@ -271,7 +276,9 @@ const PublicPageSettings = ({
             </Button>
           </Link>
           {onClose && (
-            <Button variant="ghost" size="icon" onClick={onClose} className="lg:hidden h-8 w-8 rounded-full"><X className="w-4 h-4" /></Button>
+            <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors">
+              <X className="w-4 h-4" />
+            </Button>
           )}
         </div>
       </div>
@@ -294,6 +301,9 @@ const PublicPageSettings = ({
           >
             <TabsList className="flex w-max justify-start rounded-none bg-transparent h-12 px-2 shrink-0">
               <TabsTrigger value="geral" className="text-[10px] font-bold uppercase tracking-widest px-3">Visual</TabsTrigger>
+              <TabsTrigger value="selecao" className="text-[10px] font-bold uppercase tracking-widest px-3 flex items-center gap-1.5">
+                Seleção <Badge variant="secondary" className="h-4 px-1 text-[8px] border-none">{selectedIds.length}</Badge>
+              </TabsTrigger>
               <TabsTrigger value="conteudo" className="text-[10px] font-bold uppercase tracking-widest px-3 flex items-center gap-1.5">
                 Conteúdo {!isGoldPlan && <Lock className="w-2.5 h-2.5 opacity-40" />}
               </TabsTrigger>
@@ -359,6 +369,42 @@ const PublicPageSettings = ({
                   </div>
                   {!isGoldPlan && <p className="text-[9px] text-muted-foreground italic font-medium">Troca de slug disponível apenas nos planos pagos.</p>}
                 </section>
+             </TabsContent>
+
+             <TabsContent value="selecao" className="mt-0 space-y-6">
+                <div className="flex items-center justify-between mb-4">
+                  <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Escolher Depoimentos</Label>
+                  <Badge variant="secondary" className="font-black h-5 text-[8px]">{selectedIds.length} / {SELECTION_LIMIT === Infinity ? '∞' : SELECTION_LIMIT}</Badge>
+                </div>
+                
+                <div className="space-y-3">
+                  {approvedTestimonials?.length === 0 ? (
+                    <div className="py-12 text-center opacity-30 bg-muted/10 rounded-2xl border-2 border-dashed border-primary/10">
+                      <MessageSquare className="w-8 h-8 mx-auto mb-3" />
+                      <p className="text-[9px] font-black uppercase tracking-widest">Nenhum depoimento aprovado</p>
+                    </div>
+                  ) : approvedTestimonials?.map((t: any) => {
+                    const isSelected = selectedIds.includes(t.id);
+                    return (
+                      <div 
+                        key={t.id} 
+                        onClick={() => toggleSelection(t.id)}
+                        className={cn(
+                          "p-3 rounded-xl border-2 transition-all cursor-pointer flex gap-3 items-start relative group",
+                          isSelected ? "bg-primary/5 border-primary shadow-sm" : "bg-muted/10 border-transparent hover:border-primary/20"
+                        )}
+                      >
+                        <div className={cn("h-4 w-4 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 transition-all", isSelected ? "bg-primary border-primary" : "border-muted-foreground/30")}>
+                          {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
+                        </div>
+                        <div className="flex-1 min-w-0 space-y-1">
+                          <p className="font-black text-[10px] uppercase truncate">{t.userName}</p>
+                          <p className="text-[9px] text-muted-foreground leading-relaxed italic line-clamp-2">"{t.text}"</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
              </TabsContent>
 
              <TabsContent value="conteudo" className="mt-0 space-y-8">
@@ -685,6 +731,7 @@ export default function PPEditorPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [muralIndex, setMuralIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const [tempImage, setTempImage] = useState<string | null>(null);
   const [cropType, setCropType] = useState<'logo' | null>(null);
@@ -830,15 +877,6 @@ export default function PPEditorPage() {
     return currentSelection;
   }, [currentSelection, layout, muralIndex]);
 
-  const membershipLabel = useMemo(() => {
-    const status = userData?.membershipStatus;
-    if (status === 'enterprise') return 'ENTERPRISE';
-    if (status === 'gold') return 'GOLD';
-    if (status === 'trial') return 'TRIAL';
-    if (status === 'expired') return 'EXPIRADO';
-    return 'PLANO BASE';
-  }, [userData]);
-
   if (authLoading || userDataLoading || testimonialsLoading) return <LoadingScreen />;
 
   return (
@@ -895,20 +933,24 @@ export default function PPEditorPage() {
             onFileSelect={onFileSelect}
             isUploading={isUploading} isGoldPlan={isGoldPlan} isEnterprise={isEnterprise}
             logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
+            approvedTestimonials={approvedTestimonials}
+            selectedIds={selectedIds}
+            toggleSelection={toggleSelection}
+            SELECTION_LIMIT={SELECTION_LIMIT}
           />
         </aside>
 
         <div className="flex-1 overflow-y-auto bg-muted/10 p-4 sm:p-8">
-           <div className="max-w-6xl mx-auto space-y-8">
-              <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+           <div className="max-w-6xl mx-auto space-y-8 flex flex-col h-full">
+              <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 shrink-0">
                  <div className="space-y-1">
                     <h2 className="text-2xl font-black font-headline tracking-tighter">Editor de Página Pública</h2>
-                    <p className="text-xs text-muted-foreground font-medium">Selecione depoimentos e configure o visual da sua vitrine.</p>
+                    <p className="text-xs text-muted-foreground font-medium">Configure o visual e selecione os melhores depoimentos para sua vitrine.</p>
                  </div>
                  <div className="flex items-center gap-4">
-                    <Sheet>
+                    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                       <SheetTrigger asChild>
-                         <Button variant="outline" className="lg:hidden h-11 rounded-xl font-bold gap-2"><Palette className="w-4 h-4" /> Estilo & Configs</Button>
+                         <Button variant="outline" className="lg:hidden h-11 rounded-xl font-bold gap-2"><Palette className="w-4 h-4" /> Estilo & Depoimentos</Button>
                       </SheetTrigger>
                       <SheetContent side="left" className="p-0 w-full sm:max-w-sm">
                          <PublicPageSettings 
@@ -928,115 +970,79 @@ export default function PPEditorPage() {
                             onFileSelect={onFileSelect}
                             isUploading={isUploading} isGoldPlan={isGoldPlan} isEnterprise={isEnterprise}
                             logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
+                            onClose={() => setIsSheetOpen(false)}
+                            approvedTestimonials={approvedTestimonials}
+                            selectedIds={selectedIds}
+                            toggleSelection={toggleSelection}
+                            SELECTION_LIMIT={SELECTION_LIMIT}
                           />
                       </SheetContent>
                     </Sheet>
                  </div>
               </header>
 
-              <div className="grid lg:grid-cols-12 gap-8">
-                 <div className="lg:col-span-7 space-y-6">
-                    <Card className="rounded-[2.5rem] border-none shadow-xl overflow-hidden p-6 md:p-10 space-y-8">
-                       <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                             <Star className="w-5 h-5 text-primary" />
-                             <h3 className="text-lg font-black uppercase tracking-tight">Depoimentos Aprovados</h3>
+              <div className="flex-1 flex flex-col items-center justify-center min-h-0 py-4">
+                  <div className="w-full max-w-sm flex flex-col gap-3 shrink-0 mb-4">
+                    <div className="flex items-center gap-2 px-1">
+                      <Monitor className="w-4 h-4 text-primary" />
+                      <h3 className="text-[10px] font-black uppercase tracking-widest opacity-60">Pré-visualização ao vivo</h3>
+                    </div>
+                  </div>
+                  
+                  <div className="relative w-full max-w-[360px] flex-1 bg-background rounded-[3rem] shadow-2xl border-[8px] border-muted overflow-hidden flex flex-col aspect-[9/19]">
+                    <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col">
+                        <header className="p-8 text-center space-y-6 shrink-0">
+                          {logoUrl && <img src={logoUrl} className="w-20 h-20 mx-auto rounded-2xl object-cover shadow-lg border-2 border-background" />}
+                          <div className="space-y-2">
+                              <div className="text-xl font-black leading-tight" dangerouslySetInnerHTML={{ __html: heroTitle || 'Seu Título Aqui' }} />
+                              <div className="text-[10px] text-muted-foreground font-medium italic opacity-80" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />
                           </div>
-                          <Badge variant="secondary" className="font-black h-6">{selectedIds.length} / {SELECTION_LIMIT === Infinity ? '∞' : SELECTION_LIMIT}</Badge>
-                       </div>
-                       
-                       <div className="grid gap-3 max-h-[600px] overflow-y-auto pr-2 scrollbar-hide">
-                          {approvedTestimonials?.length === 0 ? (
-                             <div className="py-20 text-center opacity-30"><MessageSquare className="w-12 h-12 mx-auto mb-4" /><p className="text-xs font-bold uppercase tracking-widest">Nenhum depoimento aprovado</p></div>
-                          ) : approvedTestimonials?.map((t: any) => {
-                             const isSelected = selectedIds.includes(t.id);
-                             return (
-                               <div 
-                                 key={t.id} 
-                                 onClick={() => toggleSelection(t.id)}
-                                 className={cn(
-                                   "p-4 rounded-2xl border-2 transition-all cursor-pointer flex gap-4 items-start relative group",
-                                   isSelected ? "bg-primary/5 border-primary shadow-sm" : "bg-muted/10 border-transparent hover:border-primary/20"
-                                 )}
-                               >
-                                  <div className={cn("h-5 w-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1 transition-all", isSelected ? "bg-primary border-primary" : "border-muted-foreground/30")}>
-                                     {isSelected && <Check className="w-3 h-3 text-white" />}
-                                  </div>
-                                  <div className="flex-1 min-w-0 space-y-1">
-                                     <div className="flex items-center justify-between">
-                                        <p className="font-black text-xs uppercase truncate pr-4">{t.userName}</p>
-                                        <div className="flex gap-0.5">{[1,2,3,4,5].map(s => <Star key={s} className={cn("w-2.5 h-2.5", s <= t.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20")} />)}</div>
-                                     </div>
-                                     <p className="text-[11px] text-muted-foreground leading-relaxed italic line-clamp-2">"{t.text}"</p>
-                                  </div>
-                               </div>
-                             );
-                          })}
-                       </div>
-                    </Card>
-                 </div>
+                        </header>
 
-                 <div className="lg:col-span-5 space-y-6">
-                    <div className="flex items-center gap-2 mb-2">
-                       <Monitor className="w-4 h-4 text-primary" />
-                       <h3 className="text-[10px] font-black uppercase tracking-widest opacity-60">Pré-visualização ao vivo</h3>
+                        {customSections.map(s => (
+                          <section key={s.id} className={cn("p-8 text-center space-y-4 shrink-0", s.variant === 'accent' ? "text-white" : (s.variant === 'dark' ? "bg-black text-white" : "bg-muted/5"))} style={{ backgroundColor: s.variant === 'accent' ? themeColor : undefined }}>
+                            <h4 className="text-sm font-black uppercase">{s.title}</h4>
+                            <p className="text-[10px] leading-relaxed opacity-80">{s.content}</p>
+                          </section>
+                        ))}
+
+                        <main className="p-6 space-y-6 flex-1">
+                          {testimonialsTitle && <h3 className="text-center font-black uppercase tracking-tight text-xs" style={{ color: themeColor }}>{testimonialsTitle}</h3>}
+                          <div className={cn("grid gap-4", (layout === 'popup' || layout === 'carousel' || layout === 'mural') ? "grid-cols-1" : "grid-cols-1")}>
+                              {visibleTestimonialsPreview.map((t, idx) => (
+                                <div 
+                                  key={`${t.id}-${idx}-${muralIndex}`} 
+                                  className={cn(
+                                    "p-4 rounded-3xl bg-card shadow-lg border-none animate-in fade-in zoom-in-95 duration-700",
+                                    layout === 'mural' && (idx % 2 === 0 ? "slide-in-from-left-4" : "slide-in-from-right-4")
+                                  )}
+                                  style={{ 
+                                    boxShadow: secondaryColor ? `0 0 20px ${secondaryColor}40` : `0 10px 30px -10px ${themeColor}20`,
+                                    border: secondaryColor ? `1px solid ${secondaryColor}40` : 'none'
+                                  }}
+                                >
+                                  <div className="flex items-center gap-3 mb-3">
+                                      <div className="h-8 w-8 rounded-xl flex items-center justify-center text-white font-black text-[10px]" style={{ backgroundColor: themeColor }}>{t.userName?.substring(0,2).toUpperCase()}</div>
+                                      <div>
+                                        <p className="font-black text-[10px] uppercase truncate max-w-[80px] leading-none">{t.userName}</p>
+                                        <div className="flex gap-0.5 mt-0.5">{[1,2,3,4,5].map(s => <Star key={s} className={cn("w-2 h-2", s <= t.rating ? "fill-current" : "opacity-10")} style={{ color: themeColor }} />)}</div>
+                                      </div>
+                                  </div>
+                                  <p className="text-[10px] font-bold italic opacity-70 leading-relaxed">"{t.text}"</p>
+                                </div>
+                              ))}
+                              {currentSelection.length === 0 && <div className="py-10 text-center opacity-20"><Star className="w-8 h-8 mx-auto" /><p className="text-[8px] font-black uppercase tracking-widest mt-2">Nenhum item selecionado</p></div>}
+                          </div>
+                        </main>
+
+                        <footer className="p-10 text-center space-y-4 border-t bg-muted/5 mt-auto shrink-0">
+                          <div className="flex flex-col items-center gap-1.5 opacity-30">
+                              <p className="text-[8px] font-bold uppercase tracking-widest">© {footerText || 'Proova'}</p>
+                              {showLogo && <span className="text-[6px] font-black uppercase tracking-[0.3em]">Powered by Proova</span>}
+                          </div>
+                        </footer>
                     </div>
-                    
-                    <div className="sticky top-8 bg-background rounded-[3rem] shadow-2xl border-[8px] border-muted overflow-hidden aspect-[9/19] flex flex-col">
-                       <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col">
-                          <header className="p-8 text-center space-y-6">
-                             {logoUrl && <img src={logoUrl} className="w-20 h-20 mx-auto rounded-2xl object-cover shadow-lg border-2 border-background" />}
-                             <div className="space-y-2">
-                                <div className="text-xl font-black leading-tight" dangerouslySetInnerHTML={{ __html: heroTitle || 'Seu Título Aqui' }} />
-                                <div className="text-[10px] text-muted-foreground font-medium italic opacity-80" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />
-                             </div>
-                          </header>
-
-                          {customSections.map(s => (
-                            <section key={s.id} className={cn("p-8 text-center space-y-4", s.variant === 'accent' ? "text-white" : (s.variant === 'dark' ? "bg-black text-white" : "bg-muted/5"))} style={{ backgroundColor: s.variant === 'accent' ? themeColor : undefined }}>
-                               <h4 className="text-sm font-black uppercase">{s.title}</h4>
-                               <p className="text-[10px] leading-relaxed opacity-80">{s.content}</p>
-                            </section>
-                          ))}
-
-                          <main className="p-6 space-y-6 flex-1">
-                             {testimonialsTitle && <h3 className="text-center font-black uppercase tracking-tight text-xs" style={{ color: themeColor }}>{testimonialsTitle}</h3>}
-                             <div className={cn("grid gap-4", (layout === 'popup' || layout === 'carousel' || layout === 'mural') ? "grid-cols-1" : "grid-cols-1")}>
-                                {visibleTestimonialsPreview.map((t, idx) => (
-                                  <div 
-                                    key={`${t.id}-${idx}-${muralIndex}`} 
-                                    className={cn(
-                                      "p-4 rounded-3xl bg-card shadow-lg border-none animate-in fade-in zoom-in-95 duration-700",
-                                      layout === 'mural' && (idx % 2 === 0 ? "slide-in-from-left-4" : "slide-in-from-right-4")
-                                    )}
-                                    style={{ 
-                                      boxShadow: secondaryColor ? `0 0 20px ${secondaryColor}40` : `0 10px 30px -10px ${themeColor}20`,
-                                      border: secondaryColor ? `1px solid ${secondaryColor}40` : 'none'
-                                    }}
-                                  >
-                                     <div className="flex items-center gap-3 mb-3">
-                                        <div className="h-8 w-8 rounded-xl flex items-center justify-center text-white font-black text-[10px]" style={{ backgroundColor: themeColor }}>{t.userName?.substring(0,2).toUpperCase()}</div>
-                                        <div>
-                                           <p className="font-black text-[10px] uppercase truncate max-w-[80px] leading-none">{t.userName}</p>
-                                           <div className="flex gap-0.5 mt-0.5">{[1,2,3,4,5].map(s => <Star key={s} className={cn("w-2 h-2", s <= t.rating ? "fill-current" : "opacity-10")} style={{ color: themeColor }} />)}</div>
-                                        </div>
-                                     </div>
-                                     <p className="text-[10px] font-bold italic opacity-70 leading-relaxed">"{t.text}"</p>
-                                  </div>
-                                ))}
-                                {currentSelection.length === 0 && <div className="py-10 text-center opacity-20"><Star className="w-8 h-8 mx-auto" /><p className="text-[8px] font-black uppercase tracking-widest mt-2">Nenhum item selecionado</p></div>}
-                             </div>
-                          </main>
-
-                          <footer className="p-10 text-center space-y-4 border-t bg-muted/5 mt-auto">
-                             <div className="flex flex-col items-center gap-1.5 opacity-30">
-                                <p className="text-[8px] font-bold uppercase tracking-widest">© {footerText || 'Proova'}</p>
-                                {showLogo && <span className="text-[6px] font-black uppercase tracking-[0.3em]">Powered by Proova</span>}
-                             </div>
-                          </footer>
-                       </div>
-                    </div>
-                 </div>
+                  </div>
               </div>
            </div>
         </div>
