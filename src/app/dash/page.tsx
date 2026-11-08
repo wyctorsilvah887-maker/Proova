@@ -671,7 +671,7 @@ export default function DashPage() {
                     {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
                   </div>
                   {activeTicket && (
-                    <div className={cn("absolute -top-1 -right-4 h-2 v-2 rounded-full", activeTicket.isSupportInChat ? "bg-green-500 animate-ping" : "bg-red-500")} />
+                    <div className={cn("absolute -top-1 -right-4 h-2 w-2 rounded-full", activeTicket.isSupportInChat ? "bg-green-500 animate-ping" : "bg-red-500")} />
                   )}
                 </div>
                 <div className="h-7 w-7 md:h-8 md:w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-3.5 h-3.5 md:w-4 md:h-4" /></div>
@@ -910,7 +910,7 @@ export default function DashPage() {
               onClick={() => setIsCollectLinkChoiceOpen(true)} 
               className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
             >
-              <Link2 className="w-6 h-6 text-primary" />
+              <Link2 className="w-5 h-5 text-primary" />
               <div className="text-center px-2">
                 <p className="text-[10px] font-black uppercase tracking-tight">Link de Coleta</p>
                 <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Capture Elogios</p>
@@ -921,7 +921,7 @@ export default function DashPage() {
               onClick={() => setIsPublicPageChoiceOpen(true)} 
               className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
             >
-              <Globe className="w-6 h-6 text-primary" />
+              <Globe className="w-5 h-5 text-primary" />
               <div className="text-center px-2">
                 <p className="text-[10px] font-black uppercase tracking-tight">Link in Bio</p>
                 <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Página Pública</p>
@@ -932,7 +932,7 @@ export default function DashPage() {
               onClick={() => router.push('/social-cards')} 
               className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
             >
-              <Share2 className="w-6 h-6 text-primary" />
+              <Share2 className="w-5 h-5 text-primary" />
               <div className="text-center px-2">
                 <p className="text-[10px] font-black uppercase tracking-tight">Social Cards</p>
                 <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Posts Instagram</p>
@@ -944,7 +944,7 @@ export default function DashPage() {
               onClick={() => router.push('/private')} 
               className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all relative shadow-sm active:scale-95 disabled:opacity-40"
             >
-              <Inbox className="w-6 h-6 text-primary" />
+              <Inbox className="w-5 h-5 text-primary" />
               {pendingTestimonialsCount > 0 && (
                 <span className="absolute top-3 right-4 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white shadow-lg animate-in zoom-in duration-300">
                   {pendingTestimonialsCount}
@@ -960,7 +960,7 @@ export default function DashPage() {
               onClick={() => router.push('/widgets')} 
               className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
             >
-              <Layout className="w-6 h-6 text-primary" />
+              <Layout className="w-5 h-5 text-primary" />
               <div className="text-center px-2">
                 <p className="text-[10px] font-black uppercase tracking-tight">Widgets</p>
                 <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Murais para Site</p>
@@ -972,7 +972,7 @@ export default function DashPage() {
               onClick={() => setIsQrDialogOpenManual(true)} 
               className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
             >
-              <QrCode className="w-6 h-6 text-primary" />
+              <QrCode className="w-5 h-5 text-primary" />
               <div className="text-center px-2">
                 <p className="text-[10px] font-black uppercase tracking-tight">QR Balcão</p>
                 <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Físico e Impresso</p>
@@ -983,7 +983,7 @@ export default function DashPage() {
               <button 
                 className="h-full w-full rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 relative"
               >
-                <Headphones className="w-6 h-6 text-primary" />
+                <Headphones className="w-5 h-5 text-primary" />
                 <div className="text-center px-2">
                   <p className="text-[10px] font-black uppercase tracking-tight">Suporte</p>
                   <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Consultor Chat</p>
@@ -996,7 +996,7 @@ export default function DashPage() {
 
             <Link href="/manual" className="w-full h-28">
               <button className="h-full w-full rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95">
-                <BookOpen className="w-6 h-6 text-primary" />
+                <BookOpen className="w-5 h-5 text-primary" />
                 <div className="text-center px-2">
                   <p className="text-[10px] font-black uppercase tracking-tight">Manual</p>
                   <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Estratégia VIP</p>
@@ -1255,7 +1255,9 @@ export default function DashPage() {
                   )}
                   <span className="text-lg font-black uppercase tracking-tight">Configurar</span>
                 </div>
-                <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">Customizar temas e depoimentos</span>
+                <span className="text-[9px] font-bold opacity-70 uppercase tracking-widest">
+                  {isPremiumUser ? 'Customizar temas e depoimentos' : 'Recurso Exclusivo Premium'}
+                </span>
               </Button>
               <button 
                 className="w-full py-2 text-[10px] font-black uppercase tracking-widest text-primary hover:opacity-70 transition-opacity flex items-center justify-center gap-1"
