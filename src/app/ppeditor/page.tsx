@@ -590,7 +590,7 @@ const PublicPageSettings = ({
                        >
                          <l.icon className={cn("w-6 h-6", layout === l.id ? "text-primary" : "text-muted-foreground")} />
                          <div className="space-y-0.5">
-                            <p className="text-[10px] font-black uppercase tracking-tight">{l.label}</p>
+                            <p className="text-sm font-black uppercase tracking-tight">{l.label}</p>
                             <p className="text-[8px] opacity-60 font-medium leading-none">{l.desc}</p>
                          </div>
                        </button>
@@ -953,6 +953,10 @@ export default function PPEditorPage() {
                          <Button variant="outline" className="lg:hidden h-11 rounded-xl font-bold gap-2"><Palette className="w-4 h-4" /> Estilo & Depoimentos</Button>
                       </SheetTrigger>
                       <SheetContent side="left" className="p-0 w-full sm:max-w-sm">
+                         <SheetHeader className="sr-only">
+                           <SheetTitle>Editor de Configurações</SheetTitle>
+                           <SheetDescription>Ajuste o visual e a seleção de depoimentos da sua página pública.</SheetDescription>
+                         </SheetHeader>
                          <PublicPageSettings 
                             themeColor={themeColor} setThemeColor={setThemeColor} secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
                             layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
