@@ -1,4 +1,3 @@
-
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -11,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Proova - Transforme Elogios em Vendas",
   description: "Colete e exiba depoimentos de clientes em minutos.",
-  manifest: "/site.webmanifest",
+  manifest: "/manifest.json",
   icons: {
     icon: [
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
@@ -22,13 +21,19 @@ export const metadata: Metadata = {
     other: [
       {
         rel: "maskable-icon",
-        url: "/maskable_icon_x192 (6).png",
+        url: "/maskable_icon_x48.png",
+        sizes: "48x48",
+        type: "image/png",
+      },
+      {
+        rel: "maskable-icon",
+        url: "/maskable_icon_x192.png",
         sizes: "192x192",
         type: "image/png",
       },
       {
         rel: "maskable-icon",
-        url: "/maskable_icon_x512 (5).png",
+        url: "/maskable_icon_x512.png",
         sizes: "512x512",
         type: "image/png",
       },
