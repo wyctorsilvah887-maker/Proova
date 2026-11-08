@@ -214,7 +214,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
   if (submitted) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-muted/20 px-4 font-body py-12">
-        <div className="fixed top-4 right-4"><ThemeToggle /></div>
+        <div className="fixed top-4 right-4"><ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" /></div>
         <Card className="w-full max-w-md text-center shadow-2xl border-none rounded-[2.5rem] overflow-hidden bg-card flex-1 sm:flex-initial">
           <div className="h-2 bg-primary w-full" />
           <CardContent className="pt-12 pb-12 px-8 space-y-8">
@@ -252,7 +252,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col items-center p-4 font-body text-foreground overflow-x-hidden">
-      <div className="fixed top-4 right-4 z-[50]"><ThemeToggle /></div>
+      <div className="fixed top-4 right-4 z-[50]"><ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" /></div>
       
       <div className="w-full max-w-xl flex-1 flex flex-col justify-center py-10 md:py-20 space-y-10">
         <header className="text-center space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
@@ -341,11 +341,11 @@ export default function CollectionClient({ slug }: { slug: string }) {
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-1.5">
                     <Label className="text-[9px] font-black uppercase tracking-widest ml-1 opacity-60">Seu Nome</Label>
-                    <Input placeholder="Como você quer ser identificado" value={userName} onChange={(e) => setUserName(e.target.value)} required className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold" />
+                    <Input placeholder="Seu nome aqui" value={userName} onChange={(e) => setUserName(e.target.value)} required className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold" />
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-[9px] font-black uppercase tracking-widest ml-1 opacity-60">E-mail (Opcional)</Label>
-                    <Input type="email" placeholder="Para receber um agradecimento" value={userEmail} onChange={(e) => setUserEmail(e.target.value)} className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold" />
+                    <Input type="email" placeholder="Receba promos e ofertas especiais por email" value={userEmail} onChange={(e) => setUserEmail(e.target.value)} className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold" />
                   </div>
                 </div>
 
