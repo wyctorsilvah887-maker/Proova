@@ -57,6 +57,16 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { getConsultantResponse } from '@/lib/consultant-rules';
 import { toast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
@@ -74,7 +84,7 @@ export default function SupportPage() {
   const [isAiThinking, setIsAiThinking] = useState(false);
   const [isCreatingTicket, setIsCreatingTicket] = useState(false);
   const [isEndingChat, setIsEndingChat] = useState(false);
-  const [isPendingClosure, setIsPendingClosure] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [localMessages, setLocalMessages] = useState<any[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -226,7 +236,7 @@ export default function SupportPage() {
     try {
       const batch = writeBatch(db);
 
-      // 1. Localizar e deletar TODAS as mensagens (não apenas as últimas 24h)
+      // 1. Localizar e deletar TODAS as mensagens
       const messagesRef = collection(db, 'users', user.uid, 'support_messages');
       const messagesSnap = await getDocs(messagesRef);
       messagesSnap.forEach(docSnap => batch.delete(docSnap.ref));
@@ -240,7 +250,7 @@ export default function SupportPage() {
 
       localStorage.removeItem(`proova_support_v1_${user.uid}`);
       setLocalMessages([]);
-      setIsPendingClosure(false);
+      setIsConfirmOpen(false);
       
       toast({ title: "Atendimento Encerrado", description: "O histórico foi limpo e o Consultor Proova reiniciado." });
     } catch (err: any) {
@@ -277,29 +287,6 @@ export default function SupportPage() {
 
       setIsAiThinking(true);
       
-      if (isPendingClosure) {
-        const normalizedInput = userMsg.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-        const validConfirmations = ['sim', 'claro', 'com certeza', 'pode fechar', 'confirmar', 'quero fechar', 'certeza', 'ok', 'pode', 'fechar', 'concordo', 'prosseguir', 'confirmado'];
-        
-        if (validConfirmations.some(word => normalizedInput.includes(word)) && normalizedInput.length >= 2) {
-          await handleFinalCleanup();
-          setIsAiThinking(false);
-          setIsSending(false);
-        } else {
-          setIsPendingClosure(false);
-          setTimeout(async () => {
-            await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
-              text: "Solicitação de encerramento cancelada. O atendimento continua ativo. Como posso ajudar?",
-              sender: 'support',
-              createdAt: serverTimestamp()
-            });
-            setIsAiThinking(false);
-            setIsSending(false);
-          }, 1000);
-        }
-        return;
-      }
-
       setTimeout(async () => {
         const botResponse = getConsultantResponse(userMsg);
         
@@ -313,10 +300,6 @@ export default function SupportPage() {
         
         if (userMsg === '6' || normalizedInput.includes('humano')) {
           await handleCreateSupportTicket();
-        }
-
-        if (userMsg === '7' || normalizedInput.includes('encerrar')) {
-          setIsPendingClosure(true);
         }
 
         setIsAiThinking(false);
@@ -529,7 +512,7 @@ export default function SupportPage() {
                    </span>
                 </div>
                 <button 
-                  onClick={() => setMessage('7')} 
+                  onClick={() => setIsConfirmOpen(true)} 
                   className="text-[8px] font-black uppercase tracking-widest text-destructive/40 hover:text-destructive transition-colors flex items-center gap-1"
                 >
                   <XCircle className="w-2.5 h-2.5" /> Encerrar Sessão
@@ -542,6 +525,32 @@ export default function SupportPage() {
       <footer className="py-4 text-center opacity-30 shrink-0">
         <p className="text-[8px] font-black uppercase tracking-[0.4em]">Proova Intelligence - Protocolo de Suporte Seguro</p>
       </footer>
+
+      <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
+        <AlertDialogContent className="rounded-[2rem] border-none shadow-2xl p-8">
+          <AlertDialogHeader className="text-center space-y-4">
+             <div className="mx-auto w-fit p-4 rounded-3xl bg-destructive/10 text-destructive">
+                <AlertTriangle className="w-10 h-10" />
+             </div>
+             <div className="space-y-2">
+                <AlertDialogTitle className="text-xl font-black uppercase tracking-tight">Finalizar Atendimento?</AlertDialogTitle>
+                <AlertDialogDescription className="text-xs font-medium leading-relaxed">
+                  Isso apagará permanentemente o seu histórico de mensagens desta sessão e encerrará qualquer ticket ativo.
+                </AlertDialogDescription>
+             </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-3 pt-4">
+            <AlertDialogCancel className="h-12 rounded-xl font-black uppercase tracking-widest text-[10px] bg-muted border-none hover:bg-muted/80">Manter Chat</AlertDialogCancel>
+            <AlertDialogAction 
+              onClick={handleFinalCleanup} 
+              disabled={isEndingChat}
+              className="h-12 rounded-xl font-black uppercase tracking-widest text-[10px] bg-destructive text-white hover:bg-destructive/90 shadow-lg shadow-destructive/20"
+            >
+              {isEndingChat ? <Loader2 className="animate-spin w-4 h-4" /> : "Encerrar e Limpar"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

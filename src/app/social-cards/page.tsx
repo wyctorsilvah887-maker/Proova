@@ -73,26 +73,35 @@ export default function SocialCardsPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData } = useDoc(userDocRef);
 
+  // Consulta simplificada para evitar erro de falta de índice composto no Firestore
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
-    return query(
-      collection(db, 'users', user.uid, 'testimonials'),
-      where('status', '==', 'approved'),
-      orderBy('createdAt', 'desc')
-    );
+    return collection(db, 'users', user.uid, 'testimonials');
   }, [db, user]);
 
   const { data: rawTestimonials, loading: testimonialsLoading } = useCollection(testimonialsQuery);
 
-  const filteredTestimonials = useMemo(() => {
+  // Filtragem e Ordenação em JS para máxima performance e compatibilidade
+  const allApprovedTestimonials = useMemo(() => {
     if (!rawTestimonials) return [];
-    if (!searchTerm.trim()) return rawTestimonials;
+    return rawTestimonials
+      .filter((t: any) => t.status === 'approved')
+      .sort((a: any, b: any) => {
+        const da = a.createdAt?.toDate?.() || new Date(0);
+        const db = b.createdAt?.toDate?.() || new Date(0);
+        return db.getTime() - da.getTime();
+      });
+  }, [rawTestimonials]);
+
+  const filteredTestimonials = useMemo(() => {
+    const list = allApprovedTestimonials;
+    if (!searchTerm.trim()) return list;
     const term = searchTerm.toLowerCase();
-    return rawTestimonials.filter((t: any) => 
+    return list.filter((t: any) => 
       t.userName?.toLowerCase().includes(term) || 
       t.text?.toLowerCase().includes(term)
     );
-  }, [rawTestimonials, searchTerm]);
+  }, [allApprovedTestimonials, searchTerm]);
 
   useEffect(() => {
     if (!authLoading && !user) router.replace('/login');
