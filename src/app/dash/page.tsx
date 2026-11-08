@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -145,8 +146,6 @@ export default function DashPage() {
   const [isCollectLinkChoiceOpen, setIsCollectLinkChoiceOpen] = useState(false);
   const [configMode, setConfigMode] = useState<'location' | 'maps' | 'business'>('location');
   
-  const [newGoogleMapsUrl, setNewGoogleMapsUrl] = useState('');
-  const [isUpdatingUrl, setIsUpdatingUrl] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
 
@@ -341,12 +340,10 @@ export default function DashPage() {
   }, [userData]);
 
   const [auditItems, setAuditItems] = useState<AuditItem[]>([]);
-  const [isAuditing, setIsAuditing] = useState(false);
 
   useEffect(() => {
     async function runAudit() {
       if ((!isSetupComplete && !userData?.isSetupProcessDone) || !userData) return;
-      setIsAuditing(true);
       const results: AuditItem[] = [];
 
       if (pendingTestimonialsCount > 0) {
@@ -400,7 +397,6 @@ export default function DashPage() {
       }
 
       setAuditItems(results);
-      setIsAuditing(false);
     }
     runAudit();
   }, [isSetupComplete, userData, widgetsList, pendingTestimonialsCount, router, isEnterpriseUser, isDigitalBusiness, pushSupported, permission]);
@@ -441,8 +437,7 @@ export default function DashPage() {
   };
 
   const handleSelectPlace = async (place: any) => {
-    if (!db || !user || isUpdatingUrl) return;
-    setIsUpdatingUrl(true);
+    if (!db || !user) return;
     const reviewLink = `https://search.google.com/local/writereview?placeid=${place.place_id}`;
     try {
       await updateDoc(doc(db, 'users', user.uid), {
@@ -456,14 +451,11 @@ export default function DashPage() {
       setSearchResults([]);
     } catch (err) {
       shadcnToast({ variant: "destructive", title: "Erro ao salvar" });
-    } finally {
-      setIsUpdatingUrl(false);
     }
   };
 
   const handleUpdateLocation = async () => {
     if (!db || !user || !city || !state) return;
-    setIsUpdatingUrl(true);
     try {
       await updateDoc(doc(db, 'users', user.uid), { city, state });
       shadcnToast({ title: "Localização Salva" });
@@ -471,14 +463,11 @@ export default function DashPage() {
       setSearchQuery('');
     } catch (err) {
       shadcnToast({ variant: "destructive", title: "Erro ao salvar local" });
-    } finally {
-      setIsUpdatingUrl(false);
     }
   };
 
   const handleUpdateBusinessInfo = async () => {
     if (!db || !user || !companyNameEdit || !companySlugEdit) return;
-    setIsUpdatingUrl(true);
     try {
       await updateDoc(doc(db, 'users', user.uid), { 
         companyName: companyNameEdit.trim(), 
@@ -488,8 +477,6 @@ export default function DashPage() {
       setIsGoogleMapsDialogOpen(false);
     } catch (err) {
       shadcnToast({ variant: "destructive", title: "Erro ao salvar identidade" });
-    } finally {
-      setIsUpdatingUrl(false);
     }
   };
 
@@ -521,7 +508,6 @@ export default function DashPage() {
 
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
       
       pdf.setFillColor(249, 115, 22); 
       pdf.rect(0, 0, pageWidth, 20, 'F'); 
@@ -685,7 +671,7 @@ export default function DashPage() {
                     {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
                   </div>
                   {activeTicket && (
-                    <div className={cn("absolute -top-1 -right-4 h-2 w-2 rounded-full", activeTicket.isSupportInChat ? "bg-green-500 animate-ping" : "bg-red-500")} />
+                    <div className={cn("absolute -top-1 -right-4 h-2 v-2 rounded-full", activeTicket.isSupportInChat ? "bg-green-500 animate-ping" : "bg-red-500")} />
                   )}
                 </div>
                 <div className="h-7 w-7 md:h-8 md:w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-3.5 h-3.5 md:w-4 md:h-4" /></div>
@@ -722,11 +708,6 @@ export default function DashPage() {
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Upgrade</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="rounded-xl font-bold py-2.5 opacity-50 cursor-not-allowed">
-                <Handshake className="mr-2 h-4 w-4 text-primary" />
-                <span>Parceiros</span>
-                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
-              </DropdownMenuItem>
               {userData?.isAdmin && (
                 <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
                   <Shield className="mr-2 h-4 w-4 text-primary" />
@@ -742,7 +723,7 @@ export default function DashPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-20 md:pt-24">
+      <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-20 md:pt-24 pb-12">
         {(!isSetupComplete && !userData?.isSetupProcessDone) && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="flex items-center justify-between">
@@ -948,10 +929,7 @@ export default function DashPage() {
             </button>
 
             <button 
-              onClick={() => {
-                const el = document.getElementById('testimonials-section');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }} 
+              onClick={() => router.push('/social-cards')} 
               className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
             >
               <Share2 className="w-6 h-6 text-primary" />
@@ -1414,7 +1392,7 @@ export default function DashPage() {
                     <Input placeholder="Ex: SP" value={state} maxLength={2} onChange={(e) => setState(e.target.value.toUpperCase())} className="h-10 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs uppercase" />
                   </div>
                 </div>
-                <Button onClick={handleUpdateLocation} disabled={!city || !state || isUpdatingUrl} className="w-full h-12 rounded-xl font-bold text-sm shadow-md gap-2">{isUpdatingUrl ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="h-4 w-4" />} Confirmar e Salvar</Button>
+                <Button onClick={handleUpdateLocation} disabled={!city || !state} className="w-full h-12 rounded-xl font-bold text-sm shadow-md gap-2"><Save className="h-4 w-4" /> Confirmar e Salvar</Button>
               </section>
             )}
             {configMode === 'business' && (
@@ -1432,7 +1410,7 @@ export default function DashPage() {
                     </div>
                   </div>
                 </div>
-                <Button onClick={handleUpdateBusinessInfo} disabled={!companyNameEdit || !companySlugEdit || isUpdatingUrl} className="w-full h-12 rounded-xl font-bold text-sm shadow-md gap-2">{isUpdatingUrl ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="h-4 w-4" />} Salvar Nova Identidade</Button>
+                <Button onClick={handleUpdateBusinessInfo} disabled={!companyNameEdit || !companySlugEdit} className="w-full h-12 rounded-xl font-bold text-sm shadow-md gap-2"><Save className="h-4 w-4" /> Salvar Nova Identidade</Button>
               </section>
             )}
             {configMode === 'maps' && (
