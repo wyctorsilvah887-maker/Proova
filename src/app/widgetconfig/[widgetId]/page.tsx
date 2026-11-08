@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect, use } from 'react';
@@ -141,8 +142,8 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
                   <span className="text-xs font-bold truncate max-w-[80px] group-hover:text-primary leading-tight">{userData?.companyName || 'Minha Empresa'}</span>
                   <div className="flex flex-col items-end gap-0">
                     <span className={cn(
-                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
-                      userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
+                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight text-primary",
+                      userData?.membershipStatus === 'enterprise' ? "animate-pulse" : ""
                     )}>{membershipLabel}</span>
                     {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
                   </div>

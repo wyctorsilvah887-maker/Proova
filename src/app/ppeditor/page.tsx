@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -1035,6 +1036,29 @@ export default function PPEditorPage() {
                               <div className="text-[11px] text-muted-foreground font-medium italic opacity-80 leading-relaxed px-2" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />
                           </div>
                         </header>
+
+                        <div className="ml-auto flex items-center gap-2 md:gap-4 px-8">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
+                                <div className="flex flex-col items-end relative">
+                                  <span className="text-[10px] md:text-xs font-bold truncate max-w-[70px] sm:max-w-[120px] transition-colors group-hover:text-primary leading-tight">
+                                    {userData?.companyName || 'Empresa'}
+                                  </span>
+                                  <div className="flex flex-col items-end gap-0">
+                                    <span className={cn(
+                                      "text-[6px] sm:text-[8px] uppercase tracking-widest font-black leading-tight text-primary",
+                                      userData?.membershipStatus === 'enterprise' && "animate-pulse"
+                                    )}>
+                                      {userData?.membershipStatus?.toUpperCase()}
+                                    </span>
+                                  </div>
+                                </div>
+                                <div className="h-7 w-7 md:h-8 md:w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20"><User className="w-3.5 h-3.5 md:w-4 md:h-4" /></div>
+                              </Button>
+                            </DropdownMenuTrigger>
+                          </DropdownMenu>
+                        </div>
 
                         <main className="p-8 space-y-8 flex-1">
                           <div className={cn("grid gap-6", "grid-cols-1")}>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState } from 'react';
@@ -227,7 +228,7 @@ export default function MetricsPage() {
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center">
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
-            <div className="relative w-[160px] h-[52px] md:w-[240px] md:h-[78px] transition-transform group-hover:scale-105">
+            <div className="relative w-[160px] h-[52px] md:w-[240px] md:h-[78px]">
               <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
               <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
@@ -245,8 +246,8 @@ export default function MetricsPage() {
                   </span>
                   <div className="flex flex-col items-end gap-0">
                     <span className={cn(
-                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
-                      userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
+                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight text-primary",
+                      userData?.membershipStatus === 'enterprise' && "animate-pulse"
                     )}>
                       {membershipLabel}
                     </span>

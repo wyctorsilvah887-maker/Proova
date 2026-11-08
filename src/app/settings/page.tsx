@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -240,13 +241,13 @@ export default function SettingsPage() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-10 md:h-14 px-1.5 md:px-3 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
                 <div className="flex flex-col items-end relative">
-                  <span className="text-[10px] md:text-sm font-black truncate max-w-[120px] sm:max-w-[200px] group-hover:text-primary leading-tight uppercase tracking-tight transition-colors">
+                  <span className="text-[10px] md:sm font-black truncate max-w-[120px] sm:max-w-[200px] group-hover:text-primary leading-tight uppercase tracking-tight transition-colors">
                     {userData?.companyName || 'Minha Empresa'}
                   </span>
                   <div className="flex flex-col items-end gap-0">
                     <span className={cn(
-                      "text-[6px] md:text-[8px] uppercase tracking-widest font-black leading-tight",
-                      userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
+                      "text-[6px] sm:text-[8px] uppercase tracking-widest font-black leading-tight text-primary",
+                      userData?.membershipStatus === 'enterprise' && "animate-pulse"
                     )}>
                       {membershipLabel}
                     </span>

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -209,7 +210,7 @@ export default function SocialCardsPage() {
               <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-3 gap-2 rounded-xl focus:ring-0 shadow-none hover:bg-transparent">
                 <div className="flex flex-col items-end">
                   <span className="text-[10px] md:text-sm font-black truncate max-w-[120px] transition-colors group-hover:text-primary uppercase tracking-tight">{userData?.companyName || 'Empresa'}</span>
-                  <span className="text-[6px] md:text-[8px] uppercase tracking-widest font-black text-muted-foreground">{membershipLabel}</span>
+                  <span className="text-[6px] md:text-[8px] uppercase tracking-widest font-black text-primary">{membershipLabel}</span>
                 </div>
                 <div className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20"><User className="w-4 h-4" /></div>
               </Button>

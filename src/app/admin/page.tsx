@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -243,7 +244,7 @@ export default function AdminPage() {
                                </div>
                             </TableCell>
                             <TableCell>
-                               <Badge variant="secondary" className="text-[8px] font-black uppercase">{u.membershipStatus}</Badge>
+                               <Badge variant="secondary" className="text-[8px] font-black uppercase text-primary">{u.membershipStatus}</Badge>
                             </TableCell>
                             <TableCell>
                                <div className="w-20">

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState } from 'react';
@@ -222,8 +223,8 @@ export default function PrivateInboxPage() {
                   </span>
                   <div className="flex flex-col items-end gap-0">
                     <span className={cn(
-                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
-                      userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
+                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight text-primary",
+                      userData?.membershipStatus === 'enterprise' ? "animate-pulse" : ""
                     )}>
                       {membershipLabel}
                     </span>

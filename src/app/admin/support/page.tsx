@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -132,7 +133,7 @@ export default function AdminSupportPage() {
                           <div>
                              <p className="text-sm font-black uppercase tracking-tight truncate max-w-[150px]">{ticket.userName}</p>
                              <div className="flex items-center gap-1.5">
-                                <Badge variant="secondary" className="text-[8px] font-black uppercase h-4 px-1">{ticket.membershipStatus}</Badge>
+                                <Badge variant="secondary" className="text-[8px] font-black uppercase h-4 px-1 text-primary">{ticket.membershipStatus}</Badge>
                                 {ticket.isSupportInChat && <span className="text-[7px] font-black uppercase text-green-600 animate-pulse">Consultor Online</span>}
                              </div>
                           </div>

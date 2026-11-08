@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
@@ -179,7 +180,7 @@ export default function PricingPage() {
             </Button>
           </Link>
           <div className="flex items-center group -ml-2">
-            <div className="relative w-[140px] h-[46px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
+            <div className="relative w-[140px] h-[46px] md:w-[320px] md:h-[105px]">
               <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
               <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
@@ -195,7 +196,7 @@ export default function PricingPage() {
                   <div className="flex flex-col items-end">
                     <span className="text-[10px] md:text-xs font-bold truncate max-w-[70px] sm:max-w-[120px] group-hover:text-primary leading-tight transition-colors">{effectiveUserData?.companyName || 'Empresa'}</span>
                     <div className="flex flex-col items-end gap-0">
-                        <span className="text-[6px] md:text-[8px] uppercase tracking-widest font-black text-muted-foreground leading-tight">{membershipLabel}</span>
+                        <span className="text-[6px] md:text-[8px] uppercase tracking-widest font-black text-primary leading-tight">{membershipLabel}</span>
                         {isMapsLinkValid && <span className="text-[5px] md:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none animate-pulse">G-Boost Ativo</span>}
                     </div>
                   </div>
