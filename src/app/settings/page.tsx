@@ -346,7 +346,7 @@ export default function SettingsPage() {
                     <CardDescription className="text-xs font-medium">Como sua empresa é vista na web e seus links oficiais.</CardDescription>
                  </CardHeader>
                  <CardContent className="p-6 md:p-8 pt-4 space-y-10">
-                    <div className="grid md:grid-cols-2 gap-8 md:gap-10">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
                        <div className="space-y-8">
                           <div className="space-y-3">
                              <Label className="text-[10px] font-black uppercase ml-1 opacity-60">Nome da Empresa</Label>
@@ -365,7 +365,9 @@ export default function SettingsPage() {
                                "flex items-center gap-1 bg-muted/20 rounded-xl px-3 border border-transparent focus-within:ring-2 focus-within:ring-primary/20 transition-all",
                                !isPremiumUser && "opacity-60 grayscale cursor-not-allowed bg-muted/40"
                              )}>
-                                <span className="text-[9px] md:text-[10px] font-black opacity-40 uppercase tracking-tighter shrink-0">useproova.online/pp/</span>
+                                <span className="text-[9px] md:text-[10px] font-black opacity-40 uppercase tracking-tighter shrink-0">
+                                   <span className="hidden xs:inline">useproova.online</span>/pp/
+                                </span>
                                 <input 
                                   disabled={!isPremiumUser}
                                   value={companySlug} 
@@ -401,7 +403,7 @@ export default function SettingsPage() {
                              </Select>
                           </div>
 
-                          <div className="grid grid-cols-2 gap-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                              <div className="space-y-3">
                                 <Label className="text-[10px] font-black uppercase ml-1 opacity-60">Cidade</Label>
                                 <div className="relative group">
@@ -416,10 +418,10 @@ export default function SettingsPage() {
                           </div>
                           
                           <Alert variant="destructive" className="bg-destructive/5 border-destructive/20 rounded-2xl animate-in fade-in zoom-in duration-500 w-full overflow-hidden">
-                            <AlertCircle className="h-4 w-4 shrink-0" />
+                            <AlertCircle className="h-4 w-4 shrink-0 mt-1" />
                             <div className="flex-1 min-w-0">
                                <AlertTitle className="text-[10px] font-black uppercase tracking-tight">Aviso de Localização</AlertTitle>
-                               <AlertDescription className="text-[10px] leading-relaxed font-medium block break-words">
+                               <AlertDescription className="text-[10px] leading-relaxed font-medium block whitespace-normal break-words">
                                  Se você alterar a cidade ou o estado, será necessário pesquisar e vincular sua empresa novamente no <b>G-Boost</b>. Esses dados são essenciais para identificarmos seu local no Google.
                                </AlertDescription>
                             </div>
@@ -448,7 +450,7 @@ export default function SettingsPage() {
                        </div>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-8 md:gap-10 pt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 pt-4">
                        <div className="space-y-3">
                           <Label className="text-[10px] font-black uppercase ml-1 opacity-60 flex items-center gap-2">Google Place ID <TooltipProvider><Tooltip><TooltipTrigger><Info className="w-3 h-3" /></TooltipTrigger><TooltipContent><p className="text-[10px] font-bold max-w-xs">Identificador único do seu local no Google. Usado para auditoria de fotos e horários.</p></TooltipContent></Tooltip></TooltipProvider></Label>
                           <Input value={googlePlaceId} onChange={(e) => setGooglePlaceId(e.target.value)} placeholder="ChIJN1t_tDeuEmsRUsoy..." className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-mono text-xs font-bold" />
