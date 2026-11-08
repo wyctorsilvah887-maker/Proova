@@ -61,7 +61,8 @@ export default function PricingPage() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
-  const [expandedPlan, setExpandedPlan] = useState<string | null>('gold');
+  // Todos os planos iniciam recolhidos conforme solicitado
+  const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
   const [cachedUserData, setCachedUserData] = useState<any>(null);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
@@ -261,11 +262,20 @@ export default function PricingPage() {
                                 "text-lg md:text-2xl font-black uppercase tracking-tight truncate",
                                 plan.id === 'gold' && "inline-block bg-clip-text text-transparent bg-gradient-to-r from-white via-orange-200 to-white animate-text-shine bg-[length:200%_auto]"
                               )}>{plan.name}</h3>
-                              {plan.highlight && (
-                                <Badge className="bg-white text-primary text-[7px] md:text-[8px] font-black uppercase h-4 px-1.5 border-none">RECOMENDADO</Badge>
-                              )}
+                              
+                              {/* Selo Verificado estilo Instagram porem sem fundo e verde */}
                               {isCurrent && (
-                                <Badge className={cn("text-[7px] md:text-[8px] font-black uppercase h-4 px-1.5 border-none", plan.highlight ? "bg-white/20 text-white" : "bg-primary/10 text-primary")}>PLANO ATUAL</Badge>
+                                <div className="flex items-center gap-1 animate-in zoom-in duration-500">
+                                   <BadgeCheck className="w-5 h-5 text-green-500" />
+                                   <span className={cn(
+                                     "text-[7px] md:text-[8px] font-black uppercase tracking-widest",
+                                     plan.highlight ? "text-white/80" : "text-primary"
+                                   )}>PLANO ATUAL</span>
+                                </div>
+                              )}
+
+                              {plan.highlight && !isCurrent && (
+                                <Badge className="bg-white text-primary text-[7px] md:text-[8px] font-black uppercase h-4 px-1.5 border-none">RECOMENDADO</Badge>
                               )}
                             </div>
                             <p className={cn("text-[8px] md:text-[10px] font-black uppercase tracking-widest opacity-70", plan.highlight ? "text-white" : "text-primary")}>
