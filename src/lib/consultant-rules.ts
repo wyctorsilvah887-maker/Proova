@@ -56,6 +56,7 @@ Escolha uma opção para dominar o mercado:
 4️⃣ **Social Cards** (Instagram)
 5️⃣ **Planos e Upgrade**
 6️⃣ **Falar com Humano**
+7️⃣ **Encerrar Chat**
 
 *Digite o **número** ou o **nome** da opção.*`;
 
