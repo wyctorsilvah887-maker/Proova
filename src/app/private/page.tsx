@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState } from 'react';
@@ -359,14 +360,6 @@ export default function PrivateInboxPage() {
            </TabsContent>
         </Tabs>
       </main>
-
-      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
-        <div className="flex items-center gap-2 relative w-[220px] h-[75px] md:w-[340px] md:h-[105px]">
-          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority unoptimized />
-          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority unoptimized />
-        </div>
-        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
-      </footer>
     </div>
   );
 }

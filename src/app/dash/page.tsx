@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -361,7 +362,6 @@ export default function DashPage() {
         });
       }
 
-      // Lógica de Auditoria Push: Só mostra o alerta se o usuário NÃO tiver um token salvo e ativo no perfil
       if (pushSupported && !userData.fcmToken && permission !== 'denied') {
         results.push({
           id: 'push-inactive',
@@ -744,7 +744,6 @@ export default function DashPage() {
       </header>
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-20 md:pt-24">
-        {/* Setup Missions Section... */}
         {(!isSetupComplete && !userData?.isSetupProcessDone) && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="flex items-center justify-between">
@@ -988,7 +987,7 @@ export default function DashPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-primary" />
-              <h2 className="text-lg md:text-xl font-bold font-headline tracking-tight">Últimos Depoimentos Publicados</h2>
+              <h2 className="text-lg md:text-xl font-bold font-headline tracking-tight">Últimos 5 Depoimentos Publicados</h2>
             </div>
           </div>
           <div className="grid gap-3 md:gap-4">
@@ -1072,16 +1071,6 @@ export default function DashPage() {
           </div>
         </section>
       </main>
-
-      <footer className="py-12 md:py-20 border-t flex flex-col items-center gap-10 mt-auto bg-background/50">
-        <div className="flex items-center gap-2 relative w-[200px] h-[65px] md:w-[320px] md:h-[105px]">
-          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="dark:hidden object-contain" unoptimized />
-          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="hidden dark:block object-contain" unoptimized />
-        </div>
-        <div className="container px-4 text-center">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">© 2026 Proova Technology - Creative Studio</p>
-        </div>
-      </footer>
 
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-lg border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[90vh] flex flex-col">
@@ -1442,7 +1431,7 @@ export default function DashPage() {
               <div className="relative group mt-2">
                 <div className="absolute -inset-4 bg-primary/5 rounded-[2.5rem] blur-xl opacity-50 group-hover:opacity-100 transition duration-700" />
                 <div id="qr-container-print" className="relative bg-white p-6 md:p-8 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.1)] border-8 border-primary/5 flex flex-col items-center space-y-4">
-                  <QRCodeSVG value={collectionLink} size={160} level="H" includeMargin={false} imageSettings={{ src: "/maskable_icon_x192 (6).png", x: undefined, y: undefined, height: 36, width: 36, excavate: true }} />
+                  <QRCodeSVG value={collectionLink} size={160} level="H" includeMargin={false} imageSettings={{ src: "/logo-proova-landing-white-mode.png", x: undefined, y: undefined, height: 36, width: 36, excavate: true }} />
                   <div className="pt-2 text-center space-y-1"><p className="text-[9px] md:text-[10px] font-black text-primary uppercase tracking-[0.2em]">Escaneie para Avaliar</p><p className="text-[7px] md:text-[8px] font-bold text-muted-foreground uppercase">{userData?.companyName}</p></div>
                 </div>
               </div>
