@@ -44,7 +44,8 @@ import {
   Zap,
   ChevronLeft,
   ChevronRight,
-  ListChecks
+  ListChecks,
+  Eye
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -287,41 +288,50 @@ const PublicPageSettings = ({
       </div>
 
       <Tabs defaultValue="geral" className="w-full flex-1 flex flex-col min-h-0">
-        <div className="w-full border-b relative">
-          {showLeftArrow && (
-            <div className="absolute left-0 top-0 bottom-0 z-10 w-8 bg-gradient-to-r from-background to-transparent flex items-center justify-start pl-1 pointer-events-none">
-              <ChevronLeft className="w-4 h-4 text-primary animate-pulse" />
-            </div>
-          )}
-          {showRightArrow && (
-            <div className="absolute right-0 top-0 bottom-0 z-10 w-8 bg-gradient-to-l from-background to-transparent flex items-center justify-end pr-1 pointer-events-none">
-              <ChevronRight className="w-4 h-4 text-primary animate-pulse" />
-            </div>
-          )}
+        <div className="w-full border-b relative bg-background/50 backdrop-blur-sm sticky top-0 z-20">
           <div 
             ref={tabsScrollRef}
             className="w-full overflow-x-auto scrollbar-hide"
           >
-            <TabsList className="flex w-max justify-start rounded-none bg-transparent h-12 px-2 shrink-0">
-              <TabsTrigger value="geral" className="text-[10px] font-bold uppercase tracking-widest px-3">Visual</TabsTrigger>
-              <TabsTrigger value="selecao" className="text-[10px] font-bold uppercase tracking-widest px-3 flex items-center gap-1.5">
-                Seleção <Badge variant="secondary" className="h-4 px-1 text-[8px] border-none">{selectedIds.length}</Badge>
-              </TabsTrigger>
-              <TabsTrigger value="conteudo" className="text-[10px] font-bold uppercase tracking-widest px-3 flex items-center gap-1.5">
-                Conteúdo {!isGoldPlan && <Lock className="w-2.5 h-2.5 opacity-40" />}
-              </TabsTrigger>
-              <TabsTrigger value="automacao" className="text-[10px] font-bold uppercase tracking-widest px-3 flex items-center gap-1.5">
-                Automação {!isEnterprise && <Lock className="w-2.5 h-2.5 opacity-40" />}
-              </TabsTrigger>
-              <TabsTrigger value="design" className="text-[10px] font-bold uppercase tracking-widest px-3">Layout</TabsTrigger>
-              <TabsTrigger value="social" className="text-[10px] font-bold uppercase tracking-widest px-3">Contato/Info</TabsTrigger>
+            <TabsList className="flex w-max justify-start rounded-none bg-transparent h-14 px-2 shrink-0 gap-1">
+              {[
+                { id: 'geral', label: 'Visual', icon: Palette },
+                { id: 'selecao', label: 'Seleção', icon: ListChecks, badge: selectedIds.length },
+                { id: 'conteudo', label: 'Conteúdo', icon: Type, locked: !isGoldPlan },
+                { id: 'automacao', label: 'Automação', icon: Zap, locked: !isEnterprise },
+                { id: 'design', label: 'Layout', icon: LayoutGrid },
+                { id: 'social', label: 'Contato', icon: MessageCircle },
+              ].map((tab) => (
+                <TabsTrigger 
+                  key={tab.id}
+                  value={tab.id} 
+                  className={cn(
+                    "relative flex flex-col items-center justify-center gap-1.5 px-4 h-full rounded-none border-b-2 border-transparent transition-all",
+                    "data-[state=active]:border-primary data-[state=active]:bg-primary/5 data-[state=active]:text-primary",
+                    "hover:text-primary/70"
+                  )}
+                >
+                  <div className="relative">
+                    <tab.icon className="w-4 h-4" />
+                    {tab.badge !== undefined && (
+                      <span className="absolute -top-1.5 -right-2 bg-primary text-white text-[7px] font-black w-3.5 h-3.5 flex items-center justify-center rounded-full ring-2 ring-background">
+                        {tab.badge}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[8px] font-black uppercase tracking-wider flex items-center gap-1">
+                    {tab.label}
+                    {tab.locked && <Lock className="w-2 h-2 opacity-50" />}
+                  </span>
+                </TabsTrigger>
+              ))}
             </TabsList>
           </div>
         </div>
         
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-8 pb-10">
-             <TabsContent value="geral" className="mt-0 space-y-8">
+             <TabsContent value="geral" className="mt-0 space-y-8 outline-none">
                 <section className="space-y-4">
                   <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Foto de Capa / Logo</Label>
                   <div className="flex items-center gap-4">
@@ -374,7 +384,7 @@ const PublicPageSettings = ({
                 </section>
              </TabsContent>
 
-             <TabsContent value="selecao" className="mt-0 space-y-6">
+             <TabsContent value="selecao" className="mt-0 space-y-6 outline-none">
                 <div className="flex items-center justify-between mb-4">
                   <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Escolher Depoimentos</Label>
                   <Badge variant="secondary" className="font-black h-5 text-[8px]">{selectedIds.length} / {SELECTION_LIMIT === Infinity ? '∞' : SELECTION_LIMIT}</Badge>
@@ -410,7 +420,7 @@ const PublicPageSettings = ({
                 </div>
              </TabsContent>
 
-             <TabsContent value="conteudo" className="mt-0 space-y-8">
+             <TabsContent value="conteudo" className="mt-0 space-y-8 outline-none">
                {!isGoldPlan ? (
                  <div className="p-8 text-center bg-primary/5 rounded-[2rem] border-2 border-dashed border-primary/20 space-y-4">
                    <div className="mx-auto w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary"><Gem className="w-6 h-6" /></div>
@@ -527,7 +537,7 @@ const PublicPageSettings = ({
                )}
              </TabsContent>
 
-             <TabsContent value="automacao" className="mt-0 space-y-8">
+             <TabsContent value="automacao" className="mt-0 space-y-8 outline-none">
                {!isEnterprise ? (
                  <div className="p-8 text-center bg-orange-500/5 rounded-[2rem] border-2 border-dashed border-orange-500/20 space-y-4">
                    <div className="mx-auto w-12 h-12 bg-orange-500/10 rounded-2xl flex items-center justify-center text-orange-600"><Zap className="w-6 h-6" /></div>
@@ -572,7 +582,7 @@ const PublicPageSettings = ({
                )}
              </TabsContent>
 
-             <TabsContent value="design" className="mt-0 space-y-8">
+             <TabsContent value="design" className="mt-0 space-y-8 outline-none">
                 <section className="space-y-4">
                    <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Layout dos Depoimentos</Label>
                    <div className="grid grid-cols-2 gap-3">
@@ -614,7 +624,7 @@ const PublicPageSettings = ({
                 </section>
              </TabsContent>
 
-             <TabsContent value="social" className="mt-0 space-y-8">
+             <TabsContent value="social" className="mt-0 space-y-8 outline-none">
                 <section className="space-y-4">
                    <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -901,9 +911,9 @@ export default function PPEditorPage() {
           <Button 
             variant="outline"
             className="flex h-10 md:h-12 px-3 md:px-6 rounded-xl font-bold gap-2 border-primary/20 text-primary hover:bg-primary/5 shadow-sm transition-all active:scale-95"
-            onClick={() => window.open(`/pp/${activeSlug}`, '_blank')}
+            onClick={() => router.push(`/pp/${activeSlug}`)}
           >
-            <ExternalLink className="w-4 h-4" />
+            <Eye className="w-4 h-4" />
             <span className="hidden xs:inline">Abrir Página</span>
           </Button>
           <Button 
@@ -917,7 +927,7 @@ export default function PPEditorPage() {
       </header>
 
       <main className="flex-1 flex overflow-hidden relative w-full h-full pt-24 md:pt-32">
-        <aside className="hidden lg:flex w-80 bg-background border-r flex flex-col shrink-0 h-full">
+        <aside className="hidden lg:flex w-80 bg-background border-r flex flex-col shrink-0 h-full shadow-2xl z-50">
           <PublicPageSettings 
             themeColor={themeColor} setThemeColor={setThemeColor} secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
             layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
@@ -952,9 +962,9 @@ export default function PPEditorPage() {
                  <div className="flex items-center gap-4">
                     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                       <SheetTrigger asChild>
-                         <Button variant="outline" className="lg:hidden h-11 rounded-xl font-bold gap-2"><Palette className="w-4 h-4" /> Estilo & Depoimentos</Button>
+                         <Button variant="outline" className="lg:hidden h-11 rounded-xl font-bold gap-2"><Palette className="w-4 h-4" /> Menu de Edição</Button>
                       </SheetTrigger>
-                      <SheetContent side="left" className="p-0 w-[85vw] max-w-[320px]">
+                      <SheetContent side="left" className="p-0 w-[320px]">
                          <SheetHeader className="sr-only">
                            <SheetTitle>Editor de Configurações</SheetTitle>
                            <SheetDescription>Ajuste o visual e a seleção de depoimentos da sua página pública.</SheetDescription>
@@ -995,7 +1005,7 @@ export default function PPEditorPage() {
                     </div>
                   </div>
                   
-                  <div className="relative w-full max-w-[360px] flex-1 bg-background rounded-[3rem] shadow-2xl border-[8px] border-muted overflow-hidden flex flex-col aspect-[9/19]">
+                  <div className="relative w-full max-w-[360px] flex-1 bg-background rounded-[3rem] shadow-2xl border-[8px] border-muted overflow-hidden flex flex-col aspect-[9/19] scale-[0.9] sm:scale-100 transition-transform">
                     <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col">
                         <header className="p-8 text-center space-y-6 shrink-0">
                           {logoUrl && <img src={logoUrl} className="w-20 h-20 mx-auto rounded-2xl object-cover shadow-lg border-2 border-background" />}
