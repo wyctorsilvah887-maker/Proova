@@ -12,7 +12,7 @@ import {
   TrendingUp, CreditCard, AlertCircle, Copy, Hash, Calendar,
   BarChart3, MousePointer2, ExternalLink, Gem, ArrowLeft,
   Settings, Handshake, Save, CheckCircle2, CircleDashed, Rocket,
-  MousePointer, Headphones, Ticket, ChevronRight
+  MousePointer, Headphones, Ticket, ChevronRight, Megaphone
 } from 'lucide-react';
 import { 
   DropdownMenu, 
