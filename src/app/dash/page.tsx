@@ -920,7 +920,7 @@ export default function DashPage() {
 
         <section className="space-y-3">
           <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Ferramentas de Conversão</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <button 
               disabled={!isGoogleDone}
               onClick={() => setIsCollectLinkChoiceOpen(true)} 
@@ -936,6 +936,17 @@ export default function DashPage() {
             >
               <Globe className="w-5 h-5 text-primary" />
               <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Link in Bio</span>
+            </button>
+
+            <button 
+              onClick={() => {
+                const el = document.getElementById('testimonials-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }} 
+              className="h-24 rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
+            >
+              <Share2 className="w-5 h-5 text-primary" />
+              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Social Cards</span>
             </button>
 
             <button 
