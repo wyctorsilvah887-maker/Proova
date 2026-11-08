@@ -52,7 +52,8 @@ import {
   SheetHeader, 
   SheetTitle, 
   SheetTrigger, 
-  SheetDescription 
+  SheetDescription,
+  SheetClose
 } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -276,9 +277,11 @@ const PublicPageSettings = ({
             </Button>
           </Link>
           {onClose && (
-            <Button variant="ghost" size="icon" onClick={onClose} className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors">
-              <X className="w-4 h-4" />
-            </Button>
+            <SheetClose asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors">
+                <X className="w-4 h-4" />
+              </Button>
+            </SheetClose>
           )}
         </div>
       </div>
@@ -364,7 +367,7 @@ const PublicPageSettings = ({
                       disabled={!isGoldPlan}
                       value={currentSlug} 
                       onChange={(e) => setSlugEdit(e.target.value.toLowerCase().replace(/\s+/g, '-'))} 
-                      className="h-10 flex-1 bg-transparent border-none focus:ring-0 text-xs font-mono" 
+                      className="h-12 flex-1 bg-transparent border-none focus:ring-0 text-xs font-mono" 
                     />
                   </div>
                   {!isGoldPlan && <p className="text-[9px] text-muted-foreground italic font-medium">Troca de slug disponível apenas nos planos pagos.</p>}
@@ -509,13 +512,12 @@ const PublicPageSettings = ({
                                       </SelectContent>
                                    </Select>
                                 </div>
-                                <Button 
-                                  variant="ghost" 
+                                <button 
                                   onClick={() => setCustomSections(customSections.filter((_, i) => i !== index))}
-                                  className="w-full h-10 rounded-xl text-destructive hover:bg-destructive/10 text-[9px] font-black uppercase gap-2"
+                                  className="w-full h-10 rounded-xl text-destructive hover:bg-destructive/10 text-[9px] font-black uppercase gap-2 border border-transparent transition-colors"
                                 >
-                                  <Trash2 className="w-3.5 h-3.5" /> Remover Esta Seção
-                                </Button>
+                                  <Trash2 className="w-3.5 h-3.5 mx-auto" /> Remover Esta Seção
+                                </button>
                              </AccordionContent>
                            </AccordionItem>
                          ))}
@@ -952,7 +954,7 @@ export default function PPEditorPage() {
                       <SheetTrigger asChild>
                          <Button variant="outline" className="lg:hidden h-11 rounded-xl font-bold gap-2"><Palette className="w-4 h-4" /> Estilo & Depoimentos</Button>
                       </SheetTrigger>
-                      <SheetContent side="left" className="p-0 w-full sm:max-w-sm">
+                      <SheetContent side="left" className="p-0 w-[85vw] max-w-[320px]">
                          <SheetHeader className="sr-only">
                            <SheetTitle>Editor de Configurações</SheetTitle>
                            <SheetDescription>Ajuste o visual e a seleção de depoimentos da sua página pública.</SheetDescription>
