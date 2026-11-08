@@ -166,7 +166,7 @@ export default function PPClient({ slug }: { slug: string }) {
       >
         <div className="space-y-4">
           <div className="flex items-center gap-4">
-            <div className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: hasSecondary ? `${secondaryColor}40` : `${themeColor}40` }}>
+            <div className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-transparent" style={{ borderColor: hasSecondary ? `${secondaryColor}40` : `${themeColor}40` }}>
               <User className="w-4 h-4" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
             </div>
             <div className="flex-1 min-w-0">

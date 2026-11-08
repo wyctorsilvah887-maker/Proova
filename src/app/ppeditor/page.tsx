@@ -1038,7 +1038,9 @@ export default function PPEditorPage() {
                                   }}
                                 >
                                   <div className="flex items-center gap-3 mb-3">
-                                      <div className="h-8 w-8 rounded-xl flex items-center justify-center text-white font-black text-[10px]" style={{ backgroundColor: themeColor }}>{t.userName?.substring(0,2).toUpperCase()}</div>
+                                      <div className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-transparent" style={{ borderColor: secondaryColor ? `${secondaryColor}40` : `${themeColor}40` }}>
+                                        <User className="w-4 h-4" style={{ color: secondaryColor ? secondaryColor : themeColor }} />
+                                      </div>
                                       <div>
                                         <p className="font-black text-[10px] uppercase truncate max-w-[80px] leading-none">{t.userName}</p>
                                         <div className="flex gap-0.5 mt-0.5">{[1,2,3,4,5].map(s => <Star key={s} className={cn("w-2 h-2", s <= t.rating ? "fill-current" : "opacity-10")} style={{ color: themeColor }} />)}</div>
