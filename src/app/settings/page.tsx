@@ -116,7 +116,11 @@ export default function SettingsPage() {
     return status === 'gold' || status === 'enterprise' || status === 'trial';
   }, [userData]);
 
-  const isMapsLinkValid = !!userData?.googleMapsUrl;
+  const isMapsLinkValid = useMemo(() => {
+    if (!userData?.googleMapsUrl) return false;
+    const url = userData.googleMapsUrl.toLowerCase();
+    return url.includes('review') || url.includes('writereview') || url.includes('placeid');
+  }, [userData]);
   
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
@@ -186,7 +190,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
-      <header className="bg-background border-b h-16 md:h-20 flex items-center px-4 md:px-6 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
+      <header className="bg-background border-b h-16 md:h-24 flex items-center px-4 md:px-6 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-3">
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[180px] h-[60px] md:w-[320px] md:h-[105px]">
@@ -200,22 +204,29 @@ export default function SettingsPage() {
           <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
-                <div className="hidden sm:flex flex-col items-end relative">
-                  <span className="text-xs font-bold truncate max-w-[120px] group-hover:text-primary leading-tight">
+              <Button variant="ghost" className="h-10 md:h-14 px-1.5 md:px-3 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
+                <div className="flex flex-col items-end relative">
+                  <span className="text-[10px] md:text-sm font-black truncate max-w-[120px] sm:max-w-[200px] group-hover:text-primary leading-tight uppercase tracking-tight transition-colors">
                     {userData?.companyName || 'Minha Empresa'}
                   </span>
                   <div className="flex flex-col items-end gap-0">
                     <span className={cn(
-                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight",
+                      "text-[6px] md:text-[8px] uppercase tracking-widest font-black leading-tight",
                       userData?.membershipStatus === 'enterprise' ? "text-primary animate-pulse" : "text-muted-foreground"
                     )}>
                       {membershipLabel}
                     </span>
-                    {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
+                    {isMapsLinkValid && (
+                      <div className="flex items-center gap-1 mt-0.5 animate-in fade-in duration-500">
+                        <div className="h-1 w-1 rounded-full bg-green-500 animate-pulse" />
+                        <span className="text-[5px] md:text-[7px] font-black uppercase text-green-500 tracking-widest leading-none">G-Boost Ativo</span>
+                      </div>
+                    )}
                   </div>
                 </div>
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
+                <div className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                  <User className="w-4 h-4 md:w-5 md:h-5" />
+                </div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
@@ -250,7 +261,7 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-8 max-w-5xl mx-auto w-full pt-20 md:pt-28 pb-20">
+      <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-8 max-w-5xl mx-auto w-full pt-20 md:pt-32 pb-20">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-4">
              <Link href="/dash" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group w-fit">
