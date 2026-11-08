@@ -177,8 +177,12 @@ export default function SocialCardsPage() {
       <header className="bg-background border-b h-16 md:h-24 flex items-center px-4 md:px-6 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-3 flex-1">
           <Link href="/dash">
-            <Button variant="ghost" size="sm" className="h-10 px-2 gap-2 text-muted-foreground hover:text-primary transition-all rounded-xl shadow-none">
-               <ArrowLeft className="w-4 h-4" /><span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Painel Dash</span>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="h-10 w-10 text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 select-none"
+            >
+               <ArrowLeft className="w-5 h-5" />
             </Button>
           </Link>
           <div className="flex items-center group -ml-2">
