@@ -33,7 +33,10 @@ import {
   Zap,
   Link2,
   Info,
-  AlertCircle
+  AlertCircle,
+  Search,
+  Navigation,
+  ShieldCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -75,6 +78,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { searchGooglePlaces } from '@/app/actions/maps-actions';
 
 export default function SettingsPage() {
   const { user, loading: authLoading } = useUser();
@@ -95,6 +99,11 @@ export default function SettingsPage() {
   const [state, setState] = useState('');
   const [googlePlaceId, setGooglePlaceId] = useState('');
   const [googleMapsUrl, setGoogleMapsUrl] = useState('');
+  
+  // Estados para Busca Google
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearchingPlaces, setIsSearchingPlaces] = useState(false);
   
   const [isSaving, setIsSaving] = useState(false);
 
@@ -117,10 +126,10 @@ export default function SettingsPage() {
   }, [userData]);
 
   const isMapsLinkValid = useMemo(() => {
-    if (!userData?.googleMapsUrl) return false;
-    const url = userData.googleMapsUrl.toLowerCase();
+    if (!googleMapsUrl) return false;
+    const url = googleMapsUrl.toLowerCase();
     return url.includes('review') || url.includes('writereview') || url.includes('placeid');
-  }, [userData]);
+  }, [googleMapsUrl]);
   
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
@@ -130,6 +139,31 @@ export default function SettingsPage() {
     if (status === 'expired') return 'EXPIRADO';
     return 'PLANO BASE';
   }, [userData]);
+
+  const handleSearchPlaces = async () => {
+    if (!searchQuery.trim()) return;
+    setIsSearchingPlaces(true);
+    try {
+      const results = await searchGooglePlaces(searchQuery, city || userData?.city, state || userData?.state);
+      setSearchResults(results);
+    } catch (err) {
+      toast({ variant: "destructive", title: "Erro na busca" });
+    } finally {
+      setIsSearchingPlaces(false);
+    }
+  };
+
+  const handleSelectPlace = (place: any) => {
+    const reviewLink = `https://search.google.com/local/writereview?placeid=${place.place_id}`;
+    setGooglePlaceId(place.place_id);
+    setGoogleMapsUrl(reviewLink);
+    setSearchResults([]);
+    setSearchQuery('');
+    toast({ 
+      title: "Empresa Localizada", 
+      description: "Agora clique em 'Salvar Alterações' no topo da página para confirmar o vínculo." 
+    });
+  };
 
   const handleSaveSettings = async () => {
     if (!user || !db || !userData) return;
@@ -422,7 +456,7 @@ export default function SettingsPage() {
                             <div className="flex-1 min-w-0">
                                <AlertTitle className="text-[10px] font-black uppercase tracking-tight">Aviso de Localização</AlertTitle>
                                <AlertDescription className="text-[10px] leading-relaxed font-medium block whitespace-normal break-words">
-                                 Se você alterar a cidade ou o estado, será necessário pesquisar e vincular sua empresa novamente no <b>G-Boost</b>. Esses dados são essenciais para identificarmos seu local no Google.
+                                 Ao alterar a cidade ou estado, use a busca na aba <b>Google</b> para revincular sua empresa corretamente.
                                </AlertDescription>
                             </div>
                           </Alert>
@@ -436,7 +470,7 @@ export default function SettingsPage() {
               <Card className="rounded-[2rem] border-none shadow-xl overflow-hidden bg-background">
                  <CardHeader className="p-6 md:p-8 pb-4">
                     <CardTitle className="text-base md:text-lg font-black uppercase tracking-tight flex items-center gap-2"><Globe className="w-5 h-5 text-primary" /> Automação G-Boost</CardTitle>
-                    <CardDescription className="text-xs font-medium">O motor de redirecionamento automático para o Google Maps.</CardDescription>
+                    <CardDescription className="text-xs font-medium">Conecte seu perfil do Google Maps para impulsionar seu SEO Local.</CardDescription>
                  </CardHeader>
                  <CardContent className="p-6 md:p-8 pt-4 space-y-10">
                     <div className="p-6 rounded-[2rem] bg-primary/5 border-2 border-dashed border-primary/20 flex flex-col sm:flex-row items-center gap-6 md:gap-8 relative overflow-hidden group">
@@ -445,31 +479,83 @@ export default function SettingsPage() {
                           <Image src="https://picsum.photos/seed/google-maps-saas/100/100" width={56} height={56} alt="Google Maps" className="grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" data-ai-hint="google maps logo" />
                        </div>
                        <div className="flex-1 space-y-2 text-center sm:text-left relative z-10">
-                          <p className="text-base font-black uppercase tracking-tight">O que é o G-Boost?</p>
-                          <p className="text-xs text-muted-foreground leading-relaxed font-medium">Ao receber um elogio 5 estrelas, o Proova detecta a nota alta e convida seu cliente a clicar em um botão que o leva direto para o seu perfil no Google Maps, injetando avaliações positivas no maior buscador do mundo e subindo seu SEO Local.</p>
+                          <p className="text-base font-black uppercase tracking-tight">Vincular Empresa</p>
+                          <p className="text-xs text-muted-foreground leading-relaxed font-medium">O G-Boost redireciona elogios 5 estrelas para o Google. Pesquise sua empresa abaixo para ativar.</p>
                        </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 pt-4">
-                       <div className="space-y-3">
-                          <Label className="text-[10px] font-black uppercase ml-1 opacity-60 flex items-center gap-2">Google Place ID <TooltipProvider><Tooltip><TooltipTrigger><Info className="w-3 h-3" /></TooltipTrigger><TooltipContent><p className="text-[10px] font-bold max-w-xs">Identificador único do seu local no Google. Usado para auditoria de fotos e horários.</p></TooltipContent></Tooltip></TooltipProvider></Label>
-                          <Input value={googlePlaceId} onChange={(e) => setGooglePlaceId(e.target.value)} placeholder="ChIJN1t_tDeuEmsRUsoy..." className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-mono text-xs font-bold" />
-                          <p className="text-[9px] text-muted-foreground italic font-medium ml-1">Encontre seu ID no <a href="https://developers.google.com/maps/documentation/places/web-service/place-id" target="_blank" className="text-primary hover:underline">Place ID Finder</a>.</p>
-                       </div>
-                       <div className="space-y-3">
-                          <Label className="text-[10px] font-black uppercase ml-1 opacity-60 flex items-center gap-2">Link Direto de Avaliação <Zap className="w-3 h-3 text-primary" /></Label>
-                          <Input value={googleMapsUrl} onChange={(e) => setGoogleMapsUrl(e.target.value)} placeholder="https://search.google.com/local/writereview?placeid=..." className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-mono text-xs font-bold" />
-                          <p className="text-[9px] text-muted-foreground italic font-medium ml-1 leading-tight">Este é o link que abre a caixa de texto do Google já com as estrelas vazias.</p>
-                       </div>
+                    <div className="space-y-6 pt-4">
+                      {googlePlaceId ? (
+                        <div className="p-5 rounded-2xl bg-green-500/5 border border-green-500/20 flex items-center justify-between group animate-in zoom-in duration-300">
+                           <div className="flex items-center gap-4">
+                              <div className="p-3 rounded-xl bg-green-500/10 text-green-600"><MapPin className="w-6 h-6" /></div>
+                              <div>
+                                 <p className="text-[10px] font-black uppercase text-green-600 tracking-widest leading-none mb-1">Empresa Vinculada</p>
+                                 <p className="text-sm font-black uppercase tracking-tight">{userData?.companyName}</p>
+                                 <p className="text-[10px] text-muted-foreground font-mono opacity-60 truncate max-w-[200px]">{googlePlaceId}</p>
+                              </div>
+                           </div>
+                           <Button variant="ghost" onClick={() => { setGooglePlaceId(''); setGoogleMapsUrl(''); }} className="text-destructive hover:bg-destructive/10 text-[9px] font-black uppercase tracking-widest h-8 px-3 rounded-lg">Desvincular</Button>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                           <div className="relative group">
+                              <Search className="absolute left-4 top-4 h-5 w-5 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
+                              <Input 
+                                placeholder="Digite o nome da sua empresa no Google Maps..." 
+                                value={searchQuery} 
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleSearchPlaces()}
+                                className="h-14 pl-12 pr-12 rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm"
+                              />
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                onClick={handleSearchPlaces}
+                                disabled={isSearchingPlaces || !searchQuery.trim()}
+                                className="absolute right-2 top-2 h-10 w-10 rounded-xl hover:bg-primary/10 text-primary"
+                              >
+                                {isSearchingPlaces ? <Loader2 className="animate-spin" /> : <Navigation className="w-5 h-5" />}
+                              </Button>
+                           </div>
+
+                           <div className="grid gap-3">
+                              {searchResults.map((place) => (
+                                <Card 
+                                  key={place.place_id} 
+                                  className="border-2 border-transparent hover:border-primary/20 cursor-pointer transition-all bg-muted/10 group active:scale-[0.98]"
+                                  onClick={() => handleSelectPlace(place)}
+                                >
+                                  <div className="p-4 flex items-center justify-between">
+                                    <div className="flex items-center gap-4 min-w-0">
+                                       <div className="p-2.5 rounded-xl bg-background group-hover:bg-primary/10 transition-colors shrink-0 shadow-sm"><MapPin className="w-5 h-5 text-muted-foreground group-hover:text-primary" /></div>
+                                       <div className="min-w-0">
+                                          <p className="text-xs font-black uppercase truncate">{place.name}</p>
+                                          <p className="text-[10px] text-muted-foreground truncate opacity-70 font-medium">{place.address}</p>
+                                       </div>
+                                    </div>
+                                    <ChevronRight className="w-4 h-4 text-muted-foreground opacity-30 group-hover:translate-x-1 group-hover:opacity-100 transition-all shrink-0" />
+                                  </div>
+                                </Card>
+                              ))}
+                              {isSearchingPlaces && (
+                                <div className="py-12 text-center animate-pulse">
+                                   <Loader2 className="animate-spin w-8 h-8 text-primary mx-auto mb-3" />
+                                   <p className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em]">Consultando Google Satélite...</p>
+                                </div>
+                              )}
+                           </div>
+                        </div>
+                      )}
                     </div>
 
-                    <Card className="rounded-3xl border-none bg-muted/20 p-6">
-                       <div className="flex items-start gap-4">
-                          <Sparkles className="w-5 h-5 text-primary shrink-0 mt-1" />
-                          <div className="space-y-2">
-                             <h4 className="text-xs font-black uppercase tracking-widest">Protocolo de Performance</h4>
-                             <p className="text-[10px] md:text-[11px] text-muted-foreground leading-relaxed font-medium">
-                                Certifique-se de que o seu link contém o parâmetro <code className="bg-primary/10 text-primary px-1.5 rounded font-black">writereview</code>. Isso reduz o atrito e garante que o cliente não precise clicar em botões adicionais para começar a escrever o depoimento no Google.
+                    <Card className="rounded-[2rem] border-none bg-muted/20 p-8">
+                       <div className="flex items-start gap-6">
+                          <div className="p-3 rounded-2xl bg-primary/10 text-primary shrink-0"><ShieldCheck className="w-6 h-6" /></div>
+                          <div className="space-y-3">
+                             <h4 className="text-sm font-black uppercase tracking-widest">Protocolo de SEO Local</h4>
+                             <p className="text-xs text-muted-foreground leading-relaxed font-medium">
+                                A Proova automatiza a geração de autoridade. Ao selecionar sua empresa, nós vinculamos seu <b>Place ID</b> oficial, garantindo que cada elogio 5 estrelas tenha o potencial de virar uma estrela real no seu perfil do Google Business. Isso aumenta drasticamente sua relevância nas buscas locais.
                              </p>
                           </div>
                        </div>
