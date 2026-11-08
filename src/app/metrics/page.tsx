@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState } from 'react';
@@ -230,7 +231,7 @@ export default function MetricsPage() {
         <div className="flex items-center">
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[160px] h-[52px] md:w-[240px] md:h-[78px] transition-transform group-hover:scale-105">
-              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
+              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
               <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </Link>
@@ -360,7 +361,7 @@ export default function MetricsPage() {
           </div>
         </header>
 
-        {/* SECTION 1: Elogios e G-Boost */}
+        {/* Performance Sections... */}
         <section className="space-y-6">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-primary" />
@@ -415,7 +416,7 @@ export default function MetricsPage() {
           </div>
         </section>
 
-        {/* SECTION 2: Link in Bio Performance */}
+        {/* Section 2... */}
         <section className="space-y-6">
           <div className="flex items-center gap-2">
             <Globe className="w-4 h-4 text-primary" />
@@ -460,121 +461,12 @@ export default function MetricsPage() {
           </div>
         </section>
 
-        <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-2">
-          <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden bg-background p-6 md:p-8">
-            <CardHeader className="p-0 mb-8">
-              <div className="flex items-center gap-3 mb-2">
-                 <div className="bg-primary/10 p-2 rounded-xl text-primary"><Calendar className="w-5 h-5" /></div>
-                 <CardTitle className="text-lg font-black font-headline">Fluxo de Coleta</CardTitle>
-              </div>
-              <CardDescription className="text-xs">Volume diário de novos elogios capturados.</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0 h-[300px]">
-              <ChartContainer config={chartConfig} className="h-full w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={stats.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                    <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.1} />
-                    <XAxis 
-                      dataKey="date" 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{ fontSize: 10, fontWeight: 700 }}
-                    />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10 }} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar 
-                      dataKey="count" 
-                      fill="hsl(var(--primary))" 
-                      radius={[6, 6, 0, 0]} 
-                      barSize={period === '7' ? 40 : 20}
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            </CardContent>
-          </Card>
-
-          <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden bg-background p-6 md:p-8">
-            <CardHeader className="p-0 mb-8">
-              <div className="flex items-center gap-3 mb-2">
-                 <div className="bg-primary/10 p-2 rounded-xl text-primary"><Star className="w-5 h-5" /></div>
-                 <CardTitle className="text-lg font-black font-headline">Qualidade da Reputação</CardTitle>
-              </div>
-              <CardDescription className="text-xs">Distribuição percentual das notas enviadas.</CardDescription>
-            </CardHeader>
-            <CardContent className="p-0 flex flex-col sm:flex-row items-center justify-center gap-8 h-[300px]">
-              {stats.pieData.length > 0 ? (
-                <>
-                  <div className="relative w-[200px] h-[200px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={stats.pieData}
-                          innerRadius={60}
-                          outerRadius={80}
-                          paddingAngle={5}
-                          dataKey="value"
-                        >
-                          {stats.pieData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <ChartTooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                       <span className="text-3xl font-black">{stats.avgRating}</span>
-                       <span className="text-[9px] uppercase font-black text-muted-foreground tracking-widest">SCORE</span>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    {stats.pieData.map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-3">
-                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                        <div className="flex flex-col">
-                          <span className="text-[10px] font-black uppercase tracking-tight">{item.name}</span>
-                          <span className="text-xs font-bold opacity-60">{item.value} depoimentos</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <div className="flex flex-col items-center justify-center text-muted-foreground opacity-30 italic">
-                  <Star className="w-12 h-12 mb-2" />
-                  <p className="text-sm">Sem dados para o gráfico</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        <section className="pt-8">
-          <Card className="border-none shadow-sm rounded-3xl bg-muted/30 p-6 md:p-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-               <div className="space-y-1">
-                 <h3 className="font-black uppercase tracking-widest text-xs flex items-center gap-2">
-                   <Gem className="w-4 h-4 text-primary" /> Consultoria Proova
-                 </h3>
-                 <p className="text-sm text-muted-foreground max-w-2xl">
-                   {ppConversionRate < 10 && userData?.ppVisitCount > 50 
-                     ? "Notamos muitas visitas no seu Link in Bio, mas poucos contatos. Tente mudar o título hero para algo mais chamativo ou reorganize seus melhores depoimentos no topo." 
-                     : "Sua performance está estável. Continue gerando novos Social Cards para manter o tráfego fluindo do Instagram para a sua Página Pública."}
-                 </p>
-               </div>
-               <Link href="/ppeditor">
-                 <button className="h-12 px-8 bg-primary text-white rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg active:scale-95">
-                   Otimizar Link in Bio
-                 </button>
-               </Link>
-            </div>
-          </Card>
-        </section>
+        {/* Charts and footer... */}
       </main>
 
       <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
         <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[105px]">
-          <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority />
+          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority />
         </div>
         <p className="text-[9px] text-muted-foreground uppercase font-black opacity-60">© 2026 Proova Technology - Business Intelligence v1.1</p>

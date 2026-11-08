@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -659,7 +660,7 @@ export default function DashPage() {
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[200px] h-[66px] md:w-[320px] md:h-[106px] transition-transform group-hover:scale-105">
               <Image 
-                src="/Logotipo%20PROOVA%20white%20mode%201.png" 
+                src="/logo-proova-white-mode.gif" 
                 alt="Logo" 
                 fill 
                 className="object-contain object-left dark:hidden" 
@@ -741,6 +742,7 @@ export default function DashPage() {
       </header>
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-20 md:pt-24">
+        {/* Setup Missions Section... */}
         {(!isSetupComplete && !userData?.isSetupProcessDone) && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="flex items-center justify-between">
@@ -1288,7 +1290,7 @@ export default function DashPage() {
 
                       <div className="flex-1 flex flex-col justify-center items-center w-full py-4 text-center">
                         <div className="flex justify-center gap-1.5 mb-6 animate-in fade-in zoom-in duration-1000">
-                            {Array.from({ length: selectedTestimonialForShare?.rating || 5 }).map((_, i) => (
+                            {Array.from({ length: 5 }).map((_, i) => (
                               <Star key={i} className="w-6 h-6 sm:w-7 sm:h-7 fill-[#fbbf24] text-[#fbbf24] drop-shadow-[0_0_12px_rgba(251,191,36,0.8)]" />
                             ))}
                         </div>

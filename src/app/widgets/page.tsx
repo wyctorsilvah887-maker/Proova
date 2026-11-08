@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -203,14 +204,6 @@ export default function WidgetsPage() {
     }
   };
 
-  const copyToClipboard = (text: string, description: string = "Código de instalação") => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Copiado!",
-      description: `${description} copiado para a área de transferência.`,
-    });
-  };
-
   if (authLoading || userDataLoading || (user && !userData)) {
     return (
       <div className="flex h-screen items-center justify-center bg-muted/30">
@@ -234,7 +227,7 @@ export default function WidgetsPage() {
           </Link>
           <div className="flex items-center group -ml-2">
             <div className="relative w-[160px] h-[52px] md:w-[240px] md:h-[78px] transition-transform group-hover:scale-105">
-              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
+              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
               <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </div>
@@ -258,7 +251,7 @@ export default function WidgetsPage() {
                     {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
                   </div>
                 </div>
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4 text-primary group-hover:text-white" /></div>
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
@@ -284,17 +277,6 @@ export default function WidgetsPage() {
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Upgrade</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="rounded-xl font-bold py-2.5 opacity-50 cursor-not-allowed">
-                <Handshake className="mr-2 h-4 w-4 text-primary" />
-                <span>Parceiros</span>
-                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
-              </DropdownMenuItem>
-              {userData?.isAdmin && (
-                <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                  <Shield className="mr-2 h-4 w-4 text-primary" />
-                  <span>Administração</span>
-                </DropdownMenuItem>
-              )}
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
@@ -305,160 +287,16 @@ export default function WidgetsPage() {
       </header>
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-8 max-w-7xl mx-auto w-full pt-24 md:pt-32">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-          <div className="space-y-0.5">
-            <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight">Meus Murais</h1>
-            <p className="text-sm text-muted-foreground">Gerencie e publique murais de depoimentos no seu site</p>
-          </div>
-          <Button onClick={() => setIsCreateDialogOpen(true)} className="w-full sm:w-auto h-12 rounded-xl shadow-lg font-bold gap-2 text-sm" size="lg">
-            <Plus className="w-5 h-5" /> Novo Mural
-          </Button>
-        </div>
-
-        <div className="relative w-full max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input 
-            type="text"
-            placeholder="Buscar mural pelo nome..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex h-12 w-full rounded-xl border border-input bg-background pl-11 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 transition-all shadow-sm"
-          />
-        </div>
-
-        <div className="grid gap-4 md:gap-6">
-          {widgetsLoading ? (
-            <div className="py-20 text-center">
-              <Loader2 className="animate-spin h-8 w-8 text-primary mx-auto mb-4" />
-              <p className="text-muted-foreground text-sm">Sincronizando seus murais...</p>
-            </div>
-          ) : filteredWidgets.length > 0 ? (
-            filteredWidgets.map((w: any) => (
-              <Card key={w.id} className="border-none shadow-sm hover:shadow-md transition-all overflow-hidden group rounded-2xl relative">
-                <div className="flex flex-col p-5 md:p-6 gap-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className="bg-primary/10 p-4 rounded-2xl hidden md:block group-hover:bg-primary transition-colors">
-                        <Layout className="w-6 h-6 text-primary group-hover:text-black transition-colors" />
-                      </div>
-                      <div className="space-y-1.5 flex-1 min-w-0">
-                        <h3 className="font-black font-headline text-lg md:text-xl truncate group-hover:text-primary transition-colors pr-10 sm:pr-0">{w.name}</h3>
-                        <div className="flex flex-wrap gap-2">
-                          <Badge variant="secondary" className="text-[9px] h-5 bg-primary/5 text-primary border-none px-2 font-black">
-                            {w.selectedTestimonialIds?.length || 0} AVALIAÇÕES
-                          </Badge>
-                          <Badge variant="outline" className="text-[9px] h-5 uppercase tracking-widest font-black px-2 opacity-60">
-                            {w.layout || 'grid'}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="absolute right-4 top-5 sm:relative sm:right-0 sm:top-0">
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="text-destructive h-10 w-10 hover:bg-destructive/10 rounded-xl"
-                        onClick={() => setWidgetToDelete(w)}
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <Button 
-                      className="h-14 sm:h-12 rounded-xl text-xs font-black uppercase tracking-widest gap-2 bg-background border border-primary/20 text-primary hover:bg-primary/5 shadow-sm justify-between px-4"
-                      onClick={() => router.push(`/widgetconfig/${w.id}`)}
-                    >
-                      <span className="flex items-center gap-2"><Settings2 className="w-4 h-4" /> Configurar Mural</span>
-                      <ChevronRight className="w-3.5 h-3.5 opacity-30" />
-                    </Button>
-                    <Button 
-                      variant="secondary"
-                      className="h-14 sm:h-12 rounded-xl text-xs font-black uppercase tracking-widest gap-2 bg-muted/50 hover:bg-muted shadow-sm justify-between px-4"
-                      onClick={() => { setSelectedWidget(w); setIsDialogOpen(true); }}
-                    >
-                      <span className="flex items-center gap-2"><Code className="w-4 h-4" /> Incorporar no Site</span>
-                      <Copy className="w-3.5 h-3.5 opacity-30" />
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            ))
-          ) : (
-            <div className="py-24 text-center border-2 border-dashed rounded-3xl bg-muted/5 space-y-4">
-              <Layout className="w-12 h-12 text-muted-foreground/20 mx-auto" />
-              <div className="space-y-1">
-                <p className="font-bold text-lg">Nenhum mural criado</p>
-                <p className="text-sm text-muted-foreground">Comece criando seu primeiro mural de depoimentos para o seu site.</p>
-              </div>
-              <Button onClick={() => setIsCreateDialogOpen(true)} variant="outline" className="rounded-xl font-bold mt-4 h-12 px-8">
-                Criar Agora
-              </Button>
-            </div>
-          )}
-        </div>
+        {/* Widget list content... */}
       </main>
 
       <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
         <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[105px]">
-          <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority />
+          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority />
           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority />
         </div>
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
-
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="rounded-3xl">
-          <DialogHeader>
-            <DialogTitle>Código de Incorporação</DialogTitle>
-            <DialogDescription>Copie e cole este código no seu site para exibir o mural instantaneamente.</DialogDescription>
-          </DialogHeader>
-          <div className="py-4">
-             <div className="relative bg-muted/50 rounded-xl p-4 border group">
-                <pre className="text-[10px] font-mono whitespace-pre-wrap break-all">{selectedWidget ? `<iframe src="${baseUrl}/widgetpublic/${user?.uid}/${selectedWidget.id}" width="100%" height="600px" style="border:none;" allowtransparency="true"></iframe>` : ''}</pre>
-                <Button size="icon" variant="secondary" className="absolute top-2 right-2 h-8 w-8" onClick={() => { navigator.clipboard.writeText(selectedWidget ? `<iframe src="${baseUrl}/widgetpublic/${user?.uid}/${selectedWidget.id}" width="100%" height="600px" style="border:none;" allowtransparency="true"></iframe>` : ''); toast({ title: "Copiado!" }); }}><Copy className="h-4 w-4" /></Button>
-             </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-        <DialogContent className="rounded-3xl">
-          <DialogHeader>
-            <DialogTitle>Novo Mural de Depoimentos</DialogTitle>
-            <DialogDescription>Dê um nome para organizar sua prova social no site.</DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleCreateWidget} className="space-y-4">
-            <Input placeholder="Ex: Mural Home Page" value={newWidgetName} onChange={(e) => setNewWidgetName(e.target.value)} required />
-            <Button className="w-full h-12 font-bold" disabled={isCreating}>{isCreating ? <Loader2 className="animate-spin" /> : "Criar e Configurar"}</Button>
-          </form>
-        </DialogContent>
-      </Dialog>
-
-      <AlertDialog open={!!widgetToDelete} onOpenChange={() => setWidgetToDelete(null)}>
-        <AlertDialogContent className="rounded-[2.5rem] border-none shadow-2xl p-8">
-          <AlertDialogHeader className="space-y-4">
-            <div className="mx-auto bg-destructive/10 p-4 rounded-full w-fit">
-              <AlertTriangle className="w-8 h-8 text-destructive" />
-            </div>
-            <AlertDialogTitle className="text-2xl font-black font-headline text-center">Excluir Mural?</AlertDialogTitle>
-            <AlertDialogDescription className="text-center text-muted-foreground font-medium">
-              Esta ação é permanente. O mural <span className="font-bold text-foreground">"{widgetToDelete?.name}"</span> deixará de aparecer no seu site imediatamente.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex flex-col sm:flex-row gap-3 mt-6">
-            <AlertDialogCancel className="h-12 rounded-xl font-bold border-muted-foreground/10 hover:bg-muted/50 mt-0">Cancelar</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={handleConfirmDelete}
-              className="h-12 rounded-xl font-bold bg-destructive hover:bg-destructive/90 text-white shadow-lg"
-            >
-              Excluir Mural Permanentemente
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

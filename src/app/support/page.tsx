@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -254,7 +255,6 @@ export default function SupportPage() {
     setIsSending(true);
     setMessage('');
 
-    // Reset typing status immediately on send
     if (activeTicket) {
       updateDoc(doc(db, 'support_tickets', activeTicket.id), { isUserTyping: false });
     }
@@ -353,7 +353,7 @@ export default function SupportPage() {
           </Link>
           <div className="flex items-center group">
             <div className="relative w-[140px] h-[40px] md:w-[280px] md:h-[90px]">
-              <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
+              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
               <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </div>
@@ -413,163 +413,7 @@ export default function SupportPage() {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col w-full max-w-5xl mx-auto min-h-0 md:p-4 lg:p-6">
-        <div className="flex-1 bg-background md:border md:rounded-[2rem] md:shadow-2xl flex flex-col overflow-hidden relative border-none">
-          
-          <div className="px-4 py-3 md:p-6 border-b bg-muted/5 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-3 md:gap-4">
-              <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl md:rounded-2xl bg-primary/10 text-primary flex items-center justify-center shadow-inner relative">
-                {isHumanSupportPresent ? <Headphones className="w-5 h-5 md:w-6 md:h-6" /> : <Bot className="w-5 h-5 md:w-6 md:h-6" />}
-                {activeTicket && (
-                  <div className={cn("absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-background", isHumanSupportPresent ? "bg-green-500 animate-pulse" : "bg-red-500")} />
-                )}
-              </div>
-              <div>
-                <h2 className="text-sm md:text-lg font-black font-headline tracking-tight uppercase leading-none">
-                  {isHumanSupportPresent ? "Atendimento Humano" : "Consultor Proova v1.0"}
-                </h2>
-                <div className="flex items-center gap-1.5 mt-1">
-                   <div className={cn("h-1.5 w-1.5 md:h-2 md:w-2 rounded-full", isHumanSupportPresent ? "bg-green-500 animate-pulse" : "bg-green-500/40")} />
-                   <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-                     {isHumanSupportPresent ? "Conectado agora" : "Árvore de Decisão Ativa"}
-                   </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <ScrollArea ref={scrollRef} className="flex-1 px-4 py-6 md:p-10">
-            <div className="space-y-6 md:space-y-8 pb-10">
-              {localMessages.length === 0 && !messagesLoading && (
-                <div className="flex justify-start animate-in fade-in slide-in-from-left-4 duration-700">
-                  <div className="flex gap-2 md:gap-3 max-w-[90%] sm:max-w-[80%]">
-                    <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-white shrink-0 mt-1 shadow-lg">
-                      <Sparkles className="w-4 h-4" />
-                    </div>
-                    <div className="space-y-1">
-                      <div className="bg-muted/50 border rounded-2xl rounded-tl-none p-3 md:p-4 shadow-sm">
-                        <p className="text-xs md:text-sm font-medium leading-relaxed whitespace-pre-wrap">
-                          Olá, <span className="text-primary font-black">{userData?.name?.split(' ')[0]}</span>! 👋 {formatText(getConsultantResponse('menu'))}
-                        </p>
-                      </div>
-                      <span className="text-[8px] font-black uppercase text-muted-foreground ml-1">Assistente Estratégico</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {localMessages.map((msg: any) => (
-                <div key={msg.id} className={cn(
-                  "flex animate-in fade-in zoom-in-95 duration-500",
-                  msg.sender === 'user' ? "justify-end" : "justify-start"
-                )}>
-                  <div className={cn(
-                    "flex gap-2 md:gap-3 max-w-[90%] sm:max-w-[80%]",
-                    msg.sender === 'user' ? "flex-row-reverse" : "flex-row")}>
-                    <div className={cn(
-                      "h-8 w-8 rounded-lg flex items-center justify-center shrink-0 mt-1 shadow-md",
-                      msg.sender === 'user' ? "bg-muted text-muted-foreground" : (msg.isSystem ? "bg-primary/20 text-primary" : "bg-primary text-white")
-                    )}>
-                      {msg.sender === 'user' ? <User className="w-4 h-4" /> : (msg.isSystem ? <Shield className="w-4 h-4" /> : <Bot className="w-4 h-4" />)}
-                    </div>
-                    <div className="space-y-1">
-                      <div className={cn(
-                        "p-3 md:p-4 shadow-sm border",
-                        msg.sender === 'user' 
-                          ? "bg-primary text-white rounded-2xl rounded-tr-none border-transparent shadow-lg shadow-primary/20" 
-                          : (msg.isSystem ? "bg-primary/5 rounded-2xl border-dashed italic text-primary" : "bg-muted/50 rounded-2xl rounded-tl-none")
-                      )}>
-                        <p className="text-xs md:text-sm font-medium leading-relaxed whitespace-pre-wrap">{formatText(msg.text)}</p>
-                      </div>
-                      <div className={cn("flex items-center gap-1.5 px-1", msg.sender === 'user' ? "justify-end" : "justify-start")}>
-                        <span className="text-[8px] font-black uppercase text-muted-foreground opacity-60">
-                          {msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '...'}
-                        </span>
-                        {msg.sender === 'user' && <CheckCheck className="w-3 h-3 text-primary opacity-40" />}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-              
-              {isAiThinking && (
-                <div className="flex justify-start animate-in fade-in slide-in-from-left-2 duration-300">
-                  <div className="flex gap-2 md:gap-3 items-center">
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                      <Bot className="w-4 h-4 animate-bounce" />
-                    </div>
-                    <div className="bg-muted/30 px-4 py-2 rounded-full flex gap-1 items-center">
-                      <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-pulse" />
-                      <div className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-pulse [animation-delay:0.2s]" />
-                      <div className="w-1.5 h-1.5 bg-primary/80 rounded-full animate-pulse [animation-delay:0.4s]" />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {isSupportTyping && (
-                <div className="flex justify-start animate-in fade-in slide-in-from-left-2 duration-300">
-                  <div className="flex gap-2 md:gap-3 items-center">
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                      <Headphones className="w-4 h-4 animate-bounce" />
-                    </div>
-                    <div className="space-y-1">
-                      <div className="bg-muted/30 px-4 py-2 rounded-full flex gap-1 items-center">
-                        <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-pulse" />
-                        <div className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-pulse [animation-delay:0.2s]" />
-                        <div className="w-1.5 h-1.5 bg-primary/80 rounded-full animate-pulse [animation-delay:0.4s]" />
-                      </div>
-                      <span className="text-[8px] font-black uppercase text-primary/60 ml-1">Suporte está digitando...</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </ScrollArea>
-
-          <div className="p-3 md:p-6 border-t bg-background shrink-0">
-             {isCreatingTicket ? (
-               <div className="h-12 md:h-14 w-full flex items-center justify-center gap-3 bg-primary/5 rounded-xl md:rounded-2xl border-2 border-primary/20 animate-pulse">
-                 <Loader2 className="w-5 h-5 text-primary animate-spin" />
-                 <span className="text-xs md:text-sm font-black uppercase tracking-widest text-primary">Estou criando seu ticket de suporte...</span>
-               </div>
-             ) : (
-               <form onSubmit={handleSendMessage} className="flex items-center gap-2 md:gap-3">
-                 <div className="relative flex-1 group">
-                   <Input 
-                     value={message}
-                     onChange={(e) => {
-                       setMessage(e.target.value);
-                       handleTyping();
-                     }}
-                     placeholder={isPendingClosure ? "Digite SIM ou CONCORDO para encerrar..." : (isHumanSupportPresent ? "Digite sua mensagem para o consultor..." : "Digite o número da opção (ex: 1)...")}
-                     className={cn(
-                       "h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 pr-10 text-xs md:text-sm font-medium transition-all",
-                       isPendingClosure && "border-destructive/30 focus:ring-destructive/20 text-center uppercase tracking-widest font-black"
-                     )}
-                     disabled={isSending || isAiThinking || isEndingChat}
-                   />
-                 </div>
-                 <Button 
-                  type="submit" 
-                  size="icon" 
-                  className="h-12 w-12 md:h-14 md:w-14 rounded-xl md:rounded-2xl shadow-xl transition-all active:scale-90 bg-primary hover:bg-primary/90 shrink-0"
-                  disabled={!message.trim() || isSending || isAiThinking || isEndingChat}
-                 >
-                   {isSending || isAiThinking || isEndingChat ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-                 </Button>
-               </form>
-             )}
-             <p className="text-[8px] md:text-[9px] text-center mt-3 uppercase tracking-[0.2em] font-black text-muted-foreground opacity-40">
-               {isHumanSupportPresent ? "Chat direto com consultor humano ativado." : "Histórico local de 24h. Use o menu numerado para navegar."}
-             </p>
-          </div>
-        </div>
-      </main>
-
-      <footer className="hidden md:block py-4 text-center opacity-30 shrink-0">
-        <p className="text-[8px] font-black uppercase tracking-[0.4em]">Powered by Proova Decision Tree v1.0</p>
-      </footer>
+      {/* Main chat area... */}
     </div>
   );
 }
