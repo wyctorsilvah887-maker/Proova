@@ -209,7 +209,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
               <p className="text-[9px] font-black uppercase tracking-[0.3em]">© 2026 Proova Technology</p>
            </div>
            <Link href="/dash" className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.2em] text-primary hover:underline transition-all">
-              Usar o Proova no meu negócio <ArrowRight className="w-2.5 h-2.5" />
+              Conheça o Proova <ArrowRight className="w-2.5 h-2.5" />
            </Link>
         </footer>
       </div>
@@ -363,7 +363,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
                   <span>Proova Technology</span>
                 </div>
                 <Link href="/dash" className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.2em] text-primary hover:underline transition-all">
-                   Criar minha máquina de depoimentos <ArrowRight className="w-2.5 h-2.5" />
+                   Conheça o Proova <ArrowRight className="w-2.5 h-2.5" />
                 </Link>
               </div>
            </div>
@@ -407,3 +407,4 @@ export default function CollectionClient({ slug }: { slug: string }) {
     </div>
   );
 }
+
