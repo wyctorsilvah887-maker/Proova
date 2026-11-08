@@ -26,7 +26,8 @@ import {
   Handshake,
   Lock,
   AlertTriangle,
-  Headphones
+  Headphones,
+  Settings
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -256,6 +257,10 @@ export default function WidgetsPage() {
               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/settings')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Settings className="mr-2 h-4 w-4 text-primary" />
+                <span>Configurações</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
                 <Layout className="mr-2 h-4 w-4 text-primary" />

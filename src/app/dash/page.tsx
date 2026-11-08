@@ -700,6 +700,10 @@ export default function DashPage() {
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/settings')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Settings className="mr-2 h-4 w-4 text-primary" />
+                <span>Configurações</span>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Murais</span>
@@ -1069,6 +1073,16 @@ export default function DashPage() {
         </section>
       </main>
 
+      <footer className="py-12 md:py-20 border-t flex flex-col items-center gap-10 mt-auto bg-background/50">
+        <div className="flex items-center gap-2 relative w-[200px] h-[65px] md:w-[320px] md:h-[105px]">
+          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="dark:hidden object-contain" unoptimized />
+          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="hidden dark:block object-contain" unoptimized />
+        </div>
+        <div className="container px-4 text-center">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">© 2026 Proova Technology - Creative Studio</p>
+        </div>
+      </footer>
+
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-lg border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[90vh] flex flex-col">
           <div className="h-2 bg-primary w-full shrink-0" />
@@ -1167,8 +1181,7 @@ export default function DashPage() {
                     router.push('/pricing');
                     return;
                   }
-                  setConfigMode('business');
-                  setIsGoogleMapsDialogOpen(true);
+                  router.push('/settings');
                   setIsCollectLinkChoiceOpen(false);
                 }}
               >
@@ -1442,4 +1455,8 @@ export default function DashPage() {
       </Dialog>
     </div>
   );
+}
+
+function copyToClipboard(text: string, description: string) {
+  navigator.clipboard.writeText(text);
 }

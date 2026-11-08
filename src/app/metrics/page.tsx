@@ -28,7 +28,8 @@ import {
   MessageCircle,
   Zap,
   TrendingDown,
-  Headphones
+  Headphones,
+  Settings
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -264,6 +265,10 @@ export default function MetricsPage() {
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
               </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/settings')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Settings className="mr-2 h-4 w-4 text-primary" />
+                <span>Configurações</span>
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Murais</span>
@@ -280,19 +285,6 @@ export default function MetricsPage() {
                 <Gem className="mr-2 h-4 w-4 text-primary" />
                 <span>Upgrade</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="rounded-xl font-bold py-2.5 opacity-50 cursor-not-allowed">
-                <Handshake className="mr-2 h-4 w-4 text-primary" />
-                <span>Parceiros</span>
-                <Lock className="ml-auto w-3.5 h-3.5 opacity-60" />
-              </DropdownMenuItem>
-              
-              {userData?.isAdmin && (
-                <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                  <Shield className="mr-2 h-4 w-4 text-primary" />
-                  <span>Administração</span>
-                </DropdownMenuItem>
-              )}
-
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 {theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}
