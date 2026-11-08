@@ -43,6 +43,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import { LoadingScreen } from '@/components/loading-screen';
 
 export default function SocialCardsPage() {
   const { user, loading: authLoading } = useUser();
@@ -81,7 +82,7 @@ export default function SocialCardsPage() {
   }, [userData]);
 
   if (authLoading || (user && (testimonialsLoading || !userData))) {
-    return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-10 w-10 text-primary mx-auto" /></div>;
+    return <LoadingScreen />;
   }
 
   return (
@@ -95,8 +96,8 @@ export default function SocialCardsPage() {
           </Link>
           <div className="flex items-center group -ml-2">
             <div className="relative w-[160px] h-[55px] md:w-[320px] md:h-[105px]">
-              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
-              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
+              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
           </div>
         </div>
@@ -164,8 +165,8 @@ export default function SocialCardsPage() {
 
       <footer className="py-20 border-t bg-background/50 text-center flex flex-col items-center gap-8">
         <div className="relative w-[180px] h-[60px]">
-           <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="dark:hidden object-contain opacity-40 grayscale" />
-           <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="hidden dark:block object-contain opacity-40 grayscale" />
+           <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="dark:hidden object-contain opacity-40 grayscale" unoptimized />
+           <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="hidden dark:block object-contain opacity-40 grayscale" unoptimized />
         </div>
         <p className="text-[9px] text-muted-foreground uppercase font-black tracking-[0.3em]">© 2026 Proova Technology - Creative Studio</p>
       </footer>

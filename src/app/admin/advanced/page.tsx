@@ -22,6 +22,7 @@ import Link from 'next/link';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { LoadingScreen } from '@/components/loading-screen';
 
 export default function AdvancedAdminPage() {
   const auth = useAuth();
@@ -91,7 +92,7 @@ export default function AdvancedAdminPage() {
   };
 
   if (authLoading || userDataLoading) {
-    return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-12 w-12 text-primary mx-auto" /></div>;
+    return <LoadingScreen />;
   }
 
   if (!userData?.isAdmin) {
@@ -104,8 +105,8 @@ export default function AdvancedAdminPage() {
         <div className="flex items-center">
           <Link href="/admin" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
-              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
-              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
+              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
           </Link>
         </div>
@@ -222,8 +223,8 @@ export default function AdvancedAdminPage() {
 
       <footer className="py-12 border-t mt-auto text-center flex flex-col items-center gap-6">
         <div className="relative w-[180px] h-[60px]">
-          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain dark:hidden opacity-30 grayscale" priority />
-          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain hidden dark:block opacity-30 grayscale" priority />
+          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain dark:hidden opacity-30 grayscale" priority unoptimized />
+          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain hidden dark:block opacity-30 grayscale" priority unoptimized />
         </div>
         <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-50">© 2026 Proova - Root Terminal</p>
       </footer>

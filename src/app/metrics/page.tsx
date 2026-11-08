@@ -68,6 +68,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from '@/hooks/use-toast';
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { LoadingScreen } from '@/components/loading-screen';
 
 export default function MetricsPage() {
   const { user, loading: authLoading } = useUser();
@@ -217,11 +218,7 @@ export default function MetricsPage() {
   }, [userData]);
 
   if (authLoading || userDataLoading || testimonialsLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-muted/30">
-        <Loader2 className="animate-spin h-10 w-10 text-primary mx-auto" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (
@@ -230,8 +227,8 @@ export default function MetricsPage() {
         <div className="flex items-center">
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[160px] h-[52px] md:w-[240px] md:h-[78px] transition-transform group-hover:scale-105">
-              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
-              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
+              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
           </Link>
         </div>
@@ -360,7 +357,6 @@ export default function MetricsPage() {
           </div>
         </header>
 
-        {/* Performance Sections... */}
         <section className="space-y-6">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-primary" />
@@ -415,7 +411,6 @@ export default function MetricsPage() {
           </div>
         </section>
 
-        {/* Section 2... */}
         <section className="space-y-6">
           <div className="flex items-center gap-2">
             <Globe className="w-4 h-4 text-primary" />
@@ -460,7 +455,6 @@ export default function MetricsPage() {
           </div>
         </section>
 
-        {/* Section 3: Charts */}
         <section className="grid gap-6 md:grid-cols-2">
           <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden">
              <CardHeader className="p-6 pb-0">
@@ -513,8 +507,8 @@ export default function MetricsPage() {
 
       <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
         <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[105px]">
-          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority />
-          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority />
+          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority unoptimized />
+          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority unoptimized />
         </div>
         <p className="text-[9px] text-muted-foreground uppercase font-black opacity-60">© 2026 Proova Technology - Business Intelligence v1.1</p>
       </footer>

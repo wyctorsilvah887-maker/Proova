@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect } from "react";
@@ -17,6 +16,7 @@ import { toast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
+import { LoadingScreen } from "@/components/loading-screen";
 
 export default function SignupPage() {
   const db = useFirestore();
@@ -137,11 +137,7 @@ export default function SignupPage() {
   };
 
   if (authLoading || user) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-muted/30">
-        <Loader2 className="animate-spin h-10 w-10 text-primary" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (

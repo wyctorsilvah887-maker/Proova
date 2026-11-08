@@ -118,6 +118,7 @@ import { cn } from '@/lib/utils';
 import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-actions';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useNotifications } from '@/hooks/use-notifications';
+import { LoadingScreen } from '@/components/loading-screen';
 
 interface AuditItem {
   id: string;
@@ -624,11 +625,7 @@ export default function DashPage() {
   };
 
   if (authLoading || userDataLoading || (user && !userData)) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-muted/30">
-        <Loader2 className="animate-spin h-10 w-10 text-primary mx-auto" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   const collectionLink = `${baseUrl}/c/${userData?.companySlug}`;
@@ -664,6 +661,7 @@ export default function DashPage() {
                 fill 
                 className="object-contain object-left dark:hidden" 
                 priority 
+                unoptimized
               />
               <Image 
                 src="/logo-proova-dark-mode.gif" 
@@ -671,6 +669,7 @@ export default function DashPage() {
                 fill 
                 className="object-contain object-left hidden dark:block" 
                 priority 
+                unoptimized
               />
             </div>
           </Link>

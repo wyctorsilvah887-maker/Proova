@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
@@ -9,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle2, Loader2, Rocket, ArrowRight, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
+import { LoadingScreen } from '@/components/loading-screen';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -68,7 +68,7 @@ function SuccessContent() {
         <div className="h-2 bg-primary w-full" />
         <CardContent className="pt-12 pb-10 text-center space-y-8">
           {isUpdating ? (
-            <>
+            <div className="flex flex-col items-center gap-6">
               <div className="mx-auto bg-primary/10 p-4 rounded-full w-fit">
                 <Loader2 className="w-12 h-12 text-primary animate-spin" />
               </div>
@@ -76,9 +76,9 @@ function SuccessContent() {
                 <h2 className="text-2xl font-black font-headline">Processando seu Acesso</h2>
                 <p className="text-muted-foreground">Estamos liberando suas ferramentas agora...</p>
               </div>
-            </>
+            </div>
           ) : error ? (
-            <>
+            <div className="flex flex-col items-center gap-6">
               <div className="mx-auto bg-destructive/10 p-4 rounded-full w-fit">
                 <ShieldAlert className="w-12 h-12 text-destructive" />
               </div>
@@ -86,13 +86,13 @@ function SuccessContent() {
                 <h2 className="text-2xl font-black font-headline">Ação Necessária</h2>
                 <p className="text-sm text-muted-foreground px-4">{error}</p>
               </div>
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 w-full">
                 <Button onClick={() => router.push('/login')} className="w-full h-12 font-bold">Fazer Login para Ativar</Button>
                 <Button variant="ghost" onClick={() => router.push('/dash')} className="w-full h-10 text-xs">Ir para o Dashboard</Button>
               </div>
-            </>
+            </div>
           ) : (
-            <>
+            <div className="flex flex-col items-center gap-6">
               <div className="mx-auto bg-green-100 dark:bg-green-900/30 p-4 rounded-full w-fit">
                 <CheckCircle2 className="w-12 h-12 text-green-600 dark:text-green-400" />
               </div>
@@ -103,7 +103,7 @@ function SuccessContent() {
               <Button onClick={() => router.push('/dash')} className="w-full h-14 text-lg font-black shadow-xl gap-2 transition-all hover:scale-105">
                 Acessar Painel VIP <ArrowRight className="w-5 h-5" />
               </Button>
-            </>
+            </div>
           )}
         </CardContent>
       </Card>
@@ -113,7 +113,7 @@ function SuccessContent() {
 
 export default function PaymentSuccessPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>}>
+    <Suspense fallback={<LoadingScreen />}>
       <SuccessContent />
     </Suspense>
   );

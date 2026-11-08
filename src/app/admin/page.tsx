@@ -12,7 +12,7 @@ import {
   TrendingUp, CreditCard, AlertCircle, Copy, Hash, Calendar,
   BarChart3, MousePointer2, ExternalLink, Gem, ArrowLeft,
   Settings, Handshake, Save, CheckCircle2, CircleDashed, Rocket,
-  MousePointer, Headphones, Ticket
+  MousePointer, Headphones, Ticket, ChevronRight
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -30,9 +30,10 @@ import {
   SheetDescription 
 } from '@/components/ui/sheet';
 import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 import { useAuth, useFirestore, useUser, useCollection, useDoc } from '@/firebase';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from 'firebase/auth';
-import { collection, query, doc, setDoc, serverTimestamp, where, orderBy, limit, updateDoc } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
+import { collection, query, doc, serverTimestamp, where, orderBy, limit, updateDoc } from 'firebase/firestore';
 import { toast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import { useTheme } from 'next-themes';
@@ -43,6 +44,7 @@ import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { LoadingScreen } from '@/components/loading-screen';
 
 export default function AdminPage() {
   const auth = useAuth();
@@ -153,7 +155,7 @@ export default function AdminPage() {
   };
 
   if (authLoading || (user && userDataLoading)) {
-    return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-12 w-12 text-primary mx-auto" /></div>;
+    return <LoadingScreen />;
   }
 
   if (!user || (userData && !userData.isAdmin)) {
@@ -166,8 +168,8 @@ export default function AdminPage() {
         <div className="flex items-center">
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
-              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
-              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
+              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
           </Link>
         </div>
@@ -293,8 +295,8 @@ export default function AdminPage() {
       
       <footer className="py-12 md:py-20 border-t flex flex-col items-center gap-10 mt-auto bg-background/50">
         <div className="flex items-center gap-2 relative w-[200px] h-[65px] md:w-[320px] md:h-[105px]">
-          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="dark:hidden object-contain" />
-          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="hidden dark:block object-contain" />
+          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="dark:hidden object-contain" unoptimized />
+          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="hidden dark:block object-contain" unoptimized />
         </div>
         <div className="container px-4 text-center">
           <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">© 2026 Proova - Gestão Segura</p>

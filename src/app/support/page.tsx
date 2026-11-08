@@ -60,6 +60,7 @@ import {
 import { getConsultantResponse } from '@/lib/consultant-rules';
 import { toast } from '@/hooks/use-toast';
 import { Label } from '@/components/ui/label';
+import { LoadingScreen } from '@/components/loading-screen';
 
 export default function SupportPage() {
   const { user, loading: authLoading } = useUser();
@@ -334,11 +335,7 @@ export default function SupportPage() {
   }, [userData]);
 
   if (authLoading || userDataLoading || (user && !userData)) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-muted/30">
-        <Loader2 className="animate-spin h-10 w-10 text-primary mx-auto" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (
@@ -352,8 +349,8 @@ export default function SupportPage() {
           </Link>
           <div className="flex items-center group">
             <div className="relative w-[140px] h-[40px] md:w-[280px] md:h-[90px]">
-              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
-              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
+              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
           </div>
         </div>

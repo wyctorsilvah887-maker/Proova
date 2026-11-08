@@ -14,6 +14,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
 import { submitTestimonialAction } from '@/app/actions/testimonial-actions';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { LoadingScreen } from '@/components/loading-screen';
 
 export default function CollectionClient({ slug }: { slug: string }) {
   const db = useFirestore();
@@ -164,7 +165,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
     }
   };
 
-  if (isLoadingCompany) return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
+  if (isLoadingCompany) return <LoadingScreen />;
   if (!targetUserId) return <div className="min-h-screen flex items-center justify-center p-4"><Card className="max-w-md w-full p-10 text-center"><Search className="w-12 h-12 mx-auto text-muted-foreground mb-4" /><h2 className="text-xl font-bold">Empresa não encontrada</h2></Card></div>;
 
   if (submitted) {

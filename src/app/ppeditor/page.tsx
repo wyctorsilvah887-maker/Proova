@@ -94,6 +94,7 @@ import { Slider } from '@/components/ui/slider';
 import Cropper from 'react-easy-crop';
 import { useTheme } from 'next-themes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { LoadingScreen } from '@/components/loading-screen';
 
 type LayoutType = 'grid' | 'mural' | 'carousel' | 'popup';
 
@@ -838,7 +839,7 @@ export default function PPEditorPage() {
     return 'PLANO BASE';
   }, [userData]);
 
-  if (authLoading || userDataLoading || testimonialsLoading) return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
+  if (authLoading || userDataLoading || testimonialsLoading) return <LoadingScreen />;
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body w-full overflow-hidden text-foreground">
@@ -851,8 +852,8 @@ export default function PPEditorPage() {
           </Link>
           <div className="flex items-center group -ml-2">
             <div className="relative w-[160px] h-[55px] md:w-[320px] md:h-[105px]">
-              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
-              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
+              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
           </div>
         </div>
@@ -876,7 +877,7 @@ export default function PPEditorPage() {
       </header>
 
       <main className="flex-1 flex overflow-hidden relative w-full h-full pt-24 md:pt-32">
-        <aside className="hidden lg:flex w-80 bg-background border-r flex-col shrink-0 h-full">
+        <aside className="hidden lg:flex w-80 bg-background border-r flex flex-col shrink-0 h-full">
           <PublicPageSettings 
             themeColor={themeColor} setThemeColor={setThemeColor} secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
             layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}

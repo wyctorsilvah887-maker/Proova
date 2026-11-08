@@ -24,6 +24,7 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { trackPPVisit, trackWhatsappClick } from '@/app/actions/stats-actions';
+import { LoadingScreen } from '@/components/loading-screen';
 
 export default function PPClient({ slug }: { slug: string }) {
   const db = useFirestore();
@@ -143,7 +144,7 @@ export default function PPClient({ slug }: { slug: string }) {
     return filteredTestimonials;
   }, [filteredTestimonials, muralIndex, layout]);
 
-  if (isLoading) return <div className="min-h-screen flex items-center justify-center bg-background"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
+  if (isLoading) return <LoadingScreen />;
 
   const TestimonialCard = ({ t, index = 0 }: { t: any, index?: number }) => {
     const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent' && secondaryColor !== '';

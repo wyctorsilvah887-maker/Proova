@@ -40,6 +40,7 @@ import { cn } from '@/lib/utils';
 import { notifySupportPresence } from '@/app/actions/support-actions';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
+import { LoadingScreen } from '@/components/loading-screen';
 
 export default function AdminChatPage({ params }: { params: Promise<{ userId: string }> }) {
   const { userId } = use(params);
@@ -201,7 +202,7 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
   };
 
   if (userLoading || messagesLoading) {
-    return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
+    return <LoadingScreen />;
   }
 
   return (

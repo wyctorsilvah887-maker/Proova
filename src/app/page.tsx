@@ -51,6 +51,7 @@ import { useUser, useFirestore } from "@/firebase";
 import { doc, setDoc, increment } from "firebase/firestore";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
+import { LoadingScreen } from "@/components/loading-screen";
 
 // --- SUB-COMPONENTS ---
 
@@ -812,11 +813,7 @@ export default function Home() {
   };
 
   if (loading || user) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-muted/30">
-        <Loader2 className="animate-spin h-10 w-10 text-primary" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (

@@ -11,6 +11,7 @@ import { toast } from '@/hooks/use-toast';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
+import { LoadingScreen } from '@/components/loading-screen';
 
 export default function LoginPage() {
   const auth = useAuth();
@@ -52,11 +53,7 @@ export default function LoginPage() {
   };
 
   if (authLoading || user) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-muted/30">
-        <Loader2 className="animate-spin h-10 w-10 text-primary" />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (

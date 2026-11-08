@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { LoadingScreen } from '@/components/loading-screen';
 
 export default function AdminSupportPage() {
   const db = useFirestore();
@@ -46,7 +47,7 @@ export default function AdminSupportPage() {
   }, [ticketsList, searchTerm]);
 
   if (authLoading || userDataLoading) {
-    return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-12 w-12 text-primary mx-auto" /></div>;
+    return <LoadingScreen />;
   }
 
   if (!userData?.isAdmin) {
@@ -59,8 +60,8 @@ export default function AdminSupportPage() {
         <div className="flex items-center">
           <Link href="/admin" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
-              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
-              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
+              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
           </Link>
         </div>
@@ -165,8 +166,8 @@ export default function AdminSupportPage() {
 
       <footer className="py-12 border-t mt-auto text-center flex flex-col items-center gap-6">
         <div className="flex items-center gap-2 relative w-[180px] h-[60px]">
-          <Image src="/logo-proova-white-mode.gif" alt="Logo Gray" fill className="object-contain dark:hidden opacity-30 grayscale" priority />
-          <Image src="/logo-proova-dark-mode.gif" alt="Logo Gray" fill className="object-contain hidden dark:block opacity-30 grayscale" priority />
+          <Image src="/logo-proova-white-mode.gif" alt="Logo Gray" fill className="object-contain dark:hidden opacity-30 grayscale" priority unoptimized />
+          <Image src="/logo-proova-dark-mode.gif" alt="Logo Gray" fill className="object-contain hidden dark:block opacity-30 grayscale" priority unoptimized />
         </div>
         <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-50">© 2026 Proova - Suporte Operacional</p>
       </footer>
