@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -254,7 +253,11 @@ const PublicPageSettings = ({
   const router = useRouter();
   const tabsScrollRef = useRef<HTMLDivElement>(null);
 
-  const isVideoLogo = logoUrl && (logoUrl.includes('.mp4') || logoUrl.includes('.webm') || logoUrl.includes('.mov') || logoUrl.includes('testimonials_videos'));
+  const isVideoLogo = useMemo(() => {
+    if (!logoUrl) return false;
+    const url = logoUrl.toLowerCase();
+    return url.includes('.mp4') || url.includes('.webm') || url.includes('.mov');
+  }, [logoUrl]);
 
   return (
     <div className="flex flex-col w-full h-full overflow-hidden bg-background relative">
@@ -340,7 +343,7 @@ const PublicPageSettings = ({
                         isVideoLogo ? (
                           <video src={logoUrl} className="w-full h-full object-cover" autoPlay loop muted playsInline />
                         ) : (
-                          <Image src={logoUrl} alt="Logo" fill className="object-cover" />
+                          <img src={logoUrl} alt="Logo" className="w-full h-full object-cover" />
                         )
                       ) : (
                         isUploading ? <Loader2 className="animate-spin text-primary" /> : <Upload className="w-6 h-6 text-primary" />
@@ -908,7 +911,11 @@ export default function PPEditorPage() {
     return currentSelection;
   }, [currentSelection, layout, muralIndex]);
 
-  const isVideoLogo = logoUrl && (logoUrl.includes('.mp4') || logoUrl.includes('.webm') || logoUrl.includes('.mov') || logoUrl.includes('testimonials_videos'));
+  const isVideoLogo = useMemo(() => {
+    if (!logoUrl) return false;
+    const url = logoUrl.toLowerCase();
+    return url.includes('.mp4') || url.includes('.webm') || url.includes('.mov');
+  }, [logoUrl]);
 
   if (authLoading || userDataLoading || testimonialsLoading) return <LoadingScreen />;
 
@@ -1036,7 +1043,9 @@ export default function PPEditorPage() {
                                  <div className="absolute top-2 right-2 bg-black/40 p-1 rounded-full"><FileVideo className="w-3 h-3 text-white" /></div>
                                </div>
                              ) : (
-                               <img src={logoUrl} className="w-24 h-24 mx-auto rounded-[2rem] object-cover shadow-2xl border-4 border-background ring-1 ring-primary/10 transition-transform duration-700 hover:scale-110" />
+                               <div className="w-24 h-24 mx-auto rounded-[2rem] overflow-hidden shadow-2xl border-4 border-background ring-1 ring-primary/10 bg-background">
+                                 <img src={logoUrl} className="w-full h-full object-cover" />
+                               </div>
                              )
                           )}
                           <div className="space-y-4">

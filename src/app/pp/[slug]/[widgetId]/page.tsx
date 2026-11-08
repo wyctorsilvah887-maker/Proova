@@ -12,7 +12,7 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { Card } from '@/components/ui/card';
-import { Star, User, Loader2, MessageSquare, MessageCircle, Globe, ArrowRight, ArrowLeft, Clock, Play, CheckCircle2 } from 'lucide-react';
+import { Star, User, Loader2, MessageSquare, MessageCircle, Globe, ArrowRight, ArrowLeft, Clock, Play, CheckCircle2, FileVideo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -136,6 +136,13 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
   const testimonialsTitle = widgetData?.testimonialsTitle || '';
   const footerText = widgetData?.footerText || `${new Date().getFullYear()} ${companyData?.companyName || ''}`;
   const showProovaBranding = widgetData?.showLogo !== false;
+
+  // Detecção robusta de logo em vídeo
+  const isVideoLogo = useMemo(() => {
+    if (!logoUrl) return false;
+    const url = logoUrl.toLowerCase();
+    return url.includes('.mp4') || url.includes('.webm') || url.includes('.mov');
+  }, [logoUrl]);
 
   // Efeito de rotação para layouts específicos
   useEffect(() => {
@@ -282,8 +289,12 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
               <div className="space-y-6">
                 {logoUrl && (
                   <div className="flex justify-center">
-                    <div className="w-24 h-24 sm:w-32 sm:h-32 relative">
-                      <img src={logoUrl} className="w-full h-full object-cover rounded-[2.5rem] shadow-2xl border-4 border-background" alt="Logo" />
+                    <div className="w-24 h-24 sm:w-32 sm:h-32 relative overflow-hidden rounded-[2.5rem] shadow-2xl border-4 border-background bg-background">
+                      {isVideoLogo ? (
+                        <video src={logoUrl} className="w-full h-full object-cover" autoPlay loop muted playsInline />
+                      ) : (
+                        <img src={logoUrl} className="w-full h-full object-cover" alt="Logo" />
+                      )}
                     </div>
                   </div>
                 )}

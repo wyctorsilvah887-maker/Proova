@@ -12,7 +12,7 @@ import {
   onSnapshot
 } from 'firebase/firestore';
 import { Card } from '@/components/ui/card';
-import { Star, User, Loader2, Globe, ArrowLeft, CheckCircle2, Clock, Play, ArrowRight, MessageCircle, FileVideo } from 'lucide-react';
+import { Star, User, Loader2, Globe, ArrowLeft, CheckCircle2, Clock, Play, ArrowRight, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -112,8 +112,12 @@ export default function PPClient({ slug }: { slug: string }) {
   const externalSiteButtonText = ppData?.externalSiteButtonText || 'Visitar Site Oficial';
   const customSections = ppData?.customSections || [];
 
-  // Helper para detectar se a logo é vídeo ou GIF dinâmico
-  const isVideoLogo = logoUrl && (logoUrl.includes('.mp4') || logoUrl.includes('.webm') || logoUrl.includes('.mov') || logoUrl.includes('pp/'));
+  // Helper robusto para detectar se a logo é vídeo
+  const isVideoLogo = useMemo(() => {
+    if (!logoUrl) return false;
+    const url = logoUrl.toLowerCase();
+    return url.includes('.mp4') || url.includes('.webm') || url.includes('.mov');
+  }, [logoUrl]);
 
   useEffect(() => {
     if ((layout === 'mural' || layout === 'popup' || layout === 'carousel') && filteredTestimonials.length > 0) {
@@ -265,7 +269,7 @@ export default function PPClient({ slug }: { slug: string }) {
             <header className="px-6 text-center py-24 sm:py-32 space-y-8">
               {logoUrl && (
                 <div className="flex justify-center">
-                  <div className="w-24 h-24 sm:w-32 sm:h-32 relative overflow-hidden rounded-[2.5rem] shadow-xl border-4 border-background">
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 relative overflow-hidden rounded-[2.5rem] shadow-xl border-4 border-background bg-background">
                     {isVideoLogo ? (
                        <video src={logoUrl} className="w-full h-full object-cover" autoPlay loop muted playsInline />
                     ) : (
