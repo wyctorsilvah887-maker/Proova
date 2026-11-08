@@ -11,6 +11,7 @@ import {
   Star, 
   Eye,
   MessageSquare,
+  MessageCircle,
   Check,
   User,
   LayoutGrid,
@@ -243,7 +244,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
             <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 shadow-xl">
                <DropdownMenuLabel className="px-3 py-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground">Minha Conta</DropdownMenuLabel>
                <DropdownMenuSeparator />
-               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl font-bold py-2.5 cursor-pointer"><TrendingUp className="mr-2 h-4 w-4 text-primary" /><span>Dashboard</span></DropdownMenuItem>
+               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5"><TrendingUp className="mr-2 h-4 w-4 text-primary" /><span>Dashboard</span></DropdownMenuItem>
                <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl font-bold py-2.5 cursor-pointer"><Gem className="mr-2 h-4 w-4 text-primary" /><span>Plano: <span className="text-primary">{membershipLabel}</span></span></DropdownMenuItem>
                <DropdownMenuSeparator />
                <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive font-bold py-2.5 cursor-pointer"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
@@ -334,7 +335,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
                               onClick={() => toggleSelection(t.id)}
                               className={cn(
                                 "p-3 rounded-2xl border-2 transition-all cursor-pointer flex gap-3 items-center group",
-                                isSelected ? "bg-primary/5 border-primary shadow-sm" : "bg-muted/10 border-transparent hover:border-primary/10"
+                                isSelected ? "bg-primary/5 border-primary shadow-sm" : "bg-muted/10 border-transparent hover:border-primary/20"
                               )}
                             >
                               <div className={cn(
