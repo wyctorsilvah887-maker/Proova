@@ -1,17 +1,19 @@
 rules_version = '2';
 
 // Regras de Segurança do Firebase Storage - Proova
-// Permite que consumidores enviem depoimentos em vídeo e administradores gerenciem seus widgets.
+// Permite que consumidores enviem depoimentos em vídeo/foto e administradores gerenciem seus widgets.
 
 service firebase.storage {
   match /b/{bucket}/o {
     
-    // 1. Depoimentos em Vídeo (Público)
+    // 1. Depoimentos em Vídeo e Foto (Público)
     // Precisamos permitir 'read', 'create' e 'update' para que o upload anônimo funcione via SDK
     match /users/{userId}/testimonials_videos/{fileName} {
       allow read, create, update: if true;
-      // Nota: A restrição de tamanho é aplicada via código no cliente, 
-      // mas mantemos as regras abertas para garantir a conclusão do handshake do upload.
+    }
+    
+    match /users/{userId}/testimonials_photos/{fileName} {
+      allow read, create, update: if true;
     }
 
     // 2. Recursos de Widgets e Logos (Híbrido)

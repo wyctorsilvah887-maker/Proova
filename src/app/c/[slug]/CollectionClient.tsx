@@ -111,7 +111,6 @@ export default function CollectionClient({ slug }: { slug: string }) {
   const handleFinalSubmit = async () => {
     if (honeypot || Date.now() - loadTime < 2000) return;
     
-    // Validação de nota no clique
     if (rating === 0) { 
       toast({ 
         variant: "destructive", 
@@ -130,28 +129,23 @@ export default function CollectionClient({ slug }: { slug: string }) {
     let finalVideoUrl = '';
     let finalPhotoUrl = '';
 
-    if (videoBlob) {
-      try {
+    try {
+      if (videoBlob) {
         const videoRef = ref(storage, `users/${targetUserId}/testimonials_videos/video_${Date.now()}.webm`);
         await uploadBytes(videoRef, videoBlob, { contentType: videoBlob.type });
         finalVideoUrl = await getDownloadURL(videoRef);
-      } catch (err) {
-        toast({ variant: "destructive", title: "Erro no Vídeo" });
-        setIsSubmitting(false);
-        return;
       }
-    }
 
-    if (photoBlob) {
-      try {
+      if (photoBlob) {
         const photoRef = ref(storage, `users/${targetUserId}/testimonials_photos/photo_${Date.now()}.jpg`);
         await uploadBytes(photoRef, photoBlob, { contentType: photoBlob.type });
         finalPhotoUrl = await getDownloadURL(photoRef);
-      } catch (err) {
-        toast({ variant: "destructive", title: "Erro na Foto" });
-        setIsSubmitting(false);
-        return;
       }
+    } catch (err: any) {
+      console.error("Erro no upload de mídia:", err);
+      toast({ variant: "destructive", title: "Erro na Mídia", description: "Verifique sua conexão ou tente novamente." });
+      setIsSubmitting(false);
+      return;
     }
 
     const result = await submitTestimonialAction({
@@ -220,7 +214,6 @@ export default function CollectionClient({ slug }: { slug: string }) {
   const hasMedia = !!recordedPhotoUrl || !!recordedVideoUrl;
   const shouldShowForm = activeMode === 'text' || hasMedia;
   
-  // Botão disponível apenas com Nome e Experiência preenchidos
   const isFormValid = userName.trim() !== '' && text.trim() !== '';
 
   return (
@@ -229,7 +222,6 @@ export default function CollectionClient({ slug }: { slug: string }) {
         <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent focus:bg-transparent" />
       </div>
       
-      {/* Inputs Nativos Ocultos */}
       <input type="file" ref={cameraPhotoInputRef} accept="image/*" capture="environment" className="sr-only" onChange={handlePhotoSelect} />
       <input type="file" ref={galleryPhotoInputRef} accept="image/*" className="sr-only" onChange={handlePhotoSelect} />
       <input type="file" ref={videoInputRef} accept="video/*" capture="environment" className="sr-only" onChange={handleVideoSelect} />
