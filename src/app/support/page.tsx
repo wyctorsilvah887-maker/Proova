@@ -82,7 +82,6 @@ export default function SupportPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
-  // Monitoramento de tickets ativos para bolinhas de status e digitação
   const supportTicketQuery = useMemo(() => {
     if (!db || !user) return null;
     return query(collection(db, 'support_tickets'), where('userId', '==', user.uid), limit(1));
@@ -100,7 +99,7 @@ export default function SupportPage() {
       collection(db, 'users', user.uid, 'support_messages'),
       where('createdAt', '>=', Timestamp.fromDate(twentyFourHoursAgo)),
       orderBy('createdAt', 'asc'),
-      limit(50)
+      limit(100)
     );
   }, [db, user]);
 
@@ -145,6 +144,9 @@ export default function SupportPage() {
     if (remoteMessages && user) {
       setLocalMessages(remoteMessages);
       localStorage.setItem(`proova_support_v1_${user.uid}`, JSON.stringify(remoteMessages));
+    } else if (remoteMessages?.length === 0) {
+      setLocalMessages([]);
+      localStorage.removeItem(`proova_support_v1_${user?.uid}`);
     }
   }, [remoteMessages, user]);
 
@@ -224,13 +226,15 @@ export default function SupportPage() {
     try {
       const batch = writeBatch(db);
 
+      // 1. Localizar e deletar TODAS as mensagens (não apenas as últimas 24h)
       const messagesRef = collection(db, 'users', user.uid, 'support_messages');
       const messagesSnap = await getDocs(messagesRef);
-      messagesSnap.forEach(doc => batch.delete(doc.ref));
+      messagesSnap.forEach(docSnap => batch.delete(docSnap.ref));
 
+      // 2. Localizar e deletar tickets ativos
       const ticketsRef = collection(db, 'support_tickets');
       const ticketsSnap = await getDocs(query(ticketsRef, where('userId', '==', user.uid)));
-      ticketsSnap.forEach(doc => batch.delete(doc.ref));
+      ticketsSnap.forEach(docSnap => batch.delete(docSnap.ref));
 
       await batch.commit();
 
@@ -238,10 +242,10 @@ export default function SupportPage() {
       setLocalMessages([]);
       setIsPendingClosure(false);
       
-      toast({ title: "Atendimento Encerrado", description: "O Consultor Proova foi reiniciado." });
+      toast({ title: "Atendimento Encerrado", description: "O histórico foi limpo e o Consultor Proova reiniciado." });
     } catch (err: any) {
-      console.error(err);
-      toast({ variant: "destructive", title: "Erro ao encerrar", description: "Não foi possível limpar os dados agora." });
+      console.error("Erro na limpeza do suporte:", err);
+      toast({ variant: "destructive", title: "Erro ao encerrar", description: "Não foi possível limpar os dados. Verifique sua conexão." });
     } finally {
       setIsEndingChat(false);
     }
@@ -249,7 +253,7 @@ export default function SupportPage() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim() || !user || !db || isSending) return;
+    if (!message.trim() || !user || !db || isSending || isEndingChat) return;
 
     const userMsg = message.trim();
     setIsSending(true);
@@ -277,20 +281,22 @@ export default function SupportPage() {
         const normalizedInput = userMsg.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
         const validConfirmations = ['sim', 'claro', 'com certeza', 'pode fechar', 'confirmar', 'quero fechar', 'certeza', 'ok', 'pode', 'fechar', 'concordo', 'prosseguir', 'confirmado'];
         
-        setTimeout(async () => {
-          if (validConfirmations.some(word => normalizedInput.includes(word)) && normalizedInput.length >= 2) {
-            await handleFinalCleanup();
-          } else {
-            setIsPendingClosure(false);
+        if (validConfirmations.some(word => normalizedInput.includes(word)) && normalizedInput.length >= 2) {
+          await handleFinalCleanup();
+          setIsAiThinking(false);
+          setIsSending(false);
+        } else {
+          setIsPendingClosure(false);
+          setTimeout(async () => {
             await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
               text: "Solicitação de encerramento cancelada. O atendimento continua ativo. Como posso ajudar?",
               sender: 'support',
               createdAt: serverTimestamp()
             });
-          }
-          setIsAiThinking(false);
-          setIsSending(false);
-        }, 1000);
+            setIsAiThinking(false);
+            setIsSending(false);
+          }, 1000);
+        }
         return;
       }
 
