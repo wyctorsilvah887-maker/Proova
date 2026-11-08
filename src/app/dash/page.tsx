@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -908,7 +907,7 @@ export default function DashPage() {
             <button 
               disabled={!isGoogleDone}
               onClick={() => setIsCollectLinkChoiceOpen(true)} 
-              className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
+              className="h-24 rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
             >
               <Link2 className="w-5 h-5 text-primary" />
               <div className="text-center px-2">
@@ -919,7 +918,7 @@ export default function DashPage() {
 
             <button 
               onClick={() => setIsPublicPageChoiceOpen(true)} 
-              className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
+              className="h-24 rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
             >
               <Globe className="w-5 h-5 text-primary" />
               <div className="text-center px-2">
@@ -930,7 +929,7 @@ export default function DashPage() {
 
             <button 
               onClick={() => router.push('/social-cards')} 
-              className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
+              className="h-24 rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
             >
               <Share2 className="w-5 h-5 text-primary" />
               <div className="text-center px-2">
@@ -942,7 +941,7 @@ export default function DashPage() {
             <button 
               disabled={!userData?.isSetupProcessDone && completedStepsCount < setupSteps.length} 
               onClick={() => router.push('/private')} 
-              className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all relative shadow-sm active:scale-95 disabled:opacity-40"
+              className="h-24 rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all relative shadow-sm active:scale-95 disabled:opacity-40"
             >
               <Inbox className="w-5 h-5 text-primary" />
               {pendingTestimonialsCount > 0 && (
@@ -958,7 +957,7 @@ export default function DashPage() {
 
             <button 
               onClick={() => router.push('/widgets')} 
-              className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
+              className="h-24 rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
             >
               <Layout className="w-5 h-5 text-primary" />
               <div className="text-center px-2">
@@ -970,7 +969,7 @@ export default function DashPage() {
             <button 
               disabled={!isGoogleDone} 
               onClick={() => setIsQrDialogOpenManual(true)} 
-              className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
+              className="h-24 rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
             >
               <QrCode className="w-5 h-5 text-primary" />
               <div className="text-center px-2">
@@ -979,9 +978,9 @@ export default function DashPage() {
               </div>
             </button>
 
-            <Link href="/support" className="w-full h-28">
+            <Link href="/support" className="w-full h-24">
               <button 
-                className="h-full w-full rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 relative"
+                className="h-full w-full rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 relative"
               >
                 <Headphones className="w-5 h-5 text-primary" />
                 <div className="text-center px-2">
@@ -994,8 +993,8 @@ export default function DashPage() {
               </button>
             </Link>
 
-            <Link href="/manual" className="w-full h-28">
-              <button className="h-full w-full rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95">
+            <Link href="/manual" className="w-full h-24">
+              <button className="h-full w-full rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95">
                 <BookOpen className="w-5 h-5 text-primary" />
                 <div className="text-center px-2">
                   <p className="text-[10px] font-black uppercase tracking-tight">Manual</p>
