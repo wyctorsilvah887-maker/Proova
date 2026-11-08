@@ -784,7 +784,7 @@ export default function DashPage() {
                           )}>
                             {step.completed ? <Check className="w-4 h-4" /> : <span className="text-xs font-black">{idx + 1}</span>}
                           </div>
-                          <div className="min-w-0">
+                          <div className="min-0">
                             <p className="text-[11px] font-black uppercase tracking-tight truncate">{step.label}</p>
                             <p className="text-[9px] text-muted-foreground font-bold uppercase">{step.completed ? 'Concluído' : (step.unlocked ? 'Pendente' : 'Bloqueado')}</p>
                           </div>
@@ -918,24 +918,33 @@ export default function DashPage() {
           </Card>
         </div>
 
-        <section className="space-y-3">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Ferramentas de Conversão</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <section className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Zap className="w-4 h-4 text-primary" />
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Ferramentas de Conversão</h2>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <button 
               disabled={!isGoogleDone}
               onClick={() => setIsCollectLinkChoiceOpen(true)} 
-              className="h-24 rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
+              className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
             >
-              <Link2 className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Link de Coleta</span>
+              <Link2 className="w-6 h-6 text-primary" />
+              <div className="text-center px-2">
+                <p className="text-[10px] font-black uppercase tracking-tight">Link de Coleta</p>
+                <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Capture Elogios</p>
+              </div>
             </button>
 
             <button 
               onClick={() => setIsPublicPageChoiceOpen(true)} 
-              className="h-24 rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
+              className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
             >
-              <Globe className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Link in Bio</span>
+              <Globe className="w-6 h-6 text-primary" />
+              <div className="text-center px-2">
+                <p className="text-[10px] font-black uppercase tracking-tight">Link in Bio</p>
+                <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Página Pública</p>
+              </div>
             </button>
 
             <button 
@@ -943,51 +952,77 @@ export default function DashPage() {
                 const el = document.getElementById('testimonials-section');
                 if (el) el.scrollIntoView({ behavior: 'smooth' });
               }} 
-              className="h-24 rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
+              className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
             >
-              <Share2 className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Social Cards</span>
+              <Share2 className="w-6 h-6 text-primary" />
+              <div className="text-center px-2">
+                <p className="text-[10px] font-black uppercase tracking-tight">Social Cards</p>
+                <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Posts Instagram</p>
+              </div>
             </button>
 
             <button 
               disabled={!userData?.isSetupProcessDone && completedStepsCount < setupSteps.length} 
               onClick={() => router.push('/private')} 
-              className="h-24 rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all relative shadow-sm active:scale-95 disabled:opacity-40"
+              className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all relative shadow-sm active:scale-95 disabled:opacity-40"
             >
-              <Inbox className="w-5 h-5 text-primary" />
+              <Inbox className="w-6 h-6 text-primary" />
               {pendingTestimonialsCount > 0 && (
-                <span className="absolute top-2 right-2 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white shadow-lg animate-in zoom-in duration-300">
+                <span className="absolute top-3 right-4 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white shadow-lg animate-in zoom-in duration-300">
                   {pendingTestimonialsCount}
                 </span>
               )}
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Inbox Unificado</span>
+              <div className="text-center px-2">
+                <p className="text-[10px] font-black uppercase tracking-tight">Moderação</p>
+                <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Inbox Unificado</p>
+              </div>
             </button>
 
-            <Link href="/support" className="w-full">
-              <button 
-                className="h-24 w-full rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 relative"
-              >
-                <Headphones className="w-5 h-5 text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Suporte Chat</span>
-                {activeTicket && (
-                  <div className={cn("absolute top-2 right-2 h-3 w-3 rounded-full border-2 border-background", activeTicket.isSupportInChat ? "bg-green-500 animate-pulse" : "bg-red-500")} />
-                )}
-              </button>
-            </Link>
+            <button 
+              onClick={() => router.push('/widgets')} 
+              className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
+            >
+              <Layout className="w-6 h-6 text-primary" />
+              <div className="text-center px-2">
+                <p className="text-[10px] font-black uppercase tracking-tight">Widgets</p>
+                <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Murais para Site</p>
+              </div>
+            </button>
 
             <button 
               disabled={!isGoogleDone} 
               onClick={() => setIsQrDialogOpenManual(true)} 
-              className="h-24 rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
+              className="h-28 rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
             >
-              <QrCode className="w-5 h-5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">QR de Balcão</span>
+              <QrCode className="w-6 h-6 text-primary" />
+              <div className="text-center px-2">
+                <p className="text-[10px] font-black uppercase tracking-tight">QR Balcão</p>
+                <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Físico e Impresso</p>
+              </div>
             </button>
 
-            <Link href="/manual" className="w-full">
-              <button className="h-24 w-full rounded-[1.5rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95">
-                <BookOpen className="w-5 h-5 text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-[0.1em] text-center px-2">Manual Estratégico</span>
+            <Link href="/support" className="w-full h-28">
+              <button 
+                className="h-full w-full rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 relative"
+              >
+                <Headphones className="w-6 h-6 text-primary" />
+                <div className="text-center px-2">
+                  <p className="text-[10px] font-black uppercase tracking-tight">Suporte</p>
+                  <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Consultor Chat</p>
+                </div>
+                {activeTicket && (
+                  <div className={cn("absolute top-3 right-4 h-3 w-3 rounded-full border-2 border-background", activeTicket.isSupportInChat ? "bg-green-500 animate-pulse" : "bg-red-500")} />
+                )}
+              </button>
+            </Link>
+
+            <Link href="/manual" className="w-full h-28">
+              <button className="h-full w-full rounded-[2rem] border-2 flex flex-col items-center justify-center gap-2 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95">
+                <BookOpen className="w-6 h-6 text-primary" />
+                <div className="text-center px-2">
+                  <p className="text-[10px] font-black uppercase tracking-tight">Manual</p>
+                  <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Estratégia VIP</p>
+                </div>
               </button>
             </Link>
           </div>
