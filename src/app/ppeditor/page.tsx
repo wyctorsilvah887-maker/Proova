@@ -87,7 +87,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/dialog";
+} from "@/components/ui/dialog";
 import {
   Accordion,
   AccordionContent,
@@ -245,12 +245,10 @@ const PublicPageSettings = ({
   const router = useRouter();
   const tabsScrollRef = useRef<HTMLDivElement>(null);
 
-  // Helper para detectar se a logo é vídeo
   const isVideoLogo = logoUrl && (logoUrl.includes('.mp4') || logoUrl.includes('.webm') || logoUrl.includes('.mov') || logoUrl.includes('testimonials_videos'));
 
   return (
     <div className="flex flex-col w-full h-full overflow-hidden bg-background relative">
-      {/* Botão de Fechar fixo no mobile dentro do settings */}
       <div className="absolute top-4 right-4 z-[100] lg:hidden">
         {onClose && (
           <button 
@@ -262,7 +260,7 @@ const PublicPageSettings = ({
         )}
       </div>
 
-      <div className="p-4 border-b bg-muted/10 shrink-0 space-y-4 pt-6 md:pt-4">
+      <div className="p-4 border-b bg-muted/10 shrink-0 space-y-4 pt-8 md:pt-4">
         <div className="flex items-center justify-between">
           <Link href="/dash">
             <Button variant="ghost" size="sm" className="gap-2 px-0 text-muted-foreground hover:text-primary hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 transition-all h-8">
@@ -323,7 +321,7 @@ const PublicPageSettings = ({
           <div className="p-5 space-y-8 pb-10">
              <TabsContent value="geral" className="mt-0 space-y-8 outline-none">
                 <section className="space-y-4">
-                  <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Foto de Capa / Logo Dinâmica</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Identidade de Marca (Logo/GIF/Vídeo)</Label>
                   <div className="flex items-center gap-4">
                     <div className={cn(
                       "w-20 h-20 rounded-3xl border-2 border-dashed border-primary/20 flex items-center justify-center bg-primary/5 overflow-hidden group cursor-pointer relative shadow-inner",
@@ -346,7 +344,7 @@ const PublicPageSettings = ({
                     <div className="flex-1 space-y-1">
                       <p className="text-xs font-bold uppercase tracking-tight">Mídia de Identidade</p>
                       <p className="text-[10px] text-muted-foreground leading-tight font-medium">Aceitamos Imagem, GIF ou Vídeo curto.</p>
-                      {logoUrl && <button onClick={() => setLogoUrl('')} className="text-[10px] font-black uppercase text-destructive hover:underline pt-1 transition-all">Remover Identidade</button>}
+                      {logoUrl && <button onClick={() => setLogoUrl('')} className="text-[10px] font-black uppercase text-destructive hover:underline pt-1 transition-all">Remover</button>}
                     </div>
                   </div>
                 </section>
@@ -366,7 +364,7 @@ const PublicPageSettings = ({
 
                 <section className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Endereço da Página (Link)</Label>
+                    <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Link da Página</Label>
                     {!isGoldPlan && <Lock className="w-3 h-3 text-muted-foreground opacity-40" />}
                   </div>
                   <div className={cn(
@@ -381,7 +379,6 @@ const PublicPageSettings = ({
                       className="h-12 flex-1 bg-transparent border-none focus:ring-0 text-xs font-mono font-bold" 
                     />
                   </div>
-                  {!isGoldPlan && <p className="text-[9px] text-muted-foreground italic font-medium px-1">Disponível apenas nos planos Gold e Enterprise.</p>}
                 </section>
              </TabsContent>
 
@@ -586,11 +583,6 @@ const PublicPageSettings = ({
                                </div>
                                <Slider value={[autoPublishMinChars]} min={0} max={200} step={10} onValueChange={(val) => setAutoPublishMinChars(val[0])} />
                             </div>
-                            <div className="bg-background/50 p-4 rounded-xl border border-primary/10">
-                              <p className="text-[8px] font-black uppercase tracking-[0.15em] text-muted-foreground leading-relaxed text-center">
-                                ✨ Elogios com <span className="text-primary">{autoPublishMinRating}+</span> estrelas e <span className="text-primary">{autoPublishMinChars}+</span> caracteres serão publicados instantaneamente.
-                              </p>
-                            </div>
                          </div>
                        )}
                     </section>
@@ -636,7 +628,7 @@ const PublicPageSettings = ({
                        <input type="color" value={secondaryColor || '#ffffff'} onChange={(e) => setSecondaryColor(e.target.value)} className="w-8 h-8 rounded-full border-2 border-transparent cursor-pointer shadow-md" />
                     </div>
                   </div>
-                  {secondaryColor && <button onClick={() => setSecondaryColor('')} className="text-[9px] font-black uppercase text-destructive hover:underline ml-1 transition-all">Desativar Efeitos Visuais</button>}
+                  {secondaryColor && <button onClick={() => setSecondaryColor('')} className="text-[9px] font-black uppercase text-destructive hover:underline ml-1 transition-all">Desativar Efeitos</button>}
                 </section>
              </TabsContent>
 
@@ -645,10 +637,7 @@ const PublicPageSettings = ({
                    <div className="flex items-center justify-between p-5 rounded-[1.5rem] bg-green-500/5 border border-green-500/20 shadow-sm">
                       <div className="flex items-center gap-3">
                          <div className="p-2.5 rounded-xl bg-green-500/10 text-green-600"><MessageCircle className="w-5 h-5" /></div>
-                         <div className="space-y-0.5">
-                            <p className="text-xs font-black uppercase tracking-tight">Botão WhatsApp</p>
-                            <p className="text-[9px] text-green-700/60 font-black uppercase tracking-tight">Contato em um clique</p>
-                         </div>
+                         <p className="text-xs font-black uppercase tracking-tight">Botão WhatsApp</p>
                       </div>
                       <Switch checked={whatsappEnabled} onCheckedChange={setWhatsappEnabled} />
                    </div>
@@ -658,9 +647,6 @@ const PublicPageSettings = ({
                            <Label className="text-[9px] font-black uppercase ml-1 opacity-60">Seu WhatsApp (Ex: 11999998888)</Label>
                            <Input placeholder="Apenas números..." value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} className="h-12 rounded-xl bg-background border-green-500/20 focus:ring-green-500/20 font-bold" />
                         </div>
-                        <p className="text-[8px] font-bold text-green-700 uppercase leading-relaxed text-center">
-                           🚀 Recomendamos ativar este recurso para converter visitantes em leads imediatos.
-                        </p>
                      </div>
                    )}
                 </section>
@@ -668,29 +654,17 @@ const PublicPageSettings = ({
                 <section className="space-y-4">
                    <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Site Oficial (Botão Rodapé)</Label>
                    <div className="space-y-4">
-                      <div className="space-y-2">
-                         <Label className="text-[9px] font-black uppercase ml-1 opacity-60">Texto de Chamada</Label>
-                         <Input value={externalSiteButtonText} onChange={(e) => setExternalSiteButtonText(e.target.value)} placeholder="Ex: Visitar Loja Oficial" className="h-11 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs font-bold" />
-                      </div>
-                      <div className="space-y-2">
-                         <Label className="text-[9px] font-black uppercase ml-1 opacity-60">Link do Destino (URL)</Label>
-                         <Input value={externalSiteUrl} onChange={(e) => setExternalSiteUrl(e.target.value)} placeholder="https://www.seusite.com.br" className="h-11 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs font-bold" />
-                      </div>
+                      <Input value={externalSiteButtonText} onChange={(e) => setExternalSiteButtonText(e.target.value)} placeholder="Texto do botão" className="h-11 rounded-xl" />
+                      <Input value={externalSiteUrl} onChange={(e) => setExternalSiteUrl(e.target.value)} placeholder="https://www.seusite.com.br" className="h-11 rounded-xl" />
                    </div>
                 </section>
 
                 <section className="space-y-5">
                    <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Configurações de Rodapé</Label>
                    <div className="space-y-4">
-                      <div className="space-y-2">
-                         <Label className="text-[9px] font-black uppercase ml-1 opacity-60">Texto de Copyright</Label>
-                         <Input value={footerText} onChange={(e) => setFooterText(e.target.value)} placeholder="Ex: 2026 Minha Empresa Ltda" className="h-11 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs font-bold" />
-                      </div>
-                      <div className="flex items-center justify-between p-5 rounded-[1.5rem] bg-muted/10 border border-muted shadow-sm">
-                        <div className="space-y-1">
-                          <p className="text-[10px] font-black uppercase tracking-tight">Marca d'água Proova</p>
-                          <p className="text-[8px] text-muted-foreground font-medium uppercase tracking-tight">Exibir "Powered by Proova"</p>
-                        </div>
+                      <Input value={footerText} onChange={(e) => setFooterText(e.target.value)} placeholder="Copyright" className="h-11 rounded-xl" />
+                      <div className="flex items-center justify-between p-5 rounded-[1.5rem] bg-muted/10 border border-muted">
+                        <p className="text-[10px] font-black uppercase tracking-tight">Exibir Powered by Proova</p>
                         <Switch checked={showLogo} onCheckedChange={setShowLogo} />
                       </div>
                    </div>
@@ -724,12 +698,6 @@ export default function PPEditorPage() {
   const isEnterprise = userData?.membershipStatus === 'enterprise';
   const isGoldPlan = isEnterprise || userData?.membershipStatus === 'gold' || userData?.membershipStatus === 'trial';
   const SELECTION_LIMIT = isEnterprise ? Infinity : (isGoldPlan ? 50 : 5);
-
-  const isMapsLinkValid = useMemo(() => {
-    if (!userData?.googleMapsUrl) return false;
-    const url = userData.googleMapsUrl.toLowerCase();
-    return url.includes('review') || url.includes('writereview') || url.includes('placeid');
-  }, [userData]);
 
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
@@ -823,7 +791,7 @@ export default function PPEditorPage() {
     setIsSaving(true);
     const oldSlug = userData.companySlug;
     const newSlug = slugEdit.trim().toLowerCase();
-    const isSlugChanging = newSlug !== oldSlug;
+    const isSlugChanging = newSlug !== oldSlug && newSlug !== '';
 
     try {
       const batch = writeBatch(db);
@@ -858,7 +826,6 @@ export default function PPEditorPage() {
     }
   };
 
-  // Melhorado para aceitar GIF/Vídeo sem recorte
   const onFileSelect = async (e: React.ChangeEvent<HTMLInputElement>, type: 'logo') => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -867,7 +834,6 @@ export default function PPEditorPage() {
     const isGif = file.type === 'image/gif';
 
     if (isVideo || isGif) {
-      // Pula o crop e faz upload direto
       if (!user || !storage || !activeSlug) return;
       setIsUploading(true);
       try {
@@ -882,7 +848,6 @@ export default function PPEditorPage() {
         setIsUploading(false);
       }
     } else {
-      // Fluxo normal de crop para imagens estáticas
       const reader = new FileReader();
       reader.addEventListener('load', () => { 
         setTempImage(reader.result as string); 
@@ -1066,26 +1031,13 @@ export default function PPEditorPage() {
                              )
                           )}
                           <div className="space-y-4">
-                              <div className="text-2xl font-black leading-[1.1] tracking-tighter" dangerouslySetInnerHTML={{ __html: heroTitle || 'Seu Título de Impacto' }} />
+                              <div className="text-2xl font-black leading-[1.1] tracking-tighter" dangerouslySetInnerHTML={{ __html: heroTitle || 'Seu Título' }} />
                               <div className="text-[11px] text-muted-foreground font-medium italic opacity-80 leading-relaxed px-2" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />
                           </div>
                         </header>
 
-                        {customSections.map(s => (
-                          <section key={s.id} className={cn("p-10 text-center space-y-4 shrink-0 transition-colors duration-700", s.variant === 'accent' ? "text-white" : (s.variant === 'dark' ? "bg-black text-white" : "bg-muted/5"))} style={{ backgroundColor: s.variant === 'accent' ? themeColor : undefined }}>
-                            <h4 className="text-base font-black uppercase tracking-tight">{s.title}</h4>
-                            <p className="text-[11px] leading-relaxed opacity-80 font-medium">{s.content}</p>
-                            {s.buttonText && (
-                              <div className="pt-2">
-                                <Button size="sm" className={cn("h-9 px-6 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl", s.variant === 'accent' ? "bg-white text-black" : "bg-primary")}>{s.buttonText}</Button>
-                              </div>
-                            )}
-                          </section>
-                        ))}
-
                         <main className="p-8 space-y-8 flex-1">
-                          {testimonialsTitle && <h3 className="text-center font-black uppercase tracking-[0.2em] text-[10px] opacity-40" style={{ color: themeColor }}>{testimonialsTitle}</h3>}
-                          <div className={cn("grid gap-6", (layout === 'popup' || layout === 'carousel' || layout === 'mural') ? "grid-cols-1" : "grid-cols-1")}>
+                          <div className={cn("grid gap-6", "grid-cols-1")}>
                               {visibleTestimonialsPreview.map((t, idx) => (
                                 <div 
                                   key={`${t.id}-${idx}-${muralIndex}`} 
@@ -1110,19 +1062,8 @@ export default function PPEditorPage() {
                                   <p className="text-xs font-bold italic opacity-80 leading-relaxed tracking-tight">"{t.text}"</p>
                                 </div>
                               ))}
-                              {currentSelection.length === 0 && <div className="py-16 text-center opacity-20"><Star className="w-12 h-12 mx-auto mb-4" /><p className="text-[10px] font-black uppercase tracking-[0.3em]">Aguardando seleção</p></div>}
                           </div>
                         </main>
-
-                        <footer className="p-12 text-center space-y-6 border-t bg-muted/5 mt-auto shrink-0">
-                          {externalSiteUrl && (
-                            <div className="inline-flex h-10 px-6 rounded-full text-white text-[9px] font-black uppercase tracking-widest items-center shadow-lg" style={{ backgroundColor: themeColor }}>Site Oficial</div>
-                          )}
-                          <div className="flex flex-col items-center gap-2 opacity-30">
-                              <p className="text-[9px] font-bold uppercase tracking-widest">© {footerText || 'Minha Autoridade 2026'}</p>
-                              {showLogo && <span className="text-[7px] font-black uppercase tracking-[0.4em]">Powered by Proova</span>}
-                          </div>
-                        </footer>
                     </div>
                   </div>
               </div>
