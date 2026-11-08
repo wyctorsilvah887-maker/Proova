@@ -1,13 +1,13 @@
 rules_version = '2';
 
 // Regras de Segurança do Firebase Storage - Proova
-// Permite que consumidores enviem depoimentos em vídeo/foto e administradores gerenciem seus widgets.
+// Permite que consumidores enviem mídia pública e administradores gerenciem recursos da conta.
 
 service firebase.storage {
   match /b/{bucket}/o {
     
     // 1. Depoimentos em Vídeo e Foto (Público)
-    // Precisamos permitir 'read', 'create' e 'update' para que o upload anônimo funcione via SDK
+    // 'update' é necessário para o handshake de upload do SDK do Firebase.
     match /users/{userId}/testimonials_videos/{fileName} {
       allow read, create, update: if true;
     }
@@ -16,16 +16,15 @@ service firebase.storage {
       allow read, create, update: if true;
     }
 
-    // 2. Recursos de Widgets e Logos (Híbrido)
-    match /users/{userId}/widgets/{widgetId}/{allPaths=**} {
-      // Leitura é pública para exibição nos sites
+    // 2. Recursos de Conta, Widgets, Logos e Página Pública (Proprietário)
+    // Permitimos leitura pública para que os logos apareçam nos sites.
+    // A escrita é restrita apenas ao dono da conta autenticado.
+    match /users/{userId}/{allPaths=**} {
       allow read: if true;
-      
-      // Escrita apenas pelo proprietário autenticado
       allow write: if request.auth != null && request.auth.uid == userId;
     }
     
-    // 3. Proteção Padrão
+    // 3. Bloqueio padrão para segurança
     match /{allPaths=**} {
       allow read, write: if false;
     }
