@@ -8,10 +8,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { 
-  Star, CheckCircle2, MessageSquare, Loader2, Send, Video, MapPin, 
-  Globe, X, Camera, Square, SwitchCamera, Play, Clock, ArrowLeft, 
-  Shield, ImageIcon, Trash2, Image as ImageIconLucide, Building2,
-  Type
+  Star, CheckCircle2, MessageSquare, Loader2, Send, Video, 
+  Globe, X, Camera, ImageIcon, Trash2, Building2, Type, 
+  Play, Clock, MapPin
 } from 'lucide-react';
 import { useFirestore, useStorage } from '@/firebase';
 import { collection, query, where, getDocs, limit, doc } from 'firebase/firestore';
@@ -20,9 +19,7 @@ import { toast } from '@/hooks/use-toast';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
 import { submitTestimonialAction } from '@/app/actions/testimonial-actions';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { LoadingScreen } from '@/components/loading-screen';
-import { Badge } from '@/components/ui/badge';
 
 type CollectionMode = 'text' | 'photo' | 'video' | null;
 
@@ -44,23 +41,13 @@ export default function CollectionClient({ slug }: { slug: string }) {
   const [membershipStatus, setMembershipStatus] = useState<string | null>(null);
   const [activeMode, setActiveMode] = useState<CollectionMode>(null);
   
-  const [isVideoDialogOpen, setIsVideoDialogOpen] = useState(false);
-  const [isPhotoChoiceOpen, setIsPhotoChoiceOpen] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
   const [recordedVideoUrl, setRecordedVideoUrl] = useState<string | null>(null);
   const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
-  
   const [recordedPhotoUrl, setRecordedPhotoUrl] = useState<string | null>(null);
   const [photoBlob, setPhotoBlob] = useState<Blob | null>(null);
   
-  const [recordingSeconds, setRecordingSeconds] = useState(0);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const videoPreviewRef = useRef<HTMLVideoElement | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  
   const photoInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
 
   const [honeypot, setHoneypot] = useState('');
   const [loadTime] = useState(Date.now());
@@ -90,57 +77,6 @@ export default function CollectionClient({ slug }: { slug: string }) {
     findCompany();
   }, [db, slug]);
 
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    if (videoPreviewRef.current) videoPreviewRef.current.srcObject = null;
-  };
-
-  const startCamera = async (mode: 'user' | 'environment' = 'user') => {
-    stopCamera();
-    await new Promise(resolve => setTimeout(resolve, 150));
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: mode, width: { ideal: 1920 }, height: { ideal: 1080 } },
-        audio: true
-      });
-      streamRef.current = stream;
-      if (videoPreviewRef.current) videoPreviewRef.current.srcObject = stream;
-    } catch (err) {
-      toast({ variant: "destructive", title: "Câmera Não Detectada" });
-    }
-  };
-
-  const handleStartRecording = () => {
-    if (!streamRef.current) return;
-    const mediaRecorder = new MediaRecorder(streamRef.current);
-    mediaRecorderRef.current = mediaRecorder;
-    const chunks: BlobPart[] = [];
-    mediaRecorder.ondataavailable = (e) => e.data.size > 0 && chunks.push(e.data);
-    mediaRecorder.onstop = () => {
-      const blob = new Blob(chunks, { type: 'video/webm' });
-      setVideoBlob(blob);
-      setRecordedVideoUrl(URL.createObjectURL(blob));
-    };
-    mediaRecorder.start();
-    setIsRecording(true);
-    setRecordingSeconds(0);
-    timerRef.current = setInterval(() => {
-      setRecordingSeconds(s => s >= 29 ? (handleStopRecording(), 30) : s + 1);
-    }, 1000);
-  };
-
-  const handleStopRecording = () => {
-    if (mediaRecorderRef.current?.state === 'recording') {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-      if (timerRef.current) clearInterval(timerRef.current);
-      stopCamera();
-    }
-  };
-
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -148,7 +84,16 @@ export default function CollectionClient({ slug }: { slug: string }) {
       setRecordedPhotoUrl(URL.createObjectURL(file));
       setRecordedVideoUrl(null);
       setVideoBlob(null);
-      setIsPhotoChoiceOpen(false);
+    }
+  };
+
+  const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setVideoBlob(file);
+      setRecordedVideoUrl(URL.createObjectURL(file));
+      setRecordedPhotoUrl(null);
+      setPhotoBlob(null);
     }
   };
 
@@ -156,7 +101,6 @@ export default function CollectionClient({ slug }: { slug: string }) {
     if (honeypot || Date.now() - loadTime < 3000) return;
     if (rating === 0) { toast({ variant: "destructive", title: "Nota Obrigatória" }); return; }
     if (!userName.trim()) { toast({ variant: "destructive", title: "Identificação" }); return; }
-    if (!videoBlob && !photoBlob && !text.trim()) { toast({ variant: "destructive", title: "Mensagem Necessária" }); return; }
     
     if (!targetUserId) return;
     setIsSubmitting(true);
@@ -167,7 +111,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
     if (videoBlob) {
       try {
         const videoRef = ref(storage, `users/${targetUserId}/testimonials_videos/video_${Date.now()}.webm`);
-        await uploadBytes(videoRef, videoBlob, { contentType: 'video/webm' });
+        await uploadBytes(videoRef, videoBlob, { contentType: videoBlob.type });
         finalVideoUrl = await getDownloadURL(videoRef);
       } catch (err) {
         toast({ variant: "destructive", title: "Erro no Vídeo" });
@@ -179,7 +123,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
     if (photoBlob) {
       try {
         const photoRef = ref(storage, `users/${targetUserId}/testimonials_photos/photo_${Date.now()}.jpg`);
-        await uploadBytes(photoRef, photoBlob, { contentType: 'image/jpeg' });
+        await uploadBytes(photoRef, photoBlob, { contentType: photoBlob.type });
         finalPhotoUrl = await getDownloadURL(photoRef);
       } catch (err) {
         toast({ variant: "destructive", title: "Erro na Foto" });
@@ -190,7 +134,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
 
     const result = await submitTestimonialAction({
       targetUserId, 
-      destination: 'public', // Por padrão enviamos para público nesta tela simplificada
+      destination: 'public',
       userName, 
       userEmail, 
       rating, 
@@ -233,7 +177,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
                 </Button>
               </div>
             )}
-            <Button variant="ghost" onClick={() => { setSubmitted(false); setRecordedVideoUrl(null); setRecordedPhotoUrl(null); setActiveMode(null); }} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary">Enviar outro depoimento</Button>
+            <Button variant="ghost" onClick={() => { setSubmitted(false); setRecordedVideoUrl(null); setRecordedPhotoUrl(null); setActiveMode(null); setRating(0); }} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary">Enviar outro depoimento</Button>
           </CardContent>
         </Card>
         
@@ -249,11 +193,21 @@ export default function CollectionClient({ slug }: { slug: string }) {
   }
 
   const isEnterprise = membershipStatus === 'enterprise';
+  
+  // Lógica de visibilidade do formulário:
+  // - Modo 'text': aparece sempre
+  // - Modo 'photo': aparece só quando recordedPhotoUrl existe
+  // - Modo 'video': aparece só quando recordedVideoUrl existe
+  const shouldShowForm = activeMode === 'text' || (activeMode === 'photo' && recordedPhotoUrl) || (activeMode === 'video' && recordedVideoUrl);
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col items-center p-4 font-body text-foreground overflow-x-hidden">
       <div className="fixed top-4 right-4 z-[50]"><ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent focus:bg-transparent" /></div>
       
+      {/* Inputs Nativos Invisíveis */}
+      <input type="file" ref={photoInputRef} accept="image/*" className="sr-only" onChange={handlePhotoSelect} />
+      <input type="file" ref={videoInputRef} accept="video/*" className="sr-only" onChange={handleVideoSelect} />
+
       <div className="w-full max-w-xl flex-1 flex flex-col justify-start py-10 md:py-20 space-y-8">
         <header className="text-center space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
           <div className="mx-auto w-20 h-20 rounded-[2rem] bg-primary/10 flex items-center justify-center text-primary shadow-inner">
@@ -261,12 +215,11 @@ export default function CollectionClient({ slug }: { slug: string }) {
           </div>
           <div className="space-y-1">
             <h1 className="text-3xl md:text-4xl font-black font-headline tracking-tighter">{companyNameDisplay}</h1>
-            <p className="text-muted-foreground text-xs md:text-sm font-medium px-4">O que você achou do nosso atendimento hoje?</p>
+            <p className="text-muted-foreground text-xs md:text-sm font-medium px-4">Como foi sua experiência com a gente?</p>
           </div>
         </header>
 
         <section className="space-y-6">
-          {/* Estrelas sempre no topo do card ou fora dele para destaque */}
           <div className="flex justify-center gap-2">
             {[1, 2, 3, 4, 5].map((star) => (
               <button 
@@ -284,9 +237,9 @@ export default function CollectionClient({ slug }: { slug: string }) {
 
           <div className="grid grid-cols-3 gap-3">
             {[
-              { id: 'text', label: 'Texto', icon: Type },
-              { id: 'photo', label: 'Foto', icon: ImageIconLucide, premium: true },
-              { id: 'video', label: 'Vídeo', icon: Video, premium: true },
+              { id: 'text', label: 'Texto', icon: Type, onClick: () => setActiveMode('text') },
+              { id: 'photo', label: 'Foto', icon: Camera, premium: true, onClick: () => photoInputRef.current?.click() || setActiveMode('photo') },
+              { id: 'video', label: 'Vídeo', icon: Video, premium: true, onClick: () => videoInputRef.current?.click() || setActiveMode('video') },
             ].map((opt) => {
               const isLocked = opt.premium && !isEnterprise;
               return (
@@ -295,8 +248,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
                   disabled={isLocked}
                   onClick={() => {
                     setActiveMode(opt.id as CollectionMode);
-                    if (opt.id === 'photo') setIsPhotoChoiceOpen(true);
-                    if (opt.id === 'video') { setIsVideoDialogOpen(true); startCamera(); }
+                    opt.onClick();
                   }}
                   className={cn(
                     "h-24 rounded-2xl flex flex-col items-center justify-center gap-2 border-2 transition-all active:scale-95 group",
@@ -314,7 +266,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
           </div>
         </section>
 
-        {activeMode && (
+        {shouldShowForm && (
           <Card className="shadow-2xl border-none overflow-hidden bg-card rounded-[2.5rem] animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="h-1.5 bg-primary w-full" />
             <CardContent className="px-6 md:px-10 py-10 space-y-8">
@@ -323,7 +275,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
 
                 {/* Preview de Mídia se houver */}
                 {(recordedVideoUrl || recordedPhotoUrl) && (
-                  <div className="relative rounded-2xl overflow-hidden border-2 border-primary/20 bg-muted/10 group">
+                  <div className="relative rounded-2xl overflow-hidden border-2 border-primary/20 bg-muted/10 group animate-in zoom-in duration-300">
                     <div className="aspect-video">
                         {recordedVideoUrl ? (
                           <video src={recordedVideoUrl} className="w-full h-full object-cover" controls />
@@ -336,7 +288,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
                           size="icon" 
                           variant="destructive" 
                           className="h-8 w-8 rounded-full shadow-lg"
-                          onClick={() => { setRecordedVideoUrl(null); setVideoBlob(null); setRecordedPhotoUrl(null); setPhotoBlob(null); }}
+                          onClick={() => { setRecordedVideoUrl(null); setVideoBlob(null); setRecordedPhotoUrl(null); setPhotoBlob(null); setActiveMode(null); }}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -382,83 +334,6 @@ export default function CollectionClient({ slug }: { slug: string }) {
            </div>
         </footer>
       </div>
-
-      {/* Diálogos de Mídia */}
-      <Dialog open={isVideoDialogOpen} onOpenChange={(o) => !o && (stopCamera(), setIsVideoDialogOpen(false))}>
-        <DialogContent className="fixed inset-0 m-0 h-screen w-screen max-w-none bg-black border-none p-0 flex flex-col z-[101] [&>button]:hidden">
-          <DialogHeader className="sr-only">
-            <DialogTitle>Gravação de Vídeo Depoimento</DialogTitle>
-          </DialogHeader>
-          <div className="relative flex-1 flex items-center justify-center">
-            {recordedVideoUrl ? (
-              <video src={recordedVideoUrl} controls className="w-full h-full object-contain" />
-            ) : (
-              <video ref={videoPreviewRef} autoPlay muted playsInline className="w-full h-full object-cover scale-x-[-1]" />
-            )}
-            
-            <div className="absolute inset-x-0 bottom-12 flex flex-col items-center gap-8">
-              {!recordedVideoUrl ? (
-                <div className="flex flex-col items-center gap-4">
-                   {isRecording && (
-                     <div className="bg-red-600/90 text-white px-4 py-1.5 rounded-full font-black text-xs uppercase tracking-widest animate-pulse flex items-center gap-2">
-                        <div className="h-2 w-2 rounded-full bg-white" /> 00:{recordingSeconds < 10 ? `0${recordingSeconds}` : recordingSeconds} / 00:30
-                     </div>
-                   )}
-                   <Button size="lg" className={cn("h-24 w-24 rounded-full shadow-2xl transition-all active:scale-90 border-8 border-white/20", isRecording ? "bg-white" : "bg-red-600")} onClick={isRecording ? handleStopRecording : handleStartRecording}>
-                     {isRecording ? <Square className="w-8 h-8 fill-red-600 text-red-600" /> : <div className="h-8 w-8 rounded-full bg-white" />}
-                   </Button>
-                   <p className="text-white/60 font-bold text-[10px] uppercase tracking-widest">{isRecording ? "Toque para finalizar" : "Toque para gravar"}</p>
-                </div>
-              ) : (
-                <div className="flex gap-4 p-6 bg-black/40 backdrop-blur-xl rounded-[2.5rem] border border-white/10 shadow-2xl">
-                   <Button variant="outline" className="h-14 px-10 rounded-2xl text-white border-white/20 hover:bg-white/10 font-black uppercase tracking-widest text-[10px]" onClick={() => { setRecordedVideoUrl(null); setVideoBlob(null); startCamera(); }}>Refazer</Button>
-                   <Button className="h-14 px-10 rounded-2xl bg-white text-black hover:bg-zinc-100 font-black uppercase tracking-widest text-[10px]" onClick={() => setIsVideoDialogOpen(false)}>Usar este Vídeo</Button>
-                </div>
-              )}
-            </div>
-
-            <Button variant="ghost" className="absolute top-8 right-8 text-white h-12 w-12 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20" onClick={() => { stopCamera(); setIsVideoDialogOpen(false); }}>
-               <X className="w-6 h-6" />
-            </Button>
-
-            {!recordedVideoUrl && !isRecording && (
-               <div className="absolute top-8 left-8">
-                  <Button variant="ghost" className="text-white gap-2 font-black uppercase tracking-widest text-[10px]" onClick={() => startCamera(streamRef.current?.getVideoTracks()[0].getSettings().facingMode === 'user' ? 'environment' : 'user')}>
-                     <SwitchCamera className="w-5 h-5" /> Inverter
-                  </Button>
-               </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={isPhotoChoiceOpen} onOpenChange={setIsPhotoChoiceOpen}>
-        <DialogContent className="rounded-[2.5rem] w-[90vw] max-w-sm border-none shadow-2xl p-0 overflow-hidden bg-background">
-          <DialogHeader className="p-8 pb-2 text-center">
-            <DialogTitle className="text-xl font-black uppercase">Adicionar Foto</DialogTitle>
-          </DialogHeader>
-          <div className="p-6 space-y-4">
-             <Button 
-               className="w-full h-16 rounded-2xl font-black uppercase tracking-widest gap-3 bg-primary"
-               onClick={() => cameraInputRef.current?.click()}
-             >
-                <Camera className="w-5 h-5" /> Tirar Foto
-             </Button>
-             <Button 
-               variant="outline" 
-               className="w-full h-16 rounded-2xl font-black uppercase tracking-widest gap-3 border-primary/20 text-primary"
-               onClick={() => photoInputRef.current?.click()}
-             >
-                <ImageIcon className="w-5 h-5" /> Abrir Galeria
-             </Button>
-          </div>
-          <div className="p-4 bg-muted/30 border-t text-center">
-             <Button variant="ghost" className="text-[10px] font-black uppercase text-muted-foreground" onClick={() => setIsPhotoChoiceOpen(false)}>Cancelar</Button>
-          </div>
-          <input type="file" ref={photoInputRef} accept="image/*" className="hidden" onChange={handlePhotoSelect} />
-          <input type="file" ref={cameraInputRef} accept="image/*" capture="environment" className="hidden" onChange={handlePhotoSelect} />
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
