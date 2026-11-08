@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState } from 'react';
@@ -88,6 +87,26 @@ export default function PrivateInboxPage() {
     if (status === 'expired') return 'EXPIRADO';
     return 'PLANO BASE';
   }, [userData]);
+
+  const testimonialsPendingQuery = useMemo(() => {
+    if (!db || !user) return null;
+    return query(
+      collection(db, 'users', user.uid, 'testimonials'), 
+      where('status', '==', 'pending'),
+      orderBy('createdAt', 'desc')
+    );
+  }, [db, user]);
+
+  const privateFeedbacksQuery = useMemo(() => {
+    if (!db || !user) return null;
+    return query(
+      collection(db, 'users', user.uid, 'private_feedbacks'),
+      orderBy('createdAt', 'desc')
+    );
+  }, [db, user]);
+
+  const { data: pendingList, loading: pendingLoading } = useCollection(testimonialsPendingQuery);
+  const { data: feedbackList, loading: feedbackLoading } = useCollection(privateFeedbacksQuery);
 
   const handleApproveTestimonial = async (id: string) => {
     if (!db || !user || isProcessing) return;
@@ -190,7 +209,7 @@ export default function PrivateInboxPage() {
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
               <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
-              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </Link>
         </div>
@@ -265,18 +284,89 @@ export default function PrivateInboxPage() {
               <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight flex items-center gap-3">
                 <Inbox className="w-8 h-8 text-primary" /> Moderação Unificada
               </h1>
-              <p className="text-sm text-muted-foreground">Gerencie tudo o que entra na sua marca.</p>
+              <p className="text-sm text-muted-foreground font-medium">Gerencie tudo o que entra na sua marca.</p>
             </div>
           </div>
         </header>
 
-        {/* Tabs and list... */}
+        <Tabs defaultValue="curatorship" className="w-full">
+           <TabsList className="bg-background border rounded-2xl h-14 p-1 gap-2">
+              <TabsTrigger value="curatorship" className="flex-1 rounded-xl text-[10px] font-black uppercase tracking-widest gap-2">
+                 <Sparkles className="w-4 h-4" /> Curadoria
+                 {pendingList && pendingList.length > 0 && <Badge className="bg-primary text-white border-none text-[8px] h-4 px-1">{pendingList.length}</Badge>}
+              </TabsTrigger>
+              <TabsTrigger value="inbox" className="flex-1 rounded-xl text-[10px] font-black uppercase tracking-widest gap-2">
+                 <MessageSquareOff className="w-4 h-4" /> Inbox Privado
+                 {feedbackList && feedbackList.length > 0 && <Badge variant="secondary" className="text-[8px] h-4 px-1">{feedbackList.length}</Badge>}
+              </TabsTrigger>
+           </TabsList>
+
+           <TabsContent value="curatorship" className="pt-8 space-y-4">
+              <div className="space-y-1 mb-6">
+                <h3 className="text-sm font-black uppercase tracking-widest">Fila de Aprovação Inteligente</h3>
+                <p className="text-xs text-muted-foreground font-medium">Elogios qualificados que ainda não estão no seu site.</p>
+              </div>
+
+              {pendingLoading ? <div className="flex justify-center py-20"><Loader2 className="animate-spin h-10 w-10 text-primary/30" /></div> : (pendingList || []).length === 0 ? (
+                <Card className="p-16 text-center border-2 border-dashed rounded-[2.5rem] opacity-30 bg-muted/20">
+                   <CheckCircle2 className="w-12 h-12 mx-auto mb-4 text-green-500" />
+                   <p className="text-xs font-bold uppercase tracking-widest">Tudo em dia! Sem pendências.</p>
+                </Card>
+              ) : pendingList?.map((t: any) => (
+                <Card key={t.id} className="rounded-[2rem] border-none shadow-sm overflow-hidden p-6 md:p-8 space-y-6">
+                   <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                         <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-xs uppercase">{t.userName?.substring(0,2)}</div>
+                         <div><p className="font-bold text-sm">{t.userName}</p><p className="text-[10px] text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />{t.createdAt?.toDate?.().toLocaleDateString('pt-BR')}</p></div>
+                      </div>
+                      <div className="flex gap-1">{[1,2,3,4,5].map(s => <Star key={s} className={cn("w-3.5 h-3.5", s <= t.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20")} />)}</div>
+                   </div>
+                   <p className="text-sm italic leading-relaxed text-foreground/80">"{t.text}"</p>
+                   <div className="flex gap-3 pt-2">
+                      <Button onClick={() => handleApproveTestimonial(t.id)} disabled={!!isProcessing} className="flex-1 h-12 rounded-xl font-black uppercase tracking-widest text-[10px] bg-primary hover:bg-primary/90">{isProcessing === t.id ? <Loader2 className="animate-spin" /> : "Aprovar e Publicar"}</Button>
+                      <Button variant="ghost" onClick={() => handleArchiveTestimonial(t.id)} disabled={!!isProcessing} className="h-12 w-12 rounded-xl text-destructive hover:bg-destructive/10"><Trash2 className="w-5 h-5" /></Button>
+                   </div>
+                </Card>
+              ))}
+           </TabsContent>
+
+           <TabsContent value="inbox" className="pt-8 space-y-4">
+              <div className="space-y-1 mb-6">
+                <h3 className="text-sm font-black uppercase tracking-widest">Reputation Shield Ativo</h3>
+                <p className="text-xs text-muted-foreground font-medium">Feedbacks críticos ou sigilosos enviados diretamente para você.</p>
+              </div>
+
+              {feedbackLoading ? <div className="flex justify-center py-20"><Loader2 className="animate-spin h-10 w-10 text-primary/30" /></div> : (feedbackList || []).length === 0 ? (
+                <Card className="p-16 text-center border-2 border-dashed rounded-[2.5rem] opacity-30 bg-muted/20">
+                   <Inbox className="w-12 h-12 mx-auto mb-4" />
+                   <p className="text-xs font-bold uppercase tracking-widest">Nenhum feedback privado no momento</p>
+                </Card>
+              ) : feedbackList?.map((f: any) => (
+                <Card key={f.id} className="rounded-[2.5rem] border-none shadow-sm overflow-hidden p-6 md:p-8 space-y-6">
+                   <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                         <div className="h-10 w-10 rounded-2xl bg-muted flex items-center justify-center text-muted-foreground"><User className="w-5 h-5" /></div>
+                         <div><p className="font-bold text-sm">{f.userName}</p><p className="text-[10px] text-muted-foreground font-medium">{f.userEmail || 'E-mail não informado'}</p></div>
+                      </div>
+                      <Badge variant={f.rating <= 3 ? "destructive" : "secondary"} className="text-[8px] font-black uppercase h-5">{f.rating} Estrelas</Badge>
+                   </div>
+                   <div className="p-4 rounded-2xl bg-muted/30 border border-muted">
+                      <p className="text-sm leading-relaxed font-medium italic">"{f.text}"</p>
+                   </div>
+                   <div className="flex gap-3 pt-2">
+                      <Button variant="outline" onClick={() => handlePromoteToPublic(f)} disabled={!!isProcessing} className="flex-1 h-12 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2">{isProcessing === f.id ? <Loader2 className="animate-spin" /> : <Globe className="w-3.5 h-3.5" />} Promover a Público</Button>
+                      <Button variant="ghost" onClick={() => handleDeleteFeedback(f.id)} className="h-12 w-12 rounded-xl text-destructive hover:bg-destructive/10"><Trash2 className="w-5 h-5" /></Button>
+                   </div>
+                </Card>
+              ))}
+           </TabsContent>
+        </Tabs>
       </main>
 
       <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
         <div className="flex items-center gap-2 relative w-[220px] h-[75px] md:w-[340px] md:h-[105px]">
           <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority />
-          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority />
+          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority />
         </div>
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>

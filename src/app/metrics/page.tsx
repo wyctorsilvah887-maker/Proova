@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState } from 'react';
@@ -232,7 +231,7 @@ export default function MetricsPage() {
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[160px] h-[52px] md:w-[240px] md:h-[78px] transition-transform group-hover:scale-105">
               <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
-              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </Link>
         </div>
@@ -461,13 +460,61 @@ export default function MetricsPage() {
           </div>
         </section>
 
-        {/* Charts and footer... */}
+        {/* Section 3: Charts */}
+        <section className="grid gap-6 md:grid-cols-2">
+          <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden">
+             <CardHeader className="p-6 pb-0">
+                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Volume de Coleta (30 dias)</CardTitle>
+             </CardHeader>
+             <CardContent className="p-6 h-[300px]">
+                <ChartContainer config={chartConfig} className="h-full w-full">
+                   <BarChart data={stats.chartData}>
+                      <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.1} />
+                      <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 10, fontWeight: 700 }} dy={10} />
+                      <YAxis hide />
+                      <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+                      <Bar dataKey="count" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} barSize={20} />
+                   </BarChart>
+                </ChartContainer>
+             </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden">
+             <CardHeader className="p-6 pb-0">
+                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Qualidade do Feedback</CardTitle>
+             </CardHeader>
+             <CardContent className="p-6 h-[300px] flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={stats.pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={60}
+                      outerRadius={80}
+                      paddingAngle={5}
+                      dataKey="value"
+                    >
+                      {stats.pieData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+                <div className="absolute flex flex-col items-center">
+                   <p className="text-2xl font-black">{stats.avgRating}</p>
+                   <p className="text-[8px] font-bold uppercase opacity-40">Score</p>
+                </div>
+             </CardContent>
+          </Card>
+        </section>
       </main>
 
       <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
         <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[105px]">
           <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority />
-          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority />
+          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority />
         </div>
         <p className="text-[9px] text-muted-foreground uppercase font-black opacity-60">© 2026 Proova Technology - Business Intelligence v1.1</p>
       </footer>

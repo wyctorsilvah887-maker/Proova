@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -97,7 +96,7 @@ export default function SocialCardsPage() {
           <div className="flex items-center group -ml-2">
             <div className="relative w-[160px] h-[55px] md:w-[320px] md:h-[105px]">
               <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
-              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </div>
         </div>
@@ -157,13 +156,16 @@ export default function SocialCardsPage() {
       </header>
 
       <main className="flex-1 p-4 md:p-12 space-y-8 max-w-7xl mx-auto w-full pt-24 md:pt-40">
-        {/* Social Cards content... */}
+        <div className="flex flex-col gap-4 text-center max-w-3xl mx-auto">
+           <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">Social Cards Studio</h1>
+           <p className="text-muted-foreground text-sm md:text-lg font-medium leading-relaxed">Crie artes profissionais para seu Instagram a partir dos seus melhores elogios.</p>
+        </div>
       </main>
 
       <footer className="py-20 border-t bg-background/50 text-center flex flex-col items-center gap-8">
         <div className="relative w-[180px] h-[60px]">
            <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="dark:hidden object-contain opacity-40 grayscale" />
-           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="hidden dark:block object-contain opacity-40 grayscale" />
+           <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="hidden dark:block object-contain opacity-40 grayscale" />
         </div>
         <p className="text-[9px] text-muted-foreground uppercase font-black tracking-[0.3em]">© 2026 Proova Technology - Creative Studio</p>
       </footer>

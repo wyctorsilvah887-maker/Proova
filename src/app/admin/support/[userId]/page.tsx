@@ -112,7 +112,7 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
         const snap = await getDocs(q);
         if (!snap.empty) {
           await updateDoc(snap.docs[0].ref, { 
-            isSupportInChat: false,
+            isSupportInChat: false, 
             isSupportTyping: false 
           });
         }

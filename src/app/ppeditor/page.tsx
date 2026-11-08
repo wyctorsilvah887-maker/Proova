@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -308,7 +307,317 @@ const PublicPageSettings = ({
         
         <ScrollArea className="flex-1">
           <div className="p-4 space-y-8 pb-10">
-            {/* Tab contents... */}
+             <TabsContent value="geral" className="mt-0 space-y-8">
+                <section className="space-y-4">
+                  <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Foto de Capa / Logo</Label>
+                  <div className="flex items-center gap-4">
+                    <div className={cn(
+                      "w-20 h-20 rounded-3xl border-2 border-dashed border-primary/20 flex items-center justify-center bg-primary/5 overflow-hidden group cursor-pointer relative",
+                      isUploading && "opacity-50"
+                    )} onClick={() => logoInputRef.current?.click()}>
+                      {logoUrl ? <Image src={logoUrl} alt="Logo" fill className="object-cover" /> : <Upload className="w-6 h-6 text-primary" />}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                         <Palette className="w-4 h-4 text-white" />
+                      </div>
+                      <input type="file" ref={logoInputRef} className="hidden" accept="image/*" onChange={(e) => onFileSelect(e, 'logo')} />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <p className="text-xs font-bold">Identidade Visual</p>
+                      <p className="text-[10px] text-muted-foreground leading-tight">Escolha uma foto quadrada (1:1) para sua vitrine.</p>
+                      {logoUrl && <button onClick={() => setLogoUrl('')} className="text-[10px] font-black uppercase text-destructive hover:underline pt-1">Remover</button>}
+                    </div>
+                  </div>
+                </section>
+
+                <section className="space-y-4">
+                   <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Paleta de Cores</Label>
+                   <div className="flex flex-wrap gap-2">
+                     {colors.map(c => (
+                       <button key={c} onClick={() => setThemeColor(c)} className={cn("w-8 h-8 rounded-full border-2 transition-all hover:scale-110", themeColor === c ? "border-primary scale-110 ring-2 ring-primary/20" : "border-transparent")} style={{ backgroundColor: c }} />
+                     ))}
+                     <div className="relative group">
+                       <input type="color" value={themeColor} onChange={(e) => setThemeColor(e.target.value)} className="w-8 h-8 rounded-full border-2 border-transparent cursor-pointer overflow-hidden p-0 opacity-0 absolute inset-0" />
+                       <div className="w-8 h-8 rounded-full border-2 border-dashed border-primary/40 flex items-center justify-center bg-muted/20 group-hover:bg-primary/10 transition-colors pointer-events-none"><Plus className="w-4 h-4 text-primary" /></div>
+                     </div>
+                   </div>
+                </section>
+
+                <section className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Link da Página</Label>
+                    {!isGoldPlan && <Lock className="w-3 h-3 text-muted-foreground opacity-40" />}
+                  </div>
+                  <div className="flex items-center gap-1 bg-muted/20 rounded-xl px-3 border border-transparent focus-within:ring-2 focus-within:ring-primary/20 transition-all opacity-80">
+                    <span className="text-[10px] font-bold opacity-40">/pp/</span>
+                    <input 
+                      disabled={!isGoldPlan}
+                      value={currentSlug} 
+                      onChange={(e) => setSlugEdit(e.target.value.toLowerCase().replace(/\s+/g, '-'))} 
+                      className="h-10 flex-1 bg-transparent border-none focus:ring-0 text-xs font-mono" 
+                    />
+                  </div>
+                  {!isGoldPlan && <p className="text-[9px] text-muted-foreground italic font-medium">Troca de slug disponível apenas nos planos pagos.</p>}
+                </section>
+             </TabsContent>
+
+             <TabsContent value="conteudo" className="mt-0 space-y-8">
+               {!isGoldPlan ? (
+                 <div className="p-8 text-center bg-primary/5 rounded-[2rem] border-2 border-dashed border-primary/20 space-y-4">
+                   <div className="mx-auto w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary"><Gem className="w-6 h-6" /></div>
+                   <h4 className="text-sm font-black uppercase tracking-tight">Conteúdo Customizado Premium</h4>
+                   <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">Assine o plano Gold para liberar edição rica com cores, fontes e seções ilimitadas na sua página.</p>
+                   <Button onClick={() => router.push('/pricing')} className="h-10 px-6 rounded-xl font-black uppercase tracking-widest text-[9px] bg-primary shadow-lg">Ver Planos</Button>
+                 </div>
+               ) : (
+                 <div className="space-y-6">
+                    <section className="space-y-3">
+                      <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Título da Seção Herói (Principal)</Label>
+                      <RichTextEditor value={heroTitle} onChange={setHeroTitle} allowColor={isGoldPlan} placeholder="Ex: O que dizem sobre nossa marca" />
+                    </section>
+                    <section className="space-y-3">
+                      <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Subtítulo Herói</Label>
+                      <RichTextEditor value={heroSubtitle} onChange={setHeroSubtitle} allowColor={isGoldPlan} placeholder="Ex: Milhares de clientes satisfeitos pelo Brasil" />
+                    </section>
+                    <section className="space-y-3">
+                      <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Título da Seção de Depoimentos</Label>
+                      <Input value={testimonialsTitle} onChange={(e) => setTestimonialsTitle(e.target.value)} placeholder="Ex: Relatos Reais" className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs font-bold" />
+                    </section>
+
+                    <section className="space-y-4 pt-4">
+                       <div className="flex items-center justify-between">
+                          <h4 className="text-[10px] font-black uppercase tracking-widest">Seções Personalizadas</h4>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => setCustomSections([...customSections, { id: Date.now().toString(), title: 'Nova Seção', subtitle: '', content: 'Conteúdo da seção...', buttonText: '', buttonUrl: '', variant: 'light' }])}
+                            className="h-8 rounded-lg text-[9px] font-black uppercase gap-1.5"
+                          >
+                            <Plus className="w-3.5 h-3.5" /> Adicionar Seção
+                          </Button>
+                       </div>
+                       
+                       <Accordion type="single" collapsible className="space-y-2">
+                         {customSections.map((section, index) => (
+                           <AccordionItem key={section.id} value={section.id} className="border bg-muted/10 rounded-2xl px-4 overflow-hidden">
+                             <AccordionTrigger className="hover:no-underline text-xs font-black uppercase tracking-tight py-4">
+                               Seção {index + 1}: {section.title.replace(/<[^>]*>?/gm, '').substring(0, 20)}...
+                             </AccordionTrigger>
+                             <AccordionContent className="space-y-4 pb-6">
+                                <div className="space-y-2">
+                                   <Label className="text-[9px] font-black uppercase">Título da Seção</Label>
+                                   <Input value={section.title} onChange={(e) => {
+                                      const newSections = [...customSections];
+                                      newSections[index].title = e.target.value;
+                                      setCustomSections(newSections);
+                                   }} className="h-10 rounded-xl" />
+                                </div>
+                                <div className="space-y-2">
+                                   <Label className="text-[9px] font-black uppercase">Subtítulo</Label>
+                                   <RichTextEditor value={section.subtitle} onChange={(val) => {
+                                      const newSections = [...customSections];
+                                      newSections[index].subtitle = val;
+                                      setCustomSections(newSections);
+                                   }} allowColor={isGoldPlan} placeholder="Subtítulo opcional" />
+                                </div>
+                                <div className="space-y-2">
+                                   <Label className="text-[9px] font-black uppercase">Texto de Conteúdo</Label>
+                                   <Textarea value={section.content} onChange={(e) => {
+                                      const newSections = [...customSections];
+                                      newSections[index].content = e.target.value;
+                                      setCustomSections(newSections);
+                                   }} className="rounded-xl min-h-[100px]" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                   <div className="space-y-2">
+                                      <Label className="text-[9px] font-black uppercase">Texto Botão</Label>
+                                      <Input value={section.buttonText} onChange={(e) => {
+                                         const newSections = [...customSections];
+                                         newSections[index].buttonText = e.target.value;
+                                         setCustomSections(newSections);
+                                      }} placeholder="Opcional" className="h-10 rounded-xl" />
+                                   </div>
+                                   <div className="space-y-2">
+                                      <Label className="text-[9px] font-black uppercase">URL Botão</Label>
+                                      <Input value={section.buttonUrl} onChange={(e) => {
+                                         const newSections = [...customSections];
+                                         newSections[index].buttonUrl = e.target.value;
+                                         setCustomSections(newSections);
+                                      }} placeholder="https://..." className="h-10 rounded-xl" />
+                                   </div>
+                                </div>
+                                <div className="space-y-2">
+                                   <Label className="text-[9px] font-black uppercase">Estilo Visual</Label>
+                                   <Select value={section.variant} onValueChange={(val: any) => {
+                                      const newSections = [...customSections];
+                                      newSections[index].variant = val;
+                                      setCustomSections(newSections);
+                                   }}>
+                                      <SelectTrigger className="h-10 rounded-xl">
+                                         <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                         <SelectItem value="light">Claro (Padrão)</SelectItem>
+                                         <SelectItem value="dark">Escuro (Inverso)</SelectItem>
+                                         <SelectItem value="accent">Destaque (Cor da Marca)</SelectItem>
+                                      </SelectContent>
+                                   </Select>
+                                </div>
+                                <Button 
+                                  variant="ghost" 
+                                  onClick={() => setCustomSections(customSections.filter((_, i) => i !== index))}
+                                  className="w-full h-10 rounded-xl text-destructive hover:bg-destructive/10 text-[9px] font-black uppercase gap-2"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" /> Remover Esta Seção
+                                </Button>
+                             </AccordionContent>
+                           </AccordionItem>
+                         ))}
+                       </Accordion>
+                    </section>
+                 </div>
+               )}
+             </TabsContent>
+
+             <TabsContent value="automacao" className="mt-0 space-y-8">
+               {!isEnterprise ? (
+                 <div className="p-8 text-center bg-orange-500/5 rounded-[2rem] border-2 border-dashed border-orange-500/20 space-y-4">
+                   <div className="mx-auto w-12 h-12 bg-orange-500/10 rounded-2xl flex items-center justify-center text-orange-600"><Zap className="w-6 h-6" /></div>
+                   <h4 className="text-sm font-black uppercase tracking-tight">Fluxos Hands-Free VIP</h4>
+                   <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">O plano Enterprise permite que o Proova publique elogios automaticamente baseados em suas regras de nota e tamanho de texto.</p>
+                   <Button onClick={() => router.push('/pricing')} className="h-10 px-6 rounded-xl font-black uppercase tracking-widest text-[9px] bg-orange-500 hover:bg-orange-600 shadow-lg text-white">Fazer Upgrade</Button>
+                 </div>
+               ) : (
+                 <div className="space-y-6">
+                    <section className="space-y-4">
+                       <div className="flex items-center justify-between p-4 rounded-2xl bg-muted/20">
+                          <div className="space-y-1">
+                             <p className="text-xs font-black uppercase tracking-tight">Auto-Publish Ativo</p>
+                             <p className="text-[9px] text-muted-foreground font-medium">Publicar automaticamente elogios qualificados.</p>
+                          </div>
+                          <Switch checked={autoPublishEnabled} onCheckedChange={setAutoPublishEnabled} />
+                       </div>
+
+                       {autoPublishEnabled && (
+                         <div className="space-y-6 p-4 rounded-2xl border-2 border-dashed border-primary/20 animate-in fade-in slide-in-from-top-2 duration-500">
+                            <div className="space-y-3">
+                               <div className="flex justify-between text-[10px] font-black uppercase opacity-60">
+                                  <span>Nota Mínima</span>
+                                  <span className="text-primary">{autoPublishMinRating} Estrelas</span>
+                               </div>
+                               <Slider value={[autoPublishMinRating]} min={1} max={5} step={1} onValueChange={(val) => setAutoPublishMinRating(val[0])} />
+                            </div>
+                            <div className="space-y-3">
+                               <div className="flex justify-between text-[10px] font-black uppercase opacity-60">
+                                  <span>Tamanho Mínimo</span>
+                                  <span className="text-primary">{autoPublishMinChars} Caracteres</span>
+                               </div>
+                               <Slider value={[autoPublishMinChars]} min={0} max={200} step={10} onValueChange={(val) => setAutoPublishMinChars(val[0])} />
+                            </div>
+                            <p className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground bg-muted/30 p-3 rounded-lg leading-relaxed">
+                               ✨ O sistema publicará instantaneamente elogios com {autoPublishMinRating} ou mais estrelas e que possuam pelo menos {autoPublishMinChars} caracteres de texto.
+                            </p>
+                         </div>
+                       )}
+                    </section>
+                 </div>
+               )}
+             </TabsContent>
+
+             <TabsContent value="design" className="mt-0 space-y-8">
+                <section className="space-y-4">
+                   <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Layout dos Depoimentos</Label>
+                   <div className="grid grid-cols-2 gap-3">
+                     {[
+                       { id: 'grid', label: 'Grade VIP', icon: LayoutGrid, desc: 'Visualização clássica e robusta' },
+                       { id: 'mural', label: 'Mural Masonry', icon: Layout, desc: 'Estilo dinâmico estilo Pinterest' },
+                       { id: 'carousel', label: 'Carrossel', icon: Play, desc: 'Foco um a um (Horizontal)' },
+                       { id: 'popup', label: 'Destaque Único', icon: MessageCircle, desc: 'Apenas o melhor elogio por vez' },
+                     ].map(l => (
+                       <button 
+                         key={l.id} 
+                         onClick={() => setLayout(l.id as LayoutType)}
+                         className={cn(
+                           "flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all gap-2 text-center",
+                           layout === l.id ? "bg-primary/5 border-primary shadow-inner" : "bg-muted/20 border-transparent hover:border-primary/20"
+                         )}
+                       >
+                         <l.icon className={cn("w-6 h-6", layout === l.id ? "text-primary" : "text-muted-foreground")} />
+                         <div className="space-y-0.5">
+                            <p className="text-[10px] font-black uppercase tracking-tight">{l.label}</p>
+                            <p className="text-[8px] opacity-60 font-medium leading-none">{l.desc}</p>
+                         </div>
+                       </button>
+                     ))}
+                   </div>
+                </section>
+                
+                <section className="space-y-4">
+                  <div className="flex items-center justify-between p-4 rounded-2xl bg-muted/20">
+                    <div className="space-y-1">
+                      <p className="text-xs font-black uppercase tracking-tight">Cores Dinâmicas Secundárias</p>
+                      <p className="text-[9px] text-muted-foreground font-medium">Ativa efeitos de borda e brilho contrastante.</p>
+                    </div>
+                    <div className="relative group">
+                       <input type="color" value={secondaryColor || '#ffffff'} onChange={(e) => setSecondaryColor(e.target.value)} className="w-8 h-8 rounded-full border-2 border-transparent cursor-pointer" />
+                    </div>
+                  </div>
+                  {secondaryColor && <button onClick={() => setSecondaryColor('')} className="text-[9px] font-black uppercase text-destructive ml-1">Desativar Efeito Secundário</button>}
+                </section>
+             </TabsContent>
+
+             <TabsContent value="social" className="mt-0 space-y-8">
+                <section className="space-y-4">
+                   <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                         <MessageCircle className="w-4 h-4 text-green-500" />
+                         <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Botão WhatsApp</Label>
+                      </div>
+                      <Switch checked={whatsappEnabled} onCheckedChange={setWhatsappEnabled} />
+                   </div>
+                   {whatsappEnabled && (
+                     <div className="space-y-4 p-4 rounded-2xl border-2 border-dashed border-green-500/20 bg-green-500/5 animate-in fade-in slide-in-from-top-2">
+                        <div className="space-y-2">
+                           <Label className="text-[9px] font-black uppercase">Seu Número com DDD</Label>
+                           <Input placeholder="Ex: 11999998888" value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} className="h-10 rounded-xl" />
+                        </div>
+                        <p className="text-[8px] font-bold text-green-700 uppercase leading-relaxed">
+                           🚀 O botão flutuante aparecerá no canto da página, facilitando o contato direto após o cliente ler os depoimentos.
+                        </p>
+                     </div>
+                   )}
+                </section>
+
+                <section className="space-y-4">
+                   <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Site Oficial (Redirecionamento)</Label>
+                   <div className="space-y-3">
+                      <div className="space-y-1.5">
+                         <Label className="text-[9px] font-black uppercase">Texto do Botão no Rodapé</Label>
+                         <Input value={externalSiteButtonText} onChange={(e) => setExternalSiteButtonText(e.target.value)} placeholder="Ex: Visitar Loja Virtual" className="h-10 rounded-xl" />
+                      </div>
+                      <div className="space-y-1.5">
+                         <Label className="text-[9px] font-black uppercase">URL do seu Site</Label>
+                         <Input value={externalSiteUrl} onChange={(e) => setExternalSiteUrl(e.target.value)} placeholder="https://..." className="h-10 rounded-xl" />
+                      </div>
+                   </div>
+                </section>
+
+                <section className="space-y-4">
+                   <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Rodapé</Label>
+                   <div className="space-y-3">
+                      <div className="space-y-1.5">
+                         <Label className="text-[9px] font-black uppercase">Texto Copyright</Label>
+                         <Input value={footerText} onChange={(e) => setFooterText(e.target.value)} placeholder="Ex: 2026 Minha Empresa" className="h-10 rounded-xl" />
+                      </div>
+                      <div className="flex items-center justify-between p-4 rounded-2xl bg-muted/10 border">
+                        <div className="space-y-1">
+                          <p className="text-[10px] font-black uppercase tracking-tight">Selo Proova</p>
+                          <p className="text-[8px] text-muted-foreground font-medium">Exibir "Powered by Proova" no rodapé.</p>
+                        </div>
+                        <Switch checked={showLogo} onCheckedChange={setShowLogo} />
+                      </div>
+                   </div>
+                </section>
+             </TabsContent>
           </div>
         </ScrollArea>
       </Tabs>
@@ -520,6 +829,15 @@ export default function PPEditorPage() {
     return currentSelection;
   }, [currentSelection, layout, muralIndex]);
 
+  const membershipLabel = useMemo(() => {
+    const status = userData?.membershipStatus;
+    if (status === 'enterprise') return 'ENTERPRISE';
+    if (status === 'gold') return 'GOLD';
+    if (status === 'trial') return 'TRIAL';
+    if (status === 'expired') return 'EXPIRADO';
+    return 'PLANO BASE';
+  }, [userData]);
+
   if (authLoading || userDataLoading || testimonialsLoading) return <div className="flex h-screen items-center justify-center bg-muted/30"><Loader2 className="animate-spin h-10 w-10 text-primary" /></div>;
 
   return (
@@ -534,7 +852,7 @@ export default function PPEditorPage() {
           <div className="flex items-center group -ml-2">
             <div className="relative w-[160px] h-[55px] md:w-[320px] md:h-[105px]">
               <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
-              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </div>
         </div>
@@ -580,7 +898,146 @@ export default function PPEditorPage() {
         </aside>
 
         <div className="flex-1 overflow-y-auto bg-muted/10 p-4 sm:p-8">
-          {/* Editor contents... */}
+           <div className="max-w-6xl mx-auto space-y-8">
+              <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                 <div className="space-y-1">
+                    <h2 className="text-2xl font-black font-headline tracking-tighter">Editor de Página Pública</h2>
+                    <p className="text-xs text-muted-foreground font-medium">Selecione depoimentos e configure o visual da sua vitrine.</p>
+                 </div>
+                 <div className="flex items-center gap-4">
+                    <Sheet>
+                      <SheetTrigger asChild>
+                         <Button variant="outline" className="lg:hidden h-11 rounded-xl font-bold gap-2"><Palette className="w-4 h-4" /> Estilo & Configs</Button>
+                      </SheetTrigger>
+                      <SheetContent side="left" className="p-0 w-full sm:max-w-sm">
+                         <PublicPageSettings 
+                            themeColor={themeColor} setThemeColor={setThemeColor} secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
+                            layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
+                            heroTitle={heroTitle} setHeroTitle={setHeroTitle} heroSubtitle={heroSubtitle} setHeroSubtitle={setHeroSubtitle}
+                            testimonialsTitle={testimonialsTitle} setTestimonialsTitle={setTestimonialsTitle}
+                            footerText={footerText} setFooterText={setFooterText} showLogo={showLogo} setShowLogo={setShowLogo}
+                            whatsappEnabled={whatsappEnabled} setWhatsappEnabled={setWhatsappEnabled}
+                            whatsappNumber={whatsappNumber} setWhatsappNumber={setWhatsappNumber}
+                            externalSiteUrl={externalSiteUrl} setExternalSiteUrl={setExternalSiteUrl}
+                            externalSiteButtonText={externalSiteButtonText} setExternalSiteButtonText={setExternalSiteButtonText}
+                            customSections={customSections} setCustomSections={setCustomSections} 
+                            autoPublishEnabled={autoPublishEnabled} setAutoPublishEnabled={setAutoPublishEnabled}
+                            autoPublishMinRating={autoPublishMinRating} setAutoPublishMinRating={setAutoPublishMinRating}
+                            autoPublishMinChars={autoPublishMinChars} setAutoPublishMinChars={setAutoPublishMinChars}
+                            onFileSelect={onFileSelect}
+                            isUploading={isUploading} isGoldPlan={isGoldPlan} isEnterprise={isEnterprise}
+                            logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
+                          />
+                      </SheetContent>
+                    </Sheet>
+                 </div>
+              </header>
+
+              <div className="grid lg:grid-cols-12 gap-8">
+                 <div className="lg:col-span-7 space-y-6">
+                    <Card className="rounded-[2.5rem] border-none shadow-xl overflow-hidden p-6 md:p-10 space-y-8">
+                       <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                             <Star className="w-5 h-5 text-primary" />
+                             <h3 className="text-lg font-black uppercase tracking-tight">Depoimentos Aprovados</h3>
+                          </div>
+                          <Badge variant="secondary" className="font-black h-6">{selectedIds.length} / {SELECTION_LIMIT === Infinity ? '∞' : SELECTION_LIMIT}</Badge>
+                       </div>
+                       
+                       <div className="grid gap-3 max-h-[600px] overflow-y-auto pr-2 scrollbar-hide">
+                          {approvedTestimonials?.length === 0 ? (
+                             <div className="py-20 text-center opacity-30"><MessageSquare className="w-12 h-12 mx-auto mb-4" /><p className="text-xs font-bold uppercase tracking-widest">Nenhum depoimento aprovado</p></div>
+                          ) : approvedTestimonials?.map((t: any) => {
+                             const isSelected = selectedIds.includes(t.id);
+                             return (
+                               <div 
+                                 key={t.id} 
+                                 onClick={() => toggleSelection(t.id)}
+                                 className={cn(
+                                   "p-4 rounded-2xl border-2 transition-all cursor-pointer flex gap-4 items-start relative group",
+                                   isSelected ? "bg-primary/5 border-primary shadow-sm" : "bg-muted/10 border-transparent hover:border-primary/20"
+                                 )}
+                               >
+                                  <div className={cn("h-5 w-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-1 transition-all", isSelected ? "bg-primary border-primary" : "border-muted-foreground/30")}>
+                                     {isSelected && <Check className="w-3 h-3 text-white" />}
+                                  </div>
+                                  <div className="flex-1 min-w-0 space-y-1">
+                                     <div className="flex items-center justify-between">
+                                        <p className="font-black text-xs uppercase truncate pr-4">{t.userName}</p>
+                                        <div className="flex gap-0.5">{[1,2,3,4,5].map(s => <Star key={s} className={cn("w-2.5 h-2.5", s <= t.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20")} />)}</div>
+                                     </div>
+                                     <p className="text-[11px] text-muted-foreground leading-relaxed italic line-clamp-2">"{t.text}"</p>
+                                  </div>
+                               </div>
+                             );
+                          })}
+                       </div>
+                    </Card>
+                 </div>
+
+                 <div className="lg:col-span-5 space-y-6">
+                    <div className="flex items-center gap-2 mb-2">
+                       <Monitor className="w-4 h-4 text-primary" />
+                       <h3 className="text-[10px] font-black uppercase tracking-widest opacity-60">Pré-visualização ao vivo</h3>
+                    </div>
+                    
+                    <div className="sticky top-8 bg-background rounded-[3rem] shadow-2xl border-[8px] border-muted overflow-hidden aspect-[9/19] flex flex-col">
+                       <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col">
+                          <header className="p-8 text-center space-y-6">
+                             {logoUrl && <img src={logoUrl} className="w-20 h-20 mx-auto rounded-2xl object-cover shadow-lg border-2 border-background" />}
+                             <div className="space-y-2">
+                                <div className="text-xl font-black leading-tight" dangerouslySetInnerHTML={{ __html: heroTitle || 'Seu Título Aqui' }} />
+                                <div className="text-[10px] text-muted-foreground font-medium italic opacity-80" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />
+                             </div>
+                          </header>
+
+                          {customSections.map(s => (
+                            <section key={s.id} className={cn("p-8 text-center space-y-4", s.variant === 'accent' ? "text-white" : (s.variant === 'dark' ? "bg-black text-white" : "bg-muted/5"))} style={{ backgroundColor: s.variant === 'accent' ? themeColor : undefined }}>
+                               <h4 className="text-sm font-black uppercase">{s.title}</h4>
+                               <p className="text-[10px] leading-relaxed opacity-80">{s.content}</p>
+                            </section>
+                          ))}
+
+                          <main className="p-6 space-y-6 flex-1">
+                             {testimonialsTitle && <h3 className="text-center font-black uppercase tracking-tight text-xs" style={{ color: themeColor }}>{testimonialsTitle}</h3>}
+                             <div className={cn("grid gap-4", (layout === 'popup' || layout === 'carousel' || layout === 'mural') ? "grid-cols-1" : "grid-cols-1")}>
+                                {visibleTestimonialsPreview.map((t, idx) => (
+                                  <div 
+                                    key={`${t.id}-${idx}-${muralIndex}`} 
+                                    className={cn(
+                                      "p-4 rounded-3xl bg-card shadow-lg border-none animate-in fade-in zoom-in-95 duration-700",
+                                      layout === 'mural' && (idx % 2 === 0 ? "slide-in-from-left-4" : "slide-in-from-right-4")
+                                    )}
+                                    style={{ 
+                                      boxShadow: secondaryColor ? `0 0 20px ${secondaryColor}40` : `0 10px 30px -10px ${themeColor}20`,
+                                      border: secondaryColor ? `1px solid ${secondaryColor}40` : 'none'
+                                    }}
+                                  >
+                                     <div className="flex items-center gap-3 mb-3">
+                                        <div className="h-8 w-8 rounded-xl flex items-center justify-center text-white font-black text-[10px]" style={{ backgroundColor: themeColor }}>{t.userName?.substring(0,2).toUpperCase()}</div>
+                                        <div>
+                                           <p className="font-black text-[10px] uppercase truncate max-w-[80px] leading-none">{t.userName}</p>
+                                           <div className="flex gap-0.5 mt-0.5">{[1,2,3,4,5].map(s => <Star key={s} className={cn("w-2 h-2", s <= t.rating ? "fill-current" : "opacity-10")} style={{ color: themeColor }} />)}</div>
+                                        </div>
+                                     </div>
+                                     <p className="text-[10px] font-bold italic opacity-70 leading-relaxed">"{t.text}"</p>
+                                  </div>
+                                ))}
+                                {currentSelection.length === 0 && <div className="py-10 text-center opacity-20"><Star className="w-8 h-8 mx-auto" /><p className="text-[8px] font-black uppercase tracking-widest mt-2">Nenhum item selecionado</p></div>}
+                             </div>
+                          </main>
+
+                          <footer className="p-10 text-center space-y-4 border-t bg-muted/5 mt-auto">
+                             <div className="flex flex-col items-center gap-1.5 opacity-30">
+                                <p className="text-[8px] font-bold uppercase tracking-widest">© {footerText || 'Proova'}</p>
+                                {showLogo && <span className="text-[6px] font-black uppercase tracking-[0.3em]">Powered by Proova</span>}
+                             </div>
+                          </footer>
+                       </div>
+                    </div>
+                 </div>
+              </div>
+           </div>
         </div>
       </main>
 

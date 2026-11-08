@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -43,6 +42,7 @@ import { cn } from '@/lib/utils';
 import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 export default function AdminPage() {
   const auth = useAuth();
@@ -122,11 +122,6 @@ export default function AdminPage() {
     });
   }, [leadsList]);
 
-  const handleAuth = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // Auth logic...
-  };
-
   const handleOpenUserDetail = (uid: string) => {
     const matchedUser = leadsList?.find((u: any) => u.id === uid);
     if (matchedUser) {
@@ -172,7 +167,7 @@ export default function AdminPage() {
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
               <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
-              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </Link>
         </div>
@@ -190,21 +185,169 @@ export default function AdminPage() {
               <ArrowLeft className="w-4 h-4" /> Voltar ao Dashboard
             </Button>
           </Link>
-          {/* Main admin content... */}
+          
+          <div className="grid gap-6 md:grid-cols-3">
+             <Card className="rounded-2xl border-none shadow-sm">
+                <CardHeader className="pb-2">
+                   <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Total de Leads</CardTitle>
+                </CardHeader>
+                <CardContent>
+                   <div className="text-3xl font-black">{leadsList?.length || 0}</div>
+                </CardContent>
+             </Card>
+             <Card className="rounded-2xl border-none shadow-sm">
+                <CardHeader className="pb-2">
+                   <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Tickets Abertos</CardTitle>
+                </CardHeader>
+                <CardContent>
+                   <div className="text-3xl font-black">{ticketsList?.length || 0}</div>
+                </CardContent>
+             </Card>
+             <Card className="rounded-2xl border-none shadow-sm bg-primary/5">
+                <CardHeader className="pb-2">
+                   <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary">Setup Completo</CardTitle>
+                </CardHeader>
+                <CardContent>
+                   <div className="text-3xl font-black text-primary">{setupMetrics.percentage}%</div>
+                </CardContent>
+             </Card>
+          </div>
+
+          <Tabs defaultValue="leads" className="w-full">
+            <TabsList className="bg-background border rounded-xl h-12 p-1 gap-1">
+              <TabsTrigger value="leads" className="rounded-lg text-[10px] font-black uppercase tracking-widest">Usuários</TabsTrigger>
+              <TabsTrigger value="payments" className="rounded-lg text-[10px] font-black uppercase tracking-widest">Pagamentos</TabsTrigger>
+              <TabsTrigger value="actions" className="rounded-lg text-[10px] font-black uppercase tracking-widest">Ações</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="leads" className="pt-6">
+              <Card className="rounded-[2rem] border-none shadow-xl overflow-hidden">
+                 <Table>
+                    <TableHeader className="bg-muted/30">
+                       <TableRow>
+                          <TableHead className="text-[9px] font-black uppercase">Empresa</TableHead>
+                          <TableHead className="text-[9px] font-black uppercase">Plano</TableHead>
+                          <TableHead className="text-[9px] font-black uppercase">Setup</TableHead>
+                          <TableHead className="text-[9px] font-black uppercase text-right">Ações</TableHead>
+                       </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                       {sortedLeads.map((u: any) => (
+                         <TableRow key={u.id} className="hover:bg-muted/10">
+                            <TableCell>
+                               <div className="flex flex-col">
+                                  <span className="font-bold text-xs">{u.companyName}</span>
+                                  <span className="text-[10px] text-muted-foreground">{u.email}</span>
+                               </div>
+                            </TableCell>
+                            <TableCell>
+                               <Badge variant="secondary" className="text-[8px] font-black uppercase">{u.membershipStatus}</Badge>
+                            </TableCell>
+                            <TableCell>
+                               <div className="w-20">
+                                  <Progress value={u.testimonialsCount > 0 ? 100 : 30} className="h-1" />
+                               </div>
+                            </TableCell>
+                            <TableCell className="text-right">
+                               <Button variant="ghost" size="sm" onClick={() => handleOpenUserDetail(u.id)} className="h-8 w-8 p-0 rounded-full"><Eye className="w-4 h-4" /></Button>
+                            </TableCell>
+                         </TableRow>
+                       ))}
+                    </TableBody>
+                 </Table>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="payments" className="pt-6">
+               <Card className="rounded-[2rem] border-none shadow-xl overflow-hidden p-6 text-center opacity-40">
+                  <CreditCard className="w-12 h-12 mx-auto mb-4" />
+                  <p className="text-xs font-bold uppercase tracking-widest">Histórico de Transações do Cakto aparecerá aqui</p>
+               </Card>
+            </TabsContent>
+
+            <TabsContent value="actions" className="pt-6">
+               <div className="grid gap-4 md:grid-cols-2">
+                  <Link href="/admin/support">
+                    <Card className="p-6 hover:bg-muted/10 transition-colors cursor-pointer rounded-2xl border-none shadow-sm flex items-center justify-between">
+                       <div className="flex items-center gap-4">
+                          <div className="p-3 rounded-xl bg-primary/10 text-primary"><Headphones className="w-6 h-6" /></div>
+                          <div><p className="font-black text-xs uppercase">Fila de Suporte</p><p className="text-[10px] text-muted-foreground">Responder chamados abertos</p></div>
+                       </div>
+                       <ChevronRight className="w-4 h-4 opacity-20" />
+                    </Card>
+                  </Link>
+                  <Link href="/admin/advanced">
+                    <Card className="p-6 hover:bg-muted/10 transition-colors cursor-pointer rounded-2xl border-none shadow-sm flex items-center justify-between">
+                       <div className="flex items-center gap-4">
+                          <div className="p-3 rounded-xl bg-orange-500/10 text-orange-600"><Megaphone className="w-6 h-6" /></div>
+                          <div><p className="font-black text-xs uppercase">Avisos Globais</p><p className="text-[10px] text-muted-foreground">Enviar mensagens no Dash</p></div>
+                       </div>
+                       <ChevronRight className="w-4 h-4 opacity-20" />
+                    </Card>
+                  </Link>
+               </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
       
       <footer className="py-12 md:py-20 border-t flex flex-col items-center gap-10 mt-auto bg-background/50">
         <div className="flex items-center gap-2 relative w-[200px] h-[65px] md:w-[320px] md:h-[105px]">
           <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="dark:hidden object-contain" />
-          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="hidden dark:block object-contain" />
+          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="hidden dark:block object-contain" />
         </div>
         <div className="container px-4 text-center">
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">© 2026 Proova - Gestão Segura</p>
+          <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black">© 2026 Proova - Gestão Segura</p>
         </div>
       </footer>
 
-      {/* User Detail Sheet... */}
+      {/* Sheet para Detalhes do Usuário */}
+      <Sheet open={isDetailOpen} onOpenChange={setIsUserDetailOpen}>
+         <SheetContent className="w-full sm:max-w-md overflow-y-auto">
+            <SheetHeader>
+               <SheetTitle className="text-xl font-black uppercase">Gerenciar Conta</SheetTitle>
+               <SheetDescription>Ajuste as permissões de {selectedUser?.companyName}</SheetDescription>
+            </SheetHeader>
+            <div className="py-8 space-y-8">
+               <div className="space-y-4">
+                  <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Status do Plano</Label>
+                  <Select value={newPlanStatus} onValueChange={setNewPlanStatus}>
+                     <SelectTrigger className="h-12 rounded-xl">
+                        <SelectValue placeholder="Selecione o plano" />
+                     </SelectTrigger>
+                     <SelectContent>
+                        <SelectItem value="base">Base (Grátis)</SelectItem>
+                        <SelectItem value="gold">Gold</SelectItem>
+                        <SelectItem value="enterprise">Enterprise</SelectItem>
+                        <SelectItem value="trial">Trial</SelectItem>
+                        <SelectItem value="expired">Expirado</SelectItem>
+                     </SelectContent>
+                  </Select>
+                  <Button onClick={handleUpdatePlan} disabled={isUpdatingPlan} className="w-full h-12 rounded-xl font-bold">{isUpdatingPlan ? <Loader2 className="animate-spin" /> : "Atualizar Privilégios"}</Button>
+               </div>
+
+               <Separator />
+
+               <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Métricas</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                     <div className="p-3 bg-muted rounded-xl text-center"><p className="text-xs font-bold">{selectedUser?.testimonialsCount || 0}</p><p className="text-[8px] uppercase">Depoimentos</p></div>
+                     <div className="p-3 bg-muted rounded-xl text-center"><p className="text-xs font-bold">{selectedUser?.googleRedirectCount || 0}</p><p className="text-[8px] uppercase">G-Clicks</p></div>
+                  </div>
+               </div>
+            </div>
+         </SheetContent>
+      </Sheet>
     </div>
+  );
+}
+
+function ThemeToggle() {
+  const { theme, setTheme } = useTheme();
+  return (
+    <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl">
+      <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+    </Button>
   );
 }

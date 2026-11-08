@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -228,7 +227,7 @@ export default function WidgetsPage() {
           <div className="flex items-center group -ml-2">
             <div className="relative w-[160px] h-[52px] md:w-[240px] md:h-[78px] transition-transform group-hover:scale-105">
               <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
-              <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
+              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </div>
         </div>
@@ -287,16 +286,132 @@ export default function WidgetsPage() {
       </header>
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-8 max-w-7xl mx-auto w-full pt-24 md:pt-32">
-        {/* Widget list content... */}
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-1">
+            <h1 className="text-2xl md:text-3xl font-black font-headline tracking-tighter">Murais Dinâmicos</h1>
+            <p className="text-muted-foreground text-sm font-medium">Instale sua prova social em qualquer site em minutos.</p>
+          </div>
+          <Button onClick={() => setIsCreateDialogOpen(true)} className="h-12 rounded-xl font-black uppercase tracking-widest gap-2 shadow-xl bg-primary hover:bg-primary/90 text-white">
+            <Plus className="w-5 h-5" /> Criar Novo Mural
+          </Button>
+        </header>
+
+        <div className="relative w-full group">
+          <Search className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
+          <Input 
+            placeholder="Filtrar meus murais..." 
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="h-11 pl-10 rounded-xl bg-background border-primary/10 focus:ring-primary/20 text-xs font-bold"
+          />
+        </div>
+
+        {widgetsLoading ? (
+          <div className="py-24 flex justify-center"><Loader2 className="animate-spin h-10 w-10 text-primary/30" /></div>
+        ) : filteredWidgets.length === 0 ? (
+          <div className="py-32 flex flex-col items-center justify-center border-2 border-dashed rounded-[3rem] opacity-30 bg-muted/20">
+             <Layout className="w-16 h-16 mb-4" />
+             <p className="text-sm font-black uppercase tracking-widest">Nenhum mural configurado</p>
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+             {filteredWidgets.map((w: any) => (
+               <Card key={w.id} className="rounded-[2rem] border-none shadow-sm hover:shadow-xl transition-all group overflow-hidden bg-card">
+                  <div className="h-1 bg-primary/20 group-hover:bg-primary transition-colors w-full" />
+                  <CardHeader className="p-6 pb-2">
+                     <div className="flex items-center justify-between">
+                        <Badge variant="secondary" className="text-[7px] font-black uppercase h-4 px-1.5">{w.layout}</Badge>
+                        <p className="text-[8px] text-muted-foreground font-black uppercase">{w.selectedTestimonialIds?.length || 0} Itens</p>
+                     </div>
+                     <CardTitle className="text-lg font-black uppercase tracking-tight truncate mt-2">{w.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 pt-2 space-y-4">
+                     <div className="flex flex-col gap-2">
+                        <Button 
+                          onClick={() => router.push(`/widgetconfig/${w.id}`)}
+                          className="w-full h-10 rounded-xl font-bold uppercase tracking-widest text-[9px] bg-foreground text-background hover:opacity-90 gap-2"
+                        >
+                          <Settings2 className="w-3.5 h-3.5" /> Configurar Mural
+                        </Button>
+                        <div className="grid grid-cols-2 gap-2">
+                           <Button 
+                             variant="outline" 
+                             className="h-9 rounded-xl font-bold uppercase tracking-widest text-[8px] gap-1.5 border-primary/20 text-primary hover:bg-primary/5"
+                             onClick={() => {
+                               copyToClipboard(`${baseUrl}/widgetpublic/${user?.uid}/${w.id}`, "Link do mural");
+                               toast({ title: "Link Copiado!", description: "Você pode embutir via iframe." });
+                             }}
+                           >
+                             <Code className="w-3 h-3" /> Embed
+                           </Button>
+                           <Button 
+                             variant="ghost" 
+                             className="h-9 rounded-xl font-bold uppercase tracking-widest text-[8px] gap-1.5 text-destructive hover:bg-destructive/10"
+                             onClick={() => setWidgetToDelete(w)}
+                           >
+                             <Trash2 className="w-3 h-3" /> Excluir
+                           </Button>
+                        </div>
+                     </div>
+                  </CardContent>
+               </Card>
+             ))}
+          </div>
+        )}
       </main>
 
       <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
         <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[105px]">
           <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority />
-          <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority />
+          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority />
         </div>
         <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
       </footer>
+
+      <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+         <DialogContent className="rounded-[2.5rem] w-[95vw] sm:max-w-md border-none shadow-2xl p-8">
+            <DialogHeader className="text-center space-y-3">
+               <DialogTitle className="text-xl md:text-2xl font-black uppercase tracking-tight">Novo Mural Proova</DialogTitle>
+               <DialogDescription className="text-xs font-medium">Dê um nome para identificar este mural no seu site.</DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleCreateWidget} className="space-y-6 pt-4">
+               <div className="space-y-2">
+                  <Label className="text-[10px] font-black uppercase opacity-60 ml-1">Identificação Interna</Label>
+                  <Input 
+                    placeholder="Ex: Mural da Home / Página de Vendas" 
+                    value={newWidgetName}
+                    onChange={(e) => setNewWidgetName(e.target.value)}
+                    className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold"
+                    required
+                    autoFocus
+                  />
+               </div>
+               <Button type="submit" disabled={isCreating || !newWidgetName.trim()} className="w-full h-14 rounded-2xl font-black uppercase tracking-widest gap-2 bg-primary shadow-xl">
+                  {isCreating ? <Loader2 className="animate-spin" /> : <Plus className="w-5 h-5" />} Criar e Configurar
+               </Button>
+            </form>
+         </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={!!widgetToDelete} onOpenChange={() => setWidgetToDelete(null)}>
+        <AlertDialogContent className="rounded-[2rem] border-none shadow-2xl p-8">
+          <AlertDialogHeader className="text-center space-y-4">
+             <div className="mx-auto w-fit p-4 rounded-3xl bg-destructive/10 text-destructive"><AlertTriangle className="w-10 h-10" /></div>
+             <div className="space-y-2">
+                <AlertDialogTitle className="text-xl font-black uppercase">Excluir Mural?</AlertDialogTitle>
+                <AlertDialogDescription className="text-xs font-medium">Esta ação é irreversível. O mural deixará de aparecer no seu site instantaneamente.</AlertDialogDescription>
+             </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2 pt-4">
+            <AlertDialogCancel className="h-12 rounded-xl font-bold border-none bg-muted hover:bg-muted/80">Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className="h-12 rounded-xl font-bold bg-destructive text-white hover:bg-destructive/90">Confirmar Exclusão</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
+}
+
+function copyToClipboard(text: string, description: string) {
+  navigator.clipboard.writeText(text);
 }

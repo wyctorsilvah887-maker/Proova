@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -667,7 +666,7 @@ export default function DashPage() {
                 priority 
               />
               <Image 
-                src="/Logotipo%20PROOVA%20dark%20mode%201.png" 
+                src="/logo-proova-dark-mode.gif" 
                 alt="Logo" 
                 fill 
                 className="object-contain object-left hidden dark:block" 
