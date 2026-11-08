@@ -186,27 +186,22 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center gap-3 flex-1">
-          <Link href="/dash">
-            <Button variant="ghost" size="sm" className="h-10 px-2 gap-2 text-muted-foreground hover:text-primary hover:bg-transparent active:bg-primary/10 transition-all border-none shadow-none bg-transparent rounded-xl">
-               <ArrowLeft className="w-4 h-4" /><span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Voltar</span>
-            </Button>
-          </Link>
-          <div className="flex items-center group -ml-2">
+      <header className="bg-background border-b h-16 md:h-20 flex items-center px-4 md:px-6 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
+        <div className="flex items-center gap-3">
+          <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[180px] h-[60px] md:w-[320px] md:h-[105px]">
               <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
               <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
-          </div>
+          </Link>
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle className="hidden sm:flex" />
+          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-12 px-1 md:px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
-                <div className="flex flex-col items-end">
+              <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
+                <div className="hidden sm:flex flex-col items-end">
                   <span className="text-xs font-bold truncate max-w-[120px] group-hover:text-primary leading-tight">
                     {userData?.companyName || 'Minha Empresa'}
                   </span>
@@ -255,8 +250,8 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-8 space-y-8 max-w-5xl mx-auto w-full pt-24 md:pt-36 pb-20">
-        <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-8 max-w-5xl mx-auto w-full pt-20 md:pt-28 pb-20">
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-4">
              <Link href="/dash" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group w-fit">
                 <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
@@ -264,7 +259,7 @@ export default function SettingsPage() {
              </Link>
              <div className="space-y-1">
                 <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight flex items-center gap-3">
-                  <div className="p-2.5 rounded-2xl bg-primary/10 text-primary shadow-inner">
+                  <div className="p-2.5 rounded-2xl bg-primary/10 text-primary shadow-inner shrink-0">
                     <Settings className="w-6 h-6" />
                   </div>
                   Configurações
@@ -272,55 +267,55 @@ export default function SettingsPage() {
                 <p className="text-xs md:text-sm text-muted-foreground font-medium">Gerencie sua identidade comercial e integrações estratégicas.</p>
              </div>
           </div>
-          <Button onClick={handleSaveSettings} disabled={isSaving} className="h-14 px-10 rounded-2xl font-black uppercase tracking-widest gap-2 shadow-xl bg-primary hover:bg-primary/90 text-white transition-all active:scale-95">
+          <Button onClick={handleSaveSettings} disabled={isSaving} className="w-full md:w-auto h-14 px-10 rounded-2xl font-black uppercase tracking-widest gap-2 shadow-xl bg-primary hover:bg-primary/90 text-white transition-all active:scale-95">
              {isSaving ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="w-4 h-4" />} Salvar Alterações
           </Button>
         </header>
 
         <Tabs defaultValue="perfil" className="w-full">
-           <TabsList className="bg-background border rounded-2xl h-16 p-1.5 gap-2 mb-10 shadow-sm">
-              <TabsTrigger value="perfil" className="flex-1 rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 data-[state=active]:bg-primary/5 data-[state=active]:text-primary transition-all">
-                 <User className="w-4 h-4" /> Perfil
+           <TabsList className="bg-background border rounded-2xl h-auto p-1.5 gap-1 mb-8 shadow-sm flex flex-wrap md:flex-row md:h-16">
+              <TabsTrigger value="perfil" className="flex-1 min-w-[90px] rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest gap-2 py-3 data-[state=active]:bg-primary/5 data-[state=active]:text-primary transition-all">
+                 <User className="w-3.5 h-3.5 md:w-4 md:h-4" /> Perfil
               </TabsTrigger>
-              <TabsTrigger value="negocio" className="flex-1 rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 data-[state=active]:bg-primary/5 data-[state=active]:text-primary transition-all">
-                 <Building2 className="w-4 h-4" /> Negócio
+              <TabsTrigger value="negocio" className="flex-1 min-w-[90px] rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest gap-2 py-3 data-[state=active]:bg-primary/5 data-[state=active]:text-primary transition-all">
+                 <Building2 className="w-3.5 h-3.5 md:w-4 md:h-4" /> Negócio
               </TabsTrigger>
-              <TabsTrigger value="google" className="flex-1 rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 data-[state=active]:bg-primary/5 data-[state=active]:text-primary transition-all">
-                 <MapPinned className="w-4 h-4" /> Google G-Boost
+              <TabsTrigger value="google" className="flex-1 min-w-[90px] rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest gap-2 py-3 data-[state=active]:bg-primary/5 data-[state=active]:text-primary transition-all">
+                 <MapPinned className="w-3.5 h-3.5 md:w-4 md:h-4" /> Google
               </TabsTrigger>
            </TabsList>
 
            <TabsContent value="perfil" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 outline-none">
-              <Card className="rounded-[2.5rem] border-none shadow-xl overflow-hidden bg-background">
-                 <CardHeader className="p-8 pb-4">
-                    <CardTitle className="text-lg font-black uppercase tracking-tight flex items-center gap-2"><Fingerprint className="w-5 h-5 text-primary" /> Dados do Usuário</CardTitle>
+              <Card className="rounded-[2rem] border-none shadow-xl overflow-hidden bg-background">
+                 <CardHeader className="p-6 md:p-8 pb-4">
+                    <CardTitle className="text-base md:text-lg font-black uppercase tracking-tight flex items-center gap-2"><Fingerprint className="w-5 h-5 text-primary" /> Dados do Usuário</CardTitle>
                     <CardDescription className="text-xs font-medium">Informações básicas da sua conta de acesso.</CardDescription>
                  </CardHeader>
-                 <CardContent className="p-8 pt-4 space-y-6">
-                    <div className="grid md:grid-cols-2 gap-8">
+                 <CardContent className="p-6 md:p-8 pt-4 space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6 md:gap-8">
                        <div className="space-y-3">
                           <Label className="text-[10px] font-black uppercase ml-1 opacity-60 flex items-center gap-2">Seu Nome Completo <TooltipProvider><Tooltip><TooltipTrigger><Info className="w-3 h-3" /></TooltipTrigger><TooltipContent><p className="text-[10px] font-bold">Como você será chamado no suporte.</p></TooltipContent></Tooltip></TooltipProvider></Label>
                           <div className="relative group">
                              <User className="absolute left-4 top-3.5 h-4 w-4 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
-                             <Input value={name} onChange={(e) => setName(e.target.value)} className="h-12 pl-11 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold transition-all" placeholder="Seu Nome" />
+                             <Input value={name} onChange={(e) => setName(e.target.value)} className="h-12 pl-11 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold transition-all text-sm" placeholder="Seu Nome" />
                           </div>
                        </div>
                        <div className="space-y-3">
                           <Label className="text-[10px] font-black uppercase ml-1 opacity-60">E-mail de Acesso (Não alterável)</Label>
                           <div className="relative opacity-60">
                              <Mail className="absolute left-4 top-3.5 h-4 w-4 text-muted-foreground/40" />
-                             <Input value={userData?.email} disabled className="h-12 pl-11 rounded-xl bg-muted/40 cursor-not-allowed font-bold" />
+                             <Input value={userData?.email} disabled className="h-12 pl-11 rounded-xl bg-muted/40 cursor-not-allowed font-bold text-sm" />
                           </div>
-                          <p className="text-[9px] text-muted-foreground italic ml-1">O e-mail é sua chave única e não pode ser modificado por segurança.</p>
+                          <p className="text-[9px] text-muted-foreground italic ml-1 leading-tight">O e-mail é sua chave única e não pode ser modificado por segurança.</p>
                        </div>
                     </div>
                  </CardContent>
               </Card>
 
               <Card className="rounded-[2.5rem] border-none shadow-xl overflow-hidden bg-primary/5 ring-1 ring-primary/10">
-                 <CardContent className="p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
-                    <div className="flex items-center gap-4 text-center sm:text-left">
-                       <div className="p-4 rounded-3xl bg-primary text-white shadow-lg shadow-primary/20">
+                 <CardContent className="p-6 md:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-4 text-center sm:text-left flex-col sm:flex-row">
+                       <div className="p-4 rounded-3xl bg-primary text-white shadow-lg shadow-primary/20 shrink-0">
                           <Shield className="w-6 h-6" />
                        </div>
                        <div>
@@ -328,49 +323,49 @@ export default function SettingsPage() {
                           <p className="text-xs text-muted-foreground font-medium">Sua conta possui acesso {userData?.membershipStatus === 'base' ? 'limitado' : 'premium'} aos recursos estratégicos.</p>
                        </div>
                     </div>
-                    <Button variant="outline" onClick={() => router.push('/pricing')} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[9px] border-primary/20 text-primary hover:bg-primary hover:text-white transition-all shadow-sm">Ver Planos e Upgrade</Button>
+                    <Button variant="outline" onClick={() => router.push('/pricing')} className="w-full sm:w-auto h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[9px] border-primary/20 text-primary hover:bg-primary hover:text-white transition-all shadow-sm">Ver Planos e Upgrade</Button>
                  </CardContent>
               </Card>
            </TabsContent>
 
            <TabsContent value="negocio" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 outline-none">
-              <Card className="rounded-[2.5rem] border-none shadow-xl overflow-hidden bg-background">
-                 <CardHeader className="p-8 pb-4">
-                    <CardTitle className="text-lg font-black uppercase tracking-tight flex items-center gap-2"><Building2 className="w-5 h-5 text-primary" /> Identidade Comercial</CardTitle>
+              <Card className="rounded-[2rem] border-none shadow-xl overflow-hidden bg-background">
+                 <CardHeader className="p-6 md:p-8 pb-4">
+                    <CardTitle className="text-base md:text-lg font-black uppercase tracking-tight flex items-center gap-2"><Building2 className="w-5 h-5 text-primary" /> Identidade Comercial</CardTitle>
                     <CardDescription className="text-xs font-medium">Como sua empresa é vista na web e seus links oficiais.</CardDescription>
                  </CardHeader>
-                 <CardContent className="p-8 pt-4 space-y-10">
-                    <div className="grid md:grid-cols-2 gap-10">
+                 <CardContent className="p-6 md:p-8 pt-4 space-y-10">
+                    <div className="grid md:grid-cols-2 gap-8 md:gap-10">
                        <div className="space-y-8">
                           <div className="space-y-3">
                              <Label className="text-[10px] font-black uppercase ml-1 opacity-60">Nome da Empresa</Label>
                              <div className="relative group">
                                 <Building2 className="absolute left-4 top-3.5 h-4 w-4 text-muted-foreground/40 group-focus-within:text-primary transition-colors" />
-                                <Input value={companyName} onChange={(e) => setCompanyName(e.target.value)} className="h-12 pl-11 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold transition-all" />
+                                <Input value={companyName} onChange={(e) => setCompanyName(e.target.value)} className="h-12 pl-11 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold transition-all text-sm" />
                              </div>
                           </div>
                           
                           <div className="space-y-3">
                              <div className="flex items-center justify-between ml-1">
                                 <Label className="text-[10px] font-black uppercase opacity-60 flex items-center gap-2">Link da Bio (Slug) <Link2 className="w-3 h-3" /></Label>
-                                {!isPremiumUser && <Badge variant="secondary" className="text-[8px] font-black bg-primary/10 text-primary border-none">PREMIUM</Badge>}
+                                {!isPremiumUser && <Badge variant="secondary" className="text-[8px] font-black bg-primary/10 text-primary border-none px-1.5 h-4">PREMIUM</Badge>}
                              </div>
                              <div className={cn(
                                "flex items-center gap-1 bg-muted/20 rounded-xl px-3 border border-transparent focus-within:ring-2 focus-within:ring-primary/20 transition-all",
                                !isPremiumUser && "opacity-60 grayscale cursor-not-allowed bg-muted/40"
                              )}>
-                                <span className="text-[10px] font-black opacity-40 uppercase tracking-tighter">useproova.online/pp/</span>
+                                <span className="text-[9px] md:text-[10px] font-black opacity-40 uppercase tracking-tighter shrink-0">useproova.online/pp/</span>
                                 <input 
                                   disabled={!isPremiumUser}
                                   value={companySlug} 
                                   onChange={(e) => setCompanySlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/\s+/g, '-'))} 
-                                  className="h-12 flex-1 bg-transparent border-none focus:ring-0 text-sm font-black text-primary tracking-tight" 
+                                  className="h-12 flex-1 bg-transparent border-none focus:ring-0 text-sm font-black text-primary tracking-tight min-w-0" 
                                   placeholder="nome-da-empresa"
                                 />
                              </div>
-                             <div className="p-4 rounded-2xl bg-muted/30 border border-muted-foreground/10 space-y-1.5">
+                             <div className="p-4 rounded-2xl bg-muted/30 border border-muted-foreground/10 space-y-1.5 overflow-hidden">
                                 <p className="text-[9px] font-black uppercase opacity-40">Visualização do Link:</p>
-                                <p className="text-[11px] font-bold text-primary truncate">https://useproova.online/pp/{companySlug || 'seu-link'}</p>
+                                <p className="text-[10px] md:text-[11px] font-bold text-primary truncate">https://useproova.online/pp/{companySlug || 'seu-link'}</p>
                              </div>
                           </div>
                        </div>
@@ -423,13 +418,13 @@ export default function SettingsPage() {
            </TabsContent>
 
            <TabsContent value="google" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 outline-none">
-              <Card className="rounded-[2.5rem] border-none shadow-xl overflow-hidden bg-background">
-                 <CardHeader className="p-8 pb-4">
-                    <CardTitle className="text-lg font-black uppercase tracking-tight flex items-center gap-2"><Globe className="w-5 h-5 text-primary" /> Automação G-Boost</CardTitle>
+              <Card className="rounded-[2rem] border-none shadow-xl overflow-hidden bg-background">
+                 <CardHeader className="p-6 md:p-8 pb-4">
+                    <CardTitle className="text-base md:text-lg font-black uppercase tracking-tight flex items-center gap-2"><Globe className="w-5 h-5 text-primary" /> Automação G-Boost</CardTitle>
                     <CardDescription className="text-xs font-medium">O motor de redirecionamento automático para o Google Maps.</CardDescription>
                  </CardHeader>
-                 <CardContent className="p-8 pt-4 space-y-10">
-                    <div className="p-6 rounded-[2rem] bg-primary/5 border-2 border-dashed border-primary/20 flex flex-col sm:flex-row items-center gap-8 relative overflow-hidden group">
+                 <CardContent className="p-6 md:p-8 pt-4 space-y-10">
+                    <div className="p-6 rounded-[2rem] bg-primary/5 border-2 border-dashed border-primary/20 flex flex-col sm:flex-row items-center gap-6 md:gap-8 relative overflow-hidden group">
                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
                        <div className="shrink-0 p-5 bg-white dark:bg-zinc-900 rounded-3xl shadow-xl border-2 border-primary/10 relative z-10 transition-transform group-hover:scale-110">
                           <Image src="https://picsum.photos/seed/google-maps-saas/100/100" width={56} height={56} alt="Google Maps" className="grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" data-ai-hint="google maps logo" />
@@ -440,7 +435,7 @@ export default function SettingsPage() {
                        </div>
                     </div>
 
-                    <div className="grid md:grid-cols-2 gap-10 pt-4">
+                    <div className="grid md:grid-cols-2 gap-8 md:gap-10 pt-4">
                        <div className="space-y-3">
                           <Label className="text-[10px] font-black uppercase ml-1 opacity-60 flex items-center gap-2">Google Place ID <TooltipProvider><Tooltip><TooltipTrigger><Info className="w-3 h-3" /></TooltipTrigger><TooltipContent><p className="text-[10px] font-bold max-w-xs">Identificador único do seu local no Google. Usado para auditoria de fotos e horários.</p></TooltipContent></Tooltip></TooltipProvider></Label>
                           <Input value={googlePlaceId} onChange={(e) => setGooglePlaceId(e.target.value)} placeholder="ChIJN1t_tDeuEmsRUsoy..." className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-mono text-xs font-bold" />
@@ -449,7 +444,7 @@ export default function SettingsPage() {
                        <div className="space-y-3">
                           <Label className="text-[10px] font-black uppercase ml-1 opacity-60 flex items-center gap-2">Link Direto de Avaliação <Zap className="w-3 h-3 text-primary" /></Label>
                           <Input value={googleMapsUrl} onChange={(e) => setGoogleMapsUrl(e.target.value)} placeholder="https://search.google.com/local/writereview?placeid=..." className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-mono text-xs font-bold" />
-                          <p className="text-[9px] text-muted-foreground italic font-medium ml-1">Este é o link que abre a caixa de texto do Google já com as estrelas vazias.</p>
+                          <p className="text-[9px] text-muted-foreground italic font-medium ml-1 leading-tight">Este é o link que abre a caixa de texto do Google já com as estrelas vazias.</p>
                        </div>
                     </div>
 
@@ -458,7 +453,7 @@ export default function SettingsPage() {
                           <Sparkles className="w-5 h-5 text-primary shrink-0 mt-1" />
                           <div className="space-y-2">
                              <h4 className="text-xs font-black uppercase tracking-widest">Protocolo de Performance</h4>
-                             <p className="text-[11px] text-muted-foreground leading-relaxed font-medium">
+                             <p className="text-[10px] md:text-[11px] text-muted-foreground leading-relaxed font-medium">
                                 Certifique-se de que o seu link contém o parâmetro <code className="bg-primary/10 text-primary px-1.5 rounded font-black">writereview</code>. Isso reduz o atrito e garante que o cliente não precise clicar em botões adicionais para começar a escrever o depoimento no Google.
                              </p>
                           </div>
