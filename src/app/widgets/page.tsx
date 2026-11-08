@@ -263,7 +263,7 @@ export default function WidgetsPage() {
                 <Settings className="mr-2 h-4 w-4 text-primary" />
                 <span>Configurações</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
+              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
                 <Layout className="mr-2 h-4 w-4 text-primary" />
                 <span>Meus Murais</span>
               </DropdownMenuItem>
@@ -288,7 +288,7 @@ export default function WidgetsPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-8 max-w-7xl mx-auto w-full pt-24 md:pt-32">
+      <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-8 max-w-7xl mx-auto w-full pt-24 md:pt-32 pb-20">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
             <h1 className="text-2xl md:text-3xl font-black font-headline tracking-tighter">Murais Dinâmicos</h1>
@@ -362,14 +362,6 @@ export default function WidgetsPage() {
           </div>
         )}
       </main>
-
-      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
-        <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[105px]">
-          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority unoptimized />
-          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority unoptimized />
-        </div>
-        <p className="text-[9px] text-muted-foreground uppercase tracking-widest font-black opacity-60">© 2026 Proova Technology</p>
-      </footer>
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
          <DialogContent className="rounded-[2.5rem] w-[95vw] sm:max-w-md border-none shadow-2xl p-8">
