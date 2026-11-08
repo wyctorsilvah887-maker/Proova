@@ -12,7 +12,7 @@ import {
   onSnapshot
 } from 'firebase/firestore';
 import { Card } from '@/components/ui/card';
-import { Star, User, Loader2, Globe, ArrowLeft, CheckCircle2, Clock, Play, ArrowRight, MessageCircle } from 'lucide-react';
+import { Star, User, Loader2, Globe, ArrowLeft, CheckCircle2, Clock, Play, ArrowRight, MessageCircle, FileVideo } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -53,12 +53,12 @@ export default function PPClient({ slug }: { slug: string }) {
         setIsLoading(true);
         const decodedSlug = decodeURIComponent(slug).toLowerCase().trim();
         const usersRef = collection(db, 'users');
-        const q = query(usersRef, where('companySlug', '==', decodedSlug), limit(1));
-        const userQuerySnap = await getDocs(q);
-        if (!userQuerySnap.empty) {
-          const uId = userQuerySnap.docs[0].id;
+        const q1 = query(usersRef, where('companySlug', '==', decodedSlug), limit(1));
+        const snap1 = await getDocs(q1);
+        if (!snap1.empty) {
+          const uId = snap1.docs[0].id;
           setTargetUserId(uId);
-          setCompanyName(userQuerySnap.docs[0].data().companyName);
+          setCompanyName(snap1.docs[0].data().companyName);
 
           // Rastreamento de Visita Única por Sessão
           const hasVisited = sessionStorage.getItem(`pp_visited_${uId}`);
@@ -111,6 +111,9 @@ export default function PPClient({ slug }: { slug: string }) {
   const externalSiteUrl = ppData?.externalSiteUrl || '';
   const externalSiteButtonText = ppData?.externalSiteButtonText || 'Visitar Site Oficial';
   const customSections = ppData?.customSections || [];
+
+  // Helper para detectar se a logo é vídeo ou GIF dinâmico
+  const isVideoLogo = logoUrl && (logoUrl.includes('.mp4') || logoUrl.includes('.webm') || logoUrl.includes('.mov') || logoUrl.includes('pp/'));
 
   useEffect(() => {
     if ((layout === 'mural' || layout === 'popup' || layout === 'carousel') && filteredTestimonials.length > 0) {
@@ -262,7 +265,13 @@ export default function PPClient({ slug }: { slug: string }) {
             <header className="px-6 text-center py-24 sm:py-32 space-y-8">
               {logoUrl && (
                 <div className="flex justify-center">
-                  <img src={logoUrl} className="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-[2.5rem] shadow-xl border-4 border-background" alt="Logo" />
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 relative overflow-hidden rounded-[2.5rem] shadow-xl border-4 border-background">
+                    {isVideoLogo ? (
+                       <video src={logoUrl} className="w-full h-full object-cover" autoPlay loop muted playsInline />
+                    ) : (
+                       <img src={logoUrl} className="w-full h-full object-cover" alt="Logo" />
+                    )}
+                  </div>
                 </div>
               )}
               <div className="space-y-4">

@@ -45,7 +45,8 @@ import {
   ChevronLeft,
   ChevronRight,
   ListChecks,
-  Eye
+  Eye,
+  FileVideo
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -86,7 +87,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog";
+} from "@/dialog";
 import {
   Accordion,
   AccordionContent,
@@ -244,9 +245,23 @@ const PublicPageSettings = ({
   const router = useRouter();
   const tabsScrollRef = useRef<HTMLDivElement>(null);
 
+  // Helper para detectar se a logo é vídeo
+  const isVideoLogo = logoUrl && (logoUrl.includes('.mp4') || logoUrl.includes('.webm') || logoUrl.includes('.mov') || logoUrl.includes('testimonials_videos'));
+
   return (
-    <div className="flex flex-col w-full h-full overflow-hidden bg-background">
-      {/* Header do Menu de Edição com espaçamento ajustado */}
+    <div className="flex flex-col w-full h-full overflow-hidden bg-background relative">
+      {/* Botão de Fechar fixo no mobile dentro do settings */}
+      <div className="absolute top-4 right-4 z-[100] lg:hidden">
+        {onClose && (
+          <button 
+            onClick={onClose}
+            className="w-10 h-10 rounded-full bg-background border shadow-lg flex items-center justify-center text-foreground hover:bg-muted active:scale-95 transition-all"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
+      </div>
+
       <div className="p-4 border-b bg-muted/10 shrink-0 space-y-4 pt-6 md:pt-4">
         <div className="flex items-center justify-between">
           <Link href="/dash">
@@ -255,13 +270,6 @@ const PublicPageSettings = ({
               <span className="text-[10px] font-black uppercase tracking-widest">Painel Dash</span>
             </Button>
           </Link>
-          {onClose && (
-            <SheetClose asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors">
-                <X className="w-5 h-5" />
-              </Button>
-            </SheetClose>
-          )}
         </div>
         <div className="space-y-1">
           <h2 className="text-sm font-black uppercase tracking-widest">Configurações</h2>
@@ -270,7 +278,6 @@ const PublicPageSettings = ({
       </div>
 
       <Tabs defaultValue="geral" className="w-full flex-1 flex flex-col min-h-0">
-        {/* Barra de Abas Adaptável com Scroll Horizontal Suave */}
         <div className="w-full border-b bg-background/50 backdrop-blur-sm sticky top-0 z-20 overflow-hidden">
           <div 
             ref={tabsScrollRef}
@@ -316,22 +323,30 @@ const PublicPageSettings = ({
           <div className="p-5 space-y-8 pb-10">
              <TabsContent value="geral" className="mt-0 space-y-8 outline-none">
                 <section className="space-y-4">
-                  <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Foto de Capa / Logo</Label>
+                  <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Foto de Capa / Logo Dinâmica</Label>
                   <div className="flex items-center gap-4">
                     <div className={cn(
                       "w-20 h-20 rounded-3xl border-2 border-dashed border-primary/20 flex items-center justify-center bg-primary/5 overflow-hidden group cursor-pointer relative shadow-inner",
                       isUploading && "opacity-50"
                     )} onClick={() => logoInputRef.current?.click()}>
-                      {logoUrl ? <Image src={logoUrl} alt="Logo" fill className="object-cover" /> : <Upload className="w-6 h-6 text-primary" />}
+                      {logoUrl ? (
+                        isVideoLogo ? (
+                          <video src={logoUrl} className="w-full h-full object-cover" autoPlay loop muted playsInline />
+                        ) : (
+                          <Image src={logoUrl} alt="Logo" fill className="object-cover" />
+                        )
+                      ) : (
+                        isUploading ? <Loader2 className="animate-spin text-primary" /> : <Upload className="w-6 h-6 text-primary" />
+                      )}
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                          <Palette className="w-4 h-4 text-white" />
                       </div>
-                      <input type="file" ref={logoInputRef} className="hidden" accept="image/*" onChange={(e) => onFileSelect(e, 'logo')} />
+                      <input type="file" ref={logoInputRef} className="hidden" accept="image/*,video/*" onChange={(e) => onFileSelect(e, 'logo')} />
                     </div>
                     <div className="flex-1 space-y-1">
-                      <p className="text-xs font-bold uppercase tracking-tight">Identidade Visual</p>
-                      <p className="text-[10px] text-muted-foreground leading-tight font-medium">Escolha uma foto quadrada (1:1) para sua vitrine.</p>
-                      {logoUrl && <button onClick={() => setLogoUrl('')} className="text-[10px] font-black uppercase text-destructive hover:underline pt-1 transition-all">Remover Imagem</button>}
+                      <p className="text-xs font-bold uppercase tracking-tight">Mídia de Identidade</p>
+                      <p className="text-[10px] text-muted-foreground leading-tight font-medium">Aceitamos Imagem, GIF ou Vídeo curto.</p>
+                      {logoUrl && <button onClick={() => setLogoUrl('')} className="text-[10px] font-black uppercase text-destructive hover:underline pt-1 transition-all">Remover Identidade</button>}
                     </div>
                   </div>
                 </section>
@@ -843,12 +858,38 @@ export default function PPEditorPage() {
     }
   };
 
-  const onFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'logo') => {
+  // Melhorado para aceitar GIF/Vídeo sem recorte
+  const onFileSelect = async (e: React.ChangeEvent<HTMLInputElement>, type: 'logo') => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.addEventListener('load', () => { setTempImage(reader.result as string); setCropType(type); });
-    reader.readAsDataURL(file);
+
+    const isVideo = file.type.startsWith('video/');
+    const isGif = file.type === 'image/gif';
+
+    if (isVideo || isGif) {
+      // Pula o crop e faz upload direto
+      if (!user || !storage || !activeSlug) return;
+      setIsUploading(true);
+      try {
+        const storageRef = ref(storage, `users/${user.uid}/pp/${activeSlug}/${type}_${Date.now()}_${file.name}`);
+        await uploadBytes(storageRef, file, { contentType: file.type });
+        const url = await getDownloadURL(storageRef);
+        setLogoUrl(url);
+        toast({ title: "Mídia Processada", description: "Identidade dinâmica aplicada com sucesso." });
+      } catch (err) {
+        toast({ variant: "destructive", title: "Erro no processamento" });
+      } finally {
+        setIsUploading(false);
+      }
+    } else {
+      // Fluxo normal de crop para imagens estáticas
+      const reader = new FileReader();
+      reader.addEventListener('load', () => { 
+        setTempImage(reader.result as string); 
+        setCropType(type); 
+      });
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleConfirmCrop = async () => {
@@ -892,6 +933,8 @@ export default function PPEditorPage() {
     
     return currentSelection;
   }, [currentSelection, layout, muralIndex]);
+
+  const isVideoLogo = logoUrl && (logoUrl.includes('.mp4') || logoUrl.includes('.webm') || logoUrl.includes('.mov') || logoUrl.includes('testimonials_videos'));
 
   if (authLoading || userDataLoading || testimonialsLoading) return <LoadingScreen />;
 
@@ -968,7 +1011,7 @@ export default function PPEditorPage() {
                       <SheetTrigger asChild>
                          <Button variant="outline" className="lg:hidden h-12 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 border-primary/20 text-primary shadow-sm bg-background"><Palette className="w-4 h-4" /> Menu de Edição</Button>
                       </SheetTrigger>
-                      <SheetContent side="left" className="p-0 w-full sm:max-w-xs border-none shadow-2xl">
+                      <SheetContent side="left" className="p-0 w-full sm:max-w-xs border-none shadow-2xl overflow-hidden">
                          <SheetHeader className="sr-only">
                            <SheetTitle>Painel de Edição VIP</SheetTitle>
                            <SheetDescription>Configurações avançadas da sua página de autoridade.</SheetDescription>
@@ -1012,7 +1055,16 @@ export default function PPEditorPage() {
                   <div className="relative w-full max-w-[360px] flex-1 bg-background rounded-[3rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border-[10px] border-muted overflow-hidden flex flex-col aspect-[9/19] scale-[0.85] sm:scale-100 transition-all duration-700 ring-1 ring-primary/5">
                     <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col">
                         <header className="p-8 text-center space-y-6 shrink-0 pt-12">
-                          {logoUrl && <img src={logoUrl} className="w-24 h-24 mx-auto rounded-[2rem] object-cover shadow-2xl border-4 border-background ring-1 ring-primary/10 transition-transform duration-700 hover:scale-110" />}
+                          {logoUrl && (
+                             isVideoLogo ? (
+                               <div className="w-24 h-24 mx-auto rounded-[2rem] overflow-hidden shadow-2xl border-4 border-background ring-1 ring-primary/10 relative">
+                                 <video src={logoUrl} className="w-full h-full object-cover" autoPlay loop muted playsInline />
+                                 <div className="absolute top-2 right-2 bg-black/40 p-1 rounded-full"><FileVideo className="w-3 h-3 text-white" /></div>
+                               </div>
+                             ) : (
+                               <img src={logoUrl} className="w-24 h-24 mx-auto rounded-[2rem] object-cover shadow-2xl border-4 border-background ring-1 ring-primary/10 transition-transform duration-700 hover:scale-110" />
+                             )
+                          )}
                           <div className="space-y-4">
                               <div className="text-2xl font-black leading-[1.1] tracking-tighter" dangerouslySetInnerHTML={{ __html: heroTitle || 'Seu Título de Impacto' }} />
                               <div className="text-[11px] text-muted-foreground font-medium italic opacity-80 leading-relaxed px-2" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />
