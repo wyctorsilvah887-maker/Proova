@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useRef, forwardRef } from "react";
@@ -70,17 +69,10 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
         <Link href="/" className="flex items-center group -ml-2 md:-ml-4">
           <div className="relative w-[200px] h-[66px] md:w-[320px] md:h-[106px] transition-transform group-hover:scale-105">
             <Image 
-              src="/Logotipo%20PROOVA%20white%20mode%201.png" 
-              alt="Logo" 
+              src="/logo-proova-landing-white-mode.png" 
+              alt="Logo Proova" 
               fill 
               className="dark:hidden object-contain object-left" 
-              priority 
-            />
-            <Image 
-              src="/Logotipo%20PROOVA%20dark%20mode%201.png" 
-              alt="Logo" 
-              fill 
-              className="hidden dark:block object-contain object-left" 
               priority 
             />
           </div>
@@ -680,8 +672,12 @@ const Footer = () => {
     <footer className="py-20 border-t bg-background">
       <div className="container px-4 mx-auto flex flex-col items-center gap-12 text-center">
         <div className="relative w-[200px] h-[60px] opacity-40 grayscale">
-           <Image src="/Logotipo%20PROOVA%20white%20mode%201.png" alt="Logo Footer" fill className="dark:hidden object-contain" />
-           <Image src="/Logotipo%20PROOVA%20dark%20mode%201.png" alt="Logo Footer" fill className="hidden dark:block object-contain" />
+           <Image 
+             src="/logo-proova-landing-white-mode.png" 
+             alt="Logo Proova Footer" 
+             fill 
+             className="dark:hidden object-contain" 
+           />
         </div>
         <div className="space-y-8">
           <div className="flex flex-wrap justify-center gap-8 md:gap-12">
