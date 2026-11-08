@@ -55,8 +55,8 @@ export default function CollectionClient({ slug }: { slug: string }) {
   
   const [isPhotoChoiceOpen, setIsPhotoChoiceOpen] = useState(false);
   
-  const photoCameraInputRef = useRef<HTMLInputElement>(null);
-  const photoGalleryInputRef = useRef<HTMLInputElement>(null);
+  const cameraPhotoInputRef = useRef<HTMLInputElement>(null);
+  const galleryPhotoInputRef = useRef<HTMLInputElement>(null);
   const videoInputRef = useRef<HTMLInputElement>(null);
 
   const [honeypot, setHoneypot] = useState('');
@@ -109,9 +109,19 @@ export default function CollectionClient({ slug }: { slug: string }) {
   };
 
   const handleFinalSubmit = async () => {
-    if (honeypot || Date.now() - loadTime < 3000) return;
-    if (rating === 0) { toast({ variant: "destructive", title: "Nota Obrigatória" }); return; }
-    if (!userName.trim()) { toast({ variant: "destructive", title: "Identificação" }); return; }
+    if (honeypot || Date.now() - loadTime < 2000) return;
+    
+    // Validação de nota no clique
+    if (rating === 0) { 
+      toast({ 
+        variant: "destructive", 
+        title: "Nota Obrigatória", 
+        description: "Por favor, selecione de 1 a 5 estrelas antes de enviar." 
+      }); 
+      return; 
+    }
+    
+    if (!userName.trim()) { toast({ variant: "destructive", title: "Nome Obrigatório" }); return; }
     if (!text.trim()) { toast({ variant: "destructive", title: "Relato Obrigatório" }); return; }
     
     if (!targetUserId) return;
@@ -148,7 +158,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
       targetUserId, 
       destination: 'public',
       userName, 
-      userEmail, 
+      userEmail: userEmail.trim(), 
       rating, 
       text: text.trim(), 
       videoUrl: finalVideoUrl,
@@ -159,7 +169,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
       setSubmitted(true);
       setIsSubmitting(false);
     } else {
-      toast({ variant: "destructive", title: "Falha no Envio" });
+      toast({ variant: "destructive", title: "Falha no Envio", description: result.error });
       setIsSubmitting(false);
     }
   };
@@ -191,7 +201,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
                 </Button>
               </div>
             )}
-            <Button variant="ghost" onClick={() => { setSubmitted(false); setRecordedVideoUrl(null); setRecordedPhotoUrl(null); setActiveMode(null); setRating(0); }} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary">Enviar outro depoimento</Button>
+            <Button variant="ghost" onClick={() => { setSubmitted(false); setRecordedVideoUrl(null); setRecordedPhotoUrl(null); setActiveMode(null); setRating(0); setUserName(''); setText(''); setUserEmail(''); }} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary">Enviar outro depoimento</Button>
           </CardContent>
         </Card>
         
@@ -209,7 +219,9 @@ export default function CollectionClient({ slug }: { slug: string }) {
   const isEnterprise = membershipStatus === 'enterprise' || membershipStatus === 'trial';
   const hasMedia = !!recordedPhotoUrl || !!recordedVideoUrl;
   const shouldShowForm = activeMode === 'text' || hasMedia;
-  const isFormValid = rating > 0 && userName.trim() !== '' && text.trim() !== '';
+  
+  // Botão disponível apenas com Nome e Experiência preenchidos
+  const isFormValid = userName.trim() !== '' && text.trim() !== '';
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col items-center p-4 font-body text-foreground overflow-x-hidden">
@@ -218,13 +230,13 @@ export default function CollectionClient({ slug }: { slug: string }) {
       </div>
       
       {/* Inputs Nativos Ocultos */}
-      <input type="file" ref={photoCameraInputRef} accept="image/*" capture="environment" className="sr-only" onChange={handlePhotoSelect} />
-      <input type="file" ref={photoGalleryInputRef} accept="image/*" className="sr-only" onChange={handlePhotoSelect} />
+      <input type="file" ref={cameraPhotoInputRef} accept="image/*" capture="environment" className="sr-only" onChange={handlePhotoSelect} />
+      <input type="file" ref={galleryPhotoInputRef} accept="image/*" className="sr-only" onChange={handlePhotoSelect} />
       <input type="file" ref={videoInputRef} accept="video/*" capture="environment" className="sr-only" onChange={handleVideoSelect} />
 
       <div className="w-full max-w-xl flex-1 flex flex-col justify-start py-10 md:py-20 space-y-8">
         <header className="text-center space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
-          <div className="mx-auto w-20 h-20 rounded-[2rem] bg-primary/10 flex items-center justify-center text-primary shadow-inner">
+          <div className="mx-auto w-20 h-20 rounded-[2.5rem] bg-primary/10 flex items-center justify-center text-primary shadow-inner">
              <Building2 className="w-8 h-8" />
           </div>
           <div className="space-y-1">
@@ -329,7 +341,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
                   className={cn(
                     "w-full h-16 text-base font-black uppercase tracking-widest shadow-2xl rounded-2xl transition-all active:scale-95 gap-3",
                     isFormValid 
-                      ? "bg-primary hover:bg-primary/90 text-white animate-in fade-in zoom-in duration-300" 
+                      ? "bg-primary hover:bg-primary/90 text-white animate-in fade-in zoom-in duration-300 shadow-primary/20" 
                       : "bg-muted text-muted-foreground opacity-50 cursor-not-allowed"
                   )}
                 >
@@ -365,8 +377,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
             <Button 
               className="h-16 rounded-2xl gap-3 font-black uppercase tracking-widest shadow-xl text-[11px]"
               onClick={() => {
-                setActiveMode('photo');
-                photoCameraInputRef.current?.click();
+                cameraPhotoInputRef.current?.click();
               }}
             >
               <Camera className="w-5 h-5" /> Tirar Foto Agora
@@ -375,8 +386,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
               variant="outline"
               className="h-16 rounded-2xl gap-3 font-black uppercase tracking-widest border-primary/20 text-primary hover:bg-primary/5 text-[11px]"
               onClick={() => {
-                setActiveMode('photo');
-                photoGalleryInputRef.current?.click();
+                galleryPhotoInputRef.current?.click();
               }}
             >
               <ImageIcon className="w-5 h-5" /> Escolher da Galeria
@@ -384,7 +394,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
             <Button 
               variant="ghost"
               className="mt-2 text-[10px] font-black uppercase tracking-widest text-muted-foreground"
-              onClick={() => { setIsPhotoChoiceOpen(false); setActiveMode(null); }}
+              onClick={() => { setIsPhotoChoiceOpen(false); }}
             >
               Cancelar
             </Button>
