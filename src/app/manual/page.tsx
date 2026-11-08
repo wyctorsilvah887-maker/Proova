@@ -52,19 +52,10 @@ export default function ManualPage() {
 
   return (
     <div className="min-h-screen bg-muted/30 font-body text-foreground flex flex-col overflow-x-hidden">
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-4 md:px-8 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center gap-2 md:gap-4">
-          <Link href="/dash">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="rounded-full text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent h-10 w-10 focus-visible:ring-0"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
-          <div className="flex items-center group">
-            <div className="relative w-[180px] h-[60px] md:w-[320px] md:h-[105px]">
+      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
+        <div className="flex items-center gap-2">
+          <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
+            <div className="relative w-[180px] h-[60px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
               <Image 
                 src="/logo-proova-white-mode.gif" 
                 alt="Logo Proova" 
@@ -82,10 +73,19 @@ export default function ManualPage() {
                 unoptimized
               />
             </div>
-          </div>
+          </Link>
+          <Link href="/dash">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="rounded-full text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent h-10 w-10 focus-visible:ring-0"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </Button>
+          </Link>
         </div>
-        <div className="ml-auto flex items-center gap-4">
-          <ThemeToggle className="hidden sm:flex" />
+        <div className="ml-auto flex items-center gap-2 md:gap-4">
+          <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-0 focus:bg-transparent" />
           <Badge variant="secondary" className="hidden sm:flex items-center gap-1.5 h-7 font-black text-[10px] uppercase tracking-widest bg-primary/10 text-primary border-none">
             <BookOpen className="w-3 h-3" /> Central de Inteligência
           </Badge>
@@ -259,7 +259,7 @@ export default function ManualPage() {
           />
         </div>
         <div className="space-y-2">
-          <p className="text-[9px] text-muted-foreground uppercase tracking-[0.3em] font-black opacity-40">© 2026 Proova Technology - Inteligência em Reputação</p>
+          <p className="text-[9px] text-muted-foreground uppercase tracking-[0.3em] font-black opacity-40">© 2026 Proova Technology - Inteligência em Reputação e Conversão</p>
           <div className="flex items-center justify-center gap-6 pt-4">
             <Link href="/terms" className="text-[8px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary">Termos</Link>
             <Link href="/privacy" className="text-[8px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary">Privacidade</Link>
