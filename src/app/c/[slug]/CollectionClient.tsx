@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { 
   Star, CheckCircle2, Loader2, Send, Video, 
   Globe, Camera, ImageIcon, Trash2, Building2, Type, 
-  MapPin, X
+  MapPin, X, ArrowRight
 } from 'lucide-react';
 import { useFirestore, useStorage } from '@/firebase';
 import { collection, query, where, getDocs, limit, doc } from 'firebase/firestore';
@@ -20,6 +20,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
 import { submitTestimonialAction } from '@/app/actions/testimonial-actions';
 import { LoadingScreen } from '@/components/loading-screen';
+import Link from 'next/link';
 import {
   Dialog,
   DialogContent,
@@ -199,12 +200,17 @@ export default function CollectionClient({ slug }: { slug: string }) {
           </CardContent>
         </Card>
         
-        <footer className="mt-12 text-center opacity-40">
-           <div className="relative w-[180px] h-[60px] mx-auto mb-4">
-              <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain dark:hidden" priority unoptimized />
-              <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain hidden dark:block" priority unoptimized />
+        <footer className="mt-12 text-center space-y-4">
+           <div className="opacity-40">
+              <div className="relative w-[180px] h-[60px] mx-auto mb-2">
+                 <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain dark:hidden" priority unoptimized />
+                 <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain hidden dark:block" priority unoptimized />
+              </div>
+              <p className="text-[9px] font-black uppercase tracking-[0.3em]">© 2026 Proova Technology</p>
            </div>
-           <p className="text-[9px] font-black uppercase tracking-[0.3em]">© 2026 Proova Technology</p>
+           <Link href="/dash" className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.2em] text-primary hover:underline transition-all">
+              Usar o Proova no meu negócio <ArrowRight className="w-2.5 h-2.5" />
+           </Link>
         </footer>
       </div>
     );
@@ -350,10 +356,15 @@ export default function CollectionClient({ slug }: { slug: string }) {
                 <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain dark:hidden" priority unoptimized />
                 <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain hidden dark:block" priority unoptimized />
               </div>
-              <div className="flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-50">
-                <span>Segurança de Dados</span>
-                <div className="h-1 w-1 rounded-full bg-muted-foreground" />
-                <span>Proova Technology</span>
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-50">
+                  <span>Segurança de Dados</span>
+                  <div className="h-1 w-1 rounded-full bg-muted-foreground" />
+                  <span>Proova Technology</span>
+                </div>
+                <Link href="/dash" className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.2em] text-primary hover:underline transition-all">
+                   Criar minha máquina de depoimentos <ArrowRight className="w-2.5 h-2.5" />
+                </Link>
               </div>
            </div>
         </footer>
