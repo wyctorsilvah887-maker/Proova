@@ -69,11 +69,17 @@ export default function SignupPage() {
     setIsSubmitting(true);
     
     try {
+      // Limpeza do Slug
       const slug = company.trim().toLowerCase()
         .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
         .replace(/[^a-z0-9-]/g, '')
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-');
+
+      // Proteção contra erro de Segmento (Firestore)
+      if (!slug || slug === "") {
+        throw new Error("O nome da empresa é inválido para gerar um link. Tente usar letras e números comuns.");
+      }
 
       const slugRef = doc(db, 'slugs', slug);
       const slugCheck = await getDoc(slugRef);
@@ -90,7 +96,7 @@ export default function SignupPage() {
         console.error("Falha ao capturar IP", e);
       }
 
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
       const newUser = userCredential.user;
       
       const batch = writeBatch(db);
