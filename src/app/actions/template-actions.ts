@@ -2,9 +2,7 @@
 
 /**
  * @fileOverview Ação para listar templates de imagem disponíveis.
- * Em produção, evitamos o uso de 'fs' (File System) pois muitos servidores de 
- * hospedagem (como Firebase App Hosting/Vercel) não permitem leitura direta da pasta public.
- * Utilizamos uma lista mestre estática para garantir 100% de estabilidade.
+ * Fonte da Verdade Única: Sincronizado com os arquivos em /public/templates/
  */
 
 export interface TemplateMetadata {
@@ -19,14 +17,14 @@ export interface TemplateMetadata {
 }
 
 export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
-  // Lista Mestre de Templates (Fonte da Verdade Única para Produção)
-  // O primeiro item desta lista será o PADRÃO inicial do sistema.
+  // Lista Mestre de Templates (Exatamente como aparecem na pasta /public/templates/)
+  // O primeiro item será o PADRÃO inicial do sistema.
   const masterTemplates: TemplateMetadata[] = [
     {
       id: 'card-proova-padrao-laranja',
       name: 'Padrão Laranja',
       type: 'image',
-      imageUrl: '/templates/card-proova-padrao-laranja.png',
+      imageUrl: '/templates/card-proova-padrão-laranja.png',
       style: {
         background: '#f97316',
         color: '#ffffff'
@@ -53,17 +51,36 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
       }
     },
     {
-      id: 'card-padrao-light',
-      name: 'Padrão Light',
+      id: 'card-proova-social-vip',
+      name: 'Social Vip',
       type: 'image',
-      imageUrl: '/templates/card-padrao-light.png',
+      imageUrl: '/templates/card-proova-social-vip.png',
       style: {
-        background: '#ffffff',
-        color: '#0f172a'
+        background: '#1e1e1e',
+        color: '#ffffff'
+      }
+    },
+    {
+      id: 'card-pink',
+      name: 'Pink',
+      type: 'image',
+      imageUrl: '/templates/card-pink.png',
+      style: {
+        background: '#fdf2f8',
+        color: '#9d174d'
+      }
+    },
+    {
+      id: 'card-proova-padrao-dark-1',
+      name: 'Padrão Dark',
+      type: 'image',
+      imageUrl: '/templates/card-proova-padrão-dark (1).png',
+      style: {
+        background: '#111827',
+        color: '#ffffff'
       }
     }
   ];
 
-  // Em produção, retornamos apenas a lista mestre para evitar erros de permissão de disco
   return masterTemplates;
 }
