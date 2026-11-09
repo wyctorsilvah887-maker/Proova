@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -101,6 +100,10 @@ export default function SupportPage() {
   const activeTicket = activeTickets?.[0] as any;
   const isHumanSupportPresent = activeTicket?.isSupportInChat === true;
   const isSupportTyping = activeTicket?.isSupportTyping === true;
+
+  const isAgency = useMemo(() => {
+    return userData?.businessType === 'agencia';
+  }, [userData]);
 
   const messagesQuery = useMemo(() => {
     if (!db || !user) return null;
@@ -339,10 +342,12 @@ export default function SupportPage() {
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Layout className="mr-2 h-4 w-4 text-primary" />
-                <span>Meus Murais</span>
-              </DropdownMenuItem>
+              {isAgency && (
+                <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                  <Layout className="mr-2 h-4 w-4 text-primary" />
+                  <span>Meus Murais</span>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>
@@ -374,7 +379,7 @@ export default function SupportPage() {
                     <Bot className="w-6 h-6" />
                   </div>
                   <div className="space-y-0.5">
-                    <h3 className="text-sm font-black uppercase tracking-tight">Consultor Proova V1.0</h3>
+                    h3 className="text-sm font-black uppercase tracking-tight">Consultor Proova V1.0</h3>
                     <div className="flex items-center gap-1.5">
                       <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
                       <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Árvore de Decisão Ativa</span>

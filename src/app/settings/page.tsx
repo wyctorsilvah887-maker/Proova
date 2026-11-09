@@ -120,6 +120,10 @@ export default function SettingsPage() {
     }
   }, [userData]);
 
+  const isAgency = useMemo(() => {
+    return userData?.businessType === 'agencia';
+  }, [userData]);
+
   const isPremiumUser = useMemo(() => {
     const status = userData?.membershipStatus;
     return status === 'gold' || status === 'enterprise' || status === 'trial';
@@ -270,10 +274,12 @@ export default function SettingsPage() {
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Layout className="mr-2 h-4 w-4 text-primary" />
-                <span>Meus Murais</span>
-              </DropdownMenuItem>
+              {isAgency && (
+                <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                  <Layout className="mr-2 h-4 w-4 text-primary" />
+                  <span>Meus Murais</span>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>

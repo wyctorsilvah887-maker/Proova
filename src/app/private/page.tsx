@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState } from 'react';
@@ -73,6 +72,10 @@ export default function PrivateInboxPage() {
   const isPremiumUser = useMemo(() => {
     const status = userData?.membershipStatus;
     return status === 'gold' || status === 'enterprise' || status === 'trial';
+  }, [userData]);
+
+  const isAgency = useMemo(() => {
+    return userData?.businessType === 'agencia';
   }, [userData]);
 
   const isMapsLinkValid = useMemo(() => {
@@ -241,10 +244,12 @@ export default function PrivateInboxPage() {
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Layout className="mr-2 h-4 w-4 text-primary" />
-                <span>Meus Murais</span>
-              </DropdownMenuItem>
+              {isAgency && (
+                <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                  <Layout className="mr-2 h-4 w-4 text-primary" />
+                  <span>Meus Murais</span>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>

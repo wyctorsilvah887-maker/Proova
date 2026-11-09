@@ -195,6 +195,10 @@ export default function DashPage() {
     return status === 'enterprise';
   }, [userData]);
 
+  const isAgency = useMemo(() => {
+    return userData?.businessType === 'agencia';
+  }, [userData]);
+
   const isDigitalBusiness = useMemo(() => {
     return userData?.businessType === 'agencia' || userData?.businessType === 'servicos_digitais';
   }, [userData]);
@@ -268,7 +272,10 @@ export default function DashPage() {
   }, [isShareDialogOpen, selectedTestimonialForShare]);
 
   const setupSteps = useMemo(() => {
-    const s0 = { 
+    const allSteps = [];
+    
+    // Passo 0: Localização
+    allSteps.push({ 
       id: 'location', 
       label: 'Localização', 
       completed: !!userData?.city, 
@@ -277,43 +284,48 @@ export default function DashPage() {
         setConfigMode('location');
         setIsGoogleMapsDialogOpen(true);
       } 
-    };
+    });
 
-    const s1 = { 
-      id: 'google', 
-      label: 'Google Maps', 
-      completed: !!userData?.googleMapsUrl, 
-      unlocked: s0.completed, 
-      action: () => {
-        setConfigMode('maps');
-        setIsGoogleMapsDialogOpen(true);
-      } 
-    };
+    // Passo 1: Google Maps (Oculto se for digital mas não agência?)
+    // No Proova atual, apenas agências pulam Google Maps ou têm comportamento diferente.
+    if (!isDigitalBusiness) {
+      const prev = allSteps[allSteps.length - 1];
+      allSteps.push({ 
+        id: 'google', 
+        label: 'Google Maps', 
+        completed: !!userData?.googleMapsUrl, 
+        unlocked: prev.completed, 
+        action: () => {
+          setConfigMode('maps');
+          setIsGoogleMapsDialogOpen(true);
+        } 
+      });
+    }
 
-    const s2 = { 
+    // Passo 2: Coleta Ativa
+    const prevStep = allSteps[allSteps.length - 1];
+    allSteps.push({ 
       id: 'collect', 
       label: 'Coleta Ativa', 
       completed: (userData?.testimonialsCount || 0) > 0, 
-      unlocked: isDigitalBusiness ? s0.completed : s1.completed, 
+      unlocked: prevStep.completed, 
       action: () => setIsCollectLinkChoiceOpen(true) 
-    };
+    });
 
-    const s3 = { 
-      id: 'widget', 
-      label: 'Primeiro Mural', 
-      completed: !!(widgetsList && widgetsList.length > 0), 
-      unlocked: s2.completed, 
-      action: () => router.push('/widgets') 
-    };
-
-    const allSteps = [s0, s1, s2, s3];
-    
-    if (isDigitalBusiness) {
-      return allSteps.filter(s => s.id !== 'google');
+    // Passo 3: Primeiro Mural (EXCLUSIVO PARA AGÊNCIAS)
+    if (isAgency) {
+      const last = allSteps[allSteps.length - 1];
+      allSteps.push({ 
+        id: 'widget', 
+        label: 'Primeiro Mural', 
+        completed: !!(widgetsList && widgetsList.length > 0), 
+        unlocked: last.completed, 
+        action: () => router.push('/widgets') 
+      });
     }
 
     return allSteps;
-  }, [userData, widgetsList, router, isDigitalBusiness]);
+  }, [userData, widgetsList, router, isDigitalBusiness, isAgency]);
 
   const completedStepsCount = setupSteps.filter(s => s.completed).length;
   const progressPercentage = (completedStepsCount / setupSteps.length) * 100;
@@ -688,10 +700,12 @@ export default function DashPage() {
                 <Settings className="mr-2 h-4 w-4 text-primary" />
                 <span>Configurações</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Layout className="mr-2 h-4 w-4 text-primary" />
-                <span>Meus Murais</span>
-              </DropdownMenuItem>
+              {isAgency && (
+                <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                  <Layout className="mr-2 h-4 w-4 text-primary" />
+                  <span>Meus Murais</span>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>
@@ -955,16 +969,18 @@ export default function DashPage() {
               </div>
             </button>
 
-            <button 
-              onClick={() => router.push('/widgets')} 
-              className="h-24 rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
-            >
-              <Layout className="w-5 h-5 text-primary" />
-              <div className="text-center px-2">
-                <p className="text-[10px] font-black uppercase tracking-tight">Widgets</p>
-                <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Murais para Site</p>
-              </div>
-            </button>
+            {isAgency && (
+              <button 
+                onClick={() => router.push('/widgets')} 
+                className="h-24 rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
+              >
+                <Layout className="w-5 h-5 text-primary" />
+                <div className="text-center px-2">
+                  <p className="text-[10px] font-black uppercase tracking-tight">Widgets</p>
+                  <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Murais para Site</p>
+                </div>
+              </button>
+            )}
 
             <button 
               disabled={!isGoogleDone} 

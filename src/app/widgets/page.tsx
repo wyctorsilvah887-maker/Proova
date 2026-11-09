@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -90,12 +89,22 @@ export default function WidgetsPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
+  useEffect(() => {
+    if (userData && userData.businessType !== 'agencia') {
+      router.replace('/dash');
+    }
+  }, [userData, router]);
+
   const widgetsQuery = useMemo(() => {
     if (!db || !user) return null;
     return collection(db, 'users', user.uid, 'widgets');
   }, [db, user]);
 
   const { data: widgetsList, loading: widgetsLoading } = useCollection(widgetsQuery);
+
+  const isAgency = useMemo(() => {
+    return userData?.businessType === 'agencia';
+  }, [userData]);
 
   const isPremiumUser = useMemo(() => {
     const status = userData?.membershipStatus;
@@ -211,6 +220,8 @@ export default function WidgetsPage() {
     return <LoadingScreen />;
   }
 
+  if (userData && userData.businessType !== 'agencia') return null;
+
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
@@ -264,10 +275,12 @@ export default function WidgetsPage() {
                 <Settings className="mr-2 h-4 w-4 text-primary" />
                 <span>Configurações</span>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
-                <Layout className="mr-2 h-4 w-4 text-primary" />
-                <span>Meus Murais</span>
-              </DropdownMenuItem>
+              {isAgency && (
+                <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
+                  <Layout className="mr-2 h-4 w-4 text-primary" />
+                  <span>Meus Murais</span>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>

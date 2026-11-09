@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -114,6 +113,10 @@ export default function SocialCardsPage() {
     }
   }, [isShareDialogOpen, selectedTestimonialForShare]);
 
+  const isAgency = useMemo(() => {
+    return userData?.businessType === 'agencia';
+  }, [userData]);
+
   const isMapsLinkValid = useMemo(() => {
     if (!userData?.googleMapsUrl) return false;
     const url = userData.googleMapsUrl.toLowerCase();
@@ -217,7 +220,9 @@ export default function SocialCardsPage() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5"><TrendingUp className="mr-2 h-4 w-4 text-primary" /><span>Dash</span></DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5"><Layout className="mr-2 h-4 w-4 text-primary" /><span>Murais</span></DropdownMenuItem>
+              {isAgency && (
+                <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5"><Layout className="mr-2 h-4 w-4 text-primary" /><span>Meus Murais</span></DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
             </DropdownMenuContent>

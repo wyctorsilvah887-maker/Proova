@@ -241,6 +241,7 @@ const PublicPageSettings = ({
   isUploading,
   isGoldPlan,
   isEnterprise,
+  isAgency,
   logoInputRef,
   currentSlug, setSlugEdit,
   onClose,
@@ -707,6 +708,10 @@ export default function PPEditorPage() {
   }, [db, user, activeSlug]);
   const { data: ppData } = useDoc(ppRef);
 
+  const isAgency = useMemo(() => {
+    return userData?.businessType === 'agencia';
+  }, [userData]);
+
   const isEnterprise = userData?.membershipStatus === 'enterprise';
   const isGoldPlan = isEnterprise || userData?.membershipStatus === 'gold' || userData?.membershipStatus === 'trial';
   const SELECTION_LIMIT = isEnterprise ? Infinity : (isGoldPlan ? 50 : 5);
@@ -971,7 +976,7 @@ export default function PPEditorPage() {
             autoPublishMinRating={autoPublishMinRating} setAutoPublishMinRating={setAutoPublishMinRating}
             autoPublishMinChars={autoPublishMinChars} setAutoPublishMinChars={setAutoPublishMinChars}
             onFileSelect={onFileSelect}
-            isUploading={isUploading} isGoldPlan={isGoldPlan} isEnterprise={isEnterprise}
+            isUploading={isUploading} isGoldPlan={isGoldPlan} isEnterprise={isEnterprise} isAgency={isAgency}
             logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
             approvedTestimonials={approvedTestimonials}
             selectedIds={selectedIds}
@@ -1012,7 +1017,7 @@ export default function PPEditorPage() {
                             autoPublishMinRating={autoPublishMinRating} setAutoPublishMinRating={setAutoPublishMinRating}
                             autoPublishMinChars={autoPublishMinChars} setAutoPublishMinChars={setAutoPublishMinChars}
                             onFileSelect={onFileSelect}
-                            isUploading={isUploading} isGoldPlan={isGoldPlan} isEnterprise={isEnterprise}
+                            isUploading={isUploading} isGoldPlan={isGoldPlan} isEnterprise={isEnterprise} isAgency={isAgency}
                             logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
                             onClose={() => setIsSheetOpen(false)}
                             approvedTestimonials={approvedTestimonials}
@@ -1074,6 +1079,29 @@ export default function PPEditorPage() {
                                 <div className="h-7 w-7 md:h-8 md:w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20"><User className="w-3.5 h-3.5 md:w-4 md:h-4" /></div>
                               </Button>
                             </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
+                                <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
+                                <DropdownMenuSeparator className="mx-1" />
+                                <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                                    <TrendingUp className="mr-2 h-4 w-4 text-primary" />
+                                    <span>Dash</span>
+                                </DropdownMenuItem>
+                                {isAgency && (
+                                    <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                                        <Layout className="mr-2 h-4 w-4 text-primary" />
+                                        <span>Meus Murais</span>
+                                    </DropdownMenuItem>
+                                )}
+                                <DropdownMenuItem onClick={() => router.push('/settings')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                                    <Settings className="mr-2 h-4 w-4 text-primary" />
+                                    <span>Configurações</span>
+                                </DropdownMenuItem>
+                                <DropdownMenuSeparator className="mx-1" />
+                                <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5">
+                                    <LogOut className="mr-2 h-4 w-4" />
+                                    <span>Sair</span>
+                                </DropdownMenuItem>
+                            </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
 
