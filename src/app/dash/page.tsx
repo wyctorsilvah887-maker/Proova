@@ -744,7 +744,6 @@ export default function DashPage() {
       </header>
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-20 md:pt-24 pb-12">
-        {/* ... (existing setup missions and reputation actions) ... */}
         {(!isSetupComplete && !userData?.isSetupProcessDone) && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="flex items-center justify-between">
@@ -1377,7 +1376,7 @@ export default function DashPage() {
                             <p className={cn("font-black text-[10px] sm:text-xs uppercase tracking-[0.3em]", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>{selectedTestimonialForShare?.userName}</p>
                             <div className={cn("px-4 py-1 rounded-full border inline-flex items-center gap-1.5 backdrop-blur-md shadow-sm", activeTemplate?.style.color === '#ffffff' ? "bg-primary/20 border-primary/30" : "bg-primary/10 border-primary/20")}>
                                 <CheckCircle2 className="w-3 h-3 text-primary fill-primary/5" />
-                                <p className={cn("text-[6px] sm:text-[7px] font-black uppercase tracking-[0.15em]", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>Feedback Verificado</p>
+                                <p className={cn("text-[6px] sm:text-[7px] font-black uppercase tracking-[0.15em]", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>coletado via Proova</p>
                             </div>
                           </div>
                       </div>

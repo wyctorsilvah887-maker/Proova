@@ -476,7 +476,7 @@ export default function SocialCardsPage() {
                                 <p className={cn(
                                   "text-[6px] sm:text-[7px] font-black uppercase tracking-[0.15em]",
                                   activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black"
-                                )}>Feedback Verificado</p>
+                                )}>coletado via Proova</p>
                             </div>
                           </div>
                       </div>
