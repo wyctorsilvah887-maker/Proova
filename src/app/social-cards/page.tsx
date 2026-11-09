@@ -83,6 +83,11 @@ export default function SocialCardsPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData } = useDoc(userDocRef);
 
+  const isPremiumUser = useMemo(() => {
+    const status = userData?.membershipStatus;
+    return status === 'gold' || status === 'enterprise' || status === 'trial';
+  }, [userData]);
+
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
     return collection(db, 'users', user.uid, 'testimonials');
@@ -202,6 +207,20 @@ export default function SocialCardsPage() {
     }
   };
 
+  const handleTemplateClick = (tpl: TemplateMetadata) => {
+    const isVip = tpl.id.toLowerCase().includes('vip');
+    if (isVip && !isPremiumUser) {
+      shadcnToast({
+        variant: "destructive",
+        title: "Recurso Premium",
+        description: "Templates VIP estão disponíveis apenas nos planos Gold e Enterprise."
+      });
+      router.push('/pricing');
+      return;
+    }
+    setSelectedTemplateId(tpl.id);
+  };
+
   if (authLoading || (user && (testimonialsLoading || !userData))) {
     return <LoadingScreen />;
   }
@@ -319,28 +338,44 @@ export default function SocialCardsPage() {
               ) : (
                 <ScrollArea className="w-full whitespace-nowrap rounded-xl border p-2 bg-muted/20">
                   <div className="flex w-max space-x-3 p-1">
-                    {availableTemplates.map((tpl) => (
-                      <button
-                        key={tpl.id}
-                        onClick={() => setSelectedTemplateId(tpl.id)}
-                        className={cn(
-                          "relative flex flex-col items-center gap-2 p-2 rounded-xl transition-all border-2",
-                          selectedTemplateId === tpl.id 
-                            ? "border-primary bg-primary/5 shadow-md" 
-                            : "border-transparent hover:border-primary/20"
-                        )}
-                      >
-                        <div className="w-12 h-12 rounded-lg shadow-inner overflow-hidden relative bg-black">
-                          <Image src={tpl.imageUrl} alt={tpl.name} fill className="object-cover" />
-                        </div>
-                        <span className="text-[8px] font-black uppercase tracking-tighter">{tpl.name}</span>
-                        {selectedTemplateId === tpl.id && (
-                          <div className="absolute -top-1 -right-1 bg-primary text-white p-0.5 rounded-full ring-2 ring-background">
-                            <Check className="w-2" />
+                    {availableTemplates.map((tpl) => {
+                      const isVip = tpl.id.toLowerCase().includes('vip');
+                      const isLocked = isVip && !isPremiumUser;
+                      
+                      return (
+                        <button
+                          key={tpl.id}
+                          onClick={() => handleTemplateClick(tpl)}
+                          className={cn(
+                            "relative flex flex-col items-center gap-2 p-2 rounded-xl transition-all border-2",
+                            selectedTemplateId === tpl.id 
+                              ? "border-primary bg-primary/5 shadow-md" 
+                              : "border-transparent hover:border-primary/20",
+                            isLocked && "grayscale opacity-80"
+                          )}
+                        >
+                          <div className="w-12 h-12 rounded-lg shadow-inner overflow-hidden relative bg-black">
+                            <Image src={tpl.imageUrl} alt={tpl.name} fill className="object-cover" />
+                            {isLocked && (
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                                <Lock className="w-4 h-4 text-white" />
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </button>
-                    ))}
+                          <div className="flex flex-col items-center">
+                            <span className="text-[8px] font-black uppercase tracking-tighter">{tpl.name}</span>
+                            {isVip && (
+                              <Badge className="h-3 text-[5px] font-black uppercase bg-primary/20 text-primary border-none px-1">VIP</Badge>
+                            )}
+                          </div>
+                          {selectedTemplateId === tpl.id && !isLocked && (
+                            <div className="absolute -top-1 -right-1 bg-primary text-white p-0.5 rounded-full ring-2 ring-background">
+                              <Check className="w-2" />
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                   <ScrollBar orientation="horizontal" />
                 </ScrollArea>
