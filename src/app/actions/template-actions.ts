@@ -21,8 +21,18 @@ export interface TemplateMetadata {
 
 export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
   // Lista Mestre de Templates (Garante exibição em produção)
-  // Adicione novos templates aqui sempre que criar um novo PNG no Canva
+  // O primeiro item desta lista será o PADRÃO inicial do sistema.
   const masterTemplates: TemplateMetadata[] = [
+    {
+      id: 'card-proova-padrao-laranja',
+      name: 'Padrão Laranja',
+      type: 'image',
+      imageUrl: '/templates/card-proova-padrao-laranja.png',
+      style: {
+        background: '#f97316',
+        color: '#ffffff'
+      }
+    },
     {
       id: 'card-black-vip',
       name: 'Black Vip',
@@ -104,7 +114,7 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
       };
     });
 
-    // Retorna a união sem duplicatas
+    // Retorna a união sem duplicatas, mantendo a ordem da master primeiro
     const allTemplates = [...masterTemplates];
     dynamicTemplates.forEach(dt => {
       if (!allTemplates.find(t => t.id === dt.id)) {
@@ -112,10 +122,7 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
       }
     });
 
-    return allTemplates.sort((a, b) => {
-      if (a.id === 'card-black-vip') return -1;
-      return 0;
-    });
+    return allTemplates;
 
   } catch (error) {
     console.error("Erro ao ler diretório de templates:", error);
