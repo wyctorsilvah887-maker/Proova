@@ -1298,18 +1298,18 @@ export default function DashPage() {
       </Dialog>
 
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
-        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[96vh] flex flex-col">
-          <DialogHeader className="p-6 sm:p-8 pb-2 text-center shrink-0">
+        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[92vh] flex flex-col">
+          <DialogHeader className="p-4 sm:p-8 pb-2 text-center shrink-0">
             <div className="flex items-center justify-center gap-2 mb-1">
-               <Sparkles className="w-5 h-5 text-primary" />
-               <DialogTitle className="text-xl font-black font-headline uppercase tracking-tight">Social Design Studio</DialogTitle>
+               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+               <DialogTitle className="text-lg sm:text-xl font-black font-headline uppercase tracking-tight">Social Design Studio</DialogTitle>
             </div>
-            <DialogDescription className="text-xs font-medium">Selecione um template e gere sua arte para post.</DialogDescription>
+            <DialogDescription className="text-[10px] sm:text-xs font-medium">Selecione um template e gere sua arte para post.</DialogDescription>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6 flex flex-col items-center gap-6 scrollbar-hide">
+          <div className="flex-1 overflow-y-auto px-3 sm:px-6 pb-6 flex flex-col items-center gap-4 sm:gap-6 scrollbar-hide">
             <div className="w-full shrink-0">
-              <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-3 ml-1">Templates Disponíveis:</p>
+              <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-2 sm:mb-3 ml-1">Templates Disponíveis:</p>
               {isLoadingTemplates ? (
                 <div className="flex justify-center py-4"><Loader2 className="animate-spin h-5 w-5 text-primary" /></div>
               ) : (
@@ -1328,12 +1328,12 @@ export default function DashPage() {
                             isLocked && "grayscale opacity-80"
                           )}
                         >
-                          <div className="w-12 h-12 rounded-lg shadow-inner overflow-hidden relative bg-black">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg shadow-inner overflow-hidden relative bg-black">
                             <Image src={tpl.imageUrl} alt={tpl.name} fill className="object-cover" />
                             {isLocked && <div className="absolute inset-0 bg-black/40 flex items-center justify-center"><Lock className="w-4 h-4 text-white" /></div>}
                           </div>
                           <div className="flex flex-col items-center">
-                            <span className="text-[8px] font-black uppercase tracking-tighter">{tpl.name}</span>
+                            <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-tighter">{tpl.name}</span>
                             {isVip && <Badge className="h-3 text-[5px] font-black uppercase bg-primary/20 text-primary border-none px-1">VIP</Badge>}
                           </div>
                         </button>
@@ -1345,38 +1345,38 @@ export default function DashPage() {
               )}
             </div>
 
-            <div className="w-full flex justify-center py-2 shrink-0">
+            <div className="w-full flex justify-center py-1 shrink-0">
               <div 
                 ref={shareCardRef}
                 className={cn(
                   "relative overflow-hidden shadow-2xl transition-all duration-700",
-                  "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] flex flex-col items-center"
+                  "w-[min(92vw,400px)] aspect-square rounded-[2rem] sm:rounded-[2.5rem] flex flex-col items-center"
                 )}
                 style={{ backgroundColor: activeTemplate?.style.background || '#000000' }}
               >
                    {activeTemplate?.imageUrl && <div className="absolute inset-0 z-0"><Image src={activeTemplate.imageUrl} alt="Bg" fill className="object-cover" priority /></div>}
-                   <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-8 sm:p-12">
-                      <div className="text-center space-y-1 mt-4">
-                        <p className={cn("text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em]", activeTemplate?.style.color === '#ffffff' ? "text-white/80" : "text-black/80")}>RELATO DE CLIENTE</p>
+                   <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-6 sm:p-12">
+                      <div className="text-center space-y-1 mt-2 sm:mt-4">
+                        <p className={cn("text-[9px] sm:text-[11px] font-black uppercase tracking-[0.2em]", activeTemplate?.style.color === '#ffffff' ? "text-white/80" : "text-black/80")}>RELATO DE CLIENTE</p>
                       </div>
                       <div className="flex-1 flex flex-col justify-center items-center w-full py-2 text-center">
-                        <div className="flex justify-center gap-1 mb-4">
-                            {[1,2,3,4,5].map((_, i) => <Star key={i} className="w-5 h-5 sm:w-7 sm:h-7 fill-[#fbbf24] text-[#fbbf24] drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" />)}
+                        <div className="flex justify-center gap-1 mb-3 sm:mb-4">
+                            {[1,2,3,4,5].map((_, i) => <Star key={i} className="w-4 h-4 sm:w-7 sm:h-7 fill-[#fbbf24] text-[#fbbf24] drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" />)}
                         </div>
-                        <div className="relative w-full max-w-[85%]">
-                          <Quote className={cn("absolute -top-3 -left-3 w-5 h-5 opacity-20 rotate-180", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")} />
-                          <div className={cn("p-5 sm:p-7 rounded-[1.8rem] shadow-2xl ring-1", activeTemplate?.style.color === '#ffffff' ? "bg-white/5 backdrop-blur-xl border-white/10 ring-white/5" : "bg-black/5 backdrop-blur-md border-black/5 ring-black/5")}>
-                            <p className={cn("font-black font-headline leading-tight italic tracking-tight", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black", (selectedTestimonialForShare?.text?.length || 0) > 180 ? "text-[10px] sm:text-xs" : (selectedTestimonialForShare?.text?.length || 0) > 120 ? "text-xs sm:text-sm" : (selectedTestimonialForShare?.text?.length || 0) > 80 ? "text-sm sm:text-base" : "text-lg sm:text-xl")}>"{selectedTestimonialForShare?.text}"</p>
+                        <div className="relative w-full max-w-[90%] sm:max-w-[85%]">
+                          <Quote className={cn("absolute -top-2 -left-2 sm:-top-3 sm:-left-3 w-4 h-4 sm:w-5 sm:h-5 opacity-20 rotate-180", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")} />
+                          <div className={cn("p-4 sm:p-7 rounded-[1.5rem] sm:rounded-[1.8rem] shadow-2xl ring-1", activeTemplate?.style.color === '#ffffff' ? "bg-white/5 backdrop-blur-xl border-white/10 ring-white/5" : "bg-black/5 backdrop-blur-md border-black/5 ring-black/5")}>
+                            <p className={cn("font-black font-headline leading-tight italic tracking-tight", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black", (selectedTestimonialForShare?.text?.length || 0) > 180 ? "text-[9px] sm:text-xs" : (selectedTestimonialForShare?.text?.length || 0) > 120 ? "text-[10px] sm:text-sm" : (selectedTestimonialForShare?.text?.length || 0) > 80 ? "text-xs sm:text-base" : "text-base sm:text-xl")}>"{selectedTestimonialForShare?.text}"</p>
                           </div>
-                          <Quote className={cn("absolute -bottom-3 -right-3 w-5 h-5 opacity-20", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")} />
+                          <Quote className={cn("absolute -bottom-2 -right-2 sm:-bottom-3 sm:-right-3 w-4 h-4 sm:w-5 sm:h-5 opacity-20", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")} />
                         </div>
                       </div>
-                      <div className={cn("w-full pt-4 mb-4", activeTemplate?.style.color === '#ffffff' ? "border-t border-white/10" : "border-t border-black/10")}>
-                          <div className="flex flex-col items-center gap-2">
-                            <p className={cn("font-black text-[10px] sm:text-xs uppercase tracking-[0.3em]", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>{selectedTestimonialForShare?.userName}</p>
-                            <div className={cn("px-4 py-1 rounded-full border inline-flex items-center gap-1.5 backdrop-blur-md shadow-sm", activeTemplate?.style.color === '#ffffff' ? "bg-primary/20 border-primary/30" : "bg-primary/10 border-primary/20")}>
-                                <CheckCircle2 className="w-3 h-3 text-primary fill-primary/5" />
-                                <p className={cn("text-[6px] sm:text-[7px] font-black uppercase tracking-[0.15em]", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>coletado via Proova</p>
+                      <div className={cn("w-full pt-3 sm:pt-4 mb-2 sm:mb-4", activeTemplate?.style.color === '#ffffff' ? "border-t border-white/10" : "border-t border-black/10")}>
+                          <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+                            <p className={cn("font-black text-[9px] sm:text-xs uppercase tracking-[0.3em]", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>{selectedTestimonialForShare?.userName}</p>
+                            <div className={cn("px-3 sm:px-4 py-0.5 sm:py-1 rounded-full border inline-flex items-center gap-1 sm:gap-1.5 backdrop-blur-md shadow-sm", activeTemplate?.style.color === '#ffffff' ? "bg-primary/20 border-primary/30" : "bg-primary/10 border-primary/20")}>
+                                <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-primary fill-primary/5" />
+                                <p className={cn("text-[5px] sm:text-[7px] font-black uppercase tracking-[0.15em]", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>coletado via Proova</p>
                             </div>
                           </div>
                       </div>
@@ -1385,17 +1385,17 @@ export default function DashPage() {
             </div>
 
             <Button 
-              className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-xs bg-primary hover:bg-primary/90 text-white"
+              className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-[10px] sm:text-xs bg-primary hover:bg-primary/90 text-white"
               onClick={handleDownloadContent}
               disabled={isExportingCard}
             >
-              {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-5 h-5" />}
+              {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-4 h-4 sm:w-5 sm:h-5" />}
               {selectedTestimonialForShare?.videoUrl ? 'Baixar Vídeo Review' : 'Gerar Arte PNG'}
             </Button>
           </div>
           
-          <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
-            <p className="text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
+          <DialogFooter className="p-4 sm:p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
+            <p className="text-[8px] sm:text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
               <Zap className="w-3 h-3 text-primary" /> Dica: Poste este card no seu Story para aumentar seu alcance.
             </p>
           </DialogFooter>
