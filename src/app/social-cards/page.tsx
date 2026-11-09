@@ -31,7 +31,8 @@ import {
   Zap,
   Check,
   Palette,
-  Sparkles
+  Sparkles,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -60,14 +61,15 @@ import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 /**
  * Definição dos Templates disponíveis.
- * Você pode adicionar mais templates aqui conforme subir novas artes na pasta /public/templates/
+ * O template Black VIP é o padrão conforme solicitado.
  */
 const CARD_TEMPLATES = [
   { 
-    id: 'dark-vip', 
-    name: 'Dark VIP', 
-    type: 'gradient',
-    style: { background: 'linear-gradient(160deg, #050505 0%, #1a1a1a 60%, #f97316 160%)', color: '#ffffff' } 
+    id: 'black-vip', 
+    name: 'Black VIP (Padrão)', 
+    type: 'image',
+    imageUrl: '/templates/card-black-vip.png',
+    style: { background: '#000000', color: '#ffffff' } 
   },
   { 
     id: 'orange-boost', 
@@ -76,18 +78,10 @@ const CARD_TEMPLATES = [
     style: { background: 'linear-gradient(160deg, #f97316 0%, #ea580c 70%, #ffffff 180%)', color: '#ffffff' } 
   },
   { 
-    id: 'premium-aesthetic', 
-    name: 'Premium Estética', 
-    type: 'image',
-    imageUrl: '/templates/card-aesthetic.png', // Exemplo de caminho na pasta public
-    style: { background: '#f8fafc', color: '#0f172a' } 
-  },
-  { 
-    id: 'agency-gold', 
-    name: 'Agência Gold', 
-    type: 'image',
-    imageUrl: '/templates/card-agency.png', // Exemplo de caminho na pasta public
-    style: { background: '#000000', color: '#ffffff' } 
+    id: 'dark-classic', 
+    name: 'Dark Classic', 
+    type: 'gradient',
+    style: { background: 'linear-gradient(160deg, #050505 0%, #1a1a1a 60%, #f97316 160%)', color: '#ffffff' } 
   },
   { 
     id: 'clean-minimal', 
@@ -173,6 +167,8 @@ export default function SocialCardsPage() {
 
   const openShareDialog = (testimonial: any) => {
     setSelectedTestimonialForShare(testimonial);
+    // Resetar para o template padrão (Black VIP) ao abrir
+    setSelectedTemplateId(CARD_TEMPLATES[0].id);
     setIsShareDialogOpen(true);
   };
 
@@ -320,13 +316,13 @@ export default function SocialCardsPage() {
                <Sparkles className="w-5 h-5 text-primary" />
                <DialogTitle className="text-xl font-black font-headline uppercase tracking-tight">Estúdio de Design VIP</DialogTitle>
             </div>
-            <DialogDescription className="text-xs font-medium">Selecione o melhor template para sua marca.</DialogDescription>
+            <DialogDescription className="text-xs font-medium">O template Black VIP já está aplicado por padrão.</DialogDescription>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6 flex flex-col items-center gap-8 scrollbar-hide">
             {/* Template Selector */}
             <div className="w-full shrink-0">
-              <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-3 ml-1">Escolha o Modelo:</p>
+              <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-3 ml-1">Estilos Disponíveis:</p>
               <ScrollArea className="w-full whitespace-nowrap rounded-xl border p-2 bg-muted/20">
                 <div className="flex w-max space-x-3 p-1">
                   {CARD_TEMPLATES.map((tpl) => (
@@ -341,11 +337,15 @@ export default function SocialCardsPage() {
                       )}
                     >
                       <div 
-                        className="w-12 h-12 rounded-lg shadow-inner overflow-hidden" 
+                        className="w-12 h-12 rounded-lg shadow-inner overflow-hidden relative" 
                         style={{ 
-                          background: tpl.type === 'image' ? `url(${tpl.imageUrl}) center/cover` : tpl.style.background 
+                          background: tpl.type === 'gradient' ? tpl.style.background : '#000'
                         }} 
-                      />
+                      >
+                        {tpl.type === 'image' && (
+                          <Image src={tpl.imageUrl!} alt={tpl.name} fill className="object-cover" />
+                        )}
+                      </div>
                       <span className="text-[8px] font-black uppercase tracking-tighter">{tpl.name}</span>
                       {selectedTemplateId === tpl.id && (
                         <div className="absolute -top-1 -right-1 bg-primary text-white p-0.5 rounded-full ring-2 ring-background">
@@ -368,13 +368,23 @@ export default function SocialCardsPage() {
                   "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] flex flex-col items-center"
                 )}
                 style={{ 
-                  background: activeTemplate.type === 'image' 
-                    ? `url(${activeTemplate.imageUrl}) center/cover no-repeat` 
-                    : activeTemplate.style.background,
-                  backgroundColor: activeTemplate.style.background.includes('url') ? undefined : activeTemplate.style.background
+                  background: activeTemplate.type === 'gradient' ? activeTemplate.style.background : 'transparent',
                 }}
               >
-                   {/* Decorative elements for classic variants */}
+                   {/* Background Image Template */}
+                   {activeTemplate.type === 'image' && (
+                     <div className="absolute inset-0 z-0">
+                       <Image 
+                         src={activeTemplate.imageUrl!} 
+                         alt="Template Background" 
+                         fill 
+                         className="object-cover" 
+                         priority
+                       />
+                     </div>
+                   )}
+
+                   {/* Decorative elements for gradient variants */}
                    {activeTemplate.type === 'gradient' && (
                      <>
                         <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20" />
