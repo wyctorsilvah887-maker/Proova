@@ -58,38 +58,7 @@ import { toPng } from 'html-to-image';
 import { toast as shadcnToast } from '@/hooks/use-toast';
 import { LoadingScreen } from '@/components/loading-screen';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-
-/**
- * Definição dos Templates disponíveis.
- * O template Black VIP é o padrão conforme solicitado.
- */
-const CARD_TEMPLATES = [
-  { 
-    id: 'black-vip', 
-    name: 'Black VIP (Padrão)', 
-    type: 'image',
-    imageUrl: '/templates/card-black-vip.png',
-    style: { background: '#000000', color: '#ffffff' } 
-  },
-  { 
-    id: 'orange-boost', 
-    name: 'Orange Boost', 
-    type: 'gradient',
-    style: { background: 'linear-gradient(160deg, #f97316 0%, #ea580c 70%, #ffffff 180%)', color: '#ffffff' } 
-  },
-  { 
-    id: 'dark-classic', 
-    name: 'Dark Classic', 
-    type: 'gradient',
-    style: { background: 'linear-gradient(160deg, #050505 0%, #1a1a1a 60%, #f97316 160%)', color: '#ffffff' } 
-  },
-  { 
-    id: 'clean-minimal', 
-    name: 'Clean Minimal', 
-    type: 'gradient',
-    style: { background: 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)', color: '#0f172a' } 
-  }
-];
+import { getAvailableTemplates, type TemplateMetadata } from '@/app/actions/template-actions';
 
 export default function SocialCardsPage() {
   const { user, loading: authLoading } = useUser();
@@ -102,7 +71,11 @@ export default function SocialCardsPage() {
   const [selectedTestimonialForShare, setSelectedTestimonialForShare] = useState<any>(null);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isExportingCard, setIsExportingCard] = useState(false);
-  const [selectedTemplateId, setSelectedTemplateId] = useState(CARD_TEMPLATES[0].id);
+  
+  // Templates Dinâmicos
+  const [availableTemplates, setAvailableTemplates] = useState<TemplateMetadata[]>([]);
+  const [isLoadingTemplates, setIsLoadingTemplates] = useState(true);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('');
   
   const shareCardRef = useRef<HTMLDivElement>(null);
   const dialogVideoRef = useRef<HTMLVideoElement>(null);
@@ -116,6 +89,20 @@ export default function SocialCardsPage() {
   }, [db, user]);
 
   const { data: rawTestimonials, loading: testimonialsLoading } = useCollection(testimonialsQuery);
+
+  // Carrega templates da pasta public/templates
+  useEffect(() => {
+    async function loadTemplates() {
+      setIsLoadingTemplates(true);
+      const templates = await getAvailableTemplates();
+      setAvailableTemplates(templates);
+      if (templates.length > 0) {
+        setSelectedTemplateId(templates[0].id);
+      }
+      setIsLoadingTemplates(false);
+    }
+    loadTemplates();
+  }, []);
 
   const allApprovedTestimonials = useMemo(() => {
     if (!rawTestimonials) return [];
@@ -149,8 +136,8 @@ export default function SocialCardsPage() {
   }, [isShareDialogOpen, selectedTestimonialForShare]);
 
   const activeTemplate = useMemo(() => {
-    return CARD_TEMPLATES.find(t => t.id === selectedTemplateId) || CARD_TEMPLATES[0];
-  }, [selectedTemplateId]);
+    return availableTemplates.find(t => t.id === selectedTemplateId) || availableTemplates[0];
+  }, [selectedTemplateId, availableTemplates]);
 
   const isAgency = useMemo(() => {
     return userData?.businessType === 'agencia';
@@ -167,8 +154,10 @@ export default function SocialCardsPage() {
 
   const openShareDialog = (testimonial: any) => {
     setSelectedTestimonialForShare(testimonial);
-    // Resetar para o template padrão (Black VIP) ao abrir
-    setSelectedTemplateId(CARD_TEMPLATES[0].id);
+    // Inicia com o primeiro template disponível (Black VIP se existir)
+    if (availableTemplates.length > 0) {
+      setSelectedTemplateId(availableTemplates[0].id);
+    }
     setIsShareDialogOpen(true);
   };
 
@@ -300,7 +289,7 @@ export default function SocialCardsPage() {
                        <p className="text-xs italic leading-relaxed text-muted-foreground line-clamp-3 font-medium px-2">"{t.text}"</p>
                     </div>
                     <Button className="w-full h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] gap-2 bg-foreground text-background group-hover:bg-primary group-hover:text-white transition-all shadow-lg">
-                       <Share2 className="w-4 h-4" /> Customizar Arte
+                       <Share2 className="w-4 h-4" /> Criar Card
                     </Button>
                  </CardContent>
               </Card>
@@ -314,49 +303,48 @@ export default function SocialCardsPage() {
           <DialogHeader className="p-6 sm:p-8 pb-2 text-center shrink-0">
             <div className="flex items-center justify-center gap-2 mb-1">
                <Sparkles className="w-5 h-5 text-primary" />
-               <DialogTitle className="text-xl font-black font-headline uppercase tracking-tight">Estúdio de Design VIP</DialogTitle>
+               <DialogTitle className="text-xl font-black font-headline uppercase tracking-tight">Social Design Studio</DialogTitle>
             </div>
-            <DialogDescription className="text-xs font-medium">O template Black VIP já está aplicado por padrão.</DialogDescription>
+            <DialogDescription className="text-xs font-medium">Os templates em /public/templates são carregados automaticamente.</DialogDescription>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6 flex flex-col items-center gap-8 scrollbar-hide">
             {/* Template Selector */}
             <div className="w-full shrink-0">
-              <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-3 ml-1">Estilos Disponíveis:</p>
-              <ScrollArea className="w-full whitespace-nowrap rounded-xl border p-2 bg-muted/20">
-                <div className="flex w-max space-x-3 p-1">
-                  {CARD_TEMPLATES.map((tpl) => (
-                    <button
-                      key={tpl.id}
-                      onClick={() => setSelectedTemplateId(tpl.id)}
-                      className={cn(
-                        "relative flex flex-col items-center gap-2 p-2 rounded-xl transition-all border-2",
-                        selectedTemplateId === tpl.id 
-                          ? "border-primary bg-primary/5 shadow-md" 
-                          : "border-transparent hover:border-primary/20"
-                      )}
-                    >
-                      <div 
-                        className="w-12 h-12 rounded-lg shadow-inner overflow-hidden relative" 
-                        style={{ 
-                          background: tpl.type === 'gradient' ? tpl.style.background : '#000'
-                        }} 
-                      >
-                        {tpl.type === 'image' && (
-                          <Image src={tpl.imageUrl!} alt={tpl.name} fill className="object-cover" />
+              <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-3 ml-1">Templates Disponíveis:</p>
+              {isLoadingTemplates ? (
+                <div className="flex justify-center py-4"><Loader2 className="animate-spin h-5 w-5 text-primary" /></div>
+              ) : availableTemplates.length === 0 ? (
+                <div className="text-center py-4 bg-muted/20 rounded-xl border border-dashed text-[8px] font-bold uppercase opacity-50">Nenhum template PNG em /public/templates</div>
+              ) : (
+                <ScrollArea className="w-full whitespace-nowrap rounded-xl border p-2 bg-muted/20">
+                  <div className="flex w-max space-x-3 p-1">
+                    {availableTemplates.map((tpl) => (
+                      <button
+                        key={tpl.id}
+                        onClick={() => setSelectedTemplateId(tpl.id)}
+                        className={cn(
+                          "relative flex flex-col items-center gap-2 p-2 rounded-xl transition-all border-2",
+                          selectedTemplateId === tpl.id 
+                            ? "border-primary bg-primary/5 shadow-md" 
+                            : "border-transparent hover:border-primary/20"
                         )}
-                      </div>
-                      <span className="text-[8px] font-black uppercase tracking-tighter">{tpl.name}</span>
-                      {selectedTemplateId === tpl.id && (
-                        <div className="absolute -top-1 -right-1 bg-primary text-white p-0.5 rounded-full ring-2 ring-background">
-                          <Check className="w-2 h-2" />
+                      >
+                        <div className="w-12 h-12 rounded-lg shadow-inner overflow-hidden relative bg-black">
+                          <Image src={tpl.imageUrl} alt={tpl.name} fill className="object-cover" />
                         </div>
-                      )}
-                    </button>
-                  ))}
-                </div>
-                <ScrollBar orientation="horizontal" />
-              </ScrollArea>
+                        <span className="text-[8px] font-black uppercase tracking-tighter">{tpl.name}</span>
+                        {selectedTemplateId === tpl.id && (
+                          <div className="absolute -top-1 -right-1 bg-primary text-white p-0.5 rounded-full ring-2 ring-background">
+                            <Check className="w-2 h-2" />
+                          </div>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+              )}
             </div>
 
             {/* Card Preview */}
@@ -368,14 +356,14 @@ export default function SocialCardsPage() {
                   "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] flex flex-col items-center"
                 )}
                 style={{ 
-                  background: activeTemplate.type === 'gradient' ? activeTemplate.style.background : 'transparent',
+                  backgroundColor: activeTemplate?.style.background || '#000000',
                 }}
               >
                    {/* Background Image Template */}
-                   {activeTemplate.type === 'image' && (
+                   {activeTemplate?.imageUrl && (
                      <div className="absolute inset-0 z-0">
                        <Image 
-                         src={activeTemplate.imageUrl!} 
+                         src={activeTemplate.imageUrl} 
                          alt="Template Background" 
                          fill 
                          className="object-cover" 
@@ -384,25 +372,17 @@ export default function SocialCardsPage() {
                      </div>
                    )}
 
-                   {/* Decorative elements for gradient variants */}
-                   {activeTemplate.type === 'gradient' && (
-                     <>
-                        <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-3xl -mr-20 -mt-20" />
-                        <div className="absolute bottom-0 left-0 w-40 h-40 bg-black/5 rounded-full blur-3xl -ml-20 -mb-20" />
-                     </>
-                   )}
-
                    <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-14 sm:p-16">
                       <div className="text-center space-y-1">
                         <p className={cn(
                           "text-[9px] font-black uppercase tracking-[0.4em] opacity-40",
-                          activeTemplate.style.color === '#ffffff' ? "text-white" : "text-black"
+                          activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black"
                         )}>
                           PROOVA TECHNOLOGY
                         </p>
                         <p className={cn(
                           "text-[11px] font-black uppercase tracking-[0.2em]",
-                          activeTemplate.style.color === '#ffffff' ? "text-white/80" : "text-black/80"
+                          activeTemplate?.style.color === '#ffffff' ? "text-white/80" : "text-black/80"
                         )}>
                           RELATO DE CLIENTE
                         </p>
@@ -418,15 +398,15 @@ export default function SocialCardsPage() {
                         <div className="relative w-full max-w-[95%]">
                           <Quote className={cn(
                             "absolute -top-5 -left-4 w-8 h-8 opacity-20 rotate-180",
-                            activeTemplate.style.color === '#ffffff' ? "text-white" : "text-black"
+                            activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black"
                           )} />
                           <div className={cn(
                             "p-6 sm:p-8 rounded-[2rem] shadow-2xl ring-1",
-                            activeTemplate.style.color === '#ffffff' ? "bg-white/5 backdrop-blur-xl border-white/10 ring-white/5" : "bg-black/5 backdrop-blur-md border-black/5 ring-black/5"
+                            activeTemplate?.style.color === '#ffffff' ? "bg-white/5 backdrop-blur-xl border-white/10 ring-white/5" : "bg-black/5 backdrop-blur-md border-black/5 ring-black/5"
                           )}>
                             <p className={cn(
                               "font-black font-headline leading-tight italic tracking-tight drop-shadow-sm",
-                              activeTemplate.style.color === '#ffffff' ? "text-white" : "text-black",
+                              activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black",
                               (selectedTestimonialForShare?.text?.length || 0) > 150 ? "text-sm" : 
                               (selectedTestimonialForShare?.text?.length || 0) > 100 ? "text-base" : "text-xl sm:text-2xl"
                             )}>
@@ -435,30 +415,30 @@ export default function SocialCardsPage() {
                           </div>
                           <Quote className={cn(
                             "absolute -bottom-5 -right-4 w-8 h-8 opacity-20",
-                            activeTemplate.style.color === '#ffffff' ? "text-white" : "text-black"
+                            activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black"
                           )} />
                         </div>
                       </div>
 
                       <div className={cn(
                         "w-full pt-6 border-t",
-                        activeTemplate.style.color === '#ffffff' ? "border-white/10" : "border-black/10"
+                        activeTemplate?.style.color === '#ffffff' ? "border-white/10" : "border-black/10"
                       )}>
                           <div className="flex flex-col items-center gap-3">
                             <p className={cn(
                               "font-black text-[11px] sm:text-xs uppercase tracking-[0.3em]",
-                              activeTemplate.style.color === '#ffffff' ? "text-white" : "text-black"
+                              activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black"
                             )}>
                               {selectedTestimonialForShare?.userName}
                             </p>
                             <div className={cn(
                               "px-5 py-1.5 rounded-full border inline-flex items-center gap-2 backdrop-blur-md shadow-sm",
-                              activeTemplate.style.color === '#ffffff' ? "bg-primary/20 border-primary/30" : "bg-primary/10 border-primary/20"
+                              activeTemplate?.style.color === '#ffffff' ? "bg-primary/20 border-primary/30" : "bg-primary/10 border-primary/20"
                             )}>
                                 <CheckCircle2 className="w-3.5 h-3.5 text-primary fill-primary/5" />
                                 <p className={cn(
                                   "text-[7px] sm:text-[8px] font-black uppercase tracking-[0.15em]",
-                                  activeTemplate.style.color === '#ffffff' ? "text-white" : "text-black"
+                                  activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black"
                                 )}>Feedback Verificado</p>
                             </div>
                           </div>
@@ -470,7 +450,7 @@ export default function SocialCardsPage() {
             <Button 
               className="w-full h-16 rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-sm bg-primary hover:bg-primary/90 text-white"
               onClick={handleDownloadContent}
-              disabled={isExportingCard}
+              disabled={isExportingCard || availableTemplates.length === 0}
             >
               {isExportingCard ? <Loader2 className="animate-spin h-6 w-6" /> : <Download className="w-5 h-5" />}
               {selectedTestimonialForShare?.videoUrl ? 'Baixar Vídeo Review' : 'Gerar Arte PNG'}
@@ -479,7 +459,7 @@ export default function SocialCardsPage() {
           
           <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
             <p className="text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
-              <Zap className="w-3 h-3 text-primary" /> Dica: Poste este card no seu Story e marque o cliente para maximizar o engajamento.
+              <Zap className="w-3 h-3 text-primary" /> Dica: Basta adicionar novas imagens em /public/templates para que elas apareçam aqui.
             </p>
           </DialogFooter>
         </DialogContent>
