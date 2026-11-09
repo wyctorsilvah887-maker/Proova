@@ -36,8 +36,8 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
       type: 'image',
       imageUrl: '/templates/card-proova-padrão-natal.png',
       style: {
-        background: '#b91c1c', 
-        color: '#ffffff'
+        background: '#ffffff', 
+        color: '#000000' // Alterado para preto para dar contraste com o fundo branco/neve
       }
     },
     {
