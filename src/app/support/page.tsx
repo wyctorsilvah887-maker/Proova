@@ -361,6 +361,8 @@ export default function SupportPage() {
                 <span>Upgrade</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="mx-1" />
+              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
+              <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -379,7 +381,7 @@ export default function SupportPage() {
                     <Bot className="w-6 h-6" />
                   </div>
                   <div className="space-y-0.5">
-                    h3 className="text-sm font-black uppercase tracking-tight">Consultor Proova V1.0</h3>
+                    <h3 className="text-sm font-black uppercase tracking-tight">Consultor Proova V1.0</h3>
                     <div className="flex items-center gap-1.5">
                       <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
                       <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Árvore de Decisão Ativa</span>
