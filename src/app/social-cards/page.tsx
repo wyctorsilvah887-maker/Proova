@@ -194,12 +194,14 @@ export default function SocialCardsPage() {
     setIsExportingCard(true);
     try {
       if (!shareCardRef.current) return;
+      
       const dataUrl = await toPng(shareCardRef.current, { 
         quality: 1.0, 
         pixelRatio: 3, 
         backgroundColor: null, 
-        style: { borderRadius: '2.5rem' }
+        style: { borderRadius: '0' }
       });
+      
       const link = document.createElement('a');
       link.download = `proova-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
       link.href = dataUrl;
@@ -402,7 +404,7 @@ export default function SocialCardsPage() {
                       <div className={cn("w-full pt-3 sm:pt-4 mb-2 sm:mb-4", activeTemplate?.style.color === '#ffffff' ? "border-t border-white/10" : "border-t border-black/10")}>
                           <div className="flex flex-col items-center gap-1.5 sm:gap-2">
                             <p className={cn("font-black text-[9px] sm:text-xs uppercase tracking-[0.3em]", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>{selectedTestimonialForShare?.userName}</p>
-                            <div className={cn("px-3 sm:px-4 py-0.5 sm:py-1 rounded-full border inline-flex items-center gap-1.5 backdrop-blur-md shadow-sm", activeTemplate?.style.color === '#ffffff' ? "bg-primary/20 border-primary/30" : "bg-primary/10 border-primary/20")}>
+                            <div className={cn("px-3 sm:px-4 py-0.5 sm:py-1 rounded-full border inline-flex items-center gap-1 sm:gap-1.5 backdrop-blur-md shadow-sm", activeTemplate?.style.color === '#ffffff' ? "bg-primary/20 border-primary/30" : "bg-primary/10 border-primary/20")}>
                                 <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-primary fill-primary/5" />
                                 <p className={cn("text-[5px] sm:text-[7px] font-black uppercase tracking-[0.15em]", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>coletado via Proova</p>
                             </div>

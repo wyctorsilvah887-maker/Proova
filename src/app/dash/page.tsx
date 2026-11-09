@@ -599,7 +599,7 @@ export default function DashPage() {
         quality: 1.0, 
         pixelRatio: 3, 
         backgroundColor: null, 
-        style: { borderRadius: '2.5rem' }
+        style: { borderRadius: '0' }
       });
       
       const link = document.createElement('a');
