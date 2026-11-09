@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -426,14 +425,7 @@ export default function SettingsPage() {
                                    <SelectValue placeholder="Selecione..." />
                                 </SelectTrigger>
                                 <SelectContent className="rounded-xl border-primary/10">
-                                   <SelectItem value="academia" className="font-medium text-xs">🏋️ Academia / Studio</SelectItem>
                                    <SelectItem value="agencia" className="font-medium text-xs">🚀 Agência Digital</SelectItem>
-                                   <SelectItem value="barbearia" className="font-medium text-xs">💈 Barbearia / Salão</SelectItem>
-                                   <SelectItem value="clinica" className="font-medium text-xs">🏥 Clínica / Médica</SelectItem>
-                                   <SelectItem value="restaurante" className="font-medium text-xs">🍔 Gastronomia</SelectItem>
-                                   <SelectItem value="servicos" className="font-medium text-xs">🛠️ Prestador de Serviços</SelectItem>
-                                   <SelectItem value="estetica" className="font-medium text-xs">✨ Estética / Spa</SelectItem>
-                                   <SelectItem value="outros" className="font-medium text-xs">📦 Outros Setores</SelectItem>
                                 </SelectContent>
                              </Select>
                           </div>

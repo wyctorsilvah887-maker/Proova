@@ -29,7 +29,7 @@ export default function SignupPage() {
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [businessType, setBusinessType] = useState("");
+  const [businessType, setBusinessType] = useState("agencia"); // Default to agencia
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -199,17 +199,7 @@ export default function SignupPage() {
                       <SelectValue placeholder="Selecione sua categoria..." />
                     </SelectTrigger>
                     <SelectContent className="max-h-64 rounded-2xl">
-                      <SelectItem value="academia">Academia / Studio / Crossfit</SelectItem>
                       <SelectItem value="agencia">Agência de Marketing / Publicidade</SelectItem>
-                      <SelectItem value="artes_marciais">Artes marciais / Lutas</SelectItem>
-                      <SelectItem value="barbearia">Barbearia</SelectItem>
-                      <SelectItem value="clinica">Clínica / Consultório Médico</SelectItem>
-                      <SelectItem value="estetica">Estética / Salão / Spa</SelectItem>
-                      <SelectItem value="oficina">Oficina / Estética Automotiva</SelectItem>
-                      <SelectItem value="petshop">Pet shop / Veterinária</SelectItem>
-                      <SelectItem value="servicos_digitais">Prestadores de Serviços Digitais / Freelancer</SelectItem>
-                      <SelectItem value="restaurante">Restaurante / Gastronomia</SelectItem>
-                      <SelectItem value="outros">Outros Setores</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
