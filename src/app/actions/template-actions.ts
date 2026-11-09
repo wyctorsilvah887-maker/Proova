@@ -36,7 +36,17 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
       type: 'image',
       imageUrl: '/templates/card-proova-padrão-natal.png',
       style: {
-        background: '#b91c1c', // Vermelho natalino como base de segurança
+        background: '#b91c1c', 
+        color: '#ffffff'
+      }
+    },
+    {
+      id: 'card-proova-padrao-natal-2',
+      name: 'Natal 2 Proova',
+      type: 'image',
+      imageUrl: '/templates/card-proova-padrão-natal2.png',
+      style: {
+        background: '#064e3b', // Verde natalino escuro para variar do primeiro
         color: '#ffffff'
       }
     },
