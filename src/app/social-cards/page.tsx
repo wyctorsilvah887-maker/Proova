@@ -88,6 +88,12 @@ export default function SocialCardsPage() {
     return status === 'gold' || status === 'enterprise' || status === 'trial';
   }, [userData]);
 
+  const isMapsLinkValid = useMemo(() => {
+    if (!userData?.googleMapsUrl) return false;
+    const url = userData.googleMapsUrl.toLowerCase();
+    return url.includes('review') || url.includes('writereview') || url.includes('placeid');
+  }, [userData]);
+
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
     return collection(db, 'users', user.uid, 'testimonials');
@@ -159,7 +165,6 @@ export default function SocialCardsPage() {
 
   const openShareDialog = (testimonial: any) => {
     setSelectedTestimonialForShare(testimonial);
-    // Inicia com o primeiro template disponível (Black VIP se existir)
     if (availableTemplates.length > 0) {
       setSelectedTemplateId(availableTemplates[0].id);
     }
@@ -247,13 +252,16 @@ export default function SocialCardsPage() {
         </div>
 
         <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle className="hidden sm:flex" />
+          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-3 gap-2 rounded-xl focus:ring-0 shadow-none hover:bg-transparent">
                 <div className="flex flex-col items-end">
                   <span className="text-[10px] md:text-sm font-black truncate max-w-[120px] transition-colors group-hover:text-primary uppercase tracking-tight">{userData?.companyName || 'Empresa'}</span>
-                  <span className="text-[6px] md:text-[8px] uppercase tracking-widest font-black text-primary">{membershipLabel}</span>
+                  <div className="flex flex-col items-end gap-0">
+                    <span className="text-[6px] md:text-[8px] uppercase tracking-widest font-black text-primary leading-tight">{membershipLabel}</span>
+                    {isMapsLinkValid && <span className="text-[5px] md:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none animate-pulse">G-Boost Ativo</span>}
+                  </div>
                 </div>
                 <div className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20"><User className="w-4 h-4" /></div>
               </Button>
@@ -382,7 +390,7 @@ export default function SocialCardsPage() {
               )}
             </div>
 
-            {/* Card Preview - Otimizado para Instagram 1080x1080 (Diagramação) */}
+            {/* Card Preview */}
             <div className="w-full flex justify-center py-2 shrink-0">
               <div 
                 ref={shareCardRef}
@@ -394,7 +402,6 @@ export default function SocialCardsPage() {
                   backgroundColor: activeTemplate?.style.background || '#000000',
                 }}
               >
-                   {/* Background Image Template */}
                    {activeTemplate?.imageUrl && (
                      <div className="absolute inset-0 z-0">
                        <Image 
@@ -407,7 +414,6 @@ export default function SocialCardsPage() {
                      </div>
                    )}
 
-                   {/* Content Container - Ajustado para não sobrepor artes de canto */}
                    <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-8 sm:p-12">
                       <div className="text-center space-y-1 mt-4">
                         <p className={cn(
