@@ -487,9 +487,7 @@ export default function SocialCardsPage() {
             <Button 
               className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-xs bg-primary hover:bg-primary/90 text-white"
               onClick={handleDownloadContent}
-              disabled={isExportingCard}
-              {/* @ts-ignore */}
-              availableTemplates.length === 0}
+              disabled={isExportingCard || availableTemplates.length === 0}
             >
               {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-5 h-5" />}
               {selectedTestimonialForShare?.videoUrl ? 'Baixar Vídeo Review' : 'Gerar Arte PNG'}
