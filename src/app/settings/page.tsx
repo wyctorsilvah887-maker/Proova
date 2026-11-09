@@ -426,6 +426,12 @@ export default function SettingsPage() {
                                 </SelectTrigger>
                                 <SelectContent className="rounded-xl border-primary/10">
                                    <SelectItem value="agencia" className="font-medium text-xs">🚀 Agência Digital</SelectItem>
+                                   <SelectItem value="clinica_estetica" className="font-medium text-xs">✨ Clínica de Estética</SelectItem>
+                                   <SelectItem value="harmonizacao" className="font-medium text-xs">💎 Harmonização Facial</SelectItem>
+                                   <SelectItem value="biomedico" className="font-medium text-xs">🧬 Biomédico(a) Esteta</SelectItem>
+                                   <SelectItem value="esteticista" className="font-medium text-xs">🧴 Esteticista</SelectItem>
+                                   <SelectItem value="dentista" className="font-medium text-xs">🦷 Dentista (Harmonização)</SelectItem>
+                                   <SelectItem value="dermatologista" className="font-medium text-xs">🏥 Dermatologista</SelectItem>
                                 </SelectContent>
                              </Select>
                           </div>

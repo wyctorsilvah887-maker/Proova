@@ -29,7 +29,7 @@ export default function SignupPage() {
   const [company, setCompany] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [businessType, setBusinessType] = useState("agencia"); // Default to agencia
+  const [businessType, setBusinessType] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -198,8 +198,14 @@ export default function SignupPage() {
                     <SelectTrigger className="h-14 rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm">
                       <SelectValue placeholder="Selecione sua categoria..." />
                     </SelectTrigger>
-                    <SelectContent className="max-h-64 rounded-2xl">
+                    <SelectContent className="max-h-80 rounded-2xl">
                       <SelectItem value="agencia">Agência de Marketing / Publicidade</SelectItem>
+                      <SelectItem value="clinica_estetica">Clínica de Estética</SelectItem>
+                      <SelectItem value="harmonizacao">Harmonização Facial</SelectItem>
+                      <SelectItem value="biomedico">Biomédico(a) Esteta</SelectItem>
+                      <SelectItem value="esteticista">Esteticista</SelectItem>
+                      <SelectItem value="dentista">Dentista (Harmonização)</SelectItem>
+                      <SelectItem value="dermatologista">Dermatologista</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
