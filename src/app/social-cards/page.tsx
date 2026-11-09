@@ -305,10 +305,10 @@ export default function SocialCardsPage() {
                <Sparkles className="w-5 h-5 text-primary" />
                <DialogTitle className="text-xl font-black font-headline uppercase tracking-tight">Social Design Studio</DialogTitle>
             </div>
-            <DialogDescription className="text-xs font-medium">Os templates em /public/templates são carregados automaticamente.</DialogDescription>
+            <DialogDescription className="text-xs font-medium">Selecione um template e gere sua arte para post.</DialogDescription>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6 flex flex-col items-center gap-8 scrollbar-hide">
+          <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6 flex flex-col items-center gap-6 scrollbar-hide">
             {/* Template Selector */}
             <div className="w-full shrink-0">
               <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-3 ml-1">Templates Disponíveis:</p>
@@ -336,7 +336,7 @@ export default function SocialCardsPage() {
                         <span className="text-[8px] font-black uppercase tracking-tighter">{tpl.name}</span>
                         {selectedTemplateId === tpl.id && (
                           <div className="absolute -top-1 -right-1 bg-primary text-white p-0.5 rounded-full ring-2 ring-background">
-                            <Check className="w-2 h-2" />
+                            <Check className="w-2" />
                           </div>
                         )}
                       </button>
@@ -347,7 +347,7 @@ export default function SocialCardsPage() {
               )}
             </div>
 
-            {/* Card Preview */}
+            {/* Card Preview - Otimizado para Instagram 1080x1080 (Diagramação) */}
             <div className="w-full flex justify-center py-2 shrink-0">
               <div 
                 ref={shareCardRef}
@@ -372,72 +372,74 @@ export default function SocialCardsPage() {
                      </div>
                    )}
 
-                   <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-14 sm:p-16">
-                      <div className="text-center space-y-1">
+                   {/* Content Container - Ajustado para não sobrepor artes de canto */}
+                   <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-8 sm:p-12">
+                      <div className="text-center space-y-1 mt-4">
                         <p className={cn(
-                          "text-[9px] font-black uppercase tracking-[0.4em] opacity-40",
+                          "text-[8px] sm:text-[9px] font-black uppercase tracking-[0.4em] opacity-40",
                           activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black"
                         )}>
                           PROOVA TECHNOLOGY
                         </p>
                         <p className={cn(
-                          "text-[11px] font-black uppercase tracking-[0.2em]",
+                          "text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em]",
                           activeTemplate?.style.color === '#ffffff' ? "text-white/80" : "text-black/80"
                         )}>
                           RELATO DE CLIENTE
                         </p>
                       </div>
 
-                      <div className="flex-1 flex flex-col justify-center items-center w-full py-4 text-center">
-                        <div className="flex justify-center gap-1.5 mb-6">
+                      <div className="flex-1 flex flex-col justify-center items-center w-full py-2 text-center">
+                        <div className="flex justify-center gap-1 mb-4">
                             {[1,2,3,4,5].map((_, i) => (
-                              <Star key={i} className="w-6 h-6 sm:w-8 sm:h-8 fill-[#fbbf24] text-[#fbbf24] drop-shadow-[0_0_12px_rgba(251,191,36,0.5)]" />
+                              <Star key={i} className="w-5 h-5 sm:w-7 sm:h-7 fill-[#fbbf24] text-[#fbbf24] drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" />
                             ))}
                         </div>
                         
-                        <div className="relative w-full max-w-[95%]">
+                        <div className="relative w-full max-w-[85%]">
                           <Quote className={cn(
-                            "absolute -top-5 -left-4 w-8 h-8 opacity-20 rotate-180",
+                            "absolute -top-3 -left-3 w-5 h-5 opacity-20 rotate-180",
                             activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black"
                           )} />
                           <div className={cn(
-                            "p-6 sm:p-8 rounded-[2rem] shadow-2xl ring-1",
+                            "p-5 sm:p-7 rounded-[1.8rem] shadow-2xl ring-1",
                             activeTemplate?.style.color === '#ffffff' ? "bg-white/5 backdrop-blur-xl border-white/10 ring-white/5" : "bg-black/5 backdrop-blur-md border-black/5 ring-black/5"
                           )}>
                             <p className={cn(
                               "font-black font-headline leading-tight italic tracking-tight drop-shadow-sm",
                               activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black",
-                              (selectedTestimonialForShare?.text?.length || 0) > 150 ? "text-sm" : 
-                              (selectedTestimonialForShare?.text?.length || 0) > 100 ? "text-base" : "text-xl sm:text-2xl"
+                              (selectedTestimonialForShare?.text?.length || 0) > 180 ? "text-[10px] sm:text-xs" : 
+                              (selectedTestimonialForShare?.text?.length || 0) > 120 ? "text-xs sm:text-sm" : 
+                              (selectedTestimonialForShare?.text?.length || 0) > 80 ? "text-sm sm:text-base" : "text-lg sm:text-xl"
                             )}>
                               "{selectedTestimonialForShare?.text}"
                             </p>
                           </div>
                           <Quote className={cn(
-                            "absolute -bottom-5 -right-4 w-8 h-8 opacity-20",
+                            "absolute -bottom-3 -right-3 w-5 h-5 opacity-20",
                             activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black"
                           )} />
                         </div>
                       </div>
 
                       <div className={cn(
-                        "w-full pt-6 border-t",
-                        activeTemplate?.style.color === '#ffffff' ? "border-white/10" : "border-black/10"
+                        "w-full pt-4 mb-4",
+                        activeTemplate?.style.color === '#ffffff' ? "border-t border-white/10" : "border-t border-black/10"
                       )}>
-                          <div className="flex flex-col items-center gap-3">
+                          <div className="flex flex-col items-center gap-2">
                             <p className={cn(
-                              "font-black text-[11px] sm:text-xs uppercase tracking-[0.3em]",
+                              "font-black text-[10px] sm:text-xs uppercase tracking-[0.3em]",
                               activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black"
                             )}>
                               {selectedTestimonialForShare?.userName}
                             </p>
                             <div className={cn(
-                              "px-5 py-1.5 rounded-full border inline-flex items-center gap-2 backdrop-blur-md shadow-sm",
+                              "px-4 py-1 rounded-full border inline-flex items-center gap-1.5 backdrop-blur-md shadow-sm",
                               activeTemplate?.style.color === '#ffffff' ? "bg-primary/20 border-primary/30" : "bg-primary/10 border-primary/20"
                             )}>
-                                <CheckCircle2 className="w-3.5 h-3.5 text-primary fill-primary/5" />
+                                <CheckCircle2 className="w-3 h-3 text-primary fill-primary/5" />
                                 <p className={cn(
-                                  "text-[7px] sm:text-[8px] font-black uppercase tracking-[0.15em]",
+                                  "text-[6px] sm:text-[7px] font-black uppercase tracking-[0.15em]",
                                   activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black"
                                 )}>Feedback Verificado</p>
                             </div>
@@ -448,18 +450,18 @@ export default function SocialCardsPage() {
             </div>
 
             <Button 
-              className="w-full h-16 rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-sm bg-primary hover:bg-primary/90 text-white"
+              className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-xs bg-primary hover:bg-primary/90 text-white"
               onClick={handleDownloadContent}
               disabled={isExportingCard || availableTemplates.length === 0}
             >
-              {isExportingCard ? <Loader2 className="animate-spin h-6 w-6" /> : <Download className="w-5 h-5" />}
+              {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-5 h-5" />}
               {selectedTestimonialForShare?.videoUrl ? 'Baixar Vídeo Review' : 'Gerar Arte PNG'}
             </Button>
           </div>
           
           <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
             <p className="text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
-              <Zap className="w-3 h-3 text-primary" /> Dica: Basta adicionar novas imagens em /public/templates para que elas apareçam aqui.
+              <Zap className="w-3 h-3 text-primary" /> Dica: Esta diagramação foi otimizada para manter a legibilidade sem cobrir a arte do fundo.
             </p>
           </DialogFooter>
         </DialogContent>
