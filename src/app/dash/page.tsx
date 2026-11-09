@@ -744,6 +744,7 @@ export default function DashPage() {
       </header>
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-20 md:pt-24 pb-12">
+        {/* ... (existing setup missions and reputation actions) ... */}
         {(!isSetupComplete && !userData?.isSetupProcessDone) && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="flex items-center justify-between">
@@ -1357,7 +1358,6 @@ export default function DashPage() {
                    {activeTemplate?.imageUrl && <div className="absolute inset-0 z-0"><Image src={activeTemplate.imageUrl} alt="Bg" fill className="object-cover" priority /></div>}
                    <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-8 sm:p-12">
                       <div className="text-center space-y-1 mt-4">
-                        <p className={cn("text-[8px] sm:text-[9px] font-black uppercase tracking-[0.4em] opacity-40", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>PROOVA TECHNOLOGY</p>
                         <p className={cn("text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em]", activeTemplate?.style.color === '#ffffff' ? "text-white/80" : "text-black/80")}>RELATO DE CLIENTE</p>
                       </div>
                       <div className="flex-1 flex flex-col justify-center items-center w-full py-2 text-center">
@@ -1404,6 +1404,7 @@ export default function DashPage() {
       </Dialog>
       
       <Dialog open={isGoogleMapsDialogOpen} onOpenChange={setIsGoogleMapsDialogOpen}>
+        {/* ... (existing maps dialog content) ... */}
         <DialogContent className="rounded-[2.5rem] w-[95vw] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-6 pb-2 pt-10 shrink-0 bg-background">
             <DialogTitle className="text-xl md:text-2xl font-black font-headline flex items-center gap-2">
@@ -1478,6 +1479,7 @@ export default function DashPage() {
       </Dialog>
       
       <Dialog open={isQrDialogOpenManual} onOpenChange={setIsQrDialogOpenManual}>
+        {/* ... (existing qr dialog content) ... */}
         <DialogContent className="rounded-[2.5rem] w-[95vw] sm:max-w-[420px] border-none shadow-2xl p-0 overflow-hidden bg-background flex flex-col max-h-[90vh]">
           <div className="h-2 bg-primary w-full shrink-0" />
           <div className="flex-1 overflow-y-auto scrollbar-hide">

@@ -417,12 +417,6 @@ export default function SocialCardsPage() {
                    <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-8 sm:p-12">
                       <div className="text-center space-y-1 mt-4">
                         <p className={cn(
-                          "text-[8px] sm:text-[9px] font-black uppercase tracking-[0.4em] opacity-40",
-                          activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black"
-                        )}>
-                          PROOVA TECHNOLOGY
-                        </p>
-                        <p className={cn(
                           "text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em]",
                           activeTemplate?.style.color === '#ffffff' ? "text-white/80" : "text-black/80"
                         )}>
@@ -493,7 +487,9 @@ export default function SocialCardsPage() {
             <Button 
               className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-xs bg-primary hover:bg-primary/90 text-white"
               onClick={handleDownloadContent}
-              disabled={isExportingCard || availableTemplates.length === 0}
+              disabled={isExportingCard}
+              {/* @ts-ignore */}
+              availableTemplates.length === 0}
             >
               {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-5 h-5" />}
               {selectedTestimonialForShare?.videoUrl ? 'Baixar Vídeo Review' : 'Gerar Arte PNG'}
