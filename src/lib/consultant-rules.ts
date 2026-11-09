@@ -13,7 +13,7 @@ export const CONSULTANT_TREE: Record<string, TreeBranch> = {
   '1': {
     title: 'G-Boost (SEO Google)',
     keys: ['1', 'gboost', 'google', 'maps', 'seo'],
-    response: "**🚀 G-Boost (Aceleração de SEO Local)**\n\n**O que é:** Um sistema que detecta elogios 5 estrelas e convida o cliente a replicar a nota no seu Google Maps.\n\n**Como funciona:** No fim da avaliação, aparece um botão especial 'Avaliar no Google'.\n\n**Vantagem:** Aumenta seu ranking nas buscas locais e atrai clientes que buscam pelo seu serviço no Google.\n\n*Digite **0** para voltar ao menu principal.*"
+    response: "**🚀 G-Boost (Aceleração de SEO Local)**\n\n**O que é:** Um sistema que detecta elogios 5 estrelas e convida o cliente a avaliar também no seu Google Maps.\n\n**Como funciona:** No fim da avaliação, aparece um botão especial 'Avaliar no Google'.\n\n**Vantagem:** Aumenta seu ranking nas buscas locais e atrai clientes que buscam pelo seu serviço no Google.\n\n*Digite **0** para voltar ao menu principal.*"
   },
   '2': {
     title: 'Reputation Shield',
@@ -21,9 +21,9 @@ export const CONSULTANT_TREE: Record<string, TreeBranch> = {
     response: "**🛡️ Reputation Shield (Inbox Privado)**\n\n**O que é:** Sua blindagem contra avaliações negativas públicas.\n\n**Como funciona:** Feedbacks de 1 a 3 estrelas são incentivados ao seu Inbox Privado para resolução interna.\n\n**Vantagem:** Evita que reclamações cheguem ao Google e permite que você recupere o cliente no sigilo.\n\n*Digite **0** para voltar ao menu principal.*"
   },
   '3': {
-    title: 'Widgets e Murais',
-    keys: ['3', 'mural', 'widget', 'site', 'embutir'],
-    response: "**🖼️ Widgets e Murais Inteligentes**\n\n**O que é:** Murais de depoimentos que você instala no seu site em minutos.\n\n**Formatos:** Masonry, Carrossel, Grade ou Popups.\n\n**Dica:** Instale o mural logo abaixo do seu botão de vendas para reduzir a resistência de compra.\n\n*Digite **0** para voltar ao menu principal.*"
+    title: 'Link in Bio (Página Pública)',
+    keys: ['3', 'link', 'bio', 'pp', 'pagina', 'vitrine'],
+    response: "**🌐 Link in Bio (Sua Vitrine Oficial)**\n\n**O que é:** Uma página personalizada que reúne seus melhores depoimentos e fornece um caminho direto para o seu WhatsApp.\n\n**Como usar:** Coloque este link na biografia do seu Instagram para gerar confiança imediata em novos seguidores.\n\n**Vantagem:** Centraliza sua prova social e facilita o contato de potenciais clientes.\n\n*Digite **0** para voltar ao menu principal.*"
   },
   '4': {
     title: 'Social Cards',
@@ -52,7 +52,7 @@ Escolha uma opção para dominar o mercado:
 
 1️⃣ **G-Boost** (SEO Google Maps)
 2️⃣ **Reputation Shield** (Inbox Privado)
-3️⃣ **Widgets** (Murais para Site)
+3️⃣ **Link in Bio** (Página Pública)
 4️⃣ **Social Cards** (Instagram)
 5️⃣ **Planos e Upgrade**
 6️⃣ **Falar com Humano**
