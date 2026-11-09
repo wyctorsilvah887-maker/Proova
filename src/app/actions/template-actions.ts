@@ -2,7 +2,7 @@
 
 /**
  * @fileOverview Ação para listar templates de imagem disponíveis.
- * Fonte da Verdade Única: Sincronizado com os arquivos em /public/templates/
+ * Fonte da Verdade Única: Registro mestre estático para garantir funcionamento em produção.
  */
 
 export interface TemplateMetadata {
@@ -17,7 +17,7 @@ export interface TemplateMetadata {
 }
 
 export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
-  // Lista Mestre de Templates (Exatamente como aparecem na pasta /public/templates/)
+  // Lista Mestre de Templates (Registro Fixo para evitar problemas de FS em produção)
   // Organizado com Modelos Padrão primeiro e VIPs por último.
   const masterTemplates: TemplateMetadata[] = [
     {
@@ -46,7 +46,7 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
       type: 'image',
       imageUrl: '/templates/card-proova-padrão-natal2.png',
       style: {
-        background: '#064e3b', // Verde natalino escuro para variar do primeiro
+        background: '#064e3b',
         color: '#ffffff'
       }
     },
@@ -106,7 +106,17 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
       type: 'image',
       imageUrl: '/templates/card-proova-natal-vip.png',
       style: {
-        background: '#7f1d1d', // Vermelho natalino elegante
+        background: '#7f1d1d',
+        color: '#ffffff'
+      }
+    },
+    {
+      id: 'card-proova-natal2-vip',
+      name: 'Natal 2 VIP',
+      type: 'image',
+      imageUrl: '/templates/card-proova-natal2-vip.png',
+      style: {
+        background: '#14532d',
         color: '#ffffff'
       }
     }
