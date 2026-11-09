@@ -99,6 +99,16 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
         background: '#1e1e1e',
         color: '#ffffff'
       }
+    },
+    {
+      id: 'card-proova-natal-vip',
+      name: 'Natal VIP',
+      type: 'image',
+      imageUrl: '/templates/card-proova-natal-vip.png',
+      style: {
+        background: '#7f1d1d', // Vermelho natalino elegante
+        color: '#ffffff'
+      }
     }
   ];
 
