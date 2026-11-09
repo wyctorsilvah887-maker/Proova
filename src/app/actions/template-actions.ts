@@ -4,8 +4,8 @@ import fs from 'fs';
 import path from 'path';
 
 /**
- * @fileOverview Ação para listar templates de imagem disponíveis na pasta public/templates.
- * Otimizada para resiliência em produção (serverless/cloud environments).
+ * @fileOverview Ação para listar templates de imagem disponíveis.
+ * Em produção (Serverless), o acesso ao FS é limitado, por isso mantemos uma lista mestre.
  */
 
 export interface TemplateMetadata {
@@ -20,9 +20,9 @@ export interface TemplateMetadata {
 }
 
 export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
-  // Lista de fallback com os arquivos que sabemos que devem existir.
-  // Isso garante que, mesmo que o FS falhe em produção, o usuário não veja uma lista vazia.
-  const defaultTemplates: TemplateMetadata[] = [
+  // Lista Mestre de Templates (Garante exibição em produção)
+  // Adicione novos templates aqui sempre que criar um novo PNG no Canva
+  const masterTemplates: TemplateMetadata[] = [
     {
       id: 'card-black-vip',
       name: 'Black Vip',
@@ -31,6 +31,16 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
       style: {
         background: '#000000',
         color: '#ffffff'
+      }
+    },
+    {
+      id: 'card-proova-rose-vip',
+      name: 'Rose Vip',
+      type: 'image',
+      imageUrl: '/templates/card-proova-rose-vip.png',
+      style: {
+        background: '#fff1f2',
+        color: '#881337'
       }
     },
     {
@@ -46,12 +56,10 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
   ];
 
   try {
-    // Em ambientes de produção (Serverless/App Hosting), o process.cwd() pode não conter a pasta public
-    // Tentamos encontrar a pasta de templates em caminhos prováveis
+    // Tentativa de descoberta dinâmica (funciona em local dev)
     const possiblePaths = [
       path.join(process.cwd(), 'public', 'templates'),
       path.join(process.cwd(), '.next', 'standalone', 'public', 'templates'),
-      path.join(process.cwd(), 'templates'), // Fallback raro
     ];
 
     let templatesDir = '';
@@ -62,38 +70,31 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
       }
     }
 
-    // Se não encontrou a pasta no FS, retorna os padrões para não quebrar a UI
-    if (!templatesDir) {
-      console.warn("Diretório de templates não localizado via FS. Retornando fallback.");
-      return defaultTemplates;
-    }
+    if (!templatesDir) return masterTemplates;
 
     const files = fs.readdirSync(templatesDir);
-    
-    // Filtra apenas arquivos de imagem suportados
     const imageFiles = files.filter(file => 
       ['.png', '.jpg', '.jpeg', '.webp'].includes(path.extname(file).toLowerCase())
     );
 
-    if (imageFiles.length === 0) {
-      return defaultTemplates;
-    }
-
-    const templates: TemplateMetadata[] = imageFiles.map(file => {
+    // Mescla arquivos encontrados com a lista mestre para evitar duplicatas
+    const dynamicTemplates: TemplateMetadata[] = imageFiles.map(file => {
       const id = path.parse(file).name;
-      
-      // Formata o nome amigável (ex: card-black-vip -> Black Vip)
+      const alreadyInMaster = masterTemplates.find(t => t.id === id);
+      if (alreadyInMaster) return alreadyInMaster;
+
       const name = id
         .replace(/^card-/, '')
+        .replace(/-proova-/, ' ')
         .split('-')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
 
-      const isLight = id.toLowerCase().includes('white') || id.toLowerCase().includes('light') || id.toLowerCase().includes('padrao');
+      const isLight = id.toLowerCase().includes('white') || id.toLowerCase().includes('light') || id.toLowerCase().includes('rose');
 
       return {
         id,
-        name: name || 'Template Custom',
+        name,
         type: 'image',
         imageUrl: `/templates/${file}`,
         style: {
@@ -103,16 +104,21 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
       };
     });
 
-    // Ordena para garantir que o Black VIP seja o primeiro se existir
-    return templates.sort((a, b) => {
+    // Retorna a união sem duplicatas
+    const allTemplates = [...masterTemplates];
+    dynamicTemplates.forEach(dt => {
+      if (!allTemplates.find(t => t.id === dt.id)) {
+        allTemplates.push(dt);
+      }
+    });
+
+    return allTemplates.sort((a, b) => {
       if (a.id === 'card-black-vip') return -1;
-      if (b.id === 'card-black-vip') return 1;
       return 0;
     });
 
   } catch (error) {
-    console.error("Erro crítico ao listar templates (FS):", error);
-    // Retorno silencioso do fallback para evitar erro 500 no servidor
-    return defaultTemplates;
+    console.error("Erro ao ler diretório de templates:", error);
+    return masterTemplates;
   }
 }
