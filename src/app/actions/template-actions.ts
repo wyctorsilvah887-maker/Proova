@@ -18,7 +18,7 @@ export interface TemplateMetadata {
 
 export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
   // Lista Mestre de Templates (Exatamente como aparecem na pasta /public/templates/)
-  // O primeiro item será o PADRÃO inicial do sistema.
+  // Organizado com Modelos Padrão primeiro e VIPs por último.
   const masterTemplates: TemplateMetadata[] = [
     {
       id: 'card-proova-padrao-laranja',
@@ -27,6 +27,26 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
       imageUrl: '/templates/card-proova-padrão-laranja.png',
       style: {
         background: '#f97316',
+        color: '#ffffff'
+      }
+    },
+    {
+      id: 'card-pink',
+      name: 'Pink',
+      type: 'image',
+      imageUrl: '/templates/card-pink.png',
+      style: {
+        background: '#fdf2f8',
+        color: '#9d174d'
+      }
+    },
+    {
+      id: 'card-proova-padrao-dark-1',
+      name: 'Padrão Dark',
+      type: 'image',
+      imageUrl: '/templates/card-proova-padrão-dark (1).png',
+      style: {
+        background: '#111827',
         color: '#ffffff'
       }
     },
@@ -57,26 +77,6 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
       imageUrl: '/templates/card-proova-social-vip.png',
       style: {
         background: '#1e1e1e',
-        color: '#ffffff'
-      }
-    },
-    {
-      id: 'card-pink',
-      name: 'Pink',
-      type: 'image',
-      imageUrl: '/templates/card-pink.png',
-      style: {
-        background: '#fdf2f8',
-        color: '#9d174d'
-      }
-    },
-    {
-      id: 'card-proova-padrao-dark-1',
-      name: 'Padrão Dark',
-      type: 'image',
-      imageUrl: '/templates/card-proova-padrão-dark (1).png',
-      style: {
-        background: '#111827',
         color: '#ffffff'
       }
     }
