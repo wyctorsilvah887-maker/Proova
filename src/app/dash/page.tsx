@@ -96,7 +96,7 @@ import {
   SheetTitle, 
   SheetDescription 
 } from '@/components/ui/sheet';
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -119,6 +119,7 @@ import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-ac
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useNotifications } from '@/hooks/use-notifications';
 import { LoadingScreen } from '@/components/loading-screen';
+import { getAvailableTemplates, type TemplateMetadata } from '@/app/actions/template-actions';
 
 interface AuditItem {
   id: string;
@@ -148,11 +149,13 @@ export default function DashPage() {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
 
-  // Estados para Social Cards
+  // Estados para Social Cards (Sincronizado com SocialCardsPage)
   const [selectedTestimonialForShare, setSelectedTestimonialForShare] = useState<any>(null);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isExportingCard, setIsExportingCard] = useState(false);
-  const [cardVariant, setCardVariant] = useState<'dark' | 'orange'>('dark');
+  const [availableTemplates, setAvailableTemplates] = useState<TemplateMetadata[]>([]);
+  const [isLoadingTemplates, setIsLoadingTemplates] = useState(true);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('');
 
   // Estado para Detalhe do Depoimento
   const [selectedTestimonialForDetail, setSelectedTestimonialForDetail] = useState<any>(null);
@@ -261,6 +264,24 @@ export default function DashPage() {
     if (typeof window !== 'undefined') setBaseUrl(window.location.origin);
   }, []);
 
+  // Carregar templates dinâmicos
+  useEffect(() => {
+    async function loadTemplates() {
+      setIsLoadingTemplates(true);
+      const templates = await getAvailableTemplates();
+      setAvailableTemplates(templates);
+      if (templates.length > 0) {
+        setSelectedTemplateId(templates[0].id);
+      }
+      setIsLoadingTemplates(false);
+    }
+    loadTemplates();
+  }, []);
+
+  const activeTemplate = useMemo(() => {
+    return availableTemplates.find(t => t.id === selectedTemplateId) || availableTemplates[0];
+  }, [selectedTemplateId, availableTemplates]);
+
   useEffect(() => {
     if (!authLoading && !user) router.replace('/login');
   }, [user, authLoading, router]);
@@ -274,7 +295,6 @@ export default function DashPage() {
   const setupSteps = useMemo(() => {
     const allSteps = [];
     
-    // Passo 0: Localização
     allSteps.push({ 
       id: 'location', 
       label: 'Localização', 
@@ -286,8 +306,6 @@ export default function DashPage() {
       } 
     });
 
-    // Passo 1: Google Maps (Oculto se for digital mas não agência?)
-    // No Proova atual, apenas agências pulam Google Maps ou têm comportamento diferente.
     if (!isDigitalBusiness) {
       const prev = allSteps[allSteps.length - 1];
       allSteps.push({ 
@@ -302,7 +320,6 @@ export default function DashPage() {
       });
     }
 
-    // Passo 2: Coleta Ativa
     const prevStep = allSteps[allSteps.length - 1];
     allSteps.push({ 
       id: 'collect', 
@@ -312,7 +329,6 @@ export default function DashPage() {
       action: () => setIsCollectLinkChoiceOpen(true) 
     });
 
-    // Passo 3: Primeiro Mural (EXCLUSIVO PARA AGÊNCIAS)
     if (isAgency) {
       const last = allSteps[allSteps.length - 1];
       allSteps.push({ 
@@ -506,15 +522,12 @@ export default function DashPage() {
     setIsGeneratingPdf(true);
     try {
       const qrElement = document.getElementById('qr-container-print');
-      if (!qrElement) throw new Error("Elemento do QR não encontrado. Certifique-se de que o diálogo está aberto.");
+      if (!qrElement) throw new Error("Elemento do QR não encontrado.");
 
       const qrImage = await toPng(qrElement, { 
         pixelRatio: 4, 
         backgroundColor: '#ffffff',
-        style: {
-          transform: 'scale(1)',
-          borderRadius: '0px'
-        }
+        style: { transform: 'scale(1)', borderRadius: '0px' }
       });
 
       const pdf = new jsPDF('p', 'mm', 'a4');
@@ -552,8 +565,7 @@ export default function DashPage() {
       pdf.save(`cartaz-balcao-${userData?.companySlug}.pdf`);
       shadcnToast({ title: "PDF Pronto!", description: "Seu cartaz de balcão foi gerado com sucesso." });
     } catch (err: any) { 
-      console.error(err);
-      shadcnToast({ variant: "destructive", title: "Erro na Impressão", description: "Tente novamente ou use um computador." }); 
+      shadcnToast({ variant: "destructive", title: "Erro na Impressão" }); 
     } finally { 
       setIsGeneratingPdf(false); 
     }
@@ -564,14 +576,13 @@ export default function DashPage() {
 
     if (selectedTestimonialForShare.videoUrl) {
       setIsExportingCard(true);
-      shadcnToast({ title: "Processando Vídeo VIP", description: "Iniciando download... aguarde." });
+      shadcnToast({ title: "Processando Vídeo VIP", description: "Iniciando download..." });
       try {
         const link = document.createElement('a');
         link.href = selectedTestimonialForShare.videoUrl;
-        link.download = `proova-social-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
+        link.download = `proova-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
         link.target = "_blank";
         link.click();
-        shadcnToast({ title: "Vídeo Iniciado!", description: "Seu vídeo review está sendo baixado." });
       } catch (err) {
         shadcnToast({ variant: "destructive", title: "Erro no download" });
       } finally {
@@ -587,31 +598,42 @@ export default function DashPage() {
       const dataUrl = await toPng(shareCardRef.current, { 
         quality: 1.0, 
         pixelRatio: 3, 
-        backgroundColor: 'rgba(0,0,0,0)', 
-        style: {
-          borderRadius: '2.5rem',
-        }
+        backgroundColor: null, 
+        style: { borderRadius: '2.5rem' }
       });
       
       const link = document.createElement('a');
-      link.download = `proova-social-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
+      link.download = `proova-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
       link.href = dataUrl;
       link.click();
-      shadcnToast({ title: "Card Gerado!", description: "Sua arte está pronta para as redes sociais." });
+      shadcnToast({ title: "Card Gerado!", description: "Sua arte está pronta." });
     } catch (err) {
-      console.error("Erro fatal ao exportar:", err);
-      shadcnToast({ variant: "destructive", title: "Erro ao exportar conteúdo" });
+      shadcnToast({ variant: "destructive", title: "Erro ao exportar" });
     } finally {
       setIsExportingCard(false);
     }
   };
 
+  const handleTemplateClick = (tpl: TemplateMetadata) => {
+    const isVip = tpl.id.toLowerCase().includes('vip');
+    if (isVip && !isPremiumUser) {
+      shadcnToast({
+        variant: "destructive",
+        title: "Recurso Premium",
+        description: "Templates VIP estão disponíveis apenas nos planos Gold e Enterprise."
+      });
+      router.push('/pricing');
+      return;
+    }
+    setSelectedTemplateId(tpl.id);
+  };
+
   const openShareDialog = (testimonial: any, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     setSelectedTestimonialForShare(testimonial);
-    const variants: ('dark' | 'orange')[] = ['dark', 'orange'];
-    const randomVariant = variants[Math.floor(Math.random() * variants.length)];
-    setCardVariant(randomVariant);
+    if (availableTemplates.length > 0) {
+      setSelectedTemplateId(availableTemplates[0].id);
+    }
     setIsShareDialogOpen(true);
   };
 
@@ -651,22 +673,8 @@ export default function DashPage() {
         <div className="flex items-center">
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[200px] h-[66px] md:w-[320px] md:h-[106px] transition-transform group-hover:scale-105">
-              <Image 
-                src="/logo-proova-white-mode.gif" 
-                alt="Logo" 
-                fill 
-                className="object-contain object-left dark:hidden" 
-                priority 
-                unoptimized
-              />
-              <Image 
-                src="/logo-proova-dark-mode.gif" 
-                alt="Logo" 
-                fill 
-                className="object-contain object-left hidden dark:block" 
-                priority 
-                unoptimized
-              />
+              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
+              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
           </Link>
         </div>
@@ -691,7 +699,6 @@ export default function DashPage() {
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
               <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator className="mx-1" />
-              
               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
                 <TrendingUp className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
@@ -800,15 +807,15 @@ export default function DashPage() {
               </h2>
             </div>
             <div className="grid gap-3 grid-cols-1">
-              {(() => {
-                const item = auditItems[0];
+              {auditItems.slice(0, 1).map((item) => {
+                const IconComponent = item.icon;
                 return (
                   <Card key={item.id} className={cn("border-none shadow-sm overflow-hidden rounded-2xl relative", item.status === 'critical' ? "bg-destructive/5" : "bg-orange-500/5")}>
                     <div className={cn("absolute top-0 left-0 w-1.5 h-full", item.status === 'critical' ? "bg-destructive" : "bg-orange-500")} />
                     <CardContent className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                       <div className="flex gap-4 items-center flex-1">
                         <div className={cn("p-2.5 rounded-xl shrink-0", item.status === 'critical' ? "bg-destructive/10 text-destructive" : "bg-orange-500/10 text-orange-600")}>
-                          <item.icon className="w-5 h-5" />
+                          <IconComponent className="w-5 h-5" />
                         </div>
                         <div className="space-y-1">
                           <p className="text-[10px] font-black uppercase tracking-widest leading-none">{item.label}</p>
@@ -825,7 +832,7 @@ export default function DashPage() {
                     </CardContent>
                   </Card>
                 );
-              })()}
+              })}
             </div>
           </section>
         )}
@@ -1294,13 +1301,50 @@ export default function DashPage() {
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[96vh] flex flex-col">
           <DialogHeader className="p-6 sm:p-8 pb-2 text-center shrink-0">
             <div className="flex items-center justify-center gap-2 mb-1">
-               <Share2 className="w-4 h-4 text-primary" />
-               <DialogTitle className="text-lg sm:text-xl font-black font-headline uppercase tracking-tight">Story Post Premium</DialogTitle>
+               <Sparkles className="w-5 h-5 text-primary" />
+               <DialogTitle className="text-xl font-black font-headline uppercase tracking-tight">Social Design Studio</DialogTitle>
             </div>
-            <DialogDescription className="text-xs">Gere uma arte profissional para seu Instagram.</DialogDescription>
+            <DialogDescription className="text-xs font-medium">Selecione um template e gere sua arte para post.</DialogDescription>
           </DialogHeader>
 
           <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-6 flex flex-col items-center gap-6 scrollbar-hide">
+            <div className="w-full shrink-0">
+              <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-3 ml-1">Templates Disponíveis:</p>
+              {isLoadingTemplates ? (
+                <div className="flex justify-center py-4"><Loader2 className="animate-spin h-5 w-5 text-primary" /></div>
+              ) : (
+                <ScrollArea className="w-full whitespace-nowrap rounded-xl border p-2 bg-muted/20">
+                  <div className="flex w-max space-x-3 p-1">
+                    {availableTemplates.map((tpl) => {
+                      const isVip = tpl.id.toLowerCase().includes('vip');
+                      const isLocked = isVip && !isPremiumUser;
+                      return (
+                        <button
+                          key={tpl.id}
+                          onClick={() => handleTemplateClick(tpl)}
+                          className={cn(
+                            "relative flex flex-col items-center gap-2 p-2 rounded-xl transition-all border-2",
+                            selectedTemplateId === tpl.id ? "border-primary bg-primary/5 shadow-md" : "border-transparent hover:border-primary/20",
+                            isLocked && "grayscale opacity-80"
+                          )}
+                        >
+                          <div className="w-12 h-12 rounded-lg shadow-inner overflow-hidden relative bg-black">
+                            <Image src={tpl.imageUrl} alt={tpl.name} fill className="object-cover" />
+                            {isLocked && <div className="absolute inset-0 bg-black/40 flex items-center justify-center"><Lock className="w-4 h-4 text-white" /></div>}
+                          </div>
+                          <div className="flex flex-col items-center">
+                            <span className="text-[8px] font-black uppercase tracking-tighter">{tpl.name}</span>
+                            {isVip && <Badge className="h-3 text-[5px] font-black uppercase bg-primary/20 text-primary border-none px-1">VIP</Badge>}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+              )}
+            </div>
+
             <div className="w-full flex justify-center py-2 shrink-0">
               <div 
                 ref={shareCardRef}
@@ -1308,56 +1352,32 @@ export default function DashPage() {
                   "relative overflow-hidden shadow-2xl transition-all duration-700",
                   "w-[min(88vw,400px)] aspect-square rounded-[2.5rem] flex flex-col items-center"
                 )}
-                style={{ 
-                  backgroundImage: cardVariant === 'dark' 
-                      ? 'linear-gradient(160deg, #050505 0%, #1a1a1a 60%, #f97316 160%)'
-                      : 'linear-gradient(160deg, #f97316 0%, #ea580c 70%, #ffffff 180%)',
-                  backgroundColor: cardVariant === 'dark' ? '#000000' : '#f97316'
-                }}
+                style={{ backgroundColor: activeTemplate?.style.background || '#000000' }}
               >
-                   <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16" />
-                   <div className="absolute bottom-0 left-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -ml-16 -mb-16" />
-
-                   <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-14 sm:p-16">
-                      <div id="card-header-cta" className="text-center space-y-1">
-                        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-white opacity-40">
-                          PROOVA TECHNOLOGY
-                        </p>
-                        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-white/80">
-                          RELATO DE CLIENTE
-                        </p>
+                   {activeTemplate?.imageUrl && <div className="absolute inset-0 z-0"><Image src={activeTemplate.imageUrl} alt="Bg" fill className="object-cover" priority /></div>}
+                   <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-8 sm:p-12">
+                      <div className="text-center space-y-1 mt-4">
+                        <p className={cn("text-[8px] sm:text-[9px] font-black uppercase tracking-[0.4em] opacity-40", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>PROOVA TECHNOLOGY</p>
+                        <p className={cn("text-[10px] sm:text-[11px] font-black uppercase tracking-[0.2em]", activeTemplate?.style.color === '#ffffff' ? "text-white/80" : "text-black/80")}>RELATO DE CLIENTE</p>
                       </div>
-
-                      <div className="flex-1 flex flex-col justify-center items-center w-full py-4 text-center">
-                        <div className="flex justify-center gap-1.5 mb-6 animate-in fade-in zoom-in duration-1000">
-                            {Array.from({ length: 5 }).map((_, i) => (
-                              <Star key={i} className="w-6 h-6 sm:w-7 sm:h-7 fill-[#fbbf24] text-[#fbbf24] drop-shadow-[0_0_12px_rgba(251,191,36,0.8)]" />
-                            ))}
+                      <div className="flex-1 flex flex-col justify-center items-center w-full py-2 text-center">
+                        <div className="flex justify-center gap-1 mb-4">
+                            {[1,2,3,4,5].map((_, i) => <Star key={i} className="w-5 h-5 sm:w-7 sm:h-7 fill-[#fbbf24] text-[#fbbf24] drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" />)}
                         </div>
-                        
-                        <div className="relative w-full max-w-[90%]">
-                          <Quote className="absolute -top-4 -left-3 w-6 h-6 text-white opacity-20 rotate-180" />
-                          <div className="bg-white/5 backdrop-blur-xl p-6 sm:p-8 rounded-[2rem] border border-white/10 shadow-2xl ring-1 ring-white/5">
-                            <p className={cn(
-                              "font-black font-headline leading-tight italic drop-shadow-md tracking-tight transition-all duration-1000 text-white",
-                              (selectedTestimonialForShare?.text?.length || 0) > 150 ? "text-sm" : 
-                              (selectedTestimonialForShare?.text?.length || 0) > 100 ? "text-base" : "text-xl sm:text-2xl"
-                            )}>
-                              "{selectedTestimonialForShare?.text}"
-                            </p>
+                        <div className="relative w-full max-w-[85%]">
+                          <Quote className={cn("absolute -top-3 -left-3 w-5 h-5 opacity-20 rotate-180", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")} />
+                          <div className={cn("p-5 sm:p-7 rounded-[1.8rem] shadow-2xl ring-1", activeTemplate?.style.color === '#ffffff' ? "bg-white/5 backdrop-blur-xl border-white/10 ring-white/5" : "bg-black/5 backdrop-blur-md border-black/5 ring-black/5")}>
+                            <p className={cn("font-black font-headline leading-tight italic tracking-tight", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black", (selectedTestimonialForShare?.text?.length || 0) > 180 ? "text-[10px] sm:text-xs" : (selectedTestimonialForShare?.text?.length || 0) > 120 ? "text-xs sm:text-sm" : (selectedTestimonialForShare?.text?.length || 0) > 80 ? "text-sm sm:text-base" : "text-lg sm:text-xl")}>"{selectedTestimonialForShare?.text}"</p>
                           </div>
-                          <Quote className="absolute -bottom-4 -right-3 w-6 h-6 text-white opacity-20" />
+                          <Quote className={cn("absolute -bottom-3 -right-3 w-5 h-5 opacity-20", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")} />
                         </div>
                       </div>
-
-                      <div className="w-full pt-6 border-t border-white/10">
+                      <div className={cn("w-full pt-4 mb-4", activeTemplate?.style.color === '#ffffff' ? "border-t border-white/10" : "border-t border-black/10")}>
                           <div className="flex flex-col items-center gap-2">
-                            <p className="text-white font-black text-[11px] sm:text-xs uppercase tracking-[0.3em]">
-                              {selectedTestimonialForShare?.userName}
-                            </p>
-                            <div className="bg-primary/20 px-4 py-1.5 rounded-full border border-primary/30 inline-flex items-center gap-1.5 backdrop-blur-md">
-                                <CheckCircle2 className="w-3 h-3 text-primary fill-primary/10" />
-                                <p className="text-[7px] sm:text-[8px] text-white font-black uppercase tracking-[0.15em]">Feedback Verificado</p>
+                            <p className={cn("font-black text-[10px] sm:text-xs uppercase tracking-[0.3em]", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>{selectedTestimonialForShare?.userName}</p>
+                            <div className={cn("px-4 py-1 rounded-full border inline-flex items-center gap-1.5 backdrop-blur-md shadow-sm", activeTemplate?.style.color === '#ffffff' ? "bg-primary/20 border-primary/30" : "bg-primary/10 border-primary/20")}>
+                                <CheckCircle2 className="w-3 h-3 text-primary fill-primary/5" />
+                                <p className={cn("text-[6px] sm:text-[7px] font-black uppercase tracking-[0.15em]", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>Feedback Verificado</p>
                             </div>
                           </div>
                       </div>
@@ -1365,21 +1385,19 @@ export default function DashPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-3 w-full">
-              <Button 
-                className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-xs bg-primary hover:bg-primary/90 text-white"
-                onClick={handleDownloadContent}
-                disabled={isExportingCard}
-              >
-                {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-5 h-5" />}
-                {selectedTestimonialForShare?.videoUrl ? 'Baixar Vídeo Review' : 'Baixar Card'}
-              </Button>
-            </div>
+            <Button 
+              className="w-full h-14 rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-xs bg-primary hover:bg-primary/90 text-white"
+              onClick={handleDownloadContent}
+              disabled={isExportingCard}
+            >
+              {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-5 h-5" />}
+              {selectedTestimonialForShare?.videoUrl ? 'Baixar Vídeo Review' : 'Gerar Arte PNG'}
+            </Button>
           </div>
           
           <DialogFooter className="p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
             <p className="text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
-              <Zap className="w-3 h-3 text-primary" /> Dica: Poste este card no seu Story e marque o cliente para aumentar seu alcance.
+              <Zap className="w-3 h-3 text-primary" /> Dica: Poste este card no seu Story para aumentar seu alcance.
             </p>
           </DialogFooter>
         </DialogContent>
