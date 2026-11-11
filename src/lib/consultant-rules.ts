@@ -33,7 +33,7 @@ export const CONSULTANT_TREE: Record<string, TreeBranch> = {
   '5': {
     title: 'Planos e Upgrade',
     keys: ['5', 'plano', 'valor', 'preco', 'upgrade'],
-    response: "**💎 Níveis de Estratégia Proova**\n\n1. **Base (Grátis):** 1 Mural e Inbox Privado.\n2. **Gold (R$ 49,90):** Ativa G-Boost, Auto-Publish e Editor VIP.\n3. **Enterprise (R$ 97):** Vídeo Reviews 4K e Suporte VIP.\n\n*Deseja mudar de plano? Acesse a aba **'Upgrade'** no painel.*\n\n*Digite **0** para voltar ao menu principal.*"
+    response: "**💎 Níveis de Estratégia Proova**\n\n1. **Base (Grátis):** 1 Mural e Inbox Privado.\n2. **Gold (R$ 49,90):** Ativa G-Boost, Auto-Publish e Editor VIP.\n3. **PRO (R$ 97):** Vídeo Reviews 4K e Suporte VIP.\n\n*Deseja mudar de plano? Acesse a aba **'Upgrade'** no painel.*\n\n*Digite **0** para voltar ao menu principal.*"
   },
   '6': {
     title: 'Falar com Humano',

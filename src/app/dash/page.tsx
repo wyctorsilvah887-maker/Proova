@@ -253,7 +253,7 @@ export default function DashPage() {
 
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
-    if (status === 'enterprise') return 'ENTERPRISE';
+    if (status === 'enterprise') return 'PRO';
     if (status === 'gold') return 'GOLD';
     if (status === 'trial') return 'TRIAL';
     if (status === 'expired') return 'EXPIRADO';
@@ -620,7 +620,7 @@ export default function DashPage() {
       shadcnToast({
         variant: "destructive",
         title: "Recurso Premium",
-        description: "Templates VIP estão disponíveis apenas nos planos Gold e Enterprise."
+        description: "Templates VIP estão disponíveis apenas nos planos Gold e PRO."
       });
       router.push('/pricing');
       return;
@@ -684,7 +684,7 @@ export default function DashPage() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
                 <div className="flex flex-col items-end relative">
-                  <span className="text-[10px] md:text-xs font-bold truncate max-w-[70px] sm:max-w-[120px] leading-tight transition-colors group-hover:text-primary">{userData?.companyName || 'Minha Empresa'}</span>
+                  <span className="text-xs font-bold truncate max-w-[70px] sm:max-w-[120px] leading-tight transition-colors group-hover:text-primary">{userData?.companyName || 'Minha Empresa'}</span>
                   <div className="flex flex-col items-end gap-0">
                     <span className={cn("text-[6px] sm:text-[8px] uppercase tracking-widest font-black leading-tight text-primary", userData?.membershipStatus === 'enterprise' && "animate-pulse")}>{membershipLabel}</span>
                     {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
@@ -1117,6 +1117,14 @@ export default function DashPage() {
         </section>
       </main>
 
+      <footer className="py-12 border-t mt-auto text-center flex flex-col items-center gap-8 bg-background/50">
+        <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[105px]">
+          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority unoptimized />
+          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority unoptimized />
+        </div>
+        <p className="text-[9px] text-muted-foreground uppercase font-black opacity-60">© 2026 Proova Technology - Business Intelligence v1.1</p>
+      </footer>
+
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-lg border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[90vh] flex flex-col">
           <div className="h-2 bg-primary w-full shrink-0" />
@@ -1364,7 +1372,7 @@ export default function DashPage() {
                             {[1,2,3,4,5].map((_, i) => <Star key={i} className="w-4 h-4 sm:w-7 sm:h-7 fill-[#fbbf24] text-[#fbbf24] drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" />)}
                         </div>
                         <div className="relative w-full max-w-[90%] sm:max-w-[85%]">
-                          <Quote className={cn("absolute -top-2 -left-2 sm:-top-3 sm:-left-3 w-4 h-4 sm:w-5 sm:h-5 opacity-20 rotate-180", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")} />
+                          <支配 className={cn("absolute -top-2 -left-2 sm:-top-3 sm:-left-3 w-4 h-4 sm:w-5 sm:h-5 opacity-20 rotate-180", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")} />
                           <div className={cn("p-4 sm:p-7 rounded-[1.5rem] sm:rounded-[1.8rem] shadow-2xl ring-1", activeTemplate?.style.color === '#ffffff' ? "bg-white/5 backdrop-blur-xl border-white/10 ring-white/5" : "bg-black/5 backdrop-blur-md border-black/5 ring-black/5")}>
                             <p className={cn("font-black font-headline leading-tight italic tracking-tight", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black", (selectedTestimonialForShare?.text?.length || 0) > 180 ? "text-[9px] sm:text-xs" : (selectedTestimonialForShare?.text?.length || 0) > 120 ? "text-[10px] sm:text-sm" : (selectedTestimonialForShare?.text?.length || 0) > 80 ? "text-xs sm:text-base" : "text-base sm:text-xl")}>"{selectedTestimonialForShare?.text}"</p>
                           </div>
@@ -1403,7 +1411,6 @@ export default function DashPage() {
       </Dialog>
       
       <Dialog open={isGoogleMapsDialogOpen} onOpenChange={setIsGoogleMapsDialogOpen}>
-        {/* ... (existing maps dialog content) ... */}
         <DialogContent className="rounded-[2.5rem] w-[95vw] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-6 pb-2 pt-10 shrink-0 bg-background">
             <DialogTitle className="text-xl md:text-2xl font-black font-headline flex items-center gap-2">
@@ -1478,7 +1485,6 @@ export default function DashPage() {
       </Dialog>
       
       <Dialog open={isQrDialogOpenManual} onOpenChange={setIsQrDialogOpenManual}>
-        {/* ... (existing qr dialog content) ... */}
         <DialogContent className="rounded-[2.5rem] w-[95vw] sm:max-w-[420px] border-none shadow-2xl p-0 overflow-hidden bg-background flex flex-col max-h-[90vh]">
           <div className="h-2 bg-primary w-full shrink-0" />
           <div className="flex-1 overflow-y-auto scrollbar-hide">

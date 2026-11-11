@@ -167,7 +167,7 @@ export default function AdminPage() {
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center">
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
-            <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
+            <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px]">
               <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
               <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
@@ -243,7 +243,7 @@ export default function AdminPage() {
                                </div>
                             </TableCell>
                             <TableCell>
-                               <Badge variant="secondary" className="text-[8px] font-black uppercase text-primary">{u.membershipStatus}</Badge>
+                               <Badge variant="secondary" className="text-[8px] font-black uppercase text-primary">{u.membershipStatus === 'enterprise' ? 'PRO' : u.membershipStatus}</Badge>
                             </TableCell>
                             <TableCell>
                                <div className="w-20">
@@ -320,7 +320,7 @@ export default function AdminPage() {
                      <SelectContent>
                         <SelectItem value="base">Base (Grátis)</SelectItem>
                         <SelectItem value="gold">Gold</SelectItem>
-                        <SelectItem value="enterprise">Enterprise</SelectItem>
+                        <SelectItem value="enterprise">PRO (Antigo Enterprise)</SelectItem>
                         <SelectItem value="trial">Trial</SelectItem>
                         <SelectItem value="expired">Expirado</SelectItem>
                      </SelectContent>

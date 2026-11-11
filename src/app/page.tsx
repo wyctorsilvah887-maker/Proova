@@ -539,7 +539,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
     },
     {
       id: 'enterprise',
-      name: "Plano Enterprise",
+      name: "Plano PRO",
       price: "R$ 97",
       period: "/mês",
       description: "Domínio de Mercado Regional",

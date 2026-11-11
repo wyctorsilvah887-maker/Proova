@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useMemo, useState, useEffect } from 'react';
@@ -96,7 +95,7 @@ export default function PricingPage() {
   }, [effectiveUserData]);
 
   const membershipLabel = useMemo(() => {
-    if (status === 'enterprise') return 'ENTERPRISE';
+    if (status === 'enterprise') return 'PRO';
     if (status === 'gold') return 'GOLD';
     if (status === 'trial') return 'TRIAL';
     if (status === 'expired') return 'EXPIRADO';
@@ -150,13 +149,13 @@ export default function PricingPage() {
     },
     {
       id: 'enterprise',
-      name: "Plano Enterprise",
+      name: "Plano PRO",
       price: "R$ 97",
       period: "/mês",
       description: "Domínio de Mercado",
       icon: Zap,
       highlight: false,
-      cta: status === 'enterprise' ? "Plano Ativo" : "Garantir Acesso Enterprise",
+      cta: status === 'enterprise' ? "Plano Ativo" : "Garantir Acesso PRO",
       disabled: status === 'enterprise',
       checkoutUrl: "https://pay.cakto.com.br/enterprise-proova",
       benefits: [
@@ -362,7 +361,7 @@ export default function PricingPage() {
                { q: "Posso cancelar minha assinatura quando quiser?", a: "Sim. A Proova não possui fidelidade. Você pode cancelar sua assinatura mensal diretamente no painel ou via suporte a qualquer momento, sem taxas ocultas." },
                { q: "O G-Boost realmente melhora meu posicionamento no Google?", a: "Absolutamente. O algoritmo do Google Maps prioriza perfis que recebem avaliações constantes e positivas. Ao automatizar o convite para elogios 5 estrelas, você aumenta sua visibilidade organicamente." },
                { q: "O que acontece com meus dados se eu voltar para o plano grátis?", a: "Seus dados permanecem seguros. No entanto, recursos premium como G-Boost, Editor VIP e Murais ilimitados serão desativados até que uma nova assinatura seja realizada." },
-               { q: "Como funciona o suporte VIP?", a: "Clientes Gold e Enterprise possuem fila prioritária em nosso chat de suporte e atendimento especializado por consultores estratégicos de prova social." }
+               { q: "Como funciona o suporte VIP?", a: "Clientes Gold e PRO possuem fila prioritária em nosso chat de suporte e atendimento especializado por consultores estratégicos de prova social." }
              ].map((faq, idx) => (
                <AccordionItem key={idx} value={`item-${idx}`} className="border rounded-[1.5rem] px-5 md:px-6 bg-card shadow-sm overflow-hidden">
                  <AccordionTrigger className="hover:no-underline text-[11px] md:text-sm font-black uppercase tracking-tight text-left py-5 md:py-6">
@@ -393,7 +392,7 @@ export default function PricingPage() {
       <footer className="py-12 md:py-20 border-t bg-background/50 flex flex-col items-center gap-6 md:gap-8 text-center mt-auto">
         <div className="relative w-[140px] h-[46px] md:w-[180px] md:h-[60px]">
           <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="dark:hidden object-contain opacity-30 grayscale" priority unoptimized />
-          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="hidden dark:block object-contain opacity-30 grayscale" priority unoptimized />
+          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="hidden dark:block opacity-30 grayscale" priority unoptimized />
         </div>
         <div className="space-y-1">
           <p className="text-[8px] md:text-[9px] text-muted-foreground font-black uppercase tracking-[0.3em] px-4">© 2026 PROOVA TECHNOLOGY - ESTRATÉGIA EM REPUTAÇÃO</p>

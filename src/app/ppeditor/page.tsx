@@ -564,7 +564,7 @@ const PublicPageSettings = ({
                  <div className="p-8 text-center bg-orange-500/5 rounded-[2.5rem] border-2 border-dashed border-orange-500/20 space-y-5">
                    <div className="mx-auto w-14 h-14 bg-orange-500/10 rounded-[1.5rem] flex items-center justify-center text-orange-600 shadow-inner"><Zap className="w-7 h-7" /></div>
                    <div className="space-y-2">
-                     <h4 className="text-sm font-black uppercase tracking-tight">Fluxos Hands-Free Enterprise</h4>
+                     <h4 className="text-sm font-black uppercase tracking-tight">Fluxos Hands-Free PRO</h4>
                      <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">Publique elogios automaticamente baseados em suas regras estratégicas de nota e volume de texto.</p>
                    </div>
                    <Button onClick={() => router.push('/pricing')} className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] bg-orange-500 hover:bg-orange-600 shadow-lg text-white transition-all active:scale-95">Fazer Upgrade</Button>
@@ -922,6 +922,15 @@ export default function PPEditorPage() {
     return url.includes('.mp4') || url.includes('.webm') || url.includes('.mov');
   }, [logoUrl]);
 
+  const membershipLabel = useMemo(() => {
+    const status = userData?.membershipStatus;
+    if (status === 'enterprise') return 'PRO';
+    if (status === 'gold') return 'GOLD';
+    if (status === 'trial') return 'TRIAL';
+    if (status === 'expired') return 'EXPIRADO';
+    return 'PLANO BASE';
+  }, [userData]);
+
   if (authLoading || userDataLoading || testimonialsLoading) return <LoadingScreen />;
 
   return (
@@ -1072,7 +1081,7 @@ export default function PPEditorPage() {
                                       "text-[6px] sm:text-[8px] uppercase tracking-widest font-black leading-tight text-primary",
                                       userData?.membershipStatus === 'enterprise' && "animate-pulse"
                                     )}>
-                                      {userData?.membershipStatus?.toUpperCase()}
+                                      {membershipLabel}
                                     </span>
                                   </div>
                                 </div>
