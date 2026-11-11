@@ -33,7 +33,8 @@ import {
   Gem,
   Sparkles,
   Stethoscope,
-  HeartPulse
+  HeartPulse,
+  AlertTriangle
 } from "lucide-react";
 import { 
   Sheet, 
@@ -728,6 +729,9 @@ export default function Home() {
   const [isPricingVisible, setIsPricingVisible] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Lógica de Vagas Restantes (Simulação de Urgência)
+  const [founderSpots, setFounderSpots] = useState(3);
 
   const agitationRef = useRef<HTMLElement>(null);
   const pillarsRef = useRef<HTMLElement>(null);
@@ -871,9 +875,15 @@ export default function Home() {
                     GARANTIR MEU ACESSO ESTRATÉGICO
                   </Button>
                 </Link>
-                <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">
-                  ⭐ Junte-se a centenas de clínicas que dominam seu nicho com a Proova.
-                </p>
+                <div className="flex flex-col items-center gap-2">
+                  <div className="flex items-center gap-2 text-primary font-black uppercase tracking-widest text-[10px] md:text-xs animate-pulse bg-primary/10 px-4 py-2 rounded-full border border-primary/20">
+                    <AlertTriangle className="w-4 h-4" />
+                    🔥 MEMBRO FUNDADOR: Restam apenas {founderSpots} de 10 vagas exclusivas.
+                  </div>
+                  <p className="text-[8px] font-bold uppercase tracking-[0.2em] text-white/30">
+                    Ativação imediata da licença após o cadastro
+                  </p>
+                </div>
               </div>
             </div>
           </div>
