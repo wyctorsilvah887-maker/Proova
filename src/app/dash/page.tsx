@@ -663,67 +663,7 @@ export default function DashPage() {
           </Link>
         </div>
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-0" />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
-                <div className="flex flex-col items-end relative">
-                  <span className="text-xs font-bold truncate max-w-[70px] sm:max-w-[120px] leading-tight transition-colors group-hover:text-primary">{userData?.companyName || 'Minha Empresa'}</span>
-                  <div className="flex flex-col items-end gap-0">
-                    <span className={cn("text-[6px] sm:text-[8px] uppercase tracking-widest font-black leading-tight text-primary", userData?.membershipStatus === 'enterprise' && "animate-pulse")}>{membershipLabel}</span>
-                    {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
-                  </div>
-                  {activeTicket && (
-                    <div className={cn("absolute -top-1 -right-4 h-2 w-2 rounded-full", activeTicket.isSupportInChat ? "bg-green-500 animate-ping" : "bg-red-500")} />
-                  )}
-                </div>
-                <div className="h-7 w-7 md:h-8 md:w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-3.5 h-3.5 md:w-4 md:h-4" /></div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
-              <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
-                <TrendingUp className="mr-2 h-4 w-4 text-primary" />
-                <span>Dash</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/settings')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Settings className="mr-2 h-4 w-4 text-primary" />
-                <span>Configurações</span>
-              </DropdownMenuItem>
-              {isAgency && (
-                <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                  <Layout className="mr-2 h-4 w-4 text-primary" />
-                  <span>Meus Murais</span>
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Inbox className="mr-2 h-4 w-4 text-primary" />
-                <span>Inbox Privado</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/support')} className="rounded-xl cursor-pointer font-bold py-2.5 relative">
-                <Headphones className="mr-2 h-4 w-4 text-primary" />
-                <span>Suporte Proova</span>
-                {activeTicket && (
-                  <div className={cn("absolute right-3 h-2 w-2 rounded-full", activeTicket.isSupportInChat ? "bg-green-500 animate-pulse" : "bg-red-500")} />
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Gem className="mr-2 h-4 w-4 text-primary" />
-                <span>Upgrade</span>
-              </DropdownMenuItem>
-              {userData?.isAdmin && (
-                <DropdownMenuItem onClick={() => router.push('/admin')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                  <Shield className="mr-2 h-4 w-4 text-primary" />
-                  <span>Administração</span>
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ThemeToggle className="flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-0" />
         </div>
       </header>
 
@@ -737,11 +677,30 @@ export default function DashPage() {
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-full overflow-hidden">
                <div className="p-6 border-b bg-muted/10 shrink-0">
-                  <SheetHeader>
-                    <SheetTitle className="text-sm font-black uppercase tracking-[0.2em] text-primary">Navegação Estratégica</SheetTitle>
-                    <SheetDescription className="sr-only">Menu de acesso rápido do Dashboard</SheetDescription>
-                  </SheetHeader>
+                  <div className="flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-500">
+                    <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
+                      <User className="w-6 h-6 text-primary" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-black uppercase tracking-tight truncate">{userData?.companyName || 'Minha Empresa'}</p>
+                      <div className="flex flex-col gap-0.5">
+                        <span className={cn(
+                          "text-[8px] font-black uppercase tracking-widest text-primary",
+                          userData?.membershipStatus === 'enterprise' && "animate-pulse"
+                        )}>
+                          {membershipLabel}
+                        </span>
+                        {isMapsLinkValid && (
+                          <div className="flex items-center gap-1">
+                            <div className="h-1 w-1 rounded-full bg-green-500 animate-pulse" />
+                            <span className="text-[7px] font-black uppercase text-green-500 tracking-tighter">G-Boost Ativo</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                </div>
+               
                <ScrollArea className="flex-1 min-h-0 w-full h-full">
                   <div className="px-4 py-6 space-y-2">
                     <div className="mb-4">
@@ -798,6 +757,7 @@ export default function DashPage() {
                         { href: '/support', label: 'Suporte VIP', icon: Headphones, hasActiveTicket: !!activeTicket },
                         { href: '/manual', label: 'Manual Estratégico', icon: BookOpen },
                         { href: '/settings', label: 'Configurações', icon: Settings },
+                        ...(userData?.isAdmin ? [{ href: '/admin', label: 'Administração', icon: Shield }] : [])
                       ].map((item: any) => (
                         <SheetClose asChild key={item.href}>
                           <Link 
