@@ -111,6 +111,16 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
       }
     },
     {
+      id: 'card-proova-botox2-vip',
+      name: 'Botox VIP',
+      type: 'image',
+      imageUrl: '/templates/card-proova-botox2-vip.png',
+      style: {
+        background: '#ffffff',
+        color: '#0f172a'
+      }
+    },
+    {
       id: 'card-proova-rose-vip',
       name: 'Rose Vip',
       type: 'image',
