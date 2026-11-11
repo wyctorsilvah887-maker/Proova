@@ -31,6 +31,16 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
       }
     },
     {
+      id: 'card-proova-dentista2-padrao',
+      name: 'Dentista 2 Proova',
+      type: 'image',
+      imageUrl: '/templates/card-proova-dentista2-padrão.png',
+      style: {
+        background: '#ffffff',
+        color: '#0f172a'
+      }
+    },
+    {
       id: 'card-proova-padrao-laranja',
       name: 'Padrão Laranja',
       type: 'image',
@@ -47,7 +57,7 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
       imageUrl: '/templates/card-proova-padrão-natal.png',
       style: {
         background: '#ffffff', 
-        color: '#000000' // Alterado para preto para dar contraste com o fundo branco/neve
+        color: '#000000'
       }
     },
     {
