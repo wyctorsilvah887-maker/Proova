@@ -30,7 +30,10 @@ import {
   Rocket,
   Shield,
   ChevronDown,
-  Gem
+  Gem,
+  Sparkles,
+  Stethoscope,
+  HeartPulse
 } from "lucide-react";
 import { 
   Sheet, 
@@ -123,7 +126,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
                 </div>
                 <div className="flex-1 p-4 space-y-1 overflow-y-auto">
                   {[
-                    { id: 'valor-reputacao', label: 'Valor da Reputação', icon: TrendingUp },
+                    { id: 'valor-reputacao', label: 'Valor da Clínica', icon: TrendingUp },
                     { id: 'metodologia', label: 'Metodologia Proova', icon: ShieldCheck },
                     { id: 'planos', label: 'Planos Estratégicos', icon: Gem },
                   ].map((item) => (
@@ -189,10 +192,10 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
     <section className="relative w-full pb-12 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh] pt-32">
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div className="absolute top-[15%] left-[8%] animate-float opacity-20 text-primary">
-          <MessageSquareQuote className="w-16 h-16 md:w-24 md:h-24" />
+          <Sparkles className="w-16 h-16 md:w-24 md:h-24" />
         </div>
         <div className="absolute top-[20%] right-[12%] animate-float-delayed opacity-20 text-primary">
-          <Star className="w-12 h-12 md:w-20 md:h-20 fill-current" />
+          <HeartPulse className="w-12 h-12 md:w-20 md:h-20" />
         </div>
         <div className="absolute bottom-[20%] left-[15%] animate-float-delayed opacity-20 text-primary">
           <Shield className="w-20 h-20 md:w-32 md:h-32" />
@@ -208,7 +211,7 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
             "inline-flex items-center text-primary px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-1000",
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
           )}>
-            A autoridade da sua marca é o seu maior ativo de vendas
+            A autoridade da sua clínica é o seu maior ativo de vendas
           </div>
           
           <h1 className={cn(
@@ -222,10 +225,10 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
           </h1>
           
           <p className={cn(
-            "max-w-xl mx-auto text-muted-foreground text-sm md:text-xl font-medium leading-relaxed transition-all duration-1000 delay-300",
+            "max-w-2xl mx-auto text-muted-foreground text-sm md:text-xl font-medium leading-relaxed transition-all duration-1000 delay-300",
             isVisible ? "animate-in fade-in slide-in-from-right-20 opacity-100" : "opacity-0"
           )}>
-            Utilize a Proova para consolidar sua reputação digital e transformar depoimentos reais em um motor de conversão de alta performance.
+            A infraestrutura estratégica para Clínicas de Estética, Dermatologistas e Profissionais VIP que desejam transformar depoimentos reais em um motor de conversão imparável.
           </p>
           
           <div className={cn(
@@ -233,8 +236,8 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
             isVisible ? "animate-in fade-in slide-in-from-bottom-5 opacity-100" : "opacity-0"
           )}>
             <Link href="/signup" className="w-full sm:w-auto">
-              <Button className="w-full sm:w-auto h-11 px-8 rounded-xl text-[9px] font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
-                CONSOLIDAR MINHA AUTORIDADE <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+              <Button className="w-full sm:w-auto h-14 px-8 rounded-2xl text-[10px] font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
+                CONSOLIDAR MINHA AUTORIDADE CLÍNICA <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
               </Button>
             </Link>
           </div>
@@ -257,33 +260,33 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
           "space-y-4 transition-all duration-1000",
           isVisible ? "animate-in fade-in zoom-in-95 opacity-100" : "opacity-0"
         )}>
-          <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">A Ciência da Reputação Digital</h2>
+          <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">A Ciência da Reputação em Saúde e Beleza</h2>
           <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
-            Seja a <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-3">Referência</span> absoluta do seu mercado.
+            Seja a <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-3">Referência</span> absoluta da sua região.
           </h3>
-          <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">A ausência de prova social gera incerteza. A incerteza interrompe a venda.</p>
+          <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">Procedimentos de alto ticket exigem confiança extrema. A incerteza do paciente é o fim do seu faturamento.</p>
         </div>
 
         <div className="grid gap-12 lg:grid-cols-3">
           {[
             { 
               icon: MapPin, 
-              title: "SEO Local e Visibilidade", 
-              desc: "Aumente sua relevância no Google Maps. Perfis com alto volume de avaliações 5 estrelas são priorizados pelo algoritmo, capturando a demanda qualificada da sua região.", 
+              title: "SEO Local para Clínicas", 
+              desc: "Domine o Google Maps. Perfis de clínicas com alto volume de avaliações 5 estrelas são priorizados no momento exato em que o paciente busca por procedimentos na sua cidade.", 
               animate: true,
               color: "text-primary"
             },
             { 
               icon: ShieldCheck, 
-              title: "Segurança na Decisão", 
-              desc: "Elimine o atrito no checkout. Exibir depoimentos verificados reduz a percepção de risco e acelera o ciclo de decisão do seu cliente final.", 
+              title: "Redução de Objeções", 
+              desc: "Elimine o medo do paciente. Exibir depoimentos verificados de resultados reais reduz a percepção de risco e acelera o agendamento de consultas de avaliação.", 
               animate: true,
               color: "text-primary" 
             },
             { 
               icon: TrendingUp, 
-              title: "Autoridade Consolidada", 
-              desc: "Deixe de ser apenas mais um no mercado. Com a Proova, sua marca transmite solidez e sucesso contínuo, atraindo parcerias e contratos de maior valor.", 
+              title: "Ticket Médio Elevado", 
+              desc: "Deixe de competir por preço. Com uma autoridade consolidada via Proova, você atrai pacientes que buscam qualidade e segurança, permitindo cobrar o valor justo pelo seu expertise.", 
               animate: false,
               color: "text-primary" 
             }
@@ -324,17 +327,17 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
     { 
       number: '01', 
       title: 'Estratégia G-Boost', 
-      desc: 'Integração direta com o ecossistema Google para maximizar o volume de avaliações positivas no seu perfil comercial, elevando seu rankeamento orgânico.' 
+      desc: 'Integração oficial com o Google Business para maximizar avaliações positivas, elevando sua clínica ao topo das buscas orgânicas de estética.' 
     },
     { 
       number: '02', 
       title: 'Protocolo Reputation Shield', 
-      desc: 'Blindagem de marca através de um canal de feedback privado. Resolva intercorrências internamente e preserve sua imagem pública imaculada.' 
+      desc: 'Blindagem contra insatisfações públicas. Feedbacks críticos são filtrados para um canal privado, permitindo resolução ética e interna.' 
     },
     { 
       number: '03', 
-      title: 'Hub de Autoridade Digital', 
-      desc: 'Uma Landing Page estratégica para o seu link da bio, reunindo seus depoimentos mais impactantes em uma interface de alta performance projetada para converter tráfego social em vendas.' 
+      title: 'Social Design Studio', 
+      desc: 'Transforme elogios em artes profissionais para o seu Instagram com um clique. O "Efeito Manada" aplicado ao seu perfil de saúde e beleza.' 
     }
   ];
 
@@ -368,9 +371,9 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
           <h3 className={cn(
             "text-3xl md:text-5xl font-black font-headline tracking-tighter"
           )}>
-            O Padrão Ouro em <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto]">Reputação.</span>
+            O Padrão Ouro em <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto]">Reputação Clínica.</span>
           </h3>
-          <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Uma infraestrutura completa para gerir, proteger e exibir a força da sua marca.</p>
+          <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Uma infraestrutura tecnológica completa para gerir, proteger e escalar o sucesso do seu consultório.</p>
         </div>
         
         <div className="max-w-4xl mx-auto relative px-4 md:px-0">
@@ -438,17 +441,17 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
           )}>
             <div className="space-y-4">
               <h2 className="text-3xl md:text-5xl font-black font-headline leading-tight tracking-tight">
-                Consolide sua marca como a <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-3">Única Opção</span> viável.
+                Sua Clínica como a <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-3">Única Opção</span> segura.
               </h2>
               <p className="text-sm md:text-lg text-muted-foreground font-medium italic">
-                "No mercado moderno, a confiança não é um detalhe — é a moeda que dita o seu volume de vendas."
+                "No mercado de estética, a confiança não é um diferencial — é o pré-requisito para o agendamento."
               </p>
             </div>
 
             <div className="space-y-6">
               {[
-                { icon: Building2, title: 'Ecossistema Corporativo', desc: 'Estruture a autoridade da sua rede de franquias ou unidades locais com dashboards unificados de performance.' },
-                { icon: Target, title: 'Serviços de Alto Ticket', desc: 'Reduza a resistência de compra em serviços premium exibindo validações de clientes satisfeitos em tempo real.' }
+                { icon: Stethoscope, title: 'Autoridade Médica e Bio', desc: 'Estruture o seu posicionamento como especialista. Depoimentos verificados validam sua competência técnica e resultados.' },
+                { icon: Sparkles, title: 'Estética de Alto Padrão', desc: 'Exiba a satisfação dos seus pacientes onde importa: logo abaixo dos seus procedimentos mais lucrativos no seu site.' }
               ].map((item, idx) => (
                 <div key={idx} className="flex gap-6 group">
                   <item.icon className="w-7 h-7 text-primary shrink-0 group-hover:scale-110 transition-transform duration-500" />
@@ -481,7 +484,7 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
                 href="/c/proova" 
                 className="inline-flex items-center justify-center gap-2 group cursor-pointer text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-all py-2 px-4 rounded-full bg-background/50 backdrop-blur-sm border border-border/50 shadow-sm"
               >
-                Quer aparecer na nossa página? Deixe sua experiência usando o Proova
+                Veja como o Proova automatiza a sua Prova Social em tempo real
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
@@ -509,11 +512,11 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
       icon: Shield,
       highlight: false,
       benefits: [
-        "1 Mural de Depoimentos",
+        "1 Mural de Depoimentos para Site",
         "5 Depoimentos Ativos no Link in Bio",
-        "Inbox Privado (Filtro de Feedbacks Críticos)",
-        "QR Code de Balcão",
-        "Link de Coleta Padrão"
+        "Inbox Privado (Filtro de Críticas)",
+        "QR Code de Balcão para Clínica",
+        "Link de Coleta Estratégico"
       ]
     },
     {
@@ -521,17 +524,17 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
       name: "Plano Gold",
       price: "R$ 49,90",
       period: "/mês",
-      description: "Aceleração de Vendas",
+      description: "Aceleração de Agendamentos",
       icon: Star,
       highlight: true,
       benefits: [
-        "Murais Ilimitados",
-        "50 Depoimentos Ativos",
-        "G-Boost (Ranqueamento no Google Maps)",
-        "Editor VIP Link in Bio",
-        "Auto-Publish (Publicação Automática de Depoimentos)",
+        "Murais Ilimitados (Home, Serviços, Bio)",
+        "50 Depoimentos Ativos Selecionáveis",
+        "G-Boost (Ranqueamento Google Maps)",
+        "Editor VIP da Página Pública",
+        "Auto-Publish (Postagem Automática)",
         "Relatórios de Performance Semanais",
-        "Suporte VIP"
+        "Suporte VIP via Chat"
       ]
     },
     {
@@ -539,16 +542,16 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
       name: "Plano Enterprise",
       price: "R$ 97",
       period: "/mês",
-      description: "Domínio de Mercado",
+      description: "Domínio de Mercado Regional",
       icon: Zap,
       highlight: false,
       benefits: [
         "Tudo do Gold + Recursos Exclusivos",
-        "Vídeo Reviews 4K de Alto Impacto",
+        "Vídeo Reviews 4K (Mídia de Alto Impacto)",
         "Depoimentos Ativos Ilimitados",
-        "Suporte VIP Dedicado no App",
+        "Suporte VIP Dedicado com Especialista",
         "Design de Página Ultra Customizado",
-        "Análise Preditiva de Conversão"
+        "Análise Preditiva de Conversão de Leads"
       ]
     }
   ];
@@ -560,11 +563,11 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
           "text-center space-y-4 mb-16 transition-all duration-1000",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         )}>
-          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Níveis de Estratégia</h2>
+          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Níveis de Estratégia Clínica</h2>
           <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
             Escolha o seu Nível de <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto]">Autoridade.</span>
           </h3>
-          <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Invista na reputação que acelera suas vendas.</p>
+          <p className="text-muted-foreground font-medium text-sm md:text-lg max-w-2xl mx-auto">Invista na reputação que protege e escala o seu faturamento.</p>
         </div>
 
         <div className="space-y-4">
@@ -655,7 +658,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                                 : "bg-primary text-white hover:bg-primary/90"
                             )}
                           >
-                            Garantir Acesso <ArrowRight className="w-4 h-4" />
+                            Garantir Acesso Estratégico <ArrowRight className="w-4 h-4" />
                           </Button>
                         </Link>
                       </div>
@@ -849,17 +852,17 @@ export default function Home() {
         />
         
         <section className="relative w-full py-24 md:py-36 bg-black text-white overflow-hidden">
-          <Image src="https://picsum.photos/seed/ctabg88/1920/1080" alt="CTA Bg" fill className="object-cover opacity-20 grayscale brightness-50" data-ai-hint="tech abstract" />
+          <Image src="https://picsum.photos/seed/ctabg88/1920/1080" alt="CTA Bg" fill className="object-cover opacity-20 grayscale brightness-50" data-ai-hint="aesthetic clinic" />
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-primary/10" />
           
           <div className="container relative z-10 px-4 mx-auto">
             <div className="max-w-3xl mx-auto text-center space-y-10">
               <div className="space-y-4">
                 <h2 className="text-4xl md:text-7xl font-black font-headline tracking-tighter leading-[1]">
-                  Pronto para elevar o <span className="text-primary italic">Patamar</span> da sua marca?
+                  Pronto para elevar o <span className="text-primary italic">Patamar</span> da sua clínica?
                 </h2>
                 <p className="max-w-lg mx-auto text-base md:text-2xl font-medium text-white/80">
-                  Assuma a liderança do seu setor através da prova social estratégica.
+                  Assuma a liderança regional através da prova social estratégica.
                 </p>
               </div>
               <div className="flex flex-col items-center gap-5">
@@ -869,7 +872,7 @@ export default function Home() {
                   </Button>
                 </Link>
                 <p className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40">
-                  ⭐ Junte-se a centenas de empresas que dominam seu nicho com a Proova.
+                  ⭐ Junte-se a centenas de clínicas que dominam seu nicho com a Proova.
                 </p>
               </div>
             </div>
