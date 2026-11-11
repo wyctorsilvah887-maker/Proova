@@ -79,7 +79,8 @@ import {
   RefreshCw,
   Headphones,
   Bell,
-  BellRing
+  BellRing,
+  Menu
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -94,7 +95,9 @@ import {
   SheetContent, 
   SheetHeader, 
   SheetTitle, 
-  SheetDescription 
+  SheetDescription,
+  SheetTrigger,
+  SheetClose
 } from '@/components/ui/sheet';
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Label } from '@/components/ui/label';
@@ -149,7 +152,7 @@ export default function DashPage() {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
 
-  // Estados para Social Cards (Sincronizado com SocialCardsPage)
+  // Estados para Social Cards
   const [selectedTestimonialForShare, setSelectedTestimonialForShare] = useState<any>(null);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isExportingCard, setIsExportingCard] = useState(false);
@@ -744,6 +747,54 @@ export default function DashPage() {
       </header>
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-20 md:pt-24 pb-12">
+        <div className="flex items-center gap-4 mb-2">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10">
+                <Menu className="w-6 h-6" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] border-none shadow-2xl bg-background p-0">
+               <div className="p-6 border-b bg-muted/10">
+                  <SheetHeader>
+                    <SheetTitle className="text-sm font-black uppercase tracking-[0.2em] text-primary">Navegação Estratégica</SheetTitle>
+                    <SheetDescription className="sr-only">Menu de acesso rápido do Dashboard</SheetDescription>
+                  </SheetHeader>
+               </div>
+               <ScrollArea className="flex-1 h-full py-6">
+                  <div className="px-4 space-y-2">
+                    {[
+                      { href: '/dash', label: 'Dashboard', icon: TrendingUp },
+                      { href: '/metrics', label: 'Analytics', icon: BarChart3 },
+                      { href: '/social-cards', label: 'Social Cards', icon: Share2 },
+                      { href: '/private', label: 'Moderação', icon: Inbox, badge: pendingTestimonialsCount },
+                      { href: '/support', label: 'Suporte VIP', icon: Headphones },
+                      { href: '/settings', label: 'Configurações', icon: Settings },
+                    ].map((item) => (
+                      <SheetClose asChild key={item.href}>
+                        <Link 
+                          href={item.href}
+                          className="flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                        >
+                          <div className="flex items-center gap-4">
+                            <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                            <span>{item.label}</span>
+                          </div>
+                          {item.badge !== undefined && item.badge > 0 && (
+                            <Badge className="bg-destructive text-white border-none h-4 px-1.5 text-[8px]">{item.badge}</Badge>
+                          )}
+                        </Link>
+                      </SheetClose>
+                    ))}
+                  </div>
+               </ScrollArea>
+            </SheetContent>
+          </Sheet>
+          <div className="flex flex-col">
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground leading-none">Acesso Rápido</h2>
+          </div>
+        </div>
+
         {(!isSetupComplete && !userData?.isSetupProcessDone) && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="flex items-center justify-between">
