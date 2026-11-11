@@ -46,7 +46,8 @@ import {
   ChevronRight,
   ListChecks,
   Eye,
-  FileVideo
+  FileVideo,
+  Settings
 } from 'lucide-react';
 import { 
   Sheet, 
