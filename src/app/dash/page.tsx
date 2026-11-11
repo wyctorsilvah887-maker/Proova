@@ -150,7 +150,6 @@ export default function DashPage() {
   const [configMode, setConfigMode] = useState<'location' | 'maps' | 'business'>('location');
   
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
 
   // Estados para Social Cards
   const [selectedTestimonialForShare, setSelectedTestimonialForShare] = useState<any>(null);
@@ -160,10 +159,6 @@ export default function DashPage() {
   const [isLoadingTemplates, setIsLoadingTemplates] = useState(true);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('');
 
-  // Estado para Detalhe do Depoimento
-  const [selectedTestimonialForDetail, setSelectedTestimonialForDetail] = useState<any>(null);
-  const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
-  
   const shareCardRef = useRef<HTMLDivElement>(null);
   const dialogVideoRef = useRef<HTMLVideoElement>(null);
 
@@ -434,11 +429,11 @@ export default function DashPage() {
   const filteredMetrics = useMemo(() => {
     const testimonials = approvedTestimonials;
     const now = new Date();
-    if (period === 'all') return { count: userData?.testimonialsCount || 0, displayList: testimonials.slice(0, 5), trendLabel: 'Total acumulado' };
+    if (period === 'all') return { count: userData?.testimonialsCount || 0, trendLabel: 'Total acumulado' };
     const days = parseInt(period);
     const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
     const periodTestimonials = testimonials.filter(t => (t.createdAt?.toDate?.() || new Date()) >= cutoff);
-    return { count: periodTestimonials.length, displayList: periodTestimonials.slice(0, 5), trendLabel: `Últimos ${days} dias` };
+    return { count: periodTestimonials.length, trendLabel: `Últimos ${days} dias` };
   }, [approvedTestimonials, period, userData]);
 
   const todayCount = useMemo(() => {
@@ -629,20 +624,6 @@ export default function DashPage() {
       return;
     }
     setSelectedTemplateId(tpl.id);
-  };
-
-  const openShareDialog = (testimonial: any, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
-    setSelectedTestimonialForShare(testimonial);
-    if (availableTemplates.length > 0) {
-      setSelectedTemplateId(availableTemplates[0].id);
-    }
-    setIsShareDialogOpen(true);
-  };
-
-  const openDetailDialog = (testimonial: any) => {
-    setSelectedTestimonialForDetail(testimonial);
-    setIsDetailDialogOpen(true);
   };
 
   if (authLoading || userDataLoading || (user && !userData)) {
@@ -1028,161 +1009,7 @@ export default function DashPage() {
             </div>
           </Card>
         </div>
-
-        <section id="testimonials-section" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5 text-primary" />
-              <h2 className="text-lg md:text-xl font-bold font-headline tracking-tight">Últimos 5 Depoimentos Publicados</h2>
-            </div>
-          </div>
-          <div className="grid gap-3 md:gap-4">
-            {testimonialsLoading ? <div className="flex items-center justify-center py-12"><Loader2 className="h-8 w-8 animate-spin text-primary/50" /></div> : filteredMetrics.displayList.length > 0 ? filteredMetrics.displayList.map((t: any) => (
-              <Card 
-                key={t.id} 
-                className="border-none shadow-sm overflow-hidden rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all hover:shadow-md cursor-pointer active:scale-[0.99] group/card"
-                onClick={() => openDetailDialog(t)}
-              >
-                <div className="flex items-start gap-4 min-w-0 flex-1">
-                  {t.videoUrl ? (
-                    <div 
-                      className={cn(
-                        "relative rounded-lg overflow-hidden bg-black shrink-0 border border-primary/10 transition-all cursor-pointer",
-                        playingVideoId === t.id ? "w-full sm:w-64 h-48 sm:h-40" : "w-20 h-16 sm:w-24 sm:h-16 hover:border-primary/30"
-                      )}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setPlayingVideoId(playingVideoId === t.id ? null : t.id);
-                      }}
-                    >
-                      {playingVideoId === t.id ? (
-                        <video 
-                          src={t.videoUrl} 
-                          className="w-full h-full object-contain"
-                          autoPlay
-                          controls
-                          playsInline
-                          disablePictureInPicture
-                          controlsList="nodownload noplaybackrate noremoteplayback"
-                          disableRemotePlayback
-                        />
-                      ) : (
-                        <>
-                          <video 
-                            src={t.videoUrl} 
-                            className="w-full h-full object-cover opacity-60"
-                            muted
-                            autoPlay
-                            loop
-                            playsInline
-                            preload="metadata"
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <Play className="w-5 h-5 text-white fill-white drop-shadow-lg" />
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="bg-primary/10 p-2 rounded-xl hidden sm:block transition-colors group-hover/card:bg-primary group-hover/card:text-white"><User className="w-4 h-4 text-primary group-hover/card:text-white" /></div>
-                  )}
-                  <div className="space-y-1 min-w-0 flex-1">
-                    <div className="flex flex-col space-y-0.5">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold text-xs truncate group-hover/card:text-primary transition-colors">{t.userName}</span>
-                        {t.videoUrl && <Badge variant="secondary" className="h-4 px-1 text-[7px] font-black uppercase bg-primary/10 text-primary border-none">Vídeo</Badge>}
-                      </div>
-                      <div className="flex gap-0.5">{Array.from({ length: t.rating || 5 }).map((_, i) => <Star key={i} className="w-2.5 h-2.5 fill-primary text-primary" />)}</div>
-                    </div>
-                    {t.text && t.text !== '(Depoimento em Vídeo)' && (
-                      <p className="text-[10px] md:text-xs text-foreground italic line-clamp-2">"{t.text}"</p>
-                    )}
-                    <div className="flex items-center gap-4 text-[8px] md:text-[10px] text-muted-foreground font-medium pt-1">
-                       <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Hoje'}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between md:justify-end gap-3 shrink-0 border-t md:border-t-0 pt-2 md:pt-0">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="rounded-full gap-1.5 text-[9px] font-black uppercase tracking-widest h-8 border-primary/20 text-primary hover:bg-primary/5 relative z-20"
-                    onClick={(e) => openShareDialog(t, e)}
-                  >
-                    <Share className="w-3 h-3" /> Criar Story
-                  </Button>
-                </div>
-              </Card>
-            )) : <div className="text-center py-16 border-2 border-dashed rounded-2xl bg-muted/10 opacity-40"><MessageSquare className="w-10 h-10 mx-auto mb-3" /><p className="text-sm">Nenhum depoimento publicado ainda.</p></div>}
-          </div>
-        </section>
       </main>
-
-      <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
-        <DialogContent className="rounded-[2.5rem] sm:max-w-lg border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[90vh] flex flex-col">
-          <div className="h-2 bg-primary w-full shrink-0" />
-          <ScrollArea className="flex-1">
-            <div className="p-8 space-y-8">
-              <div className="flex flex-col items-center text-center space-y-4">
-                <div className="p-4 rounded-3xl bg-primary/10 text-primary">
-                  <User className="w-10 h-10" />
-                </div>
-                <div className="space-y-1">
-                  <DialogTitle className="text-2xl font-black font-headline tracking-tight uppercase">{selectedTestimonialForDetail?.userName}</DialogTitle>
-                  <p className="text-xs text-muted-foreground font-bold flex items-center justify-center gap-2">
-                    <Clock className="w-3.5 h-3.5" />
-                    {selectedTestimonialForDetail?.createdAt?.toDate ? selectedTestimonialForDetail.createdAt.toDate().toLocaleString('pt-BR') : 'Hoje'}
-                  </p>
-                </div>
-                <div className="flex justify-center gap-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <Star 
-                      key={i} 
-                      className={cn(
-                        "w-6 h-6",
-                        i < (selectedTestimonialForDetail?.rating || 5) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20"
-                      )} 
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {selectedTestimonialForDetail?.videoUrl && (
-                <div className="aspect-video rounded-[2rem] overflow-hidden bg-black shadow-2xl ring-4 ring-primary/5">
-                  <video 
-                    src={selectedTestimonialForDetail.videoUrl} 
-                    controls 
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-              )}
-
-              {selectedTestimonialForDetail?.text && selectedTestimonialForDetail?.text !== '(Depoimento em Vídeo)' && (
-                <div className="relative p-8 rounded-[2rem] bg-muted/30 border-2 border-primary/10">
-                  <Quote className="absolute top-4 left-4 w-8 h-8 text-primary/20 rotate-180" />
-                  <p className="text-base md:text-lg font-medium italic leading-relaxed text-center relative z-10">
-                    "{selectedTestimonialForDetail?.text}"
-                  </p>
-                  <Quote className="absolute bottom-4 right-4 w-8 h-8 text-primary/20" />
-                </div>
-              )}
-
-              <div className="flex flex-col gap-3">
-                 <Button 
-                  className="w-full h-14 rounded-2xl font-black uppercase tracking-widest gap-2 bg-primary shadow-xl"
-                  onClick={() => {
-                    setIsDetailDialogOpen(false);
-                    openShareDialog(selectedTestimonialForDetail);
-                  }}
-                 >
-                   <Share2 className="w-5 h-5" /> Criar Social Card
-                 </Button>
-                 <Button variant="ghost" onClick={() => setIsDetailDialogOpen(false)} className="w-full text-[10px] font-black uppercase tracking-widest text-muted-foreground">Fechar Visualização</Button>
-              </div>
-            </div>
-          </ScrollArea>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={isCollectLinkChoiceOpen} onOpenChange={setIsCollectLinkChoiceOpen}>
         <DialogContent className="rounded-[2.5rem] w-[95vw] max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[90vh] flex flex-col">
