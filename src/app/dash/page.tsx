@@ -115,7 +115,7 @@ import { signOut } from 'firebase/auth';
 import { toast as shadcnToast } from '@/hooks/use-toast';
 import { QRCodeSVG } from 'qrcode.react';
 import { useTheme } from 'next-themes';
-import { jsPDF } from 'jsPDF';
+import { jsPDF } from 'jspdf';
 import { toPng } from 'html-to-image';
 import { cn } from '@/lib/utils';
 import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-actions';
