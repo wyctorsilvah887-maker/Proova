@@ -654,21 +654,8 @@ export default function DashPage() {
       )}
 
       <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center">
-          <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
-            <div className="relative w-[200px] h-[66px] md:w-[320px] md:h-[106px] transition-transform group-hover:scale-105">
-              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
-              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
-            </div>
-          </Link>
-        </div>
-        <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle className="flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-0" />
-        </div>
-      </header>
-
-      <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-20 md:pt-24 pb-12">
-        <div className="flex items-center gap-4 mb-2">
+        <div className="flex items-center gap-2">
+          {/* Hamburger Menu on the extreme left */}
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all active:scale-95">
@@ -795,11 +782,20 @@ export default function DashPage() {
                </div>
             </SheetContent>
           </Sheet>
-          <div className="flex flex-col">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground leading-none">Menu de Inteligência</h2>
-          </div>
-        </div>
 
+          <Link href="/dash" className="flex items-center group -ml-2">
+            <div className="relative w-[180px] h-[58px] md:w-[280px] md:h-[90px] transition-transform group-hover:scale-105">
+              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
+              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
+            </div>
+          </Link>
+        </div>
+        <div className="ml-auto flex items-center gap-2 md:gap-4">
+          <ThemeToggle className="flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-0" />
+        </div>
+      </header>
+
+      <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-20 md:pt-24 pb-12">
         {(!isSetupComplete && !userData?.isSetupProcessDone) && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="flex items-center justify-between">
