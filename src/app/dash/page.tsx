@@ -115,7 +115,7 @@ import { signOut } from 'firebase/auth';
 import { toast as shadcnToast } from '@/hooks/use-toast';
 import { QRCodeSVG } from 'qrcode.react';
 import { useTheme } from 'next-themes';
-import { jsPDF } from 'jspdf';
+import { jsPDF } from 'jsPDF';
 import { toPng } from 'html-to-image';
 import { cn } from '@/lib/utils';
 import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-actions';
@@ -754,15 +754,15 @@ export default function DashPage() {
                 <Menu className="w-6 h-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] border-none shadow-2xl bg-background p-0">
-               <div className="p-6 border-b bg-muted/10">
+            <SheetContent side="left" className="w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-full overflow-hidden">
+               <div className="p-6 border-b bg-muted/10 shrink-0">
                   <SheetHeader>
                     <SheetTitle className="text-sm font-black uppercase tracking-[0.2em] text-primary">Navegação Estratégica</SheetTitle>
                     <SheetDescription className="sr-only">Menu de acesso rápido do Dashboard</SheetDescription>
                   </SheetHeader>
                </div>
-               <ScrollArea className="flex-1 h-full py-6">
-                  <div className="px-4 space-y-2">
+               <ScrollArea className="flex-1 min-h-0 w-full h-full">
+                  <div className="px-4 py-6 space-y-2">
                     <div className="mb-4">
                       <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Visão Geral</p>
                       {[
@@ -841,7 +841,7 @@ export default function DashPage() {
                     </div>
                   </div>
                </ScrollArea>
-               <div className="p-6 border-t bg-muted/5">
+               <div className="p-6 border-t bg-muted/5 shrink-0">
                   <button onClick={() => signOut(auth)} className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-destructive/5 text-[10px] font-black uppercase tracking-widest text-destructive transition-all">
                     <LogOut className="w-4 h-4" />
                     <span>Encerrar Sessão</span>
