@@ -1117,14 +1117,6 @@ export default function DashPage() {
         </section>
       </main>
 
-      <footer className="py-12 border-t mt-auto text-center flex flex-col items-center gap-8 bg-background/50 text-center">
-        <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[105px]">
-          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority unoptimized />
-          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority unoptimized />
-        </div>
-        <p className="text-[9px] text-muted-foreground uppercase font-black opacity-60">© 2026 Proova Technology - Business Intelligence v1.1</p>
-      </footer>
-
       <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-lg border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[90vh] flex flex-col">
           <div className="h-2 bg-primary w-full shrink-0" />
