@@ -485,7 +485,7 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
                 href="/c/proova" 
                 className="inline-flex items-center justify-center gap-2 group cursor-pointer text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-all py-2 px-4 rounded-full bg-background/50 backdrop-blur-sm border border-border/50 shadow-sm"
               >
-                Veja como o Proova automatiza a sua Prova Social em tempo real
+                Deixe seu feedback sobre o Proova e veja seu depoimento aparecer em tempo real na nossa página
                 <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
