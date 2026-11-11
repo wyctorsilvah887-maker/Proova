@@ -15,7 +15,7 @@ import {
 
 /**
  * Página pública do Widget (Embed VIP)
- * Otimizada para ser compacta e minimalista, sem cabeçalhos ou rodapés adicionais.
+ * Otimizada para ser compacta e adaptável ao tamanho do conteúdo.
  * Projetada especificamente para ser embutida via iFrame em sites externos.
  */
 export default function WidgetPublicPage({ params }: { params: Promise<{ userId: string, widgetId: string }> }) {
@@ -104,7 +104,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
       <Card 
         key={t.id}
         className={cn(
-          "rounded-2xl p-4 transition-all duration-700 w-full max-w-full bg-white dark:bg-black text-black dark:text-white border-none",
+          "rounded-2xl p-4 sm:p-5 transition-all duration-700 w-full max-w-full bg-white dark:bg-black text-black dark:text-white border-none h-auto",
           layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-4 duration-700" : "animate-in fade-in slide-in-from-right-4 duration-700"),
           layout === 'popup' && !isAnimating && "animate-in fade-in zoom-in-90 duration-1000"
         )}
@@ -114,16 +114,16 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
             : `0 10px 30px -10px ${themeColor}15`,
         }}
       >
-        <div className="space-y-3">
+        <div className="space-y-4">
           <div className="flex items-center gap-3">
-            <div className="h-7 w-7 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: hasSecondary ? `${secondaryColor}40` : `${themeColor}40` }}>
-              <User className="w-3.5 h-3.5" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
+            <div className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: hasSecondary ? `${secondaryColor}40` : `${themeColor}40` }}>
+              <User className="w-4 h-4" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="font-black text-[10px] sm:text-[11px] tracking-tight truncate uppercase leading-none">{t.userName}</p>
-              <div className="flex gap-0.5 mt-0.5">
+              <p className="font-black text-[11px] sm:text-[12px] tracking-tight truncate uppercase leading-none">{t.userName}</p>
+              <div className="flex gap-0.5 mt-1">
                 {[1, 2, 3, 4, 5].map((s) => (
-                  <Star key={s} className={cn("w-2 h-2 sm:w-2.5 sm:h-2.5 fill-current transition-all duration-700", s <= (t.rating || 5) ? "" : "opacity-10")} style={{ color: hasSecondary ? secondaryColor : themeColor }} />
+                  <Star key={s} className={cn("w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current transition-all duration-700", s <= (t.rating || 5) ? "" : "opacity-10")} style={{ color: hasSecondary ? secondaryColor : themeColor }} />
                 ))}
               </div>
             </div>
@@ -134,8 +134,8 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
                <video src={t.videoUrl} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" muted loop playsInline autoPlay />
                <div className="absolute bottom-2 left-2">
                  <div className="bg-black/60 backdrop-blur-xl px-2 py-1 rounded-full border border-white/10 shadow-2xl">
-                   <p className="text-[6px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
-                     <Play className="w-1.5 h-1.5 fill-white" /> Vídeo
+                   <p className="text-[7px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
+                     <Play className="w-2 h-2 fill-white" /> Vídeo Review
                    </p>
                  </div>
                </div>
@@ -144,22 +144,22 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
 
           {t.text && t.text !== '(Depoimento em Vídeo)' && (
             <div className="relative">
-              <p className="opacity-70 font-bold text-[10px] sm:text-[12px] leading-relaxed italic tracking-tight line-clamp-3">
+              <p className="opacity-75 font-bold text-[11px] sm:text-[13px] leading-relaxed italic tracking-tight whitespace-pre-wrap">
                 "{t.text}"
               </p>
             </div>
           )}
 
-          <div className="pt-2 border-t border-muted/20 flex items-center justify-between opacity-50">
+          <div className="pt-3 border-t border-muted/20 flex items-center justify-between opacity-50">
             <div className="flex items-center gap-1">
-               <Clock className="w-2.5 h-2.5 opacity-50" />
-               <span className="text-[6px] font-black uppercase tracking-widest">
+               <Clock className="w-3 h-3 opacity-50" />
+               <span className="text-[7px] font-black uppercase tracking-widest">
                  {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Agora'}
                </span>
             </div>
             <div className="flex items-center gap-1">
-               <CheckCircle2 className="w-2 h-2 text-green-500" />
-               <span className="text-[6px] font-black uppercase tracking-widest">Verificado</span>
+               <CheckCircle2 className="w-3 h-3 text-green-500" />
+               <span className="text-[7px] font-black uppercase tracking-widest">Verificado</span>
             </div>
           </div>
         </div>
@@ -168,15 +168,15 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   };
 
   return (
-    <div className="min-h-screen h-screen bg-transparent p-4 sm:p-6 pt-12 sm:pt-16 font-body overflow-hidden">
-      <div className="w-full h-full flex flex-col items-center">
+    <div className="min-h-screen h-screen bg-transparent p-4 sm:p-6 pt-12 sm:pt-16 font-body overflow-y-auto scrollbar-hide">
+      <div className="w-full min-h-full flex flex-col items-center">
         {filteredTestimonials.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center opacity-10 py-10 animate-pulse">
             <Star className="w-10 h-10 mb-4" />
             <p className="text-[10px] font-black uppercase tracking-[0.3em]">Aguardando Prova Social</p>
           </div>
         ) : (
-          <div className="w-full h-full">
+          <div className="w-full max-w-4xl mx-auto h-full">
             {layout === 'grid' && (
               <div className="relative h-full w-full overflow-hidden">
                 <div className="animate-marquee-vertical flex flex-col gap-6">
@@ -188,12 +188,9 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
             )}
 
             {layout === 'mural' && (
-              <div className={cn(
-                "grid gap-6 transition-all duration-700",
-                visibleTestimonials.length > 1 ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1 max-w-xs mx-auto"
-              )}>
+              <div className="columns-1 sm:columns-2 gap-6 w-full space-y-6">
                 {visibleTestimonials.map((t, i) => (
-                  <div key={`${t.id}-${muralIndex}`} className="flex justify-center">
+                  <div key={`${t.id}-${muralIndex}-${i}`} className="break-inside-avoid mb-6 flex justify-center">
                     <TestimonialCard t={t} index={i} />
                   </div>
                 ))}
@@ -201,7 +198,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
             )}
 
             {layout === 'carousel' && (
-              <div className="w-full flex items-center justify-center py-6">
+              <div className="w-full flex items-center justify-center py-6 h-full">
                 <Carousel setApi={setApi} opts={{ loop: true }} className="w-full max-w-[280px] sm:max-w-md mx-auto">
                   <CarouselContent>
                     {filteredTestimonials.map((t, i) => (
@@ -216,7 +213,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
 
             {layout === 'popup' && (
               <div className="flex-1 flex items-center justify-center w-full max-w-xs mx-auto h-full">
-                <TestimonialCard t={filteredTestimonials[muralIndex]} />
+                <TestimonialCard t={filteredTestimonials[muralIndex % filteredTestimonials.length]} />
               </div>
             )}
           </div>
