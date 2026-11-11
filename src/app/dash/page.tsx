@@ -750,7 +750,7 @@ export default function DashPage() {
         <div className="flex items-center gap-4 mb-2">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10">
+              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all active:scale-95">
                 <Menu className="w-6 h-6" />
               </Button>
             </SheetTrigger>
@@ -763,35 +763,94 @@ export default function DashPage() {
                </div>
                <ScrollArea className="flex-1 h-full py-6">
                   <div className="px-4 space-y-2">
-                    {[
-                      { href: '/dash', label: 'Dashboard', icon: TrendingUp },
-                      { href: '/metrics', label: 'Analytics', icon: BarChart3 },
-                      { href: '/social-cards', label: 'Social Cards', icon: Share2 },
-                      { href: '/private', label: 'Moderação', icon: Inbox, badge: pendingTestimonialsCount },
-                      { href: '/support', label: 'Suporte VIP', icon: Headphones },
-                      { href: '/settings', label: 'Configurações', icon: Settings },
-                    ].map((item) => (
-                      <SheetClose asChild key={item.href}>
-                        <Link 
-                          href={item.href}
-                          className="flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                    <div className="mb-4">
+                      <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Visão Geral</p>
+                      {[
+                        { href: '/dash', label: 'Painel Principal', icon: TrendingUp },
+                        { href: '/metrics', label: 'Inteligência de Dados', icon: BarChart3 },
+                      ].map((item) => (
+                        <SheetClose asChild key={item.href}>
+                          <Link 
+                            href={item.href}
+                            className="flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                          >
+                            <div className="flex items-center gap-4">
+                              <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                              <span>{item.label}</span>
+                            </div>
+                          </Link>
+                        </SheetClose>
+                      ))}
+                    </div>
+
+                    <div className="mb-4">
+                      <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas de Autoridade</p>
+                      {[
+                        { label: 'Link de Coleta', icon: Link2, action: () => setIsCollectLinkChoiceOpen(true), disabled: !isGoogleDone },
+                        { label: 'Página Pública (Bio)', icon: Globe, action: () => setIsPublicPageChoiceOpen(true) },
+                        { label: 'Social Cards (Stories)', icon: Share2, action: () => router.push('/social-cards') },
+                        { label: 'QR Balcão', icon: QrCode, action: () => setIsQrDialogOpenManual(true), disabled: !isGoogleDone },
+                      ].map((item, idx) => (
+                        <button 
+                          key={idx}
+                          disabled={item.disabled}
+                          onClick={() => {
+                            item.action();
+                          }}
+                          className={cn(
+                            "w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group text-left disabled:opacity-40 disabled:cursor-not-allowed"
+                          )}
                         >
                           <div className="flex items-center gap-4">
                             <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
                             <span>{item.label}</span>
                           </div>
-                          {item.badge !== undefined && item.badge > 0 && (
-                            <Badge className="bg-destructive text-white border-none h-4 px-1.5 text-[8px]">{item.badge}</Badge>
-                          )}
-                        </Link>
-                      </SheetClose>
-                    ))}
+                        </button>
+                      ))}
+                    </div>
+
+                    <div className="mb-4">
+                      <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Gestão e Suporte</p>
+                      {[
+                        { href: '/private', label: 'Moderação (Inbox)', icon: Inbox, badge: pendingTestimonialsCount },
+                        ...(isAgency ? [{ href: '/widgets', label: 'Gestor de Murais', icon: Layout }] : []),
+                        { href: '/support', label: 'Suporte VIP', icon: Headphones, hasActiveTicket: !!activeTicket },
+                        { href: '/manual', label: 'Manual Estratégico', icon: BookOpen },
+                        { href: '/settings', label: 'Configurações', icon: Settings },
+                      ].map((item: any) => (
+                        <SheetClose asChild key={item.href}>
+                          <Link 
+                            href={item.href}
+                            className="flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                          >
+                            <div className="flex items-center gap-4">
+                              <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                              <span>{item.label}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              {item.badge !== undefined && item.badge > 0 && (
+                                <Badge className="bg-destructive text-white border-none h-4 px-1.5 text-[8px]">{item.badge}</Badge>
+                              )}
+                              {item.hasActiveTicket && (
+                                <div className={cn("h-2 w-2 rounded-full", activeTicket.isSupportInChat ? "bg-green-500 animate-pulse" : "bg-red-500")} />
+                              )}
+                            </div>
+                          </Link>
+                        </SheetClose>
+                      ))}
+                    </div>
                   </div>
                </ScrollArea>
+               <div className="p-6 border-t bg-muted/5">
+                  <button onClick={() => signOut(auth)} className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-destructive/5 text-[10px] font-black uppercase tracking-widest text-destructive transition-all">
+                    <LogOut className="w-4 h-4" />
+                    <span>Encerrar Sessão</span>
+                  </button>
+               </div>
             </SheetContent>
           </Sheet>
           <div className="flex flex-col">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground leading-none">Acesso Rápido</h2>
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground leading-none">Menu de Inteligência</h2>
           </div>
         </div>
 
@@ -969,115 +1028,6 @@ export default function DashPage() {
             </div>
           </Card>
         </div>
-
-        <section className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-primary" />
-            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Ferramentas de Conversão</h2>
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <button 
-              disabled={!isGoogleDone}
-              onClick={() => setIsCollectLinkChoiceOpen(true)} 
-              className="h-24 rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
-            >
-              <Link2 className="w-5 h-5 text-primary" />
-              <div className="text-center px-2">
-                <p className="text-[10px] font-black uppercase tracking-tight">Link de Coleta</p>
-                <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Capture Elogios</p>
-              </div>
-            </button>
-
-            <button 
-              onClick={() => setIsPublicPageChoiceOpen(true)} 
-              className="h-24 rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
-            >
-              <Globe className="w-5 h-5 text-primary" />
-              <div className="text-center px-2">
-                <p className="text-[10px] font-black uppercase tracking-tight">Link in Bio</p>
-                <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Página Pública</p>
-              </div>
-            </button>
-
-            <button 
-              onClick={() => router.push('/social-cards')} 
-              className="h-24 rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
-            >
-              <Share2 className="w-5 h-5 text-primary" />
-              <div className="text-center px-2">
-                <p className="text-[10px] font-black uppercase tracking-tight">Social Cards</p>
-                <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Posts Instagram</p>
-              </div>
-            </button>
-
-            <button 
-              disabled={!userData?.isSetupProcessDone && completedStepsCount < setupSteps.length} 
-              onClick={() => router.push('/private')} 
-              className="h-24 rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all relative shadow-sm active:scale-95 disabled:opacity-40"
-            >
-              <Inbox className="w-5 h-5 text-primary" />
-              {pendingTestimonialsCount > 0 && (
-                <span className="absolute top-3 right-4 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-[10px] font-bold text-white shadow-lg animate-in zoom-in duration-300">
-                  {pendingTestimonialsCount}
-                </span>
-              )}
-              <div className="text-center px-2">
-                <p className="text-[10px] font-black uppercase tracking-tight">Moderação</p>
-                <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Inbox Unificado</p>
-              </div>
-            </button>
-
-            {isAgency && (
-              <button 
-                onClick={() => router.push('/widgets')} 
-                className="h-24 rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95"
-              >
-                <Layout className="w-5 h-5 text-primary" />
-                <div className="text-center px-2">
-                  <p className="text-[10px] font-black uppercase tracking-tight">Widgets</p>
-                  <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Murais para Site</p>
-                </div>
-              </button>
-            )}
-
-            <button 
-              disabled={!isGoogleDone} 
-              onClick={() => setIsQrDialogOpenManual(true)} 
-              className="h-24 rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 disabled:opacity-40"
-            >
-              <QrCode className="w-5 h-5 text-primary" />
-              <div className="text-center px-2">
-                <p className="text-[10px] font-black uppercase tracking-tight">QR Balcão</p>
-                <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Físico e Impresso</p>
-              </div>
-            </button>
-
-            <Link href="/support" className="w-full h-24">
-              <button 
-                className="h-full w-full rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95 relative"
-              >
-                <Headphones className="w-5 h-5 text-primary" />
-                <div className="text-center px-2">
-                  <p className="text-[10px] font-black uppercase tracking-tight">Suporte</p>
-                  <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Consultor Chat</p>
-                </div>
-                {activeTicket && (
-                  <div className={cn("absolute top-3 right-4 h-3 w-3 rounded-full border-2 border-background", activeTicket.isSupportInChat ? "bg-green-500 animate-pulse" : "bg-red-500")} />
-                )}
-              </button>
-            </Link>
-
-            <Link href="/manual" className="w-full h-24">
-              <button className="h-full w-full rounded-[1.8rem] border-2 flex flex-col items-center justify-center gap-1.5 border-primary/20 bg-background hover:bg-primary/5 transition-all shadow-sm active:scale-95">
-                <BookOpen className="w-5 h-5 text-primary" />
-                <div className="text-center px-2">
-                  <p className="text-[10px] font-black uppercase tracking-tight">Manual</p>
-                  <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Estratégia VIP</p>
-                </div>
-              </button>
-            </Link>
-          </div>
-        </section>
 
         <section id="testimonials-section" className="space-y-4">
           <div className="flex items-center justify-between">
