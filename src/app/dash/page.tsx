@@ -1117,7 +1117,7 @@ export default function DashPage() {
         </section>
       </main>
 
-      <footer className="py-12 border-t mt-auto text-center flex flex-col items-center gap-8 bg-background/50">
+      <footer className="py-12 border-t mt-auto text-center flex flex-col items-center gap-8 bg-background/50 text-center">
         <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[105px]">
           <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority unoptimized />
           <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority unoptimized />
@@ -1372,7 +1372,7 @@ export default function DashPage() {
                             {[1,2,3,4,5].map((_, i) => <Star key={i} className="w-4 h-4 sm:w-7 sm:h-7 fill-[#fbbf24] text-[#fbbf24] drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" />)}
                         </div>
                         <div className="relative w-full max-w-[90%] sm:max-w-[85%]">
-                          <支配 className={cn("absolute -top-2 -left-2 sm:-top-3 sm:-left-3 w-4 h-4 sm:w-5 sm:h-5 opacity-20 rotate-180", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")} />
+                          <Quote className={cn("absolute -top-2 -left-2 sm:-top-3 sm:-left-3 w-4 h-4 sm:w-5 sm:h-5 opacity-20 rotate-180", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")} />
                           <div className={cn("p-4 sm:p-7 rounded-[1.5rem] sm:rounded-[1.8rem] shadow-2xl ring-1", activeTemplate?.style.color === '#ffffff' ? "bg-white/5 backdrop-blur-xl border-white/10 ring-white/5" : "bg-black/5 backdrop-blur-md border-black/5 ring-black/5")}>
                             <p className={cn("font-black font-headline leading-tight italic tracking-tight", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black", (selectedTestimonialForShare?.text?.length || 0) > 180 ? "text-[9px] sm:text-xs" : (selectedTestimonialForShare?.text?.length || 0) > 120 ? "text-[10px] sm:text-sm" : (selectedTestimonialForShare?.text?.length || 0) > 80 ? "text-xs sm:text-base" : "text-base sm:text-xl")}>"{selectedTestimonialForShare?.text}"</p>
                           </div>
