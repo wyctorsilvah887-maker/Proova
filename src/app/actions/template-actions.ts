@@ -21,6 +21,16 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
   // Organizado com Modelos Padrão primeiro e VIPs por último.
   const masterTemplates: TemplateMetadata[] = [
     {
+      id: 'card-proova-dentista-padrao',
+      name: 'Dentista Proova',
+      type: 'image',
+      imageUrl: '/templates/cad-proova-dentista-padrão.png',
+      style: {
+        background: '#ffffff',
+        color: '#0f172a'
+      }
+    },
+    {
       id: 'card-proova-padrao-laranja',
       name: 'Padrão Laranja',
       type: 'image',
