@@ -676,6 +676,11 @@ export default function DashPage() {
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-full overflow-hidden">
+               <SheetHeader className="sr-only">
+                 <SheetTitle>Menu Estratégico Proova</SheetTitle>
+                 <SheetDescription>Acesse as ferramentas e configurações da sua clínica.</SheetDescription>
+               </SheetHeader>
+               
                <div className="p-6 border-b bg-muted/10 shrink-0">
                   <div className="flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-500">
                     <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
