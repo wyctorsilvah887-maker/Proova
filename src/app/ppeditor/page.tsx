@@ -47,7 +47,10 @@ import {
   ListChecks,
   Eye,
   FileVideo,
-  Settings
+  Settings,
+  LayoutGrid as LayoutGridIcon,
+  BarChart3,
+  Headphones
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -108,6 +111,7 @@ import Cropper from 'react-easy-crop';
 import { useTheme } from 'next-themes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LoadingScreen } from '@/components/loading-screen';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 type LayoutType = 'grid' | 'mural' | 'carousel' | 'popup';
 
@@ -274,19 +278,9 @@ const PublicPageSettings = ({
         )}
       </div>
 
-      <div className="p-4 border-b bg-muted/10 shrink-0 space-y-4 pt-8 md:pt-4">
-        <div className="flex items-center justify-between">
-          <Link href="/dash">
-            <Button variant="ghost" size="sm" className="gap-2 px-0 text-muted-foreground hover:text-primary hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 transition-all h-8">
-              <ArrowLeft className="w-4 h-4" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Painel Dash</span>
-            </Button>
-          </Link>
-        </div>
-        <div className="space-y-1">
-          <h2 className="text-sm font-black uppercase tracking-widest">Configurações</h2>
-          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tight">Personalize sua vitrine Proova</p>
-        </div>
+      <div className="p-4 border-b bg-muted/10 shrink-0 space-y-1 md:pt-4">
+        <h2 className="text-sm font-black uppercase tracking-widest">Configurações</h2>
+        <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tight">Personalize sua vitrine Proova</p>
       </div>
 
       <Tabs defaultValue="geral" className="w-full flex-1 flex flex-col min-h-0">
@@ -749,6 +743,9 @@ export default function PPEditorPage() {
   const [muralIndex, setMuralIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   const [isSheetOpen, setIsSheetOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
 
   const [tempImage, setTempImage] = useState<string | null>(null);
   const [cropType, setCropType] = useState<'logo' | null>(null);
@@ -936,19 +933,29 @@ export default function PPEditorPage() {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body w-full overflow-hidden text-foreground">
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center gap-3 flex-1">
-          <Link href="/dash">
-            <Button variant="ghost" size="sm" className="h-10 px-2 gap-2 text-muted-foreground hover:text-primary hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 rounded-xl shadow-none">
-               <ArrowLeft className="w-4 h-4" /><span className="hidden sm:inline text-[10px] font-black uppercase tracking-widest">Painel Dash</span>
-            </Button>
-          </Link>
-          <div className="flex items-center group -ml-2">
-            <div className="relative w-[160px] h-[55px] md:w-[320px] md:h-[105px]">
-              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
-              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
+      <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[110] shadow-sm backdrop-blur-md bg-background/95">
+        <div className="flex items-center gap-2 flex-1">
+          <button 
+            ref={toggleButtonRef}
+            type="button"
+            onPointerDown={(e) => {
+              e.preventDefault();
+              setIsMenuOpen(!isMenuOpen);
+            }}
+            className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none z-[150] relative"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-5">
+              <line x1="4" y1="7" x2="20" y2="7" className={cn("origin-center transition-all", isMenuOpen ? "translate-y-[5px] rotate-45" : "")} />
+              <line x1="4" y1="12" x2="20" y2="12" className={cn("origin-center transition-all", isMenuOpen ? "opacity-0" : "")} />
+              <line x1="4" y1="17" x2="20" y2="17" className={cn("origin-center transition-all", isMenuOpen ? "-translate-y-[5px] -rotate-45" : "")} />
+            </svg>
+          </button>
+          <Link href="/dash" className="flex items-center group -ml-2">
+            <div className="relative w-[140px] h-[46px] md:w-[280px] md:h-[90px]">
+              <Image src="/logo-proova-white-mode.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
+              <Image src="/logo-proova-landing-dark-mode.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
-          </div>
+          </Link>
         </div>
         <div className="ml-auto flex items-center gap-2 md:gap-4">
           <Button 
@@ -957,7 +964,7 @@ export default function PPEditorPage() {
             onClick={() => router.push(`/pp/${activeSlug}`)}
           >
             <Eye className="w-4 h-4" />
-            <span className="hidden xs:inline">Abrir Página</span>
+            <span className="hidden xs:inline">Visualizar</span>
           </Button>
           <Button 
             onClick={handleSave} 
@@ -969,8 +976,106 @@ export default function PPEditorPage() {
         </div>
       </header>
 
-      <main className="flex-1 flex overflow-hidden relative w-full h-full pt-24 md:pt-32">
-        <aside className="hidden lg:flex w-[340px] bg-background border-r flex flex-col shrink-0 h-full shadow-2xl z-50 pt-4">
+      <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen} modal={false}>
+        <SheetContent 
+          side="left" 
+          className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden z-[140]"
+          onPointerDownOutside={(e) => {
+            if (toggleButtonRef.current?.contains(e.target as Node)) {
+              e.preventDefault();
+            }
+          }}
+        >
+          <SheetHeader className="sr-only">
+            <SheetTitle>Menu de Navegação</SheetTitle>
+            <SheetDescription>Acesse as funcionalidades e configurações da sua conta Proova.</SheetDescription>
+          </SheetHeader>
+          
+          <div className="p-6 border-b bg-muted/10 shrink-0 mt-20">
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
+                <User className="w-6 h-6 text-primary" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-black uppercase tracking-tight truncate">{userData?.companyName}</p>
+                <span className="text-[8px] font-black uppercase tracking-widest text-primary">{membershipLabel}</span>
+              </div>
+            </div>
+          </div>
+
+          <ScrollArea className="flex-1">
+            <div className="px-4 py-6 space-y-8">
+              <div>
+                <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Navegação Principal</p>
+                <button 
+                    onClick={() => { router.push('/dash'); setIsMenuOpen(false); }}
+                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                  >
+                    <LayoutGridIcon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                    <span>Dashboard</span>
+                  </button>
+              </div>
+
+              <div>
+                <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas Proova</p>
+                {[
+                  { label: 'Social Cards', href: '/social-cards', icon: ImageIcon },
+                  { label: 'Moderação Inbox', href: '/private', icon: Inbox, badge: currentSelection.filter(t => t.status === 'pending').length },
+                  { label: 'Métricas & ROI', href: '/metrics', icon: BarChart3 },
+                ].map((item: any, idx) => (
+                  <button 
+                    key={idx}
+                    onClick={() => {
+                      router.push(item.href);
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                  >
+                    <div className="flex items-center gap-4">
+                      <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                      <span>{item.label}</span>
+                    </div>
+                    {item.badge > 0 && <Badge className="bg-destructive text-white h-4 px-1.5 text-[8px]">{item.badge}</Badge>}
+                  </button>
+                ))}
+              </div>
+
+              <div>
+                <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Suporte & Conta</p>
+                {[
+                  { label: 'Suporte VIP', href: '/support', icon: Headphones },
+                  { label: 'Configurações', href: '/settings', icon: Settings },
+                ].map((item: any, idx) => (
+                  <button 
+                    key={idx}
+                    onClick={() => {
+                      router.push(item.href);
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                  >
+                    <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </ScrollArea>
+
+          <div className="p-4 border-t shrink-0">
+             <Button 
+               variant="ghost" 
+               className="w-full h-12 rounded-xl text-destructive hover:bg-destructive/10 font-black uppercase tracking-widest text-[9px] gap-2"
+               onClick={() => signOut(auth)}
+             >
+                <LogOut className="w-4 h-4" /> Sair da Conta
+             </Button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <main className="flex-1 flex overflow-hidden relative w-full h-full pt-16 md:pt-20">
+        <aside className="hidden lg:flex w-[340px] bg-background border-r flex flex-col shrink-0 h-full shadow-2xl z-50">
           <PublicPageSettings 
             themeColor={themeColor} setThemeColor={setThemeColor} secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
             layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
