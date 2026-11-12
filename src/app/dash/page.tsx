@@ -148,7 +148,10 @@ export default function DashPage() {
   const [isPublicPageChoiceOpen, setIsPublicPageChoiceOpen] = useState(false);
   const [isCollectLinkChoiceOpen, setIsCollectLinkChoiceOpen] = useState(false);
   const [configMode, setConfigMode] = useState<'location' | 'maps' | 'business'>('location');
+  
+  // Controle refinado do menu lateral
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
@@ -656,16 +659,14 @@ export default function DashPage() {
 
       <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[110] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2">
-          {/* Botão de Alternância Hamburguer/X com lógica de Interrupção de Eventos */}
+          {/* Botão de Alternância Hamburguer/X Robusto */}
           <button 
+            ref={menuButtonRef}
             type="button"
-            onPointerDown={(e) => {
-              // Previne que o Sheet detecte clique fora antes de trocarmos o estado
-              e.preventDefault();
-              setIsMenuOpen((prev) => !prev);
-            }}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none focus:ring-0"
             aria-label={isMenuOpen ? "Fechar Menu" : "Abrir Menu"}
+            aria-expanded={isMenuOpen}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="size-5" aria-hidden="true">
               <line x1="4" y1="7" x2="20" y2="7" style={{ transitionDuration: '300ms' }} className={cn("origin-center transition-all", isMenuOpen ? "translate-y-[5px] rotate-45" : "")} />
@@ -688,7 +689,16 @@ export default function DashPage() {
 
       {/* Menu Lateral controlado pelo estado isMenuOpen */}
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-        <SheetContent side="left" className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden">
+        <SheetContent 
+          side="left" 
+          onPointerDownOutside={(e) => {
+            // Evita que o clique no botão de toggle dispare o fechamento automático e a reabertura simultânea
+            if (menuButtonRef.current?.contains(e.target as Node)) {
+              e.preventDefault();
+            }
+          }}
+          className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden"
+        >
           <SheetHeader className="sr-only">
             <SheetTitle>Menu Estratégico Proova</SheetTitle>
             <SheetDescription>Acesse as ferramentas e configurações da sua clínica.</SheetDescription>
@@ -1121,8 +1131,8 @@ export default function DashPage() {
                 <ScrollArea className="w-full whitespace-nowrap rounded-xl border p-2 bg-muted/20">
                   <div className="flex w-max space-x-3 p-1">
                     {availableTemplates.map((tpl) => {
-                      const isVip = tpl.id.toLowerCase().includes('vip');
-                      const isLocked = isVip && !isPremiumUser;
+                      const iVip = tpl.id.toLowerCase().includes('vip');
+                      const isLocked = iVip && !isPremiumUser;
                       return (
                         <button
                           key={tpl.id}
@@ -1139,7 +1149,7 @@ export default function DashPage() {
                           </div>
                           <div className="flex flex-col items-center">
                             <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-tighter">{tpl.name}</span>
-                            {isVip && <Badge className="h-3 text-[5px] font-black uppercase bg-primary/20 text-primary border-none px-1">VIP</Badge>}
+                            {iVip && <Badge className="h-3 text-[5px] font-black uppercase bg-primary/20 text-primary border-none px-1">VIP</Badge>}
                           </div>
                         </button>
                       );
