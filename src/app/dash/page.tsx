@@ -656,19 +656,16 @@ export default function DashPage() {
 
       <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[110] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2">
-          {/* Botão de Alternância Hamburguer/X com lógica robusta para evitar double-toggle */}
+          {/* Botão de Alternância Hamburguer/X Robusto contra Double-Toggle */}
           <button 
             type="button"
-            onPointerDown={(e) => {
-              // Previne que o Sheet detecte clique fora e feche antes de alternarmos manualmente
-              e.preventDefault();
-              e.stopPropagation();
-            }}
             onClick={(e) => {
+              // Evita que o evento borbulhe para o Sheet e cause o fechamento/reabertura cíclica
               e.stopPropagation();
-              setIsMenuOpen(!isMenuOpen);
+              e.preventDefault();
+              setIsMenuOpen((prev) => !prev);
             }}
-            className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none pointer-events-auto"
+            className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none focus:ring-0 active:scale-95"
             aria-label={isMenuOpen ? "Fechar Menu" : "Abrir Menu"}
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="size-5" aria-hidden="true">
@@ -756,7 +753,8 @@ export default function DashPage() {
                   <button 
                     key={idx}
                     disabled={item.disabled}
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.stopPropagation();
                       item.action();
                       setIsMenuOpen(false);
                     }}
@@ -806,7 +804,7 @@ export default function DashPage() {
             </div>
           </ScrollArea>
           <div className="p-6 border-t bg-muted/5 shrink-0">
-            <button onClick={() => signOut(auth)} className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-destructive/5 text-[10px] font-black uppercase tracking-widest text-destructive transition-all">
+            <button onClick={() => { setIsMenuOpen(false); signOut(auth); }} className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-destructive/5 text-[10px] font-black uppercase tracking-widest text-destructive transition-all">
               <LogOut className="w-4 h-4" />
               <span>Encerrar Sessão</span>
             </button>
