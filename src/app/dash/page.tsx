@@ -359,7 +359,6 @@ export default function DashPage() {
         </div>
       </header>
 
-      {/* Menu Lateral Estratégico */}
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen} modal={false}>
         <SheetContent 
           side="left" 
@@ -389,7 +388,6 @@ export default function DashPage() {
 
           <ScrollArea className="flex-1">
             <div className="px-4 py-6 space-y-8">
-              {/* Seção 1: Atalhos do Dashboard */}
               <div>
                 <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Configuração Rápida</p>
                 {[
@@ -412,7 +410,6 @@ export default function DashPage() {
                 ))}
               </div>
 
-              {/* Seção 2: Páginas Dedicadas */}
               <div>
                 <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas Proova</p>
                 {[
@@ -439,7 +436,6 @@ export default function DashPage() {
                 ))}
               </div>
 
-              {/* Seção 3: Apoio e Gestão */}
               <div>
                 <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Suporte & Conta</p>
                 {[
@@ -645,10 +641,10 @@ export default function DashPage() {
             </header>
 
             <div className="grid gap-4 md:gap-6 grid-cols-1">
-              <Card onClick={() => router.push('/metrics')} className="border-none shadow-xl rounded-[2rem] p-6 md:p-12 cursor-pointer hover:shadow-2xl transition-all group relative overflow-hidden bg-background">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl -mr-24 -mt-24 group-hover:bg-primary/10 transition-colors" />
+              <Card className="border-none shadow-xl rounded-[2rem] p-6 md:p-12 transition-all group relative overflow-hidden bg-background">
+                <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl -mr-24 -mt-24" />
                 <div className="flex items-center justify-between mb-8 relative z-10">
-                  <div className="p-3 rounded-2xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-white transition-all"><BarChart3 className="w-6 h-6" /></div>
+                  <div className="p-3 rounded-2xl bg-primary/10 text-primary transition-all"><BarChart3 className="w-6 h-6" /></div>
                   <Badge variant="outline" className="text-[9px] font-black uppercase border-primary/30 text-primary">{filteredMetrics.label}</Badge>
                 </div>
                 <div className="flex items-baseline gap-4 relative z-10">
