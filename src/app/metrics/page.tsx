@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { 
@@ -29,7 +29,11 @@ import {
   Zap,
   TrendingDown,
   Headphones,
-  Settings
+  Settings,
+  LayoutGrid as LayoutGridIcon,
+  ImageIcon,
+  X,
+  Menu
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -39,6 +43,16 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetDescription,
+  SheetTrigger,
+  SheetClose
+} from '@/components/ui/sheet';
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -80,6 +94,8 @@ export default function MetricsPage() {
   
   const [period, setPeriod] = useState<'7' | '30' | 'all'>('7');
   const [isSendingReport, setIsSendingReport] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
@@ -105,6 +121,11 @@ export default function MetricsPage() {
   }, [db, user]);
 
   const { data: rawTestimonials, loading: testimonialsLoading } = useCollection(testimonialsQuery);
+
+  const pendingTestimonialsCount = useMemo(() => {
+    if (!rawTestimonials) return 0;
+    return rawTestimonials.filter((t: any) => t.status === 'pending').length;
+  }, [rawTestimonials]);
 
   useEffect(() => {
     if (!authLoading && !user) router.replace('/login');
@@ -215,7 +236,7 @@ export default function MetricsPage() {
 
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
-    if (status === 'enterprise') return 'PRO';
+    if (status === 'enterprise') return 'ENTERPRISE';
     if (status === 'gold') return 'GOLD';
     if (status === 'trial') return 'TRIAL';
     if (status === 'expired') return 'EXPIRADO';
@@ -228,18 +249,33 @@ export default function MetricsPage() {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center">
-          <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
-            <div className="relative w-[160px] h-[52px] md:w-[240px] md:h-[78px]">
-              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
-              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
+      <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[120] shadow-sm backdrop-blur-md bg-background/95">
+        <div className="flex items-center gap-2 flex-1">
+          <button 
+            ref={toggleButtonRef}
+            type="button"
+            onPointerDown={(e) => {
+              e.preventDefault();
+              setIsMenuOpen(!isMenuOpen);
+            }}
+            className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none z-[150] relative"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-5">
+              <line x1="4" y1="7" x2="20" y2="7" className={cn("origin-center transition-all", isMenuOpen ? "translate-y-[5px] rotate-45" : "")} />
+              <line x1="4" y1="12" x2="20" y2="12" className={cn("origin-center transition-all", isMenuOpen ? "opacity-0" : "")} />
+              <line x1="4" y1="17" x2="20" y2="17" className={cn("origin-center transition-all", isMenuOpen ? "-translate-y-[5px] -rotate-45" : "")} />
+            </svg>
+          </button>
+          <Link href="/dash" className="flex items-center group -ml-2">
+            <div className="relative w-[140px] h-[46px] md:w-[280px] md:h-[90px]">
+              <Image src="/logo-proova-white-mode.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
+              <Image src="/logo-proova-landing-dark-mode.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
           </Link>
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent active:bg-transparent focus-visible:ring-0" />
+          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent focus-visible:ring-0" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 h-12 px-2 rounded-xl hover:bg-primary/5 group transition-all outline-none shadow-none focus-visible:ring-0">
@@ -266,19 +302,13 @@ export default function MetricsPage() {
               <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
               <DropdownMenuSeparator className="mx-1" />
               <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <TrendingUp className="mr-2 h-4 w-4 text-primary" />
+                <LayoutGridIcon className="mr-2 h-4 w-4 text-primary" />
                 <span>Dash</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push('/settings')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Settings className="mr-2 h-4 w-4 text-primary" />
                 <span>Configurações</span>
               </DropdownMenuItem>
-              {isAgency && (
-                <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                  <Layout className="mr-2 h-4 w-4 text-primary" />
-                  <span>Meus Murais</span>
-                </DropdownMenuItem>
-              )}
               <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
                 <Inbox className="mr-2 h-4 w-4 text-primary" />
                 <span>Inbox Privado</span>
@@ -306,16 +336,109 @@ export default function MetricsPage() {
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-8 space-y-12 max-w-7xl mx-auto w-full pt-24 md:pt-32">
+      <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen} modal={false}>
+        <SheetContent 
+          side="left" 
+          className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden z-[110]"
+          onPointerDownOutside={(e) => {
+            if (toggleButtonRef.current?.contains(e.target as Node)) {
+              e.preventDefault();
+            }
+          }}
+        >
+          <SheetHeader className="sr-only">
+            <SheetTitle>Menu de Navegação</SheetTitle>
+            <SheetDescription>Acesse as funcionalidades e configurações da sua conta Proova.</SheetDescription>
+          </SheetHeader>
+          
+          <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col pt-20">
+            <div className="p-6 border-b bg-muted/10 shrink-0">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
+                  <User className="w-6 h-6 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-black uppercase tracking-tight truncate">{userData?.companyName}</p>
+                  <span className="text-[8px] font-black uppercase tracking-widest text-primary">{membershipLabel}</span>
+                </div>
+              </div>
+            </div>
+
+            <ScrollArea className="flex-1">
+              <div className="px-4 py-6 space-y-8">
+                <div>
+                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Navegação Principal</p>
+                  <button 
+                    onClick={() => { router.push('/dash'); setIsMenuOpen(false); }}
+                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
+                  >
+                    <LayoutGridIcon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                    <span>Dashboard</span>
+                  </button>
+                </div>
+
+                <div>
+                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas Proova</p>
+                  {[
+                    { label: 'Social Cards', href: '/social-cards', icon: ImageIcon },
+                    { label: 'Moderação Inbox', href: '/private', icon: Inbox, badge: pendingTestimonialsCount },
+                    { label: 'Métricas & ROI', href: '/metrics', icon: BarChart3 },
+                  ].map((item: any, idx) => (
+                    <button 
+                      key={idx}
+                      onClick={() => {
+                        router.push(item.href);
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
+                    >
+                      <div className="flex items-center gap-4">
+                        <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                        <span>{item.label}</span>
+                      </div>
+                      {item.badge > 0 && <Badge className="bg-destructive text-white h-4 px-1.5 text-[8px]">{item.badge}</Badge>}
+                    </button>
+                  ))}
+                </div>
+
+                <div>
+                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Suporte & Conta</p>
+                  {[
+                    { label: 'Suporte VIP', href: '/support', icon: Headphones },
+                    { label: 'Configurações', href: '/settings', icon: Settings },
+                  ].map((item: any, idx) => (
+                    <button 
+                      key={idx}
+                      onClick={() => {
+                        router.push(item.href);
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
+                    >
+                      <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                      <span>{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </ScrollArea>
+
+            <div className="p-4 border-t shrink-0">
+               <Button 
+                 variant="ghost" 
+                 className="w-full h-12 rounded-xl text-destructive hover:bg-destructive/10 font-black uppercase tracking-widest text-[9px] gap-2"
+                 onClick={() => signOut(auth)}
+               >
+                  <LogOut className="w-4 h-4" /> Sair da Conta
+               </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <main className="flex-1 p-4 md:p-8 space-y-12 max-w-7xl mx-auto w-full pt-24 md:pt-32 pb-12">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex flex-col gap-4">
-            <Link 
-              href="/dash" 
-              className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors group w-fit"
-            >
-              <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
-              <span className="text-[10px] font-black uppercase tracking-widest">Voltar ao Painel</span>
-            </Link>
             <div className="space-y-1">
               <h1 className="text-2xl md:text-3xl font-bold font-headline tracking-tight flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-primary/10 text-primary">
@@ -502,14 +625,6 @@ export default function MetricsPage() {
           </Card>
         </section>
       </main>
-
-      <footer className="py-12 border-t mt-auto flex flex-col items-center gap-8 bg-background/50 text-center">
-        <div className="flex items-center gap-2 relative w-[240px] h-[78px] md:w-[320px] md:h-[105px]">
-          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain object-center dark:hidden" priority unoptimized />
-          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain object-center hidden dark:block" priority unoptimized />
-        </div>
-        <p className="text-[9px] text-muted-foreground uppercase font-black opacity-60">© 2026 Proova Technology - Business Intelligence v1.1</p>
-      </footer>
     </div>
   );
 }
