@@ -315,7 +315,7 @@ export default function DashPage() {
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
       {currentAnnouncement && !isAnnouncementDismissed && !activeHash && (
         <div className={cn(
-          "w-full py-3 flex items-center relative overflow-hidden transition-all duration-500 z-[100] border-b border-white/10",
+          "w-full py-3 flex items-center relative overflow-hidden transition-all duration-500 z-[130] border-b border-white/10",
           currentAnnouncement.type === 'info' && "bg-blue-600 text-white",
           currentAnnouncement.type === 'warning' && "bg-orange-500 text-white",
           currentAnnouncement.type === 'success' && "bg-green-600 text-white",
@@ -330,7 +330,7 @@ export default function DashPage() {
         </div>
       )}
 
-      <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[110] shadow-sm backdrop-blur-md bg-background/95">
+      <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[120] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2">
           <button 
             ref={toggleButtonRef}
@@ -362,7 +362,7 @@ export default function DashPage() {
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen} modal={false}>
         <SheetContent 
           side="left" 
-          className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden z-[140]"
+          className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden z-[110]"
           onPointerDownOutside={(e) => {
             if (toggleButtonRef.current?.contains(e.target as Node)) {
               e.preventDefault();
@@ -374,96 +374,98 @@ export default function DashPage() {
             <SheetDescription>Acesse as funcionalidades e configurações da sua conta Proova.</SheetDescription>
           </SheetHeader>
           
-          <div className="p-6 border-b bg-muted/10 shrink-0 mt-20">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
-                <User className="w-6 h-6 text-primary" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-black uppercase tracking-tight truncate">{userData?.companyName}</p>
-                <span className="text-[8px] font-black uppercase tracking-widest text-primary">{membershipLabel}</span>
+          <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col pt-20">
+            <div className="p-6 border-b bg-muted/10 shrink-0">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
+                  <User className="w-6 h-6 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-black uppercase tracking-tight truncate">{userData?.companyName}</p>
+                  <span className="text-[8px] font-black uppercase tracking-widest text-primary">{membershipLabel}</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <ScrollArea className="flex-1">
-            <div className="px-4 py-6 space-y-8">
-              <div>
-                <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Configuração Rápida</p>
-                {[
-                  { label: 'Visão Geral', icon: LayoutGrid, onClick: () => { clearHash(); setIsMenuOpen(false); } },
-                  { label: 'Link de Coleta', icon: Link2, hash: '#link-coleta' },
-                  { label: 'QR de Balcão', icon: QrCode, hash: '#qr' },
-                  { label: 'Página Pública', icon: Globe, hash: '#bio' },
-                ].map((item: any, idx) => (
-                  <button 
-                    key={idx}
-                    onClick={() => {
-                      if (item.onClick) item.onClick();
-                      else if (item.hash) { window.location.hash = item.hash; setIsMenuOpen(false); }
-                    }}
-                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
-                  >
-                    <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
-                    <span>{item.label}</span>
-                  </button>
-                ))}
-              </div>
-
-              <div>
-                <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas Proova</p>
-                {[
-                  { label: 'Social Cards', href: '/social-cards', icon: ImageIcon },
-                  { label: 'Moderação Inbox', href: '/private', icon: Inbox, badge: pendingTestimonialsCount },
-                  { label: 'Métricas & ROI', href: '/metrics', icon: BarChart3 },
-                ].map((item: any, idx) => (
-                  <button 
-                    key={idx}
-                    onClick={() => {
-                      router.push(item.href);
-                      setIsMenuOpen(false);
-                    }}
-                    className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
-                  >
-                    <div className="flex items-center gap-4">
+            <ScrollArea className="flex-1">
+              <div className="px-4 py-6 space-y-8">
+                <div>
+                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Configuração Rápida</p>
+                  {[
+                    { label: 'Visão Geral', icon: LayoutGrid, onClick: () => { clearHash(); setIsMenuOpen(false); } },
+                    { label: 'Link de Coleta', icon: Link2, hash: '#link-coleta' },
+                    { label: 'QR de Balcão', icon: QrCode, hash: '#qr' },
+                    { label: 'Página Pública', icon: Globe, hash: '#bio' },
+                  ].map((item: any, idx) => (
+                    <button 
+                      key={idx}
+                      onClick={() => {
+                        if (item.onClick) item.onClick();
+                        else if (item.hash) { window.location.hash = item.hash; setIsMenuOpen(false); }
+                      }}
+                      className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                    >
                       <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
                       <span>{item.label}</span>
-                    </div>
-                    {item.badge > 0 && <Badge className="bg-destructive text-white h-4 px-1.5 text-[8px]">{item.badge}</Badge>}
-                  </button>
-                ))}
-              </div>
+                    </button>
+                  ))}
+                </div>
 
-              <div>
-                <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Suporte & Conta</p>
-                {[
-                  { label: 'Suporte VIP', href: '/support', icon: Headphones },
-                  { label: 'Configurações', href: '/settings', icon: Settings },
-                ].map((item: any, idx) => (
-                  <button 
-                    key={idx}
-                    onClick={() => {
-                      router.push(item.href);
-                      setIsMenuOpen(false);
-                    }}
-                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
-                  >
-                    <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
-                    <span>{item.label}</span>
-                  </button>
-                ))}
+                <div>
+                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas Proova</p>
+                  {[
+                    { label: 'Social Cards', href: '/social-cards', icon: ImageIcon },
+                    { label: 'Moderação Inbox', href: '/private', icon: Inbox, badge: pendingTestimonialsCount },
+                    { label: 'Métricas & ROI', href: '/metrics', icon: BarChart3 },
+                  ].map((item: any, idx) => (
+                    <button 
+                      key={idx}
+                      onClick={() => {
+                        router.push(item.href);
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                    >
+                      <div className="flex items-center gap-4">
+                        <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                        <span>{item.label}</span>
+                      </div>
+                      {item.badge > 0 && <Badge className="bg-destructive text-white h-4 px-1.5 text-[8px]">{item.badge}</Badge>}
+                    </button>
+                  ))}
+                </div>
+
+                <div>
+                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Suporte & Conta</p>
+                  {[
+                    { label: 'Suporte VIP', href: '/support', icon: Headphones },
+                    { label: 'Configurações', href: '/settings', icon: Settings },
+                  ].map((item: any, idx) => (
+                    <button 
+                      key={idx}
+                      onClick={() => {
+                        router.push(item.href);
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                    >
+                      <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                      <span>{item.label}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
+            </ScrollArea>
+
+            <div className="p-4 border-t shrink-0">
+               <Button 
+                 variant="ghost" 
+                 className="w-full h-12 rounded-xl text-destructive hover:bg-destructive/10 font-black uppercase tracking-widest text-[9px] gap-2"
+                 onClick={() => signOut(auth)}
+               >
+                  <LogOut className="w-4 h-4" /> Sair da Conta
+               </Button>
             </div>
-          </ScrollArea>
-
-          <div className="p-4 border-t shrink-0">
-             <Button 
-               variant="ghost" 
-               className="w-full h-12 rounded-xl text-destructive hover:bg-destructive/10 font-black uppercase tracking-widest text-[9px] gap-2"
-               onClick={() => signOut(auth)}
-             >
-                <LogOut className="w-4 h-4" /> Sair da Conta
-             </Button>
           </div>
         </SheetContent>
       </Sheet>
@@ -663,4 +665,8 @@ export default function DashPage() {
       </footer>
     </div>
   );
+}
+
+function copyToClipboard(text: string, description: string) {
+  navigator.clipboard.writeText(text);
 }
