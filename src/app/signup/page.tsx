@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -9,7 +10,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
-import Image from "next/image";
 import { doc, setDoc, serverTimestamp, getDoc, writeBatch } from "firebase/firestore";
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useFirestore, useAuth, useUser } from "@/firebase";
@@ -97,7 +97,7 @@ export default function SignupPage() {
       router.push('/dash');
     } catch (error: any) {
       console.error(error);
-      toast({ variant: "destructive", title: "Erro no Cadastro", description: "Não foi possível conectar com o Google agora." });
+      toast({ variant: "destructive", title: "Erro no Cadastro", description: "Não foi possível conectar com the Google agora." });
     } finally {
       setIsGoogleLoading(false);
     }
