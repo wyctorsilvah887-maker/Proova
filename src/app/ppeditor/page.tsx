@@ -287,7 +287,6 @@ const PublicPageSettings = ({
 
       <Tabs defaultValue="geral" className="w-full flex-1 flex flex-col min-h-0">
         <div className="w-full border-b bg-background/50 backdrop-blur-sm sticky top-0 z-20 overflow-hidden relative group/tabs">
-          {/* Indicadores Visuais de Scroll */}
           <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none opacity-0 group-hover/tabs:opacity-100 transition-opacity" />
           <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none opacity-0 group-hover/tabs:opacity-100 transition-opacity" />
           
@@ -309,7 +308,7 @@ const PublicPageSettings = ({
                   value={tab.id} 
                   className={cn(
                     "relative flex flex-col items-center justify-center gap-1.5 px-3 h-full rounded-none border-b-2 border-transparent transition-all min-w-[62px] sm:min-w-[70px]",
-                    "data-[state=active]:border-primary data-[state=active]:bg-primary/5 data-[state=active]:text-primary",
+                    "data-[state=active]:border-primary data-[state=active]:text-primary",
                     "hover:text-primary/70"
                   )}
                 >
@@ -1015,7 +1014,7 @@ export default function PPEditorPage() {
                 <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Navegação Principal</p>
                 <button 
                     onClick={() => { router.push('/dash'); setIsMenuOpen(false); }}
-                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
                   >
                     <LayoutGridIcon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
                     <span>Dashboard</span>
@@ -1035,7 +1034,7 @@ export default function PPEditorPage() {
                       router.push(item.href);
                       setIsMenuOpen(false);
                     }}
-                    className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                    className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
                   >
                     <div className="flex items-center gap-4">
                       <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
@@ -1058,7 +1057,7 @@ export default function PPEditorPage() {
                       router.push(item.href);
                       setIsMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
                   >
                     <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
                     <span>{item.label}</span>

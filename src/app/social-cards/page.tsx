@@ -350,7 +350,7 @@ export default function SocialCardsPage() {
                   <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Navegação Principal</p>
                   <button 
                     onClick={() => { router.push('/dash'); setIsMenuOpen(false); }}
-                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
                   >
                     <LayoutGridIcon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
                     <span>Dashboard</span>
@@ -360,7 +360,7 @@ export default function SocialCardsPage() {
                 <div>
                   <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas Proova</p>
                   {[
-                    { label: 'Social Cards', href: '/social-cards', icon: ImageIcon, active: true },
+                    { label: 'Social Cards', href: '/social-cards', icon: ImageIcon },
                     { label: 'Moderação Inbox', href: '/private', icon: Inbox, badge: allApprovedTestimonials.filter(t => t.status === 'pending').length },
                     { label: 'Métricas & ROI', href: '/metrics', icon: BarChart3 },
                   ].map((item: any, idx) => (
@@ -370,14 +370,11 @@ export default function SocialCardsPage() {
                         router.push(item.href);
                         setIsMenuOpen(false);
                       }}
-                      className={cn(
-                        "w-full flex items-center justify-between p-3.5 rounded-xl transition-all group",
-                        item.active ? "bg-primary/10 text-primary" : "hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest"
-                      )}
+                      className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
                     >
                       <div className="flex items-center gap-4">
-                        <item.icon className={cn("w-4 h-4", item.active ? "text-primary" : "text-primary opacity-60 group-hover:opacity-100")} />
-                        <span className={cn(item.active ? "text-[10px] font-black uppercase tracking-widest" : "")}>{item.label}</span>
+                        <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                        <span>{item.label}</span>
                       </div>
                       {item.badge > 0 && <Badge className="bg-destructive text-white h-4 px-1.5 text-[8px]">{item.badge}</Badge>}
                     </button>
@@ -396,7 +393,7 @@ export default function SocialCardsPage() {
                         router.push(item.href);
                         setIsMenuOpen(false);
                       }}
-                      className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                      className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
                     >
                       <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
                       <span>{item.label}</span>
@@ -451,7 +448,7 @@ export default function SocialCardsPage() {
                             <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner"><User className="w-5 h-5" /></div>
                             <p className="text-xs font-black uppercase tracking-tight truncate max-w-[120px]">{t.userName}</p>
                          </div>
-                         <div className="flex gap-0.5">{[1,2,3,4,5].map(s => <Star key={s} className={cn("w-3.5 h-3.5", s <= t.rating ? "fill-yellow-400 text-yellow-400" : "text-muted/20")} />)}</div>
+                         <div className="flex gap-0.5">{[1,2,3,4,5].map(s => <Star key={s} className={cn("w-3.5 h-3.5", s <= t.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20")} />)}</div>
                       </div>
                       <div className="relative">
                          <Quote className="absolute -top-2 -left-2 w-6 h-6 text-primary/10 rotate-180" />

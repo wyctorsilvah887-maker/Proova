@@ -403,7 +403,7 @@ export default function DashPage() {
                         if (item.onClick) item.onClick();
                         else if (item.hash) { window.location.hash = item.hash; setIsMenuOpen(false); }
                       }}
-                      className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                      className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
                     >
                       <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
                       <span>{item.label}</span>
@@ -424,7 +424,7 @@ export default function DashPage() {
                         router.push(item.href);
                         setIsMenuOpen(false);
                       }}
-                      className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                      className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
                     >
                       <div className="flex items-center gap-4">
                         <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
@@ -447,7 +447,7 @@ export default function DashPage() {
                         router.push(item.href);
                         setIsMenuOpen(false);
                       }}
-                      className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                      className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
                     >
                       <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
                       <span>{item.label}</span>
