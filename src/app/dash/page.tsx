@@ -414,11 +414,9 @@ export default function DashPage() {
                 <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas Proova</p>
                 {[
                   { label: 'Social Cards', href: '/social-cards', icon: ImageIcon },
-                  { label: 'Mural de Elogios', href: '/widgets', icon: Layout, condition: isAgency },
-                  { label: 'Editor de Bio', href: '/ppeditor', icon: Edit3, condition: isPremiumUser },
                   { label: 'Moderação Inbox', href: '/private', icon: Inbox, badge: pendingTestimonialsCount },
                   { label: 'Métricas & ROI', href: '/metrics', icon: BarChart3 },
-                ].filter(item => item.condition !== false).map((item: any, idx) => (
+                ].map((item: any, idx) => (
                   <button 
                     key={idx}
                     onClick={() => {
@@ -440,7 +438,6 @@ export default function DashPage() {
                 <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Suporte & Conta</p>
                 {[
                   { label: 'Suporte VIP', href: '/support', icon: Headphones },
-                  { label: 'Manual de Estratégia', href: '/manual', icon: BookOpen },
                   { label: 'Configurações', href: '/settings', icon: Settings },
                 ].map((item: any, idx) => (
                   <button 
