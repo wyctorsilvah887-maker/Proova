@@ -215,7 +215,7 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
             Sua Clínica no Piloto <br className="hidden sm:block" />
             <span className="inline-block relative bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">
               AUTOMÁTICO
-            </span> via IA
+            </span> com IA
           </h1>
           
           <p className={cn(
