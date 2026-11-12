@@ -149,13 +149,11 @@ export default function DashPage() {
   const [isCollectLinkChoiceOpen, setIsCollectLinkChoiceOpen] = useState(false);
   const [configMode, setConfigMode] = useState<'location' | 'maps' | 'business'>('location');
   
-  // Controle refinado do menu lateral
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
-  // Estados para Social Cards
   const [selectedTestimonialForShare, setSelectedTestimonialForShare] = useState<any>(null);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isExportingCard, setIsExportingCard] = useState(false);
@@ -166,7 +164,6 @@ export default function DashPage() {
   const shareCardRef = useRef<HTMLDivElement>(null);
   const dialogVideoRef = useRef<HTMLVideoElement>(null);
 
-  // Estados para Busca de Local e Identidade
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -178,10 +175,8 @@ export default function DashPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
-  // Sistema de Notificações Push
   const { permission, requestPermission, isSupported: pushSupported } = useNotifications(user?.uid);
 
-  // Sistema de Notificações de Suporte em Tempo Real
   const supportTicketQuery = useMemo(() => {
     if (!db || !user) return null;
     return query(collection(db, 'support_tickets'), where('userId', '==', user.uid), limit(1));
@@ -266,7 +261,6 @@ export default function DashPage() {
     if (typeof window !== 'undefined') setBaseUrl(window.location.origin);
   }, []);
 
-  // Carregar templates dinâmicos
   useEffect(() => {
     async function loadTemplates() {
       setIsLoadingTemplates(true);
@@ -630,6 +624,12 @@ export default function DashPage() {
     setSelectedTemplateId(tpl.id);
   };
 
+  const toggleMenu = (e: React.MouseEvent | React.PointerEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   if (authLoading || userDataLoading || (user && !userData)) {
     return <LoadingScreen />;
   }
@@ -659,11 +659,10 @@ export default function DashPage() {
 
       <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[110] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2">
-          {/* Botão de Alternância Hamburger/X com interceptação técnica Radix */}
           <button 
             ref={menuButtonRef}
             type="button"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onPointerDown={toggleMenu}
             className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none focus:ring-0 z-[120]"
             aria-label={isMenuOpen ? "Fechar Menu" : "Abrir Menu"}
             aria-expanded={isMenuOpen}
@@ -687,13 +686,10 @@ export default function DashPage() {
         </div>
       </header>
 
-      {/* Menu Lateral controlado pelo estado isMenuOpen */}
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <SheetContent 
           side="left" 
           onPointerDownOutside={(e) => {
-            // Se o alvo do clique for o botão de alternância, impedimos o fechamento automático do Radix
-            // para que a nossa função manual gerencie a alternância sem conflitos.
             if (menuButtonRef.current?.contains(e.target as Node)) {
               e.preventDefault();
             }
