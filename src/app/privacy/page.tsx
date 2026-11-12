@@ -70,6 +70,8 @@ export default function PrivacyPage() {
               <div className="space-y-4 pt-4 border-t border-primary/10">
                 <p className="text-xs md:text-sm text-muted-foreground font-medium leading-relaxed italic">
                   Declaramos expressamente que a <strong>única finalidade</strong> do processamento e uso dessas informações é a gestão estratégica de reputação e autoridade da própria clínica usuária. Os dados acessados destinam-se exclusivamente a permitir que a clínica monitore e responda às suas próprias avaliações no Google Business Profile, nunca sendo utilizados para fins publicitários, prospecção de terceiros ou comercialização de bases de dados.
+                  <br /><br />
+                  Informamos adicionalmente que, para viabilizar a geração de respostas automatizadas, o texto da avaliação é processado via APIs seguras de inteligência artificial sob regime de estrita confidencialidade técnica e sem qualquer retenção de dados para treinamento de modelos públicos de terceiros.
                 </p>
               </div>
             </div>
