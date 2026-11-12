@@ -80,7 +80,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
               priority 
             />
             <Image 
-              src="/logo-proova-landing-dark-mode.png" 
+              src="/logo-proovaai-darkmode.png" 
               alt="Logo Proova Dark" 
               fill 
               className="hidden dark:block object-contain object-left" 
@@ -513,7 +513,7 @@ const Footer = () => {
       <div className="container px-4 mx-auto flex flex-col items-center gap-12 text-center">
         <div className="relative w-[200px] h-[60px] opacity-40 grayscale">
            <Image src="/logo-proovaai-whitemode.png" alt="Logo Proova Footer Light" fill className="dark:hidden object-contain" />
-           <Image src="/logo-proova-landing-dark-mode.png" alt="Logo Proova Footer Dark" fill className="hidden dark:block object-contain" />
+           <Image src="/logo-proovaai-darkmode.png" alt="Logo Proova Footer Dark" fill className="hidden dark:block object-contain" />
         </div>
         <div className="space-y-8">
           <div className="flex flex-wrap justify-center gap-8 md:gap-12">
