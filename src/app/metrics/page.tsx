@@ -4,26 +4,17 @@ import { useMemo, useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { 
-  ArrowLeft, 
   BarChart3, 
   Loader2, 
   TrendingUp,
   User,
   LogOut,
   Inbox,
-  Layout,
   Gem,
-  Handshake,
-  Sun,
-  Moon,
   Star,
   MousePointer2,
-  Calendar,
-  MessageSquare,
-  ChevronDown,
   Mail,
   Lock,
-  Shield,
   Globe,
   MessageCircle,
   Zap,
@@ -32,28 +23,18 @@ import {
   Settings,
   LayoutGrid as LayoutGridIcon,
   ImageIcon,
-  X,
+  BarChart3 as BarChart3Icon,
   Menu
 } from 'lucide-react';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
 import { 
   Sheet, 
   SheetContent, 
   SheetHeader, 
   SheetTitle, 
-  SheetDescription,
-  SheetTrigger,
-  SheetClose
+  SheetDescription 
 } from '@/components/ui/sheet';
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -103,16 +84,6 @@ export default function MetricsPage() {
   const isPremiumUser = useMemo(() => {
     const status = userData?.membershipStatus;
     return status === 'gold' || status === 'enterprise' || status === 'trial';
-  }, [userData]);
-
-  const isAgency = useMemo(() => {
-    return userData?.businessType === 'agencia';
-  }, [userData]);
-
-  const isMapsLinkValid = useMemo(() => {
-    if (!userData?.googleMapsUrl) return false;
-    const url = userData.googleMapsUrl.toLowerCase();
-    return url.includes('review') || url.includes('writereview') || url.includes('placeid');
   }, [userData]);
 
   const testimonialsQuery = useMemo(() => {
@@ -236,7 +207,7 @@ export default function MetricsPage() {
 
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
-    if (status === 'enterprise') return 'ENTERPRISE';
+    if (status === 'enterprise') return 'PRO';
     if (status === 'gold') return 'GOLD';
     if (status === 'trial') return 'TRIAL';
     if (status === 'expired') return 'EXPIRADO';
@@ -275,64 +246,7 @@ export default function MetricsPage() {
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent focus-visible:ring-0" />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="flex items-center gap-2 h-12 px-2 rounded-xl hover:bg-primary/5 group transition-all outline-none shadow-none focus-visible:ring-0">
-                <div className="flex flex-col items-end">
-                  <span className="text-xs font-bold truncate max-w-[80px] sm:max-w-[150px] transition-colors group-hover:text-primary leading-tight">
-                    {userData?.companyName || 'Minha Empresa'}
-                  </span>
-                  <div className="flex flex-col items-end gap-0">
-                    <span className={cn(
-                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight text-primary",
-                      userData?.membershipStatus === 'enterprise' && "animate-pulse"
-                    )}>
-                      {membershipLabel}
-                    </span>
-                    {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
-                  </div>
-                </div>
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
-                  <User className="w-4 h-4" />
-                </div>
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
-              <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <LayoutGridIcon className="mr-2 h-4 w-4 text-primary" />
-                <span>Dash</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/settings')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Settings className="mr-2 h-4 w-4 text-primary" />
-                <span>Configurações</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Inbox className="mr-2 h-4 w-4 text-primary" />
-                <span>Inbox Privado</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/support')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Headphones className="mr-2 h-4 w-4 text-primary" />
-                <span>Suporte Proova</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Gem className="mr-2 h-4 w-4 text-primary" />
-                <span>Upgrade</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                {theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}
-                <span>Alternar Tema</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-bold font-bold py-2.5">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sair</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ThemeToggle className="flex border-none bg-transparent shadow-none hover:bg-transparent focus-visible:ring-0" />
         </div>
       </header>
 
@@ -382,7 +296,7 @@ export default function MetricsPage() {
                   {[
                     { label: 'Social Cards', href: '/social-cards', icon: ImageIcon },
                     { label: 'Moderação Inbox', href: '/private', icon: Inbox, badge: pendingTestimonialsCount },
-                    { label: 'Métricas & ROI', href: '/metrics', icon: BarChart3 },
+                    { label: 'Métricas & ROI', href: '/metrics', icon: BarChart3Icon },
                   ].map((item: any, idx) => (
                     <button 
                       key={idx}
@@ -486,8 +400,8 @@ export default function MetricsPage() {
           <div className="grid gap-4 md:gap-6 grid-cols-2 lg:grid-cols-4">
             <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Volume Total</CardTitle>
-                <MessageSquare className="w-4 h-4 text-primary" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Volume Total</p>
+                <BarChart3 className="w-4 h-4 text-primary" />
               </CardHeader>
               <CardContent className="px-4 md:px-6 pb-4">
                 <div className="text-2xl font-black">{stats.total}</div>
@@ -497,7 +411,7 @@ export default function MetricsPage() {
 
             <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Média Geral</CardTitle>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Média Geral</p>
                 <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
               </CardHeader>
               <CardContent className="px-4 md:px-6 pb-4">
@@ -508,7 +422,7 @@ export default function MetricsPage() {
 
             <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Cliques no Maps</CardTitle>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Cliques no Maps</p>
                 <MousePointer2 className="w-4 h-4 text-primary" />
               </CardHeader>
               <CardContent className="px-4 md:px-6 pb-4">
@@ -519,7 +433,7 @@ export default function MetricsPage() {
 
             <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem] bg-primary/5 border border-primary/10">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-primary">Conversão G-Boost Estimada</CardTitle>
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary">Conversão G-Boost Estimada</p>
                 <TrendingUp className="w-4 h-4 text-primary" />
               </CardHeader>
               <CardContent className="px-4 md:px-6 pb-4">
@@ -540,7 +454,7 @@ export default function MetricsPage() {
           <div className="grid gap-4 md:gap-6 grid-cols-2 lg:grid-cols-4">
             <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Visitas Link in Bio</CardTitle>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Visitas Link in Bio</p>
                 <Globe className="w-4 h-4 text-primary" />
               </CardHeader>
               <CardContent className="px-4 md:px-6 pb-4">
@@ -551,7 +465,7 @@ export default function MetricsPage() {
 
             <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Cliques WhatsApp</CardTitle>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Cliques WhatsApp</p>
                 <MessageCircle className="w-4 h-4 text-green-500" />
               </CardHeader>
               <CardContent className="px-4 md:px-6 pb-4">
@@ -562,7 +476,7 @@ export default function MetricsPage() {
 
             <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem] bg-green-500/5 border border-green-500/10 col-span-2">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-green-600">Conversão Link in Bio</CardTitle>
+                <p className="text-[10px] font-black uppercase tracking-widest text-green-600">Conversão Link in Bio</p>
                 <TrendingUp className="w-4 h-4 text-green-600" />
               </CardHeader>
               <CardContent className="px-4 md:px-6 pb-4">
@@ -628,3 +542,4 @@ export default function MetricsPage() {
     </div>
   );
 }
+

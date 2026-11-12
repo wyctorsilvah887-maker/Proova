@@ -4,25 +4,17 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { 
-  ArrowLeft, 
   Loader2, 
   Share2, 
   Star, 
   User, 
   MessageSquare,
   Search,
-  ChevronRight,
   LogOut,
-  TrendingUp,
-  Layout,
   Inbox,
   Gem,
-  Handshake,
   Sun,
   Moon,
-  Lock,
-  Shield,
-  BadgeCheck,
   Headphones,
   Download,
   Quote,
@@ -32,7 +24,6 @@ import {
   Check,
   Palette,
   Sparkles,
-  X,
   LayoutGrid as LayoutGridIcon,
   BarChart3,
   Settings,
@@ -41,7 +32,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { 
@@ -49,7 +40,6 @@ import {
   SheetContent, 
   SheetHeader, 
   SheetTitle, 
-  SheetTrigger, 
   SheetDescription 
 } from '@/components/ui/sheet';
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -60,14 +50,6 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useTheme } from 'next-themes';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
 import { toPng } from 'html-to-image';
 import { toast as shadcnToast } from '@/hooks/use-toast';
 import { LoadingScreen } from '@/components/loading-screen';
@@ -102,12 +84,6 @@ export default function SocialCardsPage() {
   const isPremiumUser = useMemo(() => {
     const status = userData?.membershipStatus;
     return status === 'gold' || status === 'enterprise' || status === 'trial';
-  }, [userData]);
-
-  const isMapsLinkValid = useMemo(() => {
-    if (!userData?.googleMapsUrl) return false;
-    const url = userData.googleMapsUrl.toLowerCase();
-    return url.includes('review') || url.includes('writereview') || url.includes('placeid');
   }, [userData]);
 
   const testimonialsQuery = useMemo(() => {
@@ -166,13 +142,9 @@ export default function SocialCardsPage() {
     return availableTemplates.find(t => t.id === selectedTemplateId) || availableTemplates[0];
   }, [selectedTemplateId, availableTemplates]);
 
-  const isAgency = useMemo(() => {
-    return userData?.businessType === 'agencia';
-  }, [userData]);
-
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
-    if (status === 'enterprise') return 'ENTERPRISE';
+    if (status === 'enterprise') return 'PRO';
     if (status === 'gold') return 'GOLD';
     if (status === 'trial') return 'TRIAL';
     if (status === 'expired') return 'EXPIRADO';
@@ -276,43 +248,7 @@ export default function SocialCardsPage() {
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent focus:bg-transparent" />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-3 gap-2 rounded-xl focus:ring-0 shadow-none hover:bg-transparent">
-                <div className="flex flex-col items-end">
-                  <span className="text-[10px] md:text-sm font-black truncate max-w-[120px] transition-colors group-hover:text-primary uppercase tracking-tight">{userData?.companyName || 'Empresa'}</span>
-                  <div className="flex flex-col items-end gap-0">
-                    <span className={cn(
-                      "text-[6px] md:text-[8px] uppercase tracking-widest font-black text-primary leading-tight",
-                      userData?.membershipStatus === 'enterprise' && "animate-pulse"
-                    )}>
-                      {membershipLabel}
-                    </span>
-                    {isMapsLinkValid && <span className="text-[5px] md:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none animate-pulse">G-Boost Ativo</span>}
-                  </div>
-                </div>
-                <div className="h-8 w-8 md:h-10 md:w-10 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20"><User className="w-4 h-4" /></div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
-              <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <LayoutGridIcon className="mr-2 h-4 w-4 text-primary" />
-                <span>Dashboard</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/settings')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Settings className="mr-2 h-4 w-4 text-primary" />
-                <span>Configurações</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive font-bold py-2.5 cursor-pointer">
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sair</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ThemeToggle className="flex border-none bg-transparent shadow-none hover:bg-transparent focus:bg-transparent" />
         </div>
       </header>
 
@@ -572,3 +508,4 @@ export default function SocialCardsPage() {
     </div>
   );
 }
+
