@@ -40,7 +40,8 @@ import {
   SheetContent, 
   SheetHeader, 
   SheetTitle, 
-  SheetDescription 
+  SheetDescription,
+  SheetTrigger
 } from '@/components/ui/sheet';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUser, useFirestore, useCollection, useDoc, useAuth } from '@/firebase';
@@ -508,4 +509,3 @@ export default function SocialCardsPage() {
     </div>
   );
 }
-
