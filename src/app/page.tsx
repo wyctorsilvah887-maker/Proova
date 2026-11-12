@@ -53,7 +53,7 @@ import {
   CollapsibleTrigger 
 } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
-import { useUser, useFirestore } from "@/firebase";
+import { useUser } from "@/firebase";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 import { LoadingScreen } from "@/components/loading-screen";
@@ -248,7 +248,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
       <div className="container px-4 mx-auto text-center space-y-16">
         <div className={cn(
           "space-y-4 transition-all duration-1000",
-          isVisible ? "animate-in fade-in zoom-in-95 opacity-100" : "opacity-0"
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         )}>
           <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">Gestão Unificada de Autoridade</h2>
           <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
@@ -280,7 +280,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
           ].map((item, idx) => (
             <div key={idx} className={cn(
               "space-y-4 transition-all duration-1000",
-              isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-0"
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             )} style={{ transitionDelay: `${(idx + 1) * 200}ms` }}>
               <div className="flex justify-center">
                 <div className="p-4 rounded-2xl bg-primary/5 text-primary">
@@ -299,46 +299,12 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
 AgitationSection.displayName = "AgitationSection";
 
 const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
-  const [scrollProgress, setScrollProgress] = useState(0);
-
-  const steps = [
-    { 
-      number: '01', 
-      title: 'Conexão com Google', 
-      desc: 'Integração via API oficial para ler e gerir o perfil da sua clínica no Google Business Profile de forma segura.' 
-    },
-    { 
-      number: '02', 
-      title: 'IA Generativa (Gemini)', 
-      desc: 'O Proova utiliza modelos avançados de IA para responder pacientes com empatia, mantendo o tom de voz da sua marca.' 
-    },
-    { 
-      number: '03', 
-      title: 'Mural de Prova Social', 
-      desc: 'Criação automática de widgets e páginas públicas dinâmicas para exibir a satisfação dos seus clientes no seu site.' 
-    }
-  ];
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const element = document.getElementById('metodologia');
-      if (!element) return;
-      const rect = element.getBoundingClientRect();
-      const triggerPoint = window.innerHeight * 0.5;
-      const currentPos = triggerPoint - rect.top;
-      const progress = currentPos / rect.height;
-      setScrollProgress(Math.max(0, Math.min(1, progress)));
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   return (
     <section id="metodologia" ref={ref} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
       <div className="container px-4 mx-auto">
         <div className={cn(
           "text-center space-y-4 mb-24 transition-all duration-1000",
-          isVisible ? "animate-in fade-in slide-in-from-bottom-10 opacity-100" : "opacity-0"
+          isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         )}>
           <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Funcionalidades do Produto</h2>
           <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
@@ -348,28 +314,30 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
         
         <div className="max-w-4xl mx-auto relative px-4 md:px-0">
           <div className="space-y-20 md:space-y-32">
-            {steps.map((step, idx) => {
-              const stepTrigger = idx / (steps.length - 1);
-              const isActive = scrollProgress >= stepTrigger - 0.1;
-
-              return (
-                <div key={idx} className={cn("flex items-start gap-8 md:gap-16 relative transition-all duration-300", isVisible ? "animate-in fade-in opacity-100" : "opacity-0")}>
-                  <div className="flex flex-col items-center shrink-0 w-11">
-                    <div className={cn("text-lg md:text-3xl font-black font-headline transition-all duration-300 mb-1.5", isActive ? "text-primary scale-110" : "text-foreground/10")}>
-                      {step.number}
-                    </div>
-                  </div>
-                  <div className={cn("space-y-3 md:space-y-4 pt-1 md:pt-2 transition-all duration-300 flex-1", isActive ? "translate-x-0 opacity-100" : "translate-x-4 opacity-20 grayscale")}>
-                    <h4 className={cn("text-xl md:text-4xl font-black font-headline tracking-tight transition-colors duration-300", isActive ? "text-foreground" : "text-foreground/40")}>
-                      {step.title}
-                    </h4>
-                    <p className={cn("text-muted-foreground text-sm md:text-xl leading-relaxed font-medium max-w-2xl transition-opacity duration-300", isActive ? "opacity-100" : "opacity-40")}>
-                      {step.desc}
-                    </p>
+            {[
+              { number: '01', title: 'Conexão com Google', desc: 'Integração via API oficial para ler e gerir o perfil da sua clínica no Google Business Profile de forma segura.' },
+              { number: '02', title: 'IA Generativa (Gemini)', desc: 'O Proova utiliza modelos avançados de IA para responder pacientes com empatia, mantendo o tom de voz da sua marca.' },
+              { number: '03', title: 'Mural de Prova Social', desc: 'Criação automática de widgets e páginas públicas dinâmicas para exibir a satisfação dos seus clientes no seu site.' }
+            ].map((step, idx) => (
+              <div key={idx} className={cn(
+                "flex items-start gap-8 md:gap-16 relative transition-all duration-1000", 
+                isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
+              )} style={{ transitionDelay: `${idx * 200}ms` }}>
+                <div className="flex flex-col items-center shrink-0 w-11">
+                  <div className="text-lg md:text-3xl font-black font-headline text-primary">
+                    {step.number}
                   </div>
                 </div>
-              );
-            })}
+                <div className="space-y-3 md:space-y-4 pt-1 md:pt-2 flex-1">
+                  <h4 className="text-xl md:text-4xl font-black font-headline tracking-tight">
+                    {step.title}
+                  </h4>
+                  <p className="text-muted-foreground text-sm md:text-xl leading-relaxed font-medium max-w-2xl">
+                    {step.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -579,9 +547,22 @@ export default function Home() {
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
-    setTimeout(() => setIsHeroVisible(true), 100);
+    
+    // Fallback de segurança: Se o IntersectionObserver falhar, mostra tudo após 1.5 segundos
+    const fallbackTimer = setTimeout(() => {
+      setIsHeroVisible(true);
+      setIsAgitationVisible(true);
+      setIsPillarsVisible(true);
+      setIsVersatilityVisible(true);
+      setIsPricingVisible(true);
+    }, 1500);
 
-    const observerOptions = { threshold: 0.1 };
+    // Observer mais sensível com rootMargin para carregar antes da entrada total
+    const observerOptions = { 
+      threshold: 0.05,
+      rootMargin: '0px 0px -50px 0px' 
+    };
+
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -599,8 +580,11 @@ export default function Home() {
     if (versatilityRef.current) observer.observe(versatilityRef.current);
     if (pricingRef.current) observer.observe(pricingRef.current);
 
+    setIsHeroVisible(true);
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
+      clearTimeout(fallbackTimer);
       observer.disconnect();
     };
   }, []);
