@@ -662,7 +662,7 @@ export default function DashPage() {
                 <Menu className="w-6 h-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-full overflow-hidden">
+            <SheetContent side="left" className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden">
                <SheetHeader className="sr-only">
                  <SheetTitle>Menu Estratégico Proova</SheetTitle>
                  <SheetDescription>Acesse as ferramentas e configurações da sua clínica.</SheetDescription>
@@ -693,7 +693,7 @@ export default function DashPage() {
                   </div>
                </div>
                
-               <ScrollArea className="flex-1 min-h-0 w-full h-full">
+               <ScrollArea className="flex-1 w-full overflow-y-auto">
                   <div className="px-4 py-6 space-y-2">
                     <div className="mb-4">
                       <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Visão Geral</p>
