@@ -656,142 +656,23 @@ export default function DashPage() {
 
       <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[110] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2">
-          {/* Hamburger Menu on the extreme left */}
-          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-            <SheetTrigger asChild>
-              <button 
-                type="button"
-                className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none"
-                aria-label={isMenuOpen ? "Fechar Menu" : "Abrir Menu"}
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="size-5" aria-hidden="true">
-                  <line x1="4" y1="7" x2="20" y2="7" style={{ transitionDuration: '300ms' }} className={cn("origin-center transition-all", isMenuOpen ? "translate-y-[5px] rotate-45" : "")} />
-                  <line x1="4" y1="12" x2="20" y2="12" style={{ transitionDuration: '300ms' }} className={cn("origin-center transition-all", isMenuOpen ? "opacity-0" : "")} />
-                  <line x1="4" y1="17" x2="20" y2="17" style={{ transitionDuration: '300ms' }} className={cn("origin-center transition-all", isMenuOpen ? "-translate-y-[5px] -rotate-45" : "")} />
-                </svg>
-              </button>
-            </SheetTrigger>
-            <SheetContent side="left" className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden">
-               <SheetHeader className="sr-only">
-                 <SheetTitle>Menu Estratégico Proova</SheetTitle>
-                 <SheetDescription>Acesse as ferramentas e configurações da sua clínica.</SheetDescription>
-               </SheetHeader>
-               
-               <div className="p-6 border-b bg-muted/10 shrink-0 mt-16 md:mt-20">
-                  <div className="flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-500">
-                    <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
-                      <User className="w-6 h-6 text-primary" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-black uppercase tracking-tight truncate">{userData?.companyName || 'Minha Empresa'}</p>
-                      <div className="flex flex-col gap-0.5">
-                        <span className={cn(
-                          "text-[8px] font-black uppercase tracking-widest text-primary",
-                          userData?.membershipStatus === 'enterprise' && "animate-pulse"
-                        )}>
-                          {membershipLabel}
-                        </span>
-                        {isMapsLinkValid && (
-                          <div className="flex items-center gap-1">
-                            <div className="h-1 w-1 rounded-full bg-green-500 animate-pulse" />
-                            <span className="text-[7px] font-black uppercase text-green-500 tracking-tighter">G-Boost Ativo</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-               </div>
-               
-               <ScrollArea className="flex-1 w-full overflow-y-auto">
-                  <div className="px-4 py-6 space-y-2">
-                    <div className="mb-4">
-                      <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Visão Geral</p>
-                      {[
-                        { href: '/dash', label: 'Painel Principal', icon: TrendingUp },
-                        { href: '/metrics', label: 'Inteligência de Dados', icon: BarChart3 },
-                      ].map((item) => (
-                        <SheetClose asChild key={item.href}>
-                          <Link 
-                            href={item.href}
-                            className="flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
-                          >
-                            <div className="flex items-center gap-4">
-                              <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
-                              <span>{item.label}</span>
-                            </div>
-                          </Link>
-                        </SheetClose>
-                      ))}
-                    </div>
-
-                    <div className="mb-4">
-                      <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas de Autoridade</p>
-                      {[
-                        { label: 'Link de Coleta', icon: Link2, action: () => setIsCollectLinkChoiceOpen(true), disabled: !isGoogleDone },
-                        { label: 'Página Pública (Bio)', icon: Globe, action: () => setIsPublicPageChoiceOpen(true) },
-                        { label: 'Social Cards (Stories)', icon: Share2, action: () => router.push('/social-cards') },
-                        { label: 'QR Balcão', icon: QrCode, action: () => setIsQrDialogOpenManual(true), disabled: !isGoogleDone },
-                      ].map((item, idx) => (
-                        <button 
-                          key={idx}
-                          disabled={item.disabled}
-                          onClick={() => {
-                            item.action();
-                            setIsMenuOpen(false);
-                          }}
-                          className={cn(
-                            "w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group text-left disabled:opacity-40 disabled:cursor-not-allowed"
-                          )}
-                        >
-                          <div className="flex items-center gap-4">
-                            <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
-                            <span>{item.label}</span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="mb-4">
-                      <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Gestão e Suporte</p>
-                      {[
-                        { href: '/private', label: 'Moderação (Inbox)', icon: Inbox, badge: pendingTestimonialsCount },
-                        ...(isAgency ? [{ href: '/widgets', label: 'Gestor de Murais', icon: Layout }] : []),
-                        { href: '/support', label: 'Suporte VIP', icon: Headphones, hasActiveTicket: !!activeTicket },
-                        { href: '/manual', label: 'Manual Estratégico', icon: BookOpen },
-                        { href: '/settings', label: 'Configurações', icon: Settings },
-                        ...(userData?.isAdmin ? [{ href: '/admin', label: 'Administração', icon: Shield }] : [])
-                      ].map((item: any) => (
-                        <SheetClose asChild key={item.href}>
-                          <Link 
-                            href={item.href}
-                            className="flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
-                          >
-                            <div className="flex items-center gap-4">
-                              <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
-                              <span>{item.label}</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {item.badge !== undefined && item.badge > 0 && (
-                                <Badge className="bg-destructive text-white border-none h-4 px-1.5 text-[8px]">{item.badge}</Badge>
-                              )}
-                              {item.hasActiveTicket && (
-                                <div className={cn("h-2 w-2 rounded-full", activeTicket.isSupportInChat ? "bg-green-500 animate-pulse" : "bg-red-500")} />
-                              )}
-                            </div>
-                          </Link>
-                        </SheetClose>
-                      ))}
-                    </div>
-                  </div>
-               </ScrollArea>
-               <div className="p-6 border-t bg-muted/5 shrink-0">
-                  <button onClick={() => signOut(auth)} className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-destructive/5 text-[10px] font-black uppercase tracking-widest text-destructive transition-all">
-                    <LogOut className="w-4 h-4" />
-                    <span>Encerrar Sessão</span>
-                  </button>
-               </div>
-            </SheetContent>
-          </Sheet>
+          {/* Botão de Alternância Hamburguer/X com lógica robusta de fechamento */}
+          <button 
+            type="button"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsMenuOpen(!isMenuOpen);
+            }}
+            className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none pointer-events-auto"
+            aria-label={isMenuOpen ? "Fechar Menu" : "Abrir Menu"}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="size-5" aria-hidden="true">
+              <line x1="4" y1="7" x2="20" y2="7" style={{ transitionDuration: '300ms' }} className={cn("origin-center transition-all", isMenuOpen ? "translate-y-[5px] rotate-45" : "")} />
+              <line x1="4" y1="12" x2="20" y2="12" style={{ transitionDuration: '300ms' }} className={cn("origin-center transition-all", isMenuOpen ? "opacity-0" : "")} />
+              <line x1="4" y1="17" x2="20" y2="17" style={{ transitionDuration: '300ms' }} className={cn("origin-center transition-all", isMenuOpen ? "-translate-y-[5px] -rotate-45" : "")} />
+            </svg>
+          </button>
 
           <Link href="/dash" className="flex items-center group -ml-2">
             <div className="relative w-[180px] h-[58px] md:w-[280px] md:h-[90px] transition-transform group-hover:scale-105">
@@ -805,8 +686,131 @@ export default function DashPage() {
         </div>
       </header>
 
+      {/* Menu Lateral controlado pelo estado isMenuOpen */}
+      <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+        <SheetContent side="left" className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Menu Estratégico Proova</SheetTitle>
+            <SheetDescription>Acesse as ferramentas e configurações da sua clínica.</SheetDescription>
+          </SheetHeader>
+          
+          <div className="p-6 border-b bg-muted/10 shrink-0 mt-16 md:mt-20">
+            <div className="flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-500">
+              <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
+                <User className="w-6 h-6 text-primary" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-black uppercase tracking-tight truncate">{userData?.companyName || 'Minha Empresa'}</p>
+                <div className="flex flex-col gap-0.5">
+                  <span className={cn(
+                    "text-[8px] font-black uppercase tracking-widest text-primary",
+                    userData?.membershipStatus === 'enterprise' && "animate-pulse"
+                  )}>
+                    {membershipLabel}
+                  </span>
+                  {isMapsLinkValid && (
+                    <div className="flex items-center gap-1">
+                      <div className="h-1 w-1 rounded-full bg-green-500 animate-pulse" />
+                      <span className="text-[7px] font-black uppercase text-green-500 tracking-tighter">G-Boost Ativo</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <ScrollArea className="flex-1 w-full overflow-y-auto">
+            <div className="px-4 py-6 space-y-2">
+              <div className="mb-4">
+                <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Visão Geral</p>
+                {[
+                  { href: '/dash', label: 'Painel Principal', icon: TrendingUp },
+                  { href: '/metrics', label: 'Inteligência de Dados', icon: BarChart3 },
+                ].map((item) => (
+                  <SheetClose asChild key={item.href}>
+                    <Link 
+                      href={item.href}
+                      className="flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                    >
+                      <div className="flex items-center gap-4">
+                        <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                        <span>{item.label}</span>
+                      </div>
+                    </Link>
+                  </SheetClose>
+                ))}
+              </div>
+
+              <div className="mb-4">
+                <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas de Autoridade</p>
+                {[
+                  { label: 'Link de Coleta', icon: Link2, action: () => setIsCollectLinkChoiceOpen(true), disabled: !isGoogleDone },
+                  { label: 'Página Pública (Bio)', icon: Globe, action: () => setIsPublicPageChoiceOpen(true) },
+                  { label: 'Social Cards (Stories)', icon: Share2, action: () => router.push('/social-cards') },
+                  { label: 'QR Balcão', icon: QrCode, action: () => setIsQrDialogOpenManual(true), disabled: !isGoogleDone },
+                ].map((item, idx) => (
+                  <button 
+                    key={idx}
+                    disabled={item.disabled}
+                    onClick={() => {
+                      item.action();
+                      setIsMenuOpen(false);
+                    }}
+                    className={cn(
+                      "w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group text-left disabled:opacity-40 disabled:cursor-not-allowed"
+                    )}
+                  >
+                    <div className="flex items-center gap-4">
+                      <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                      <span>{item.label}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              <div className="mb-4">
+                <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Gestão e Suporte</p>
+                {[
+                  { href: '/private', label: 'Moderação (Inbox)', icon: Inbox, badge: pendingTestimonialsCount },
+                  ...(isAgency ? [{ href: '/widgets', label: 'Gestor de Murais', icon: Layout }] : []),
+                  { href: '/support', label: 'Suporte VIP', icon: Headphones, hasActiveTicket: !!activeTicket },
+                  { href: '/manual', label: 'Manual Estratégico', icon: BookOpen },
+                  { href: '/settings', label: 'Configurações', icon: Settings },
+                  ...(userData?.isAdmin ? [{ href: '/admin', label: 'Administração', icon: Shield }] : [])
+                ].map((item: any) => (
+                  <SheetClose asChild key={item.href}>
+                    <Link 
+                      href={item.href}
+                      className="flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                    >
+                      <div className="flex items-center gap-4">
+                        <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                        <span>{item.label}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {item.badge !== undefined && item.badge > 0 && (
+                          <Badge className="bg-destructive text-white border-none h-4 px-1.5 text-[8px]">{item.badge}</Badge>
+                        )}
+                        {item.hasActiveTicket && (
+                          <div className={cn("h-2 w-2 rounded-full", activeTicket.isSupportInChat ? "bg-green-500 animate-pulse" : "bg-red-500")} />
+                        )}
+                      </div>
+                    </Link>
+                  </SheetClose>
+                ))}
+              </div>
+            </div>
+          </ScrollArea>
+          <div className="p-6 border-t bg-muted/5 shrink-0">
+            <button onClick={() => signOut(auth)} className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-destructive/5 text-[10px] font-black uppercase tracking-widest text-destructive transition-all">
+              <LogOut className="w-4 h-4" />
+              <span>Encerrar Sessão</span>
+            </button>
+          </div>
+        </SheetContent>
+      </Sheet>
+
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-20 md:pt-24 pb-12">
-        {/* ... Restante do Dashboard inalterado ... */}
         {(!isSetupComplete && !userData?.isSetupProcessDone) && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="flex items-center justify-between">
