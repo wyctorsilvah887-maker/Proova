@@ -486,9 +486,16 @@ export default function DashPage() {
                 </h1>
                 <p className="text-muted-foreground text-sm font-medium">Configuração Estratégica Proova</p>
               </div>
-              <Button variant="ghost" onClick={clearHash} className="h-12 w-12 rounded-full hover:bg-primary/5 text-muted-foreground hover:text-primary">
-                <X className="w-6 h-6" />
-              </Button>
+              <button 
+                onClick={clearHash}
+                className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-5">
+                  <line x1="4" y1="7" x2="20" y2="7" className="origin-center translate-y-[5px] rotate-45" />
+                  <line x1="4" y1="12" x2="20" y2="12" className="origin-center opacity-0" />
+                  <line x1="4" y1="17" x2="20" y2="17" className="origin-center -translate-y-[5px] -rotate-45" />
+                </svg>
+              </button>
             </header>
 
             <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-background">
@@ -532,7 +539,7 @@ export default function DashPage() {
                         <p className="text-[10px] font-bold text-muted-foreground uppercase">{userData.companyName}</p>
                       </div>
                     </div>
-                    <Button className="w-full max-w-sm h-16 rounded-2xl text-lg font-black gap-3 shadow-xl" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
+                    <Button className="w-full h-16 max-w-sm rounded-2xl text-lg font-black gap-3 shadow-xl" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
                       {isGeneratingPdf ? <Loader2 className="animate-spin" /> : <Download className="w-6 h-6" />} Baixar PDF para Impressão
                     </Button>
                   </div>
@@ -639,7 +646,7 @@ export default function DashPage() {
               </div>
             </header>
 
-            <div className="grid gap-4 md:gap-6 grid-cols-1">
+            <div className="grid grid-cols-1 gap-4 md:gap-6">
               <Card className="border-none shadow-xl rounded-[2rem] p-6 md:p-12 transition-all group relative overflow-hidden bg-background">
                 <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl -mr-24 -mt-24" />
                 <div className="flex items-center justify-between mb-8 relative z-10">
