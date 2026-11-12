@@ -659,11 +659,15 @@ export default function DashPage() {
 
       <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[110] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2">
-          {/* Botão de Alternância Hamburguer/X Robusto */}
+          {/* Botão de Alternância Hamburguer/X com lógica de PointerDown para evitar conflito */}
           <button 
             ref={menuButtonRef}
             type="button"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            onPointerDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setIsMenuOpen(!isMenuOpen);
+            }}
             className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none focus:ring-0"
             aria-label={isMenuOpen ? "Fechar Menu" : "Abrir Menu"}
             aria-expanded={isMenuOpen}
