@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -383,6 +382,11 @@ export default function DashPage() {
       {/* Menu Lateral */}
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen} modal={false}>
         <SheetContent side="left" className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Menu de Navegação</SheetTitle>
+            <SheetDescription>Acesse as funcionalidades e configurações da sua conta.</SheetDescription>
+          </SheetHeader>
+          
           <div className="p-6 border-b bg-muted/10 shrink-0 mt-20">
             <div className="flex items-center gap-4">
               <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
