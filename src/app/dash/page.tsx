@@ -659,20 +659,16 @@ export default function DashPage() {
 
       <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[110] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2">
-          {/* Botão de Alternância Hamburguer/X com lógica de PointerDown para evitar conflito */}
+          {/* Botão de Alternância Hamburger/X com interceptação técnica Radix */}
           <button 
             ref={menuButtonRef}
             type="button"
-            onPointerDown={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              setIsMenuOpen(!isMenuOpen);
-            }}
-            className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none focus:ring-0"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none focus:ring-0 z-[120]"
             aria-label={isMenuOpen ? "Fechar Menu" : "Abrir Menu"}
             aria-expanded={isMenuOpen}
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="size-5" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-5" aria-hidden="true">
               <line x1="4" y1="7" x2="20" y2="7" style={{ transitionDuration: '300ms' }} className={cn("origin-center transition-all", isMenuOpen ? "translate-y-[5px] rotate-45" : "")} />
               <line x1="4" y1="12" x2="20" y2="12" style={{ transitionDuration: '300ms' }} className={cn("origin-center transition-all", isMenuOpen ? "opacity-0" : "")} />
               <line x1="4" y1="17" x2="20" y2="17" style={{ transitionDuration: '300ms' }} className={cn("origin-center transition-all", isMenuOpen ? "-translate-y-[5px] -rotate-45" : "")} />
@@ -696,7 +692,8 @@ export default function DashPage() {
         <SheetContent 
           side="left" 
           onPointerDownOutside={(e) => {
-            // Evita que o clique no botão de toggle dispare o fechamento automático e a reabertura simultânea
+            // Se o alvo do clique for o botão de alternância, impedimos o fechamento automático do Radix
+            // para que a nossa função manual gerencie a alternância sem conflitos.
             if (menuButtonRef.current?.contains(e.target as Node)) {
               e.preventDefault();
             }
@@ -766,8 +763,7 @@ export default function DashPage() {
                   <button 
                     key={idx}
                     disabled={item.disabled}
-                    onClick={(e) => {
-                      e.stopPropagation();
+                    onClick={() => {
                       item.action();
                       setIsMenuOpen(false);
                     }}
