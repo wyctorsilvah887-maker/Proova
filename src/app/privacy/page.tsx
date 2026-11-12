@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ShieldCheck, Lock, Eye, FileText, Database, ShieldAlert, Gavel, Globe } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, Lock, Eye, FileText, Database, ShieldAlert, Gavel, Globe, Trash2, Settings2 } from 'lucide-react';
 import Image from 'next/image';
 import { ThemeToggle } from '@/components/theme-toggle';
 
@@ -54,6 +54,7 @@ export default function PrivacyPage() {
         </section>
 
         <div className="grid gap-12">
+          {/* SEÇÃO GOOGLE API - USO LIMITADO */}
           <section className="space-y-6">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-xl bg-primary/10 text-primary shadow-inner">
@@ -67,8 +68,39 @@ export default function PrivacyPage() {
               </p>
               <div className="space-y-4 pt-4 border-t border-primary/10">
                 <p className="text-xs md:text-sm text-muted-foreground font-medium leading-relaxed italic">
-                  Isso significa que nossa plataforma utiliza apenas os dados estritamente necessários para o funcionamento das ferramentas de gestão de reputação, como a listagem de locais e o monitoramento de avaliações, nunca compartilhando tais informações com terceiros para fins publicitários ou de rastreamento não autorizado.
+                  Declaramos expressamente que a <strong>única finalidade</strong> do processamento e uso dessas informações é a gestão estratégica de reputação e autoridade da própria clínica usuária. Os dados acessados destinam-se exclusivamente a permitir que a clínica monitore e responda às suas próprias avaliações no Google Business Profile, nunca sendo utilizados para fins publicitários, prospecção de terceiros ou comercialização de bases de dados.
                 </p>
+              </div>
+            </div>
+          </section>
+
+          {/* SEÇÃO REVOGAÇÃO E LGPD */}
+          <section className="space-y-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-muted text-muted-foreground shadow-inner">
+                <Trash2 className="w-5 h-5" />
+              </div>
+              <h2 className="text-xl font-black uppercase tracking-tight">Revogação de Acesso e Exclusão (LGPD)</h2>
+            </div>
+            <div className="space-y-4">
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed font-medium">
+                Em total conformidade com a Lei Geral de Proteção de Dados (LGPD) e as normas de segurança do Google, garantimos o controle absoluto do titular sobre suas integrações:
+              </p>
+              <div className="grid gap-4 md:grid-cols-2">
+                <Card className="p-6 rounded-2xl bg-background border shadow-sm space-y-3">
+                  <div className="flex items-center gap-2 text-primary">
+                    <Settings2 className="w-4 h-4" />
+                    <p className="text-[10px] font-black uppercase tracking-widest">Como Desconectar</p>
+                  </div>
+                  <p className="text-xs leading-relaxed font-medium">Você pode revogar o acesso do Proova AI à sua conta Google a qualquer momento através do nosso painel de configurações ou diretamente nas <strong>Configurações de Segurança da sua Conta Google</strong> (sessão "Aplicativos de terceiros com acesso à conta").</p>
+                </Card>
+                <Card className="p-6 rounded-2xl bg-background border shadow-sm space-y-3">
+                  <div className="flex items-center gap-2 text-primary">
+                    <Trash2 className="w-4 h-4" />
+                    <p className="text-[10px] font-black uppercase tracking-widest">Exclusão Definitiva</p>
+                  </div>
+                  <p className="text-xs leading-relaxed font-medium">Para solicitar a exclusão permanente de todos os seus dados, registros de integração e histórico de uso dos nossos servidores, basta enviar uma solicitação para o e-mail oficial: <strong className="text-primary">contato@useproovaai.com.br</strong>.</p>
+                </Card>
               </div>
             </div>
           </section>
