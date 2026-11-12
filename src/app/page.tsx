@@ -73,7 +73,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
         <Link href="/" className="flex items-center group -ml-2 md:-ml-4">
           <div className="relative w-[200px] h-[66px] md:w-[320px] md:h-[106px] transition-transform group-hover:scale-105">
             <Image 
-              src="/logo-proova-landing-white-mode.png" 
+              src="/logo-proovaai-whitemode.png" 
               alt="Logo Proova Light" 
               fill 
               className="dark:hidden object-contain object-left" 
@@ -215,7 +215,7 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
             Sua Clínica no Piloto <br className="hidden sm:block" />
             <span className="inline-block relative bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">
               AUTOMÁTICO
-            </span> via IA.
+            </span> via IA
           </h1>
           
           <p className={cn(
@@ -512,7 +512,7 @@ const Footer = () => {
     <footer className="py-20 border-t bg-background">
       <div className="container px-4 mx-auto flex flex-col items-center gap-12 text-center">
         <div className="relative w-[200px] h-[60px] opacity-40 grayscale">
-           <Image src="/logo-proova-landing-white-mode.png" alt="Logo Proova Footer Light" fill className="dark:hidden object-contain" />
+           <Image src="/logo-proovaai-whitemode.png" alt="Logo Proova Footer Light" fill className="dark:hidden object-contain" />
            <Image src="/logo-proova-landing-dark-mode.png" alt="Logo Proova Footer Dark" fill className="hidden dark:block object-contain" />
         </div>
         <div className="space-y-8">
