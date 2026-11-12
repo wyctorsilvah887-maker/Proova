@@ -50,7 +50,8 @@ import {
   Settings,
   LayoutGrid as LayoutGridIcon,
   BarChart3,
-  Headphones
+  Headphones,
+  ImageIcon
 } from 'lucide-react';
 import { 
   Sheet, 
