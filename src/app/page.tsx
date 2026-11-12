@@ -252,7 +252,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
         )}>
           <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">Gestão Unificada de Autoridade</h2>
           <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
-            Integração Oficial com <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-3">Google Business</span>.
+            Integração Oficial com <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto]">Google Business</span>.
           </h3>
           <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">O Proova se conecta diretamente ao Perfil da sua Empresa no Google para monitorar, responder e escalar seu ranking orgânico através de dados reais.</p>
         </div>
