@@ -231,7 +231,7 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
           )}>
             <Link href="/signup" className="w-full sm:w-auto">
               <Button className="w-full sm:w-auto h-14 px-8 rounded-2xl text-[10px] font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
-                INICIAR GESTÃO INTELIGENTE <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+                AUTOMATIZAR MINHAS AVALIAÇÕES <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
               </Button>
             </Link>
           </div>
