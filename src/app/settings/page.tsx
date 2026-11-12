@@ -41,7 +41,8 @@ import {
   BarChart3,
   ImageIcon,
   X,
-  Menu
+  Menu,
+  BadgeCheck
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -64,7 +65,7 @@ import {
 } from "@/components/ui/alert";
 import { useUser, useFirestore, useDoc, useAuth } from '@/firebase';
 import { doc, updateDoc, serverTimestamp, getDoc, writeBatch } from 'firebase/firestore';
-import { signOut } from 'firebase/auth';
+import { signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { toast } from '@/hooks/use-toast';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
@@ -114,6 +115,7 @@ export default function SettingsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearchingPlaces, setIsSearchingPlaces] = useState(false);
+  const [isGoogleConnecting, setIsGoogleConnecting] = useState(false);
   
   const [isSaving, setIsSaving] = useState(false);
 
@@ -177,6 +179,42 @@ export default function SettingsPage() {
       title: "Empresa Localizada", 
       description: "Agora clique em 'Salvar Alterações' no topo da página para confirmar o vínculo." 
     });
+  };
+
+  const handleConnectGoogle = async () => {
+    if (!db || !user || isGoogleConnecting) return;
+    setIsGoogleConnecting(true);
+
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.addScope('https://www.googleapis.com/auth/business.manage');
+      provider.setCustomParameters({
+        access_type: 'offline',
+        prompt: 'consent'
+      });
+
+      const result = await signInWithPopup(auth, provider);
+      
+      const userRef = doc(db, 'users', user.uid);
+      await updateDoc(userRef, {
+        googleConnected: true,
+        lastGoogleSync: serverTimestamp()
+      });
+
+      toast({ 
+        title: "Google Conectado!", 
+        description: "Sua conta agora tem permissão para gerir o Perfil da Empresa." 
+      });
+    } catch (error: any) {
+      console.error("Erro ao conectar Google:", error);
+      toast({ 
+        variant: "destructive", 
+        title: "Erro na Conexão", 
+        description: "Não foi possível vincular sua conta Google agora." 
+      });
+    } finally {
+      setIsGoogleConnecting(false);
+    }
   };
 
   const handleSaveSettings = async () => {
@@ -538,13 +576,45 @@ export default function SettingsPage() {
                     <CardDescription className="text-xs font-medium">Conecte seu perfil do Google Maps para impulsionar seu SEO Local.</CardDescription>
                  </CardHeader>
                  <CardContent className="p-6 md:p-8 pt-4 space-y-10">
+                    <div className="p-6 rounded-[2rem] bg-muted/5 border-2 border-dashed border-muted-foreground/10 flex flex-col sm:flex-row items-center justify-between gap-6 md:gap-8 relative overflow-hidden group">
+                       <div className="flex items-center gap-4 text-center sm:text-left relative z-10">
+                          <div className="shrink-0 p-4 bg-white dark:bg-zinc-900 rounded-2xl shadow-lg border border-border/50">
+                             <svg className="w-8 h-8" viewBox="0 0 24 24">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                             </svg>
+                          </div>
+                          <div>
+                             <p className="text-sm font-black uppercase tracking-tight">Vínculo com Google</p>
+                             <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">Permissão para gestão do GBP</p>
+                          </div>
+                       </div>
+                       
+                       {userData?.googleConnected ? (
+                         <div className="flex items-center gap-2 bg-green-500/10 text-green-600 px-4 py-2 rounded-full border border-green-500/20 animate-in zoom-in duration-500">
+                            <BadgeCheck className="w-5 h-5 fill-green-500/10" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Conectado</span>
+                         </div>
+                       ) : (
+                         <Button 
+                           onClick={handleConnectGoogle} 
+                           disabled={isGoogleConnecting}
+                           className="w-full sm:w-auto h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[9px] bg-foreground text-background hover:opacity-90 shadow-lg"
+                         >
+                            {isGoogleConnecting ? <Loader2 className="animate-spin w-4 h-4" /> : "Conectar meu Perfil Google Meu Negócio"}
+                         </Button>
+                       )}
+                    </div>
+
                     <div className="p-6 rounded-[2rem] bg-primary/5 border-2 border-dashed border-primary/20 flex flex-col sm:flex-row items-center gap-6 md:gap-8 relative overflow-hidden group">
                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
                        <div className="shrink-0 p-5 bg-white dark:bg-zinc-900 rounded-3xl shadow-xl border-2 border-primary/10 relative z-10 transition-transform group-hover:scale-110">
                           <Image src="https://picsum.photos/seed/google-maps-saas/100/100" width={56} height={56} alt="Google Maps" className="grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" data-ai-hint="google maps logo" />
                        </div>
                        <div className="flex-1 space-y-2 text-center sm:text-left relative z-10">
-                          <p className="text-base font-black uppercase tracking-tight">Vincular Empresa</p>
+                          <p className="text-base font-black uppercase tracking-tight">Vincular Localização</p>
                           <p className="text-xs text-muted-foreground leading-relaxed font-medium">O G-Boost redireciona elogios 5 estrelas para o Google. Pesquise sua empresa abaixo para ativar.</p>
                        </div>
                     </div>
