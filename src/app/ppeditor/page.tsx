@@ -51,7 +51,8 @@ import {
   LayoutGrid as LayoutGridIcon,
   BarChart3,
   Headphones,
-  ImageIcon
+  ImageIcon,
+  Menu
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -285,12 +286,16 @@ const PublicPageSettings = ({
       </div>
 
       <Tabs defaultValue="geral" className="w-full flex-1 flex flex-col min-h-0">
-        <div className="w-full border-b bg-background/50 backdrop-blur-sm sticky top-0 z-20 overflow-hidden">
+        <div className="w-full border-b bg-background/50 backdrop-blur-sm sticky top-0 z-20 overflow-hidden relative group/tabs">
+          {/* Indicadores Visuais de Scroll */}
+          <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none opacity-0 group-hover/tabs:opacity-100 transition-opacity" />
+          <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none opacity-0 group-hover/tabs:opacity-100 transition-opacity" />
+          
           <div 
             ref={tabsScrollRef}
-            className="w-full overflow-x-auto scrollbar-hide flex items-center"
+            className="w-full overflow-x-auto scrollbar-hide flex items-center px-0.5"
           >
-            <TabsList className="flex w-max justify-start rounded-none bg-transparent h-14 px-2 shrink-0 gap-1">
+            <TabsList className="flex w-max justify-start rounded-none bg-transparent h-14 shrink-0 gap-0.5">
               {[
                 { id: 'geral', label: 'Visual', icon: Palette },
                 { id: 'selecao', label: 'Seleção', icon: ListChecks, badge: selectedIds.length },
@@ -303,22 +308,22 @@ const PublicPageSettings = ({
                   key={tab.id}
                   value={tab.id} 
                   className={cn(
-                    "relative flex flex-col items-center justify-center gap-1.5 px-5 h-full rounded-none border-b-2 border-transparent transition-all min-w-[70px]",
+                    "relative flex flex-col items-center justify-center gap-1.5 px-3 h-full rounded-none border-b-2 border-transparent transition-all min-w-[62px] sm:min-w-[70px]",
                     "data-[state=active]:border-primary data-[state=active]:bg-primary/5 data-[state=active]:text-primary",
                     "hover:text-primary/70"
                   )}
                 >
                   <div className="relative">
-                    <tab.icon className="w-4 h-4" />
+                    <tab.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     {tab.badge !== undefined && tab.badge > 0 && (
-                      <span className="absolute -top-1.5 -right-2 bg-primary text-white text-[7px] font-black w-3.5 h-3.5 flex items-center justify-center rounded-full ring-2 ring-background">
+                      <span className="absolute -top-1.5 -right-2 bg-primary text-white text-[7px] font-black w-3.5 h-3.5 flex items-center justify-center rounded-full ring-2 ring-background shadow-sm">
                         {tab.badge}
                       </span>
                     )}
                   </div>
-                  <span className="text-[8px] font-black uppercase tracking-wider flex items-center gap-1 whitespace-nowrap">
+                  <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-tight flex items-center gap-0.5 whitespace-nowrap">
                     {tab.label}
-                    {tab.locked && <Lock className="w-2.5 h-2.5 opacity-50" />}
+                    {tab.locked && <Lock className="w-2 h-2 opacity-50" />}
                   </span>
                 </TabsTrigger>
               ))}
@@ -1213,10 +1218,7 @@ export default function PPEditorPage() {
                                     <span>Configurações</span>
                                 </DropdownMenuItem>
                                 <DropdownMenuSeparator className="mx-1" />
-                                <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5">
-                                    <LogOut className="mr-2 h-4 w-4" />
-                                    <span>Sair</span>
-                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
