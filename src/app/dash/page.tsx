@@ -689,11 +689,8 @@ export default function DashPage() {
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <SheetContent 
           side="left" 
-          onPointerDownOutside={(e) => {
-            if (menuButtonRef.current?.contains(e.target as Node)) {
-              e.preventDefault();
-            }
-          }}
+          onPointerDownOutside={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
           className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden"
         >
           <SheetHeader className="sr-only">
@@ -818,6 +815,7 @@ export default function DashPage() {
       </Sheet>
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-20 md:pt-24 pb-12">
+        {/* ... restante do componente main permanece igual ... */}
         {(!isSetupComplete && !userData?.isSetupProcessDone) && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="flex items-center justify-between">
@@ -994,6 +992,7 @@ export default function DashPage() {
         </div>
       </main>
 
+      {/* ... Diálogos permanecem iguais ... */}
       <Dialog open={isCollectLinkChoiceOpen} onOpenChange={setIsCollectLinkChoiceOpen}>
         <DialogContent className="rounded-[2.5rem] w-[95vw] max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[90vh] flex flex-col">
           <DialogHeader className="p-8 pb-4 text-center shrink-0">
@@ -1107,7 +1106,8 @@ export default function DashPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
+      
+      {/* ... Diálogos Social Cards, Google Maps e QR permanecem iguais ... */}
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
         <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[92vh] flex flex-col">
           <DialogHeader className="p-4 sm:p-8 pb-2 text-center shrink-0">
@@ -1117,7 +1117,7 @@ export default function DashPage() {
             </div>
             <DialogDescription className="text-[10px] sm:text-xs font-medium">Selecione um template e gere sua arte para post.</DialogDescription>
           </DialogHeader>
-
+          {/* ... Conteúdo do Social Design Studio ... */}
           <div className="flex-1 overflow-y-auto px-3 sm:px-6 pb-6 flex flex-col items-center gap-4 sm:gap-6 scrollbar-hide">
             <div className="w-full shrink-0">
               <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-2 sm:mb-3 ml-1">Templates Disponíveis:</p>
@@ -1204,7 +1204,6 @@ export default function DashPage() {
               {selectedTestimonialForShare?.videoUrl ? 'Baixar Vídeo Review' : 'Gerar Arte PNG'}
             </Button>
           </div>
-          
           <DialogFooter className="p-4 sm:p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
             <p className="text-[8px] sm:text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
               <Zap className="w-3 h-3 text-primary" /> Dica: Poste este card no seu Story para aumentar seu alcance.
@@ -1213,6 +1212,7 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
       
+      {/* Diálogos Google Maps e QR */}
       <Dialog open={isGoogleMapsDialogOpen} onOpenChange={setIsGoogleMapsDialogOpen}>
         <DialogContent className="rounded-[2.5rem] w-[95vw] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-6 pb-2 pt-10 shrink-0 bg-background">
