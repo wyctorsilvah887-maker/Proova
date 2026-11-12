@@ -36,7 +36,8 @@ import {
   AlertTriangle,
   Bot,
   BrainCircuit,
-  Layout
+  Layout,
+  LayoutGrid
 } from "lucide-react";
 import { 
   Sheet, 
@@ -213,7 +214,7 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
           )}>
             Sua Clínica no Piloto <br className="hidden sm:block" />
             <span className="inline-block relative bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-3">
-              AUTOMÁTICO
+              AUTOMÁTICO.
             </span> via IA.
           </h1>
           
@@ -354,17 +355,17 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
           <div className={cn("space-y-8 transition-all duration-1000", isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10")}>
             <div className="space-y-4">
               <h2 className="text-3xl md:text-5xl font-black font-headline leading-tight tracking-tight">
-                Software de <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-3">Alta Performance</span> para Murais.
+                Sua <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-3">Página de Autoridade</span> para o Link da Bio.
               </h2>
               <p className="text-sm md:text-lg text-muted-foreground font-medium">
-                Nossa tecnologia de embutimento permite que você insira murais dinâmicos em qualquer site (WordPress, Wix, HTML) em menos de 1 minuto.
+                Nossa tecnologia permite que você centralize seus melhores depoimentos e facilite o contato de novos pacientes através de um link único e profissional.
               </p>
             </div>
 
             <div className="space-y-6">
               {[
                 { icon: Bot, title: 'IA Pilot', desc: 'Respostas inteligentes geradas automaticamente para economizar tempo da sua equipe.' },
-                { icon: Layout, title: 'Widget Generator', desc: 'Personalize cores, layouts e fontes para que o Proova pareça parte nativa do seu site.' }
+                { icon: LayoutGrid, title: 'Bio Link Studio', desc: 'Personalize cores, layouts e seções para que sua página de depoimentos reflita a identidade da sua clínica.' }
               ].map((item, idx) => (
                 <div key={idx} className="flex gap-6 group">
                   <item.icon className="w-7 h-7 text-primary shrink-0 group-hover:scale-110 transition-transform duration-500" />
@@ -409,7 +410,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
       icon: Shield,
       highlight: false,
       benefits: [
-        "1 Mural para Site",
+        "Página Pública Padrão",
         "Monitoramento de Avaliações",
         "Inbox Privado",
         "QR Code de Balcão",
@@ -425,12 +426,12 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
       icon: Bot,
       highlight: true,
       benefits: [
-        "Murais Ilimitados",
+        "Editor VIP da Página",
         "Automação de Respostas via IA",
         "G-Boost (SEO Local)",
-        "Editor VIP da Página",
-        "Relatórios de Performance Pesonais",
-        "Suporte Prioritário"
+        "Relatórios de Performance Pessoais",
+        "Suporte Prioritário",
+        "Estatísticas de Conversão"
       ]
     }
   ];
