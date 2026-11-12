@@ -28,7 +28,8 @@ import {
   Handshake,
   BadgeCheck,
   Headphones,
-  CheckCircle2
+  CheckCircle2,
+  Bot
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useUser, useAuth, useFirestore, useDoc } from '@/firebase';
@@ -50,7 +51,7 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
+} from "@/components/accordion";
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LoadingScreen } from '@/components/loading-screen';
 
@@ -61,7 +62,6 @@ export default function PricingPage() {
   const router = useRouter();
   const { theme, setTheme } = useTheme();
 
-  // Todos os planos iniciam recolhidos conforme solicitado
   const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
   const [cachedUserData, setCachedUserData] = useState<any>(null);
 
@@ -88,17 +88,10 @@ export default function PricingPage() {
     return (effectiveUserData?.membershipStatus || 'base').toLowerCase();
   }, [user, effectiveUserData]);
 
-  const isMapsLinkValid = useMemo(() => {
-    if (!effectiveUserData?.googleMapsUrl) return false;
-    const url = effectiveUserData.googleMapsUrl.toLowerCase();
-    return url.includes('review') || url.includes('writereview') || url.includes('placeid');
-  }, [effectiveUserData]);
-
   const membershipLabel = useMemo(() => {
-    if (status === 'enterprise') return 'PRO';
+    if (status === 'enterprise' || status === 'pro') return 'PRO';
     if (status === 'gold') return 'GOLD';
     if (status === 'trial') return 'TRIAL';
-    if (status === 'expired') return 'EXPIRADO';
     if (status === 'guest') return 'Visitante';
     return 'PLANO BASE';
   }, [status]);
@@ -109,27 +102,9 @@ export default function PricingPage() {
 
   const plans = [
     {
-      id: 'base',
-      name: "Plano Base",
-      price: "R$ 0",
-      period: "/sempre",
-      description: "Fundação de Reputação",
-      icon: Shield,
-      highlight: false,
-      cta: "Plano Ativo",
-      disabled: status === 'base',
-      benefits: [
-        "1 Mural de Depoimentos",
-        "5 Depoimentos Ativos no Link in Bio",
-        "Inbox Privado (Reputation Shield)",
-        "QR Code de Balcão Padrão",
-        "Link de Coleta Proova"
-      ]
-    },
-    {
       id: 'gold',
       name: "Plano Gold",
-      price: "R$ 49,90",
+      price: "R$ 147",
       period: "/mês",
       description: "Aceleração de Vendas",
       icon: Star,
@@ -138,33 +113,34 @@ export default function PricingPage() {
       disabled: status === 'gold',
       checkoutUrl: "https://pay.cakto.com.br/gold-proova",
       benefits: [
-        "Murais Ilimitados para seu Site",
-        "50 Depoimentos Ativos no Link in Bio",
+        "Página Pública VIP de Autoridade",
+        "Automação de Respostas via IA (Gemini)",
         "G-Boost (Ranqueamento no Google Maps)",
-        "Editor VIP da Página Pública",
-        "Auto-Publish (Postagem Automática)",
-        "Relatórios de Performance Semanais",
-        "Suporte VIP via Chat"
+        "Social Cards Studio (Post/Story)",
+        "Relatórios de Performance Automáticos",
+        "Inbox Privado (Reputation Shield)",
+        "Suporte VIP via Chat no App"
       ]
     },
     {
-      id: 'enterprise',
+      id: 'pro',
       name: "Plano PRO",
-      price: "R$ 97",
+      price: "R$ 270",
       period: "/mês",
       description: "Domínio de Mercado",
       icon: Zap,
       highlight: false,
-      cta: status === 'enterprise' ? "Plano Ativo" : "Garantir Acesso PRO",
-      disabled: status === 'enterprise',
+      cta: (status === 'pro' || status === 'enterprise') ? "Plano Ativo" : "Garantir Acesso PRO",
+      disabled: status === 'pro' || status === 'enterprise',
       checkoutUrl: "https://pay.cakto.com.br/enterprise-proova",
       benefits: [
-        "Tudo do Gold + Recursos Exclusivos",
-        "Vídeo Reviews 4K de Alto Impacto",
-        "Depoimentos Ativos Ilimitados",
-        "Suporte VIP Dedicado no App",
+        "Tudo do Plano Gold + Exclusivos",
+        "Coleta de Vídeo Reviews 4K",
+        "Suporte VIP Dedicado com Consultor",
+        "Métricas de ROI Avançadas",
         "Design de Página Ultra Customizado",
-        "Análise Preditiva de Conversão"
+        "Consultoria de Reputação Mensal",
+        "Uplink para Domínio Próprio"
       ]
     }
   ];
@@ -194,10 +170,7 @@ export default function PricingPage() {
                 <Button variant="ghost" className="h-10 md:h-12 px-1 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
                   <div className="flex flex-col items-end">
                     <span className="text-[10px] md:text-xs font-bold truncate max-w-[70px] sm:max-w-[120px] group-hover:text-primary leading-tight transition-colors">{effectiveUserData?.companyName || 'Empresa'}</span>
-                    <div className="flex flex-col items-end gap-0">
-                        <span className="text-[6px] md:text-[8px] uppercase tracking-widest font-black text-primary leading-tight">{membershipLabel}</span>
-                        {isMapsLinkValid && <span className="text-[5px] md:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none animate-pulse">G-Boost Ativo</span>}
-                    </div>
+                    <span className="text-[6px] md:text-[8px] uppercase tracking-widest font-black text-primary leading-tight">{membershipLabel}</span>
                   </div>
                   <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
                     <User className="w-3.5 h-3.5 md:w-4 md:h-4" />
@@ -231,7 +204,7 @@ export default function PricingPage() {
         <section className="space-y-4">
           {plans.map((plan) => {
             const isExpanded = expandedPlan === plan.id;
-            const isCurrent = status === plan.id;
+            const isCurrent = status === plan.id || (plan.id === 'pro' && status === 'enterprise');
 
             return (
               <Collapsible
@@ -263,7 +236,6 @@ export default function PricingPage() {
                                 plan.id === 'gold' && "inline-block bg-clip-text text-transparent bg-gradient-to-r from-white via-orange-200 to-white animate-text-shine bg-[length:200%_auto]"
                               )}>{plan.name}</h3>
                               
-                              {/* Selo Verificado estilo Instagram porem sem fundo e verde */}
                               {isCurrent && (
                                 <div className="flex items-center gap-1 animate-in zoom-in duration-500">
                                    <BadgeCheck className="w-5 h-5 text-green-500" />
@@ -360,7 +332,6 @@ export default function PricingPage() {
              {[
                { q: "Posso cancelar minha assinatura quando quiser?", a: "Sim. A Proova não possui fidelidade. Você pode cancelar sua assinatura mensal diretamente no painel ou via suporte a qualquer momento, sem taxas ocultas." },
                { q: "O G-Boost realmente melhora meu posicionamento no Google?", a: "Absolutamente. O algoritmo do Google Maps prioriza perfis que recebem avaliações constantes e positivas. Ao automatizar o convite para elogios 5 estrelas, você aumenta sua visibilidade organicamente." },
-               { q: "O que acontece com meus dados se eu voltar para o plano grátis?", a: "Seus dados permanecem seguros. No entanto, recursos premium como G-Boost, Editor VIP e Murais ilimitados serão desativados até que uma nova assinatura seja realizada." },
                { q: "Como funciona o suporte VIP?", a: "Clientes Gold e PRO possuem fila prioritária em nosso chat de suporte e atendimento especializado por consultores estratégicos de prova social." }
              ].map((faq, idx) => (
                <AccordionItem key={idx} value={`item-${idx}`} className="border rounded-[1.5rem] px-5 md:px-6 bg-card shadow-sm overflow-hidden">

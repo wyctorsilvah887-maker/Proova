@@ -170,7 +170,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
                         <Button variant="outline" className="w-full h-11 rounded-xl font-black uppercase tracking-widest text-[8px]">Acessar Dashboard</Button>
                       </Link>
                       <Link href="/signup" className="block" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-2xl">Ativar Licença Gratuita</Button>
+                        <Button className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-2xl">Ativar Licença</Button>
                       </Link>
                     </div>
                   </div>
@@ -402,36 +402,37 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 
   const plans = [
     {
-      id: 'base',
-      name: "Plano Base",
-      price: "Grátis",
-      period: "/sempre",
-      description: "Ideal para iniciar",
-      icon: Shield,
-      highlight: false,
-      benefits: [
-        "Página Pública Padrão",
-        "Monitoramento de Avaliações",
-        "Inbox Privado",
-        "QR Code de Balcão",
-        "Link de Coleta"
-      ]
-    },
-    {
       id: 'gold',
       name: "Plano Gold",
-      price: "R$ 49,90",
+      price: "R$ 147",
       period: "/mês",
-      description: "Foco em Automação",
+      description: "Aceleração de Vendas",
       icon: Bot,
       highlight: true,
       benefits: [
-        "Editor VIP da Página",
+        "Página Pública VIP",
         "Automação de Respostas via IA",
-        "G-Boost (SEO Local)",
-        "Relatórios de Performance Pessoais",
-        "Suporte Prioritário",
-        "Estatísticas de Conversão"
+        "G-Boost (Estratégia de SEO Local)",
+        "Social Cards Studio (Post/Story)",
+        "Relatórios de Performance Automáticos",
+        "Inbox Privado (Shield)"
+      ]
+    },
+    {
+      id: 'pro',
+      name: "Plano PRO",
+      price: "R$ 270",
+      period: "/mês",
+      description: "Domínio de Mercado",
+      icon: Zap,
+      highlight: false,
+      benefits: [
+        "Tudo do Plano Gold + Exclusivos",
+        "Coleta de Vídeo Reviews 4K",
+        "Suporte VIP Dedicado no App",
+        "Métricas de ROI Avançadas",
+        "Design de Página Ultra Customizado",
+        "Consultoria de Reputação Mensal"
       ]
     }
   ];
