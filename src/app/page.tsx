@@ -54,7 +54,6 @@ import {
 } from "@/components/ui/collapsible";
 import { Badge } from "@/components/ui/badge";
 import { useUser, useFirestore } from "@/firebase";
-import { doc, setDoc, increment } from "firebase/firestore";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 import { LoadingScreen } from "@/components/loading-screen";
@@ -300,7 +299,6 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
 AgitationSection.displayName = "AgitationSection";
 
 const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
-  const sectionRef = useRef<HTMLElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
 
   const steps = [
@@ -323,8 +321,9 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 
   useEffect(() => {
     const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
+      const element = document.getElementById('metodologia');
+      if (!element) return;
+      const rect = element.getBoundingClientRect();
       const triggerPoint = window.innerHeight * 0.5;
       const currentPos = triggerPoint - rect.top;
       const progress = currentPos / rect.height;
@@ -335,7 +334,7 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
   }, []);
 
   return (
-    <section id="metodologia" ref={sectionRef} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
+    <section id="metodologia" ref={ref} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
       <div className="container px-4 mx-auto">
         <div className={cn(
           "text-center space-y-4 mb-24 transition-all duration-1000",
@@ -562,7 +561,6 @@ const Footer = () => {
 
 export default function Home() {
   const { user, loading } = useUser();
-  const db = useFirestore();
   const router = useRouter();
 
   const [isHeroVisible, setIsHeroVisible] = useState(false);
@@ -583,6 +581,7 @@ export default function Home() {
     window.addEventListener("scroll", handleScroll);
     setTimeout(() => setIsHeroVisible(true), 100);
 
+    const observerOptions = { threshold: 0.1 };
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -593,7 +592,7 @@ export default function Home() {
           if (id === 'planos') setIsPricingVisible(true);
         }
       });
-    }, { threshold: 0.1 });
+    }, observerOptions);
 
     if (agitationRef.current) observer.observe(agitationRef.current);
     if (pillarsRef.current) observer.observe(pillarsRef.current);
