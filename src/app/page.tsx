@@ -252,7 +252,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
         )}>
           <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">Gestão Unificada de Autoridade</h2>
           <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
-            Integração Oficial com <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">Google Business.</span>
+            Integração Oficial com <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-1">Google Business.</span>
           </h3>
           <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">O Proova se conecta diretamente ao Perfil da sua Empresa no Google para monitorar, responder e escalar seu ranking orgânico através de dados reais.</p>
         </div>
@@ -317,7 +317,7 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
             {[
               { number: '01', title: 'Conexão com Google', desc: 'Integração via API oficial para ler e gerir o perfil da sua clínica no Google Business Profile de forma segura.' },
               { number: '02', title: 'IA Generativa (Gemini)', desc: 'O Proova utiliza modelos avançados de IA para responder pacientes com empatia, mantendo o tom de voz da sua marca.' },
-              { number: '03', title: 'Mural de Prova Social', desc: 'Criação automática de widgets e páginas públicas dinâmicas para exibir a satisfação dos seus clientes no seu site.' }
+              { number: '03', title: 'Link in Bio de Autoridade', desc: 'Transforme sua biografia do Instagram em um hub de conversão com uma vitrine dinâmica de depoimentos e botão de contato direto.' }
             ].map((step, idx) => (
               <div key={idx} className={cn(
                 "flex items-start gap-8 md:gap-16 relative transition-all duration-1000", 
@@ -429,7 +429,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
         "Automação de Respostas via IA",
         "G-Boost (SEO Local)",
         "Editor VIP da Página",
-        "Relatórios de Performance",
+        "Relatórios de Performance Pesonais",
         "Suporte Prioritário"
       ]
     }
@@ -548,7 +548,7 @@ export default function Home() {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     
-    // Fallback de segurança: Se o IntersectionObserver falhar, mostra tudo após 1.5 segundos
+    // Fallback de segurança
     const fallbackTimer = setTimeout(() => {
       setIsHeroVisible(true);
       setIsAgitationVisible(true);
@@ -557,7 +557,6 @@ export default function Home() {
       setIsPricingVisible(true);
     }, 1500);
 
-    // Observer mais sensível com rootMargin para carregar antes da entrada total
     const observerOptions = { 
       threshold: 0.05,
       rootMargin: '0px 0px -50px 0px' 
