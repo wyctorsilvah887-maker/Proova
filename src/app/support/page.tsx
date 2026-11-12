@@ -23,7 +23,13 @@ import {
   Headphones,
   Ticket,
   XCircle,
-  AlertTriangle
+  AlertTriangle,
+  LayoutGrid as LayoutGridIcon,
+  BarChart3,
+  ImageIcon,
+  Settings,
+  X,
+  Menu
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -50,13 +56,12 @@ import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useTheme } from 'next-themes';
 import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuLabel, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '@/components/ui/dropdown-menu';
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetDescription 
+} from '@/components/ui/sheet';
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -70,6 +75,7 @@ import {
 import { getConsultantResponse, getMainMenu } from '@/lib/consultant-rules';
 import { toast } from '@/hooks/use-toast';
 import { LoadingScreen } from '@/components/loading-screen';
+import { Badge } from '@/components/ui/badge';
 
 export default function SupportPage() {
   const { user, loading: authLoading } = useUser();
@@ -85,8 +91,10 @@ export default function SupportPage() {
   const [isEndingChat, setIsEndingChat] = useState(false);
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [localMessages, setLocalMessages] = useState<any[]>([]);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
@@ -100,10 +108,6 @@ export default function SupportPage() {
   const activeTicket = activeTickets?.[0] as any;
   const isHumanSupportPresent = activeTicket?.isSupportInChat === true;
   const isSupportTyping = activeTicket?.isSupportTyping === true;
-
-  const isAgency = useMemo(() => {
-    return userData?.businessType === 'agencia';
-  }, [userData]);
 
   const messagesQuery = useMemo(() => {
     if (!db || !user) return null;
@@ -280,10 +284,9 @@ export default function SupportPage() {
     }
   };
 
-  const isMapsLinkValid = !!userData?.googleMapsUrl;
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
-    if (status === 'enterprise') return 'ENTERPRISE';
+    if (status === 'enterprise') return 'PRO';
     if (status === 'gold') return 'GOLD';
     if (status === 'trial') return 'TRIAL';
     if (status === 'expired') return 'EXPIRADO';
@@ -296,85 +299,140 @@ export default function SupportPage() {
 
   return (
     <div className="h-[100dvh] flex flex-col font-body text-foreground overflow-hidden bg-muted/30">
-      <header className="bg-background border-b h-16 md:h-24 flex items-center px-4 md:px-6 shrink-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center gap-2 md:gap-4 flex-1">
-          <Link href="/dash">
-            <Button variant="ghost" size="icon" className="rounded-full h-10 w-10 text-muted-foreground hover:text-primary transition-all bg-transparent hover:bg-transparent shadow-none border-none">
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
-          <div className="flex items-center group">
-            <div className="relative w-[140px] h-[40px] md:w-[280px] md:h-[90px]">
-              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
-              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
+      <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[120] shadow-sm backdrop-blur-md bg-background/95">
+        <div className="flex items-center gap-2 flex-1">
+          <button 
+            ref={toggleButtonRef}
+            type="button"
+            onPointerDown={(e) => {
+              e.preventDefault();
+              setIsMenuOpen(!isMenuOpen);
+            }}
+            className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none z-[150] relative"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-5">
+              <line x1="4" y1="7" x2="20" y2="7" className={cn("origin-center transition-all", isMenuOpen ? "translate-y-[5px] rotate-45" : "")} />
+              <line x1="4" y1="12" x2="20" y2="12" className={cn("origin-center transition-all", isMenuOpen ? "opacity-0" : "")} />
+              <line x1="4" y1="17" x2="20" y2="17" className={cn("origin-center transition-all", isMenuOpen ? "-translate-y-[5px] -rotate-45" : "")} />
+            </svg>
+          </button>
+          <Link href="/dash" className="flex items-center group -ml-2">
+            <div className="relative w-[140px] h-[46px] md:w-[280px] md:h-[90px]">
+              <Image src="/logo-proova-white-mode.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
+              <Image src="/logo-proova-landing-dark-mode.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
-          </div>
+          </Link>
         </div>
+
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle className="hidden sm:flex" />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
-                <div className="hidden sm:flex flex-col items-end relative">
-                  <span className="text-xs font-bold truncate max-w-[120px] transition-colors group-hover:text-primary leading-tight">
-                    {userData?.companyName || 'Empresa'}
-                  </span>
-                  <div className="flex flex-col items-end gap-0">
-                    <span className={cn(
-                      "text-[7px] sm:text-[8px] uppercase tracking-widest font-black leading-tight text-primary",
-                      userData?.membershipStatus === 'enterprise' ? "animate-pulse" : ""
-                    )}>
-                      {membershipLabel}
-                    </span>
-                    {isMapsLinkValid && <span className="text-[5px] sm:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none">G-Boost Ativo</span>}
-                  </div>
-                  {activeTicket && (
-                    <div className={cn("absolute -top-1 -right-4 h-2 w-2 rounded-full", activeTicket.isSupportInChat ? "bg-green-500 animate-ping" : "bg-red-500")} />
-                  )}
-                </div>
-                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors"><User className="w-4 h-4" /></div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
-              <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <TrendingUp className="mr-2 h-4 w-4 text-primary" />
-                <span>Dash</span>
-              </DropdownMenuItem>
-              {isAgency && (
-                <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                  <Layout className="mr-2 h-4 w-4 text-primary" />
-                  <span>Meus Murais</span>
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem onClick={() => router.push('/private')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Inbox className="mr-2 h-4 w-4 text-primary" />
-                <span>Inbox Privado</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/support')} className="rounded-xl cursor-pointer font-bold py-2.5 bg-primary/5 text-primary">
-                <Headphones className="mr-2 h-4 w-4 text-primary" />
-                <span>Suporte Proova</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => router.push('/pricing')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                <Gem className="mr-2 h-4 w-4 text-primary" />
-                <span>Upgrade</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="rounded-xl cursor-pointer font-bold py-2.5">{theme === 'light' ? <Moon className="mr-2 h-4 w-4 text-primary" /> : <Sun className="mr-2 h-4 w-4 text-primary" />}<span>Tema</span></DropdownMenuItem>
-              <DropdownMenuSeparator className="mx-1" />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ThemeToggle className="flex border-none bg-transparent shadow-none hover:bg-transparent" />
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col w-full max-w-5xl mx-auto min-h-0 md:p-4 lg:p-6 pb-2 md:pb-8 relative">
+      <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen} modal={false}>
+        <SheetContent 
+          side="left" 
+          className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden z-[110]"
+          onPointerDownOutside={(e) => {
+            if (toggleButtonRef.current?.contains(e.target as Node)) {
+              e.preventDefault();
+            }
+          }}
+        >
+          <SheetHeader className="sr-only">
+            <SheetTitle>Menu de Navegação</SheetTitle>
+            <SheetDescription>Acesse as funcionalidades e configurações da sua conta Proova.</SheetDescription>
+          </SheetHeader>
+          
+          <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col pt-20">
+            <div className="p-6 border-b bg-muted/10 shrink-0">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
+                  <User className="w-6 h-6 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-black uppercase tracking-tight truncate">{userData?.companyName}</p>
+                  <span className="text-[8px] font-black uppercase tracking-widest text-primary">{membershipLabel}</span>
+                </div>
+              </div>
+            </div>
+
+            <ScrollArea className="flex-1">
+              <div className="px-4 py-6 space-y-8">
+                <div>
+                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Navegação Principal</p>
+                  <button 
+                    onClick={() => { router.push('/dash'); setIsMenuOpen(false); }}
+                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
+                  >
+                    <LayoutGridIcon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                    <span>Dashboard</span>
+                  </button>
+                </div>
+
+                <div>
+                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas Proova</p>
+                  {[
+                    { label: 'Social Cards', href: '/social-cards', icon: ImageIcon },
+                    { label: 'Moderação Inbox', href: '/private', icon: Inbox },
+                    { label: 'Métricas & ROI', href: '/metrics', icon: BarChart3 },
+                  ].map((item: any, idx) => (
+                    <button 
+                      key={idx}
+                      onClick={() => {
+                        router.push(item.href);
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
+                    >
+                      <div className="flex items-center gap-4">
+                        <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                        <span>{item.label}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+
+                <div>
+                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Suporte & Conta</p>
+                  {[
+                    { label: 'Suporte VIP', href: '/support', icon: Headphones },
+                    { label: 'Configurações', href: '/settings', icon: Settings },
+                  ].map((item: any, idx) => (
+                    <button 
+                      key={idx}
+                      onClick={() => {
+                        router.push(item.href);
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
+                    >
+                      <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                      <span>{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </ScrollArea>
+
+            <div className="p-4 border-t shrink-0">
+               <Button 
+                 variant="ghost" 
+                 className="w-full h-12 rounded-xl text-destructive hover:bg-destructive/10 font-black uppercase tracking-widest text-[9px] gap-2"
+                 onClick={() => signOut(auth)}
+               >
+                  <LogOut className="w-4 h-4" /> Sair da Conta
+               </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <main className="flex-1 flex flex-col w-full max-w-5xl mx-auto min-h-0 md:p-4 lg:p-6 pb-2 md:pb-8 relative pt-24 md:pt-32">
         <div className="flex-1 bg-background md:border md:rounded-[2.5rem] md:shadow-2xl flex flex-col overflow-hidden relative">
           
           <ScrollArea ref={scrollRef} className="flex-1 px-4 py-6 md:p-10">
             <div className="space-y-6">
-              {/* Header do Consultor - Screenshot Style */}
               <div className="bg-muted/10 border-2 border-muted rounded-[1.5rem] p-5 mb-8 animate-in fade-in zoom-in duration-700">
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
