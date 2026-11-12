@@ -656,10 +656,14 @@ export default function DashPage() {
 
       <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[110] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2">
-          {/* Botão de Alternância Hamburguer/X com lógica robusta de fechamento */}
+          {/* Botão de Alternância Hamburguer/X com lógica robusta para evitar double-toggle */}
           <button 
             type="button"
-            onPointerDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => {
+              // Previne que o Sheet detecte clique fora e feche antes de alternarmos manualmente
+              e.preventDefault();
+              e.stopPropagation();
+            }}
             onClick={(e) => {
               e.stopPropagation();
               setIsMenuOpen(!isMenuOpen);
