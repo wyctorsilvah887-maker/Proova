@@ -296,7 +296,7 @@ const PublicPageSettings = ({
                 { id: 'selecao', label: 'Seleção', icon: ListChecks, badge: selectedIds.length },
                 { id: 'conteudo', label: 'Conteúdo', icon: Type, locked: !isGoldPlan },
                 { id: 'automacao', label: 'Automação', icon: Zap, locked: !isEnterprise },
-                { id: 'design', label: 'Layout', icon: LayoutGrid },
+                { id: 'design', label: 'Layout', icon: LayoutGridIcon },
                 { id: 'social', label: 'Contato', icon: MessageCircle },
               ].map((tab) => (
                 <TabsTrigger 
@@ -604,7 +604,7 @@ const PublicPageSettings = ({
                    <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Layout dos Depoimentos</Label>
                    <div className="grid grid-cols-2 gap-3.5">
                      {[
-                       { id: 'grid', label: 'Grade VIP', icon: LayoutGrid, desc: 'Clássico e sólido' },
+                       { id: 'grid', label: 'Grade VIP', icon: LayoutGridIcon, desc: 'Clássico e sólido' },
                        { id: 'mural', label: 'Mural', icon: Layout, desc: 'Dinâmico Pinterest' },
                        { id: 'carousel', label: 'Carrossel', icon: Play, desc: 'Foco um a um' },
                        { id: 'popup', label: 'Destaque', icon: MessageCircle, desc: 'O melhor por vez' },
@@ -934,7 +934,7 @@ export default function PPEditorPage() {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body w-full overflow-hidden text-foreground">
-      <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[110] shadow-sm backdrop-blur-md bg-background/95">
+      <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[120] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2 flex-1">
           <button 
             ref={toggleButtonRef}
@@ -980,7 +980,7 @@ export default function PPEditorPage() {
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen} modal={false}>
         <SheetContent 
           side="left" 
-          className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden z-[140]"
+          className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden z-[110]"
           onPointerDownOutside={(e) => {
             if (toggleButtonRef.current?.contains(e.target as Node)) {
               e.preventDefault();
@@ -992,20 +992,20 @@ export default function PPEditorPage() {
             <SheetDescription>Acesse as funcionalidades e configurações da sua conta Proova.</SheetDescription>
           </SheetHeader>
           
-          <div className="p-6 border-b bg-muted/10 shrink-0 mt-20">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
-                <User className="w-6 h-6 text-primary" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-black uppercase tracking-tight truncate">{userData?.companyName}</p>
-                <span className="text-[8px] font-black uppercase tracking-widest text-primary">{membershipLabel}</span>
+          <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col pt-20">
+            <div className="p-6 border-b bg-muted/10 shrink-0">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
+                  <User className="w-6 h-6 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-black uppercase tracking-tight truncate">{userData?.companyName}</p>
+                  <span className="text-[8px] font-black uppercase tracking-widest text-primary">{membershipLabel}</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <ScrollArea className="flex-1">
-            <div className="px-4 py-6 space-y-8">
+            <div className="px-4 py-6 space-y-8 flex-1">
               <div>
                 <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Navegação Principal</p>
                 <button 
@@ -1061,16 +1061,16 @@ export default function PPEditorPage() {
                 ))}
               </div>
             </div>
-          </ScrollArea>
 
-          <div className="p-4 border-t shrink-0">
-             <Button 
-               variant="ghost" 
-               className="w-full h-12 rounded-xl text-destructive hover:bg-destructive/10 font-black uppercase tracking-widest text-[9px] gap-2"
-               onClick={() => signOut(auth)}
-             >
-                <LogOut className="w-4 h-4" /> Sair da Conta
-             </Button>
+            <div className="p-4 border-t shrink-0">
+               <Button 
+                 variant="ghost" 
+                 className="w-full h-12 rounded-xl text-destructive hover:bg-destructive/10 font-black uppercase tracking-widest text-[9px] gap-2"
+                 onClick={() => signOut(auth)}
+               >
+                  <LogOut className="w-4 h-4" /> Sair da Conta
+               </Button>
+            </div>
           </div>
         </SheetContent>
       </Sheet>
