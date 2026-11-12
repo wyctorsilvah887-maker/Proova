@@ -1,9 +1,11 @@
+
 'use server';
 
 import { headers } from 'next/headers';
 import { initializeFirebase } from '@/firebase';
 import { collection, query, getDocs, addDoc, serverTimestamp, doc, updateDoc, increment, getDoc, limit, where } from 'firebase/firestore';
 import { Resend } from 'resend';
+import { generateReplyAction } from '@/ai/flows/generate-reply-flow';
 
 /**
  * Verifica o limite de requisições.
@@ -54,24 +56,7 @@ async function sendCriticalFeedbackAlert(ownerEmail: string, feedbackData: any, 
 }
 
 /**
- * Notifica o dono sobre um depoimento aguardando curadoria.
- */
-async function sendCuratorshipAlert(ownerEmail: string, testimonialData: any, companyName: string) {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey || !ownerEmail) return;
-  try {
-    const resend = new Resend(apiKey);
-    await resend.emails.send({
-      from: 'Proova Curadoria <proova@proova.wsstudioscompany.com.br>',
-      to: [ownerEmail],
-      subject: `✨ Novo Elogio para Curadoria - ${companyName}`,
-      html: `<p>Um elogio qualificado está aguardando sua aprovação.</p><p>"${testimonialData.text}"</p>`,
-    });
-  } catch (err) { console.error(err); }
-}
-
-/**
- * Salva um depoimento.
+ * Salva um depoimento com resposta automática via IA.
  */
 export async function submitTestimonialAction(data: {
   targetUserId: string;
@@ -87,8 +72,26 @@ export async function submitTestimonialAction(data: {
     await checkRateLimit('submit_testimonial');
     const { firestore } = initializeFirebase();
     
-    // Agora todos os depoimentos (públicos e privados) são marcados como aprovados por padrão.
-    // Depoimentos públicos pulam a fila de curadoria conforme solicitação.
+    const userRef = doc(firestore, 'users', data.targetUserId);
+    const userSnap = await getDoc(userRef);
+    if (!userSnap.exists()) throw new Error("Empresa não localizada.");
+    
+    const userData = userSnap.data();
+    const status = userData.membershipStatus || 'base';
+    const isPremium = status === 'gold' || status === 'enterprise' || status === 'trial';
+
+    // Piloto Automático: Gerar resposta via Gemini
+    let aiReply = null;
+    if (isPremium && data.text.length > 5) {
+      const { reply } = await generateReplyAction({
+        testimonialText: data.text,
+        rating: data.rating,
+        companyName: userData.companyName,
+        businessType: userData.businessType
+      });
+      aiReply = reply;
+    }
+
     const initialStatus = 'approved';
 
     const testimonialData = {
@@ -99,33 +102,23 @@ export async function submitTestimonialAction(data: {
       videoUrl: data.videoUrl || null,
       photoUrl: data.photoUrl || null,
       status: initialStatus,
+      aiReply: aiReply,
       createdAt: serverTimestamp(),
     };
 
     const collectionName = data.destination === 'public' ? 'testimonials' : 'private_feedbacks';
     const feedbacksRef = collection(firestore, 'users', data.targetUserId, collectionName);
 
-    const userRef = doc(firestore, 'users', data.targetUserId);
     await updateDoc(userRef, { testimonialsCount: increment(1) });
     await addDoc(feedbacksRef, testimonialData);
 
-    const userSnap = await getDoc(userRef);
-    if (userSnap.exists()) {
-      const userData = userSnap.data();
-      const status = userData.membershipStatus || 'base';
-      const isPremium = status === 'gold' || status === 'enterprise' || status === 'trial';
-
-      // Alertas por e-mail são benefícios Premium
-      if (isPremium) {
-        if (data.destination === 'private' || data.rating <= 3) {
-          await sendCriticalFeedbackAlert(userData.email, testimonialData, userData.companyName);
-        } else if (data.destination === 'public' && data.rating >= 4 && data.text.length >= 20) {
-          // Mantemos o alerta de curadoria apenas como informativo de novo elogio, 
-          // já que ele agora entra aprovado.
-          await sendCuratorshipAlert(userData.email, testimonialData, userData.companyName);
-        }
+    // Alertas por e-mail (Premium)
+    if (isPremium) {
+      if (data.destination === 'private' || data.rating <= 3) {
+        await sendCriticalFeedbackAlert(userData.email, testimonialData, userData.companyName);
       }
     }
+    
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };

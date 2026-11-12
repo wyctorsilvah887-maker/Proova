@@ -1,9 +1,10 @@
+
 'use client';
 
 import { useState, useMemo, useEffect, use } from 'react';
 import { useFirestore } from '@/firebase';
 import { doc, onSnapshot, collection, query, where } from 'firebase/firestore';
-import { Star, CheckCircle2, Clock, Play, User } from 'lucide-react';
+import { Star, CheckCircle2, Clock, Play, User, Bot } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import {
@@ -101,69 +102,83 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
     const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent' && secondaryColor !== '';
     
     return (
-      <Card 
-        key={t.id}
-        className={cn(
-          "rounded-2xl p-4 sm:p-5 transition-all duration-700 w-full max-w-full bg-white dark:bg-black text-black dark:text-white border-none h-auto",
-          layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-4 duration-700" : "animate-in fade-in slide-in-from-right-4 duration-700"),
-          layout === 'popup' && !isAnimating && "animate-in fade-in zoom-in-90 duration-1000"
-        )}
-        style={{ 
-          boxShadow: hasSecondary 
-            ? `0 0 20px ${secondaryColor}50, 0 10px 30px -10px rgba(0,0,0,0.15)` 
-            : `0 10px 30px -10px ${themeColor}15`,
-        }}
-      >
-        <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: hasSecondary ? `${secondaryColor}40` : `${themeColor}40` }}>
-              <User className="w-4 h-4" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
+      <div className="flex flex-col gap-3 w-full">
+        <Card 
+          key={t.id}
+          className={cn(
+            "rounded-2xl p-4 sm:p-5 transition-all duration-700 w-full max-w-full bg-white dark:bg-black text-black dark:text-white border-none h-auto relative z-10",
+            layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-4 duration-700" : "animate-in fade-in slide-in-from-right-4 duration-700"),
+            layout === 'popup' && !isAnimating && "animate-in fade-in zoom-in-90 duration-1000"
+          )}
+          style={{ 
+            boxShadow: hasSecondary 
+              ? `0 0 20px ${secondaryColor}50, 0 10px 30px -10px rgba(0,0,0,0.15)` 
+              : `0 10px 30px -10px ${themeColor}15`,
+          }}
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" style={{ borderColor: hasSecondary ? `${secondaryColor}40` : `${themeColor}40` }}>
+                <User className="w-4 h-4" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-black text-[11px] sm:text-[12px] tracking-tight truncate uppercase leading-none">{t.userName}</p>
+                <div className="flex gap-0.5 mt-1">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star key={s} className={cn("w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current transition-all duration-700", s <= (t.rating || 5) ? "" : "opacity-10")} style={{ color: hasSecondary ? secondaryColor : themeColor }} />
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="min-w-0 flex-1">
-              <p className="font-black text-[11px] sm:text-[12px] tracking-tight truncate uppercase leading-none">{t.userName}</p>
-              <div className="flex gap-0.5 mt-1">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <Star key={s} className={cn("w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current transition-all duration-700", s <= (t.rating || 5) ? "" : "opacity-10")} style={{ color: hasSecondary ? secondaryColor : themeColor }} />
-                ))}
+
+            {t.videoUrl && (
+              <div className="relative aspect-video rounded-xl overflow-hidden bg-black shadow-2xl ring-1 ring-white/10 group">
+                 <video src={t.videoUrl} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" muted loop playsInline autoPlay />
+                 <div className="absolute bottom-2 left-2">
+                   <div className="bg-black/60 backdrop-blur-xl px-2 py-1 rounded-full border border-white/10 shadow-2xl">
+                     <p className="text-[7px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
+                       <Play className="w-2 h-2 fill-white" /> Vídeo Review
+                     </p>
+                   </div>
+                 </div>
+              </div>
+            )}
+
+            {t.text && t.text !== '(Depoimento em Vídeo)' && (
+              <div className="relative">
+                <p className="opacity-75 font-bold text-[11px] sm:text-[13px] leading-relaxed italic tracking-tight whitespace-pre-wrap">
+                  "{t.text}"
+                </p>
+              </div>
+            )}
+
+            <div className="pt-3 border-t border-muted/20 flex items-center justify-between opacity-50">
+              <div className="flex items-center gap-1">
+                 <Clock className="w-3 h-3 opacity-50" />
+                 <span className="text-[7px] font-black uppercase tracking-widest">
+                   {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Agora'}
+                 </span>
+              </div>
+              <div className="flex items-center gap-1">
+                 <CheckCircle2 className="w-3 h-3 text-green-500" />
+                 <span className="text-[7px] font-black uppercase tracking-widest">Verificado</span>
               </div>
             </div>
           </div>
-
-          {t.videoUrl && (
-            <div className="relative aspect-video rounded-xl overflow-hidden bg-black shadow-2xl ring-1 ring-white/10 group">
-               <video src={t.videoUrl} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105" muted loop playsInline autoPlay />
-               <div className="absolute bottom-2 left-2">
-                 <div className="bg-black/60 backdrop-blur-xl px-2 py-1 rounded-full border border-white/10 shadow-2xl">
-                   <p className="text-[7px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
-                     <Play className="w-2 h-2 fill-white" /> Vídeo Review
-                   </p>
-                 </div>
-               </div>
-            </div>
-          )}
-
-          {t.text && t.text !== '(Depoimento em Vídeo)' && (
-            <div className="relative">
-              <p className="opacity-75 font-bold text-[11px] sm:text-[13px] leading-relaxed italic tracking-tight whitespace-pre-wrap">
-                "{t.text}"
-              </p>
-            </div>
-          )}
-
-          <div className="pt-3 border-t border-muted/20 flex items-center justify-between opacity-50">
-            <div className="flex items-center gap-1">
-               <Clock className="w-3 h-3 opacity-50" />
-               <span className="text-[7px] font-black uppercase tracking-widest">
-                 {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Agora'}
-               </span>
-            </div>
-            <div className="flex items-center gap-1">
-               <CheckCircle2 className="w-3 h-3 text-green-500" />
-               <span className="text-[7px] font-black uppercase tracking-widest">Verificado</span>
+        </Card>
+        
+        {t.aiReply && (
+          <div className="pl-4 sm:pl-8 -mt-1 animate-in fade-in slide-in-from-top-1 duration-1000">
+            <div className="bg-muted/10 border-l-2 rounded-r-xl p-3 space-y-1" style={{ borderColor: themeColor }}>
+              <div className="flex items-center gap-1.5">
+                <Bot className="w-2.5 h-2.5 text-primary" />
+                <span className="text-[7px] font-black uppercase tracking-widest text-primary">Resposta</span>
+              </div>
+              <p className="text-[10px] font-medium leading-relaxed opacity-80">{t.aiReply}</p>
             </div>
           </div>
-        </div>
-      </Card>
+        )}
+      </div>
     );
   };
 
@@ -188,9 +203,9 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
             )}
 
             {layout === 'mural' && (
-              <div className="columns-1 sm:columns-2 gap-6 w-full space-y-6">
+              <div className="columns-1 sm:columns-2 gap-6 w-full space-y-12">
                 {visibleTestimonials.map((t, i) => (
-                  <div key={`${t.id}-${muralIndex}-${i}`} className="break-inside-avoid mb-6 flex justify-center">
+                  <div key={`${t.id}-${muralIndex}-${i}`} className="break-inside-avoid mb-12 flex justify-center">
                     <TestimonialCard t={t} index={i} />
                   </div>
                 ))}

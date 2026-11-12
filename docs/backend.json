@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "User": {
@@ -20,6 +21,22 @@
         "googleConnected": { "type": "boolean", "description": "Indica se o usuário autorizou o Proova a gerenciar seu GBP." },
         "lastGoogleSync": { "type": "string", "format": "date-time" },
         "fcmToken": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "Testimonial": {
+      "title": "Testimonial",
+      "description": "Depoimento de cliente coletado via Proova ou sincronizado do Google.",
+      "type": "object",
+      "properties": {
+        "userName": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "rating": { "type": "number" },
+        "text": { "type": "string" },
+        "videoUrl": { "type": "string" },
+        "photoUrl": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "archived"] },
+        "aiReply": { "type": "string", "description": "Resposta gerada automaticamente pelo Gemini." },
         "createdAt": { "type": "string", "format": "date-time" }
       }
     },
@@ -50,6 +67,9 @@
     },
     "/users/{userId}": {
       "schema": "User"
+    },
+    "/users/{userId}/testimonials/{testimonialId}": {
+      "schema": "Testimonial"
     }
   }
 }

@@ -1,3 +1,4 @@
+
 import { ai } from './genkit';
 
 /**
@@ -7,3 +8,4 @@ import { ai } from './genkit';
 
 // Registro dos fluxos
 import './flows/support-ai-flow';
+import './flows/generate-reply-flow';

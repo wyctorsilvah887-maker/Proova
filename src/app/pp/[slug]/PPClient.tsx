@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -12,7 +13,7 @@ import {
   onSnapshot
 } from 'firebase/firestore';
 import { Card } from '@/components/ui/card';
-import { Star, User, Loader2, Globe, ArrowLeft, CheckCircle2, Clock, Play, ArrowRight, MessageCircle } from 'lucide-react';
+import { Star, User, Loader2, Globe, ArrowLeft, CheckCircle2, Clock, Play, ArrowRight, MessageCircle, Bot } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -60,7 +61,6 @@ export default function PPClient({ slug }: { slug: string }) {
           setTargetUserId(uId);
           setCompanyName(snap1.docs[0].data().companyName);
 
-          // Rastreamento de Visita Única por Sessão
           const hasVisited = sessionStorage.getItem(`pp_visited_${uId}`);
           if (!hasVisited) {
             trackPPVisit(uId);
@@ -112,7 +112,6 @@ export default function PPClient({ slug }: { slug: string }) {
   const externalSiteButtonText = ppData?.externalSiteButtonText || 'Visitar Site Oficial';
   const customSections = ppData?.customSections || [];
 
-  // Helper robusto para detectar se a logo é vídeo
   const isVideoLogo = useMemo(() => {
     if (!logoUrl) return false;
     const url = logoUrl.toLowerCase();
@@ -158,69 +157,83 @@ export default function PPClient({ slug }: { slug: string }) {
     const side = (index + muralIndex) % 2 === 0 ? 'left' : 'right';
 
     return (
-      <Card 
-        key={`${t.id}-${muralIndex}`}
-        className={cn(
-          "rounded-[1.5rem] p-5 transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white mb-6 border-none",
-          layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-8 duration-700" : "animate-in fade-in slide-in-from-right-8 duration-700"),
-          layout === 'popup' && !isAnimating && "animate-in fade-in zoom-in-90 duration-1000"
-        )}
-        style={{ 
-          boxShadow: hasSecondary 
-            ? `0 0 35px ${secondaryColor}60, 0 15px 40px -10px rgba(0,0,0,0.2)` 
-            : `0 20px 40px -20px ${themeColor}25`,
-        }}
-      >
-        <div className="space-y-4">
-          <div className="flex items-center gap-4">
-            <div className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-transparent" style={{ borderColor: hasSecondary ? `${secondaryColor}40` : `${themeColor}40` }}>
-              <User className="w-4 h-4" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
+      <div className="flex flex-col gap-4 w-full">
+        <Card 
+          key={`${t.id}-${muralIndex}`}
+          className={cn(
+            "rounded-[1.5rem] p-5 transition-all duration-700 w-full bg-white dark:bg-black text-black dark:text-white border-none relative z-10",
+            layout === 'mural' && !isAnimating && (side === 'left' ? "animate-in fade-in slide-in-from-left-8 duration-700" : "animate-in fade-in slide-in-from-right-8 duration-700"),
+            layout === 'popup' && !isAnimating && "animate-in fade-in zoom-in-90 duration-1000"
+          )}
+          style={{ 
+            boxShadow: hasSecondary 
+              ? `0 0 35px ${secondaryColor}60, 0 15px 40px -10px rgba(0,0,0,0.2)` 
+              : `0 20px 40px -20px ${themeColor}25`,
+          }}
+        >
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-transparent" style={{ borderColor: hasSecondary ? `${secondaryColor}40` : `${themeColor}40` }}>
+                <User className="w-4 h-4" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-black text-xs tracking-tight truncate uppercase leading-none">{t.userName}</p>
+                <div className="flex gap-0.5 mt-1">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className={cn("w-3 w-3 fill-current transition-all", i < (t.rating || 5) ? "" : "opacity-10")} style={{ color: hasSecondary ? secondaryColor : themeColor }} />
+                  ))}
+                </div>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-black text-xs tracking-tight truncate uppercase leading-none">{t.userName}</p>
-              <div className="flex gap-0.5 mt-1">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className={cn("w-3 h-3 fill-current transition-all", i < (t.rating || 5) ? "" : "opacity-10")} style={{ color: hasSecondary ? secondaryColor : themeColor }} />
-                ))}
+
+            {t.videoUrl && (
+              <div className="relative aspect-video rounded-2xl overflow-hidden bg-black shadow-lg ring-1 ring-white/10">
+                 <video src={t.videoUrl} className="w-full h-full object-cover" muted loop playsInline autoPlay />
+                 <div className="absolute bottom-3 left-3">
+                   <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
+                     <p className="text-[8px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
+                       <Play className="w-2.5 h-2.5 fill-white" /> Vídeo
+                     </p>
+                   </div>
+                 </div>
+              </div>
+            )}
+
+            {t.text && t.text !== '(Depoimento em Vídeo)' && (
+              <div className="relative">
+                <p className="opacity-80 font-bold text-sm sm:text-base leading-relaxed italic tracking-tight relative z-10 px-1">
+                  "{t.text}"
+                </p>
+              </div>
+            )}
+
+            <div className="pt-4 border-t border-muted/10 flex items-center justify-between opacity-50">
+              <div className="flex items-center gap-1.5">
+                 <Clock className="w-3 w-3" />
+                 <span className="text-[8px] font-black uppercase tracking-widest">
+                   {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Agora'}
+                 </span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                 <CheckCircle2 className="w-3 w-3 text-green-500" />
+                 <span className="text-[8px] font-black uppercase tracking-widest">Verificado</span>
               </div>
             </div>
           </div>
+        </Card>
 
-          {t.videoUrl && (
-            <div className="relative aspect-video rounded-2xl overflow-hidden bg-black shadow-lg ring-1 ring-white/10">
-               <video src={t.videoUrl} className="w-full h-full object-cover" muted loop playsInline autoPlay />
-               <div className="absolute bottom-3 left-3">
-                 <div className="bg-black/60 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                   <p className="text-[8px] text-white font-black uppercase tracking-widest flex items-center gap-1.5">
-                     <Play className="w-2.5 h-2.5 fill-white" /> Vídeo
-                   </p>
-                 </div>
-               </div>
-            </div>
-          )}
-
-          {t.text && t.text !== '(Depoimento em Vídeo)' && (
-            <div className="relative">
-              <p className="opacity-80 font-bold text-sm sm:text-base leading-relaxed italic tracking-tight relative z-10 px-1">
-                "{t.text}"
-              </p>
-            </div>
-          )}
-
-          <div className="pt-4 border-t border-muted/10 flex items-center justify-between opacity-50">
-            <div className="flex items-center gap-1.5">
-               <Clock className="w-3 h-3" />
-               <span className="text-[8px] font-black uppercase tracking-widest">
-                 {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Agora'}
-               </span>
-            </div>
-            <div className="flex items-center gap-1.5">
-               <CheckCircle2 className="w-3 h-3 text-green-500" />
-               <span className="text-[8px] font-black uppercase tracking-widest">Verificado</span>
+        {t.aiReply && (
+          <div className="pl-6 sm:pl-10 -mt-2 animate-in fade-in slide-in-from-top-2 duration-1000">
+            <div className="bg-muted/30 border-l-4 rounded-r-2xl p-4 space-y-2 relative" style={{ borderColor: themeColor }}>
+              <div className="flex items-center gap-2">
+                <Bot className="w-3 h-3 text-primary" />
+                <span className="text-[9px] font-black uppercase tracking-widest text-primary">Resposta da Clínica</span>
+              </div>
+              <p className="text-xs font-medium leading-relaxed opacity-90">{t.aiReply}</p>
             </div>
           </div>
-        </div>
-      </Card>
+        )}
+      </div>
     );
   };
 
@@ -228,7 +241,7 @@ export default function PPClient({ slug }: { slug: string }) {
     if (targetUserId) {
       const hasClicked = sessionStorage.getItem(`pp_whatsapp_clicked_${targetUserId}`);
       if (!hasClicked) {
-        trackWhatsappClick(targetUserId);
+        trackWhatsappClick(uId);
         sessionStorage.setItem(`pp_whatsapp_clicked_${targetUserId}`, 'true');
       }
     }
@@ -246,7 +259,7 @@ export default function PPClient({ slug }: { slug: string }) {
             {user ? (
               <Link href="/dash">
                 <Button variant="ghost" size="sm" className="text-[9px] font-bold uppercase gap-2">
-                  <ArrowLeft className="w-3 h-3" /> Dashboard
+                  <ArrowLeft className="w-3 w-3" /> Dashboard
                 </Button>
               </Link>
             ) : (
