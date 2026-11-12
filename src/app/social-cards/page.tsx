@@ -32,13 +32,27 @@ import {
   Check,
   Palette,
   Sparkles,
-  X
+  X,
+  LayoutGrid as LayoutGridIcon,
+  BarChart3,
+  Settings,
+  ImageIcon,
+  Menu
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { 
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetTrigger, 
+  SheetDescription 
+} from '@/components/ui/sheet';
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUser, useFirestore, useCollection, useDoc, useAuth } from '@/firebase';
 import { doc, collection, query, where, orderBy } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
@@ -57,7 +71,7 @@ import {
 import { toPng } from 'html-to-image';
 import { toast as shadcnToast } from '@/hooks/use-toast';
 import { LoadingScreen } from '@/components/loading-screen';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollBar } from '@/components/ui/scroll-area';
 import { getAvailableTemplates, type TemplateMetadata } from '@/app/actions/template-actions';
 
 export default function SocialCardsPage() {
@@ -71,6 +85,7 @@ export default function SocialCardsPage() {
   const [selectedTestimonialForShare, setSelectedTestimonialForShare] = useState<any>(null);
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isExportingCard, setIsExportingCard] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   // Templates Dinâmicos
   const [availableTemplates, setAvailableTemplates] = useState<TemplateMetadata[]>([]);
@@ -79,6 +94,7 @@ export default function SocialCardsPage() {
   
   const shareCardRef = useRef<HTMLDivElement>(null);
   const dialogVideoRef = useRef<HTMLVideoElement>(null);
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData } = useDoc(userDocRef);
@@ -101,7 +117,7 @@ export default function SocialCardsPage() {
 
   const { data: rawTestimonials, loading: testimonialsLoading } = useCollection(testimonialsQuery);
 
-  // Carrega templates da pasta public/templates
+  // Carrega templates
   useEffect(() => {
     async function loadTemplates() {
       setIsLoadingTemplates(true);
@@ -233,35 +249,46 @@ export default function SocialCardsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
-      <header className="bg-background border-b h-16 md:h-24 flex items-center px-4 md:px-6 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
-        <div className="flex items-center gap-3 flex-1">
-          <Link href="/dash">
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-10 w-10 text-muted-foreground hover:text-primary transition-all border-none shadow-none bg-transparent hover:bg-transparent active:bg-transparent focus:bg-transparent focus-visible:ring-0 select-none"
-            >
-               <ArrowLeft className="w-5 h-5" />
-            </Button>
-          </Link>
-          <div className="flex items-center group -ml-2">
-            <div className="relative w-[160px] h-[55px] md:w-[320px] md:h-[105px]">
-              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
-              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
+    <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-hidden">
+      <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[120] shadow-sm backdrop-blur-md bg-background/95">
+        <div className="flex items-center gap-2 flex-1">
+          <button 
+            ref={toggleButtonRef}
+            type="button"
+            onPointerDown={(e) => {
+              e.preventDefault();
+              setIsMenuOpen(!isMenuOpen);
+            }}
+            className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none z-[150] relative"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-5">
+              <line x1="4" y1="7" x2="20" y2="7" className={cn("origin-center transition-all", isMenuOpen ? "translate-y-[5px] rotate-45" : "")} />
+              <line x1="4" y1="12" x2="20" y2="12" className={cn("origin-center transition-all", isMenuOpen ? "opacity-0" : "")} />
+              <line x1="4" y1="17" x2="20" y2="17" className={cn("origin-center transition-all", isMenuOpen ? "-translate-y-[5px] -rotate-45" : "")} />
+            </svg>
+          </button>
+          <Link href="/dash" className="flex items-center group -ml-2">
+            <div className="relative w-[140px] h-[46px] md:w-[280px] md:h-[90px]">
+              <Image src="/logo-proova-white-mode.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
+              <Image src="/logo-proova-landing-dark-mode.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
             </div>
-          </div>
+          </Link>
         </div>
 
-        <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none" />
+        <div className="ml-auto flex items-center gap-2 md:gap-4">
+          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none hover:bg-transparent focus:bg-transparent" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-3 gap-2 rounded-xl focus:ring-0 shadow-none hover:bg-transparent">
                 <div className="flex flex-col items-end">
                   <span className="text-[10px] md:text-sm font-black truncate max-w-[120px] transition-colors group-hover:text-primary uppercase tracking-tight">{userData?.companyName || 'Empresa'}</span>
                   <div className="flex flex-col items-end gap-0">
-                    <span className="text-[6px] md:text-[8px] uppercase tracking-widest font-black text-primary leading-tight">{membershipLabel}</span>
+                    <span className={cn(
+                      "text-[6px] md:text-[8px] uppercase tracking-widest font-black text-primary leading-tight",
+                      userData?.membershipStatus === 'enterprise' && "animate-pulse"
+                    )}>
+                      {membershipLabel}
+                    </span>
                     {isMapsLinkValid && <span className="text-[5px] md:text-[6px] font-black uppercase text-green-500 tracking-tighter leading-none animate-pulse">G-Boost Ativo</span>}
                   </div>
                 </div>
@@ -269,61 +296,175 @@ export default function SocialCardsPage() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
-              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5"><TrendingUp className="mr-2 h-4 w-4 text-primary" /><span>Dash</span></DropdownMenuItem>
-              {isAgency && (
-                <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5"><Layout className="mr-2 h-4 w-4 text-primary" /><span>Meus Murais</span></DropdownMenuItem>
-              )}
+              <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
+              <DropdownMenuSeparator className="mx-1" />
+              <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <LayoutGridIcon className="mr-2 h-4 w-4 text-primary" />
+                <span>Dashboard</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push('/settings')} className="rounded-xl cursor-pointer font-bold py-2.5">
+                <Settings className="mr-2 h-4 w-4 text-primary" />
+                <span>Configurações</span>
+              </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
+              <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive font-bold py-2.5 cursor-pointer">
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sair</span>
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </header>
 
-      <main className="flex-1 p-4 md:p-8 space-y-8 max-w-6xl mx-auto w-full pt-24 md:pt-32">
-        <header className="space-y-4">
-           <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter uppercase">Social Card Studio</h1>
-           <p className="text-muted-foreground text-sm md:text-lg font-medium leading-relaxed max-w-2xl">Transforme depoimentos de texto em artes de alta autoridade para o seu Instagram.</p>
-        </header>
-
-        <div className="relative group">
-          <Search className="absolute left-4 top-4 h-5 w-5 text-muted-foreground/30 group-focus-within:text-primary transition-colors" />
-          <Input 
-            placeholder="Pesquisar por nome do cliente ou trecho do relato..." 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="h-14 pl-12 rounded-2xl bg-background border-primary/10 focus:ring-primary/20 font-bold text-sm shadow-sm"
-          />
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {filteredTestimonials.length === 0 ? (
-            <div className="col-span-full py-32 text-center opacity-30 border-2 border-dashed rounded-[3rem] bg-muted/10">
-              <MessageSquare className="w-16 h-16 mx-auto mb-4" />
-              <p className="text-sm font-black uppercase tracking-widest">Nenhum depoimento qualificado</p>
+      <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen} modal={false}>
+        <SheetContent 
+          side="left" 
+          className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden z-[110]"
+          onPointerDownOutside={(e) => {
+            if (toggleButtonRef.current?.contains(e.target as Node)) {
+              e.preventDefault();
+            }
+          }}
+        >
+          <SheetHeader className="sr-only">
+            <SheetTitle>Menu de Navegação</SheetTitle>
+            <SheetDescription>Acesse as funcionalidades e configurações da sua conta Proova.</SheetDescription>
+          </SheetHeader>
+          
+          <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col pt-20">
+            <div className="p-6 border-b bg-muted/10 shrink-0">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
+                  <User className="w-6 h-6 text-primary" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-black uppercase tracking-tight truncate">{userData?.companyName}</p>
+                  <span className="text-[8px] font-black uppercase tracking-widest text-primary">{membershipLabel}</span>
+                </div>
+              </div>
             </div>
-          ) : (
-            filteredTestimonials.map((t: any) => (
-              <Card key={t.id} className="rounded-[2.5rem] border-none shadow-sm hover:shadow-2xl transition-all cursor-pointer group bg-card overflow-hidden active:scale-[0.98]" onClick={() => openShareDialog(t)}>
-                 <CardContent className="p-6 space-y-5">
-                    <div className="flex items-center justify-between">
-                       <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner"><User className="w-5 h-5" /></div>
-                          <p className="text-xs font-black uppercase tracking-tight truncate max-w-[120px]">{t.userName}</p>
-                       </div>
-                       <div className="flex gap-0.5">{[1,2,3,4,5].map(s => <Star key={s} className={cn("w-3.5 h-3.5", s <= t.rating ? "fill-yellow-400 text-yellow-400" : "text-muted/20")} />)}</div>
-                    </div>
-                    <div className="relative">
-                       <Quote className="absolute -top-2 -left-2 w-6 h-6 text-primary/10 rotate-180" />
-                       <p className="text-xs italic leading-relaxed text-muted-foreground line-clamp-3 font-medium px-2">"{t.text}"</p>
-                    </div>
-                    <Button className="w-full h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] gap-2 bg-foreground text-background group-hover:bg-primary group-hover:text-white transition-all shadow-lg">
-                       <Share2 className="w-4 h-4" /> Criar Card
-                    </Button>
-                 </CardContent>
-              </Card>
-            ))
-          )}
+
+            <ScrollArea className="flex-1">
+              <div className="px-4 py-6 space-y-8">
+                <div>
+                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Navegação Principal</p>
+                  <button 
+                    onClick={() => { router.push('/dash'); setIsMenuOpen(false); }}
+                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                  >
+                    <LayoutGridIcon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                    <span>Dashboard</span>
+                  </button>
+                </div>
+
+                <div>
+                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas Proova</p>
+                  {[
+                    { label: 'Social Cards', href: '/social-cards', icon: ImageIcon, active: true },
+                    { label: 'Moderação Inbox', href: '/private', icon: Inbox, badge: allApprovedTestimonials.filter(t => t.status === 'pending').length },
+                    { label: 'Métricas & ROI', href: '/metrics', icon: BarChart3 },
+                  ].map((item: any, idx) => (
+                    <button 
+                      key={idx}
+                      onClick={() => {
+                        router.push(item.href);
+                        setIsMenuOpen(false);
+                      }}
+                      className={cn(
+                        "w-full flex items-center justify-between p-3.5 rounded-xl transition-all group",
+                        item.active ? "bg-primary/10 text-primary" : "hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest"
+                      )}
+                    >
+                      <div className="flex items-center gap-4">
+                        <item.icon className={cn("w-4 h-4", item.active ? "text-primary" : "text-primary opacity-60 group-hover:opacity-100")} />
+                        <span className={cn(item.active ? "text-[10px] font-black uppercase tracking-widest" : "")}>{item.label}</span>
+                      </div>
+                      {item.badge > 0 && <Badge className="bg-destructive text-white h-4 px-1.5 text-[8px]">{item.badge}</Badge>}
+                    </button>
+                  ))}
+                </div>
+
+                <div>
+                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Suporte & Conta</p>
+                  {[
+                    { label: 'Suporte VIP', href: '/support', icon: Headphones },
+                    { label: 'Configurações', href: '/settings', icon: Settings },
+                  ].map((item: any, idx) => (
+                    <button 
+                      key={idx}
+                      onClick={() => {
+                        router.push(item.href);
+                        setIsMenuOpen(false);
+                      }}
+                      className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                    >
+                      <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                      <span>{item.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </ScrollArea>
+
+            <div className="p-4 border-t shrink-0">
+               <Button 
+                 variant="ghost" 
+                 className="w-full h-12 rounded-xl text-destructive hover:bg-destructive/10 font-black uppercase tracking-widest text-[9px] gap-2"
+                 onClick={() => signOut(auth)}
+               >
+                  <LogOut className="w-4 h-4" /> Sair da Conta
+               </Button>
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 pt-24 md:pt-32 pb-20">
+        <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-700">
+          <header className="space-y-4">
+             <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter uppercase">Social Card Studio</h1>
+             <p className="text-muted-foreground text-sm md:text-lg font-medium leading-relaxed max-w-2xl">Transforme depoimentos de texto em artes de alta autoridade para o seu Instagram.</p>
+          </header>
+
+          <div className="relative group">
+            <Search className="absolute left-4 top-4 h-5 w-5 text-muted-foreground/30 group-focus-within:text-primary transition-colors" />
+            <Input 
+              placeholder="Pesquisar por nome do cliente ou trecho do relato..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="h-14 pl-12 rounded-2xl bg-background border-primary/10 focus:ring-primary/20 font-bold text-sm shadow-sm"
+            />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {filteredTestimonials.length === 0 ? (
+              <div className="col-span-full py-32 text-center opacity-30 border-2 border-dashed rounded-[3rem] bg-muted/10">
+                <MessageSquare className="w-16 h-16 mx-auto mb-4" />
+                <p className="text-sm font-black uppercase tracking-widest">Nenhum depoimento qualificado</p>
+              </div>
+            ) : (
+              filteredTestimonials.map((t: any) => (
+                <Card key={t.id} className="rounded-[2.5rem] border-none shadow-sm hover:shadow-2xl transition-all cursor-pointer group bg-card overflow-hidden active:scale-[0.98]" onClick={() => openShareDialog(t)}>
+                   <CardContent className="p-6 space-y-5">
+                      <div className="flex items-center justify-between">
+                         <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-inner"><User className="w-5 h-5" /></div>
+                            <p className="text-xs font-black uppercase tracking-tight truncate max-w-[120px]">{t.userName}</p>
+                         </div>
+                         <div className="flex gap-0.5">{[1,2,3,4,5].map(s => <Star key={s} className={cn("w-3.5 h-3.5", s <= t.rating ? "fill-yellow-400 text-yellow-400" : "text-muted/20")} />)}</div>
+                      </div>
+                      <div className="relative">
+                         <Quote className="absolute -top-2 -left-2 w-6 h-6 text-primary/10 rotate-180" />
+                         <p className="text-xs italic leading-relaxed text-muted-foreground line-clamp-3 font-medium px-2">"{t.text}"</p>
+                      </div>
+                      <Button className="w-full h-12 rounded-2xl font-black uppercase tracking-widest text-[10px] gap-2 bg-foreground text-background group-hover:bg-primary group-hover:text-white transition-all shadow-lg">
+                         <Share2 className="w-4 h-4" /> Criar Card
+                      </Button>
+                   </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
         </div>
       </main>
 
