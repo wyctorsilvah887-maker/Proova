@@ -559,50 +559,6 @@ const PublicPageSettings = ({
                )}
              </TabsContent>
 
-             <TabsContent value="automacao" className="mt-0 space-y-8 outline-none">
-               {!isEnterprise ? (
-                 <div className="p-8 text-center bg-orange-500/5 rounded-[2.5rem] border-2 border-dashed border-orange-500/20 space-y-5">
-                   <div className="mx-auto w-14 h-14 bg-orange-500/10 rounded-[1.5rem] flex items-center justify-center text-orange-600 shadow-inner"><Zap className="w-7 h-7" /></div>
-                   <div className="space-y-2">
-                     <h4 className="text-sm font-black uppercase tracking-tight">Fluxos Hands-Free PRO</h4>
-                     <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">Publique elogios automaticamente baseados em suas regras estratégicas de nota e volume de texto.</p>
-                   </div>
-                   <Button onClick={() => router.push('/pricing')} className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] bg-orange-500 hover:bg-orange-600 shadow-lg text-white transition-all active:scale-95">Fazer Upgrade</Button>
-                 </div>
-               ) : (
-                 <div className="space-y-6">
-                    <section className="space-y-4">
-                       <div className="flex items-center justify-between p-5 rounded-[1.5rem] bg-muted/20 border border-muted shadow-sm">
-                          <div className="space-y-1">
-                             <p className="text-xs font-black uppercase tracking-tight">Auto-Publish Ativo</p>
-                             <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-tight">Postagem automática por critérios</p>
-                          </div>
-                          <Switch checked={autoPublishEnabled} onCheckedChange={setAutoPublishEnabled} />
-                       </div>
-
-                       {autoPublishEnabled && (
-                         <div className="space-y-8 p-5 rounded-[2rem] border-2 border-dashed border-primary/20 bg-primary/5 animate-in fade-in slide-in-from-top-3 duration-500">
-                            <div className="space-y-4">
-                               <div className="flex justify-between text-[10px] font-black uppercase tracking-widest opacity-70">
-                                  <span>Nota Mínima</span>
-                                  <span className="text-primary">{autoPublishMinRating} Estrelas</span>
-                               </div>
-                               <Slider value={[autoPublishMinRating]} min={1} max={5} step={1} onValueChange={(val) => setAutoPublishMinRating(val[0])} />
-                            </div>
-                            <div className="space-y-4">
-                               <div className="flex justify-between text-[10px] font-black uppercase tracking-widest opacity-70">
-                                  <span>Tamanho Mínimo</span>
-                                  <span className="text-primary">{autoPublishMinChars} Caracteres</span>
-                               </div>
-                               <Slider value={[autoPublishMinChars]} min={0} max={200} step={10} onValueChange={(val) => setAutoPublishMinChars(val[0])} />
-                            </div>
-                         </div>
-                       )}
-                    </section>
-                 </div>
-               )}
-             </TabsContent>
-
              <TabsContent value="design" className="mt-0 space-y-8 outline-none">
                 <section className="space-y-4">
                    <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Layout dos Depoimentos</Label>
@@ -956,9 +912,9 @@ export default function PPEditorPage() {
             </svg>
           </button>
           <Link href="/dash" className="flex items-center group -ml-2">
-            <div className="relative w-[140px] h-[46px] md:w-[280px] md:h-[90px]">
-              <Image src="/logo-proova-white-mode.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
-              <Image src="/logo-proova-landing-dark-mode.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
+            <div className="relative w-[140px] h-[46px] md:w-[280px] md:h-[93px]">
+              <Image src="/logo-proovaai-whitemode.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
+              <Image src="/logo-proovaai-darkmode.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </Link>
         </div>

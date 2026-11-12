@@ -155,9 +155,9 @@ export default function PricingPage() {
             </Button>
           </Link>
           <div className="flex items-center group -ml-2">
-            <div className="relative w-[140px] h-[46px] md:w-[320px] md:h-[105px]">
-              <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
-              <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
+            <div className="relative w-[140px] h-[46px] md:w-[320px] md:h-[106px]">
+              <Image src="/logo-proovaai-whitemode.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
+              <Image src="/logo-proovaai-darkmode.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </div>
         </div>
@@ -287,7 +287,7 @@ export default function PricingPage() {
                             )}>
                               <Check className="w-3 h-3 md:w-3.5 md:h-3.5" />
                             </div>
-                            <span className="text-xs md:text-sm font-bold leading-relaxed">{benefit}</span>
+                            <span className="text-xs md:sm font-bold leading-relaxed">{benefit}</span>
                           </div>
                         ))}
                       </div>
@@ -361,9 +361,9 @@ export default function PricingPage() {
       </main>
 
       <footer className="py-12 md:py-20 border-t bg-background/50 flex flex-col items-center gap-6 md:gap-8 text-center mt-auto">
-        <div className="relative w-[140px] h-[46px] md:w-[180px] md:h-[60px]">
-          <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="dark:hidden object-contain opacity-30 grayscale" priority unoptimized />
-          <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="hidden dark:block opacity-30 grayscale" priority unoptimized />
+        <div className="relative w-[140px] h-[46px] md:w-[220px] h-[73px]">
+          <Image src="/logo-proovaai-whitemode.png" alt="Logo Footer" fill className="dark:hidden object-contain opacity-30 grayscale" priority />
+          <Image src="/logo-proovaai-darkmode.png" alt="Logo Footer" fill className="hidden dark:block object-contain opacity-30 grayscale" priority />
         </div>
         <div className="space-y-1">
           <p className="text-[8px] md:text-[9px] text-muted-foreground font-black uppercase tracking-[0.3em] px-4">© 2026 PROOVA TECHNOLOGY - ESTRATÉGIA EM REPUTAÇÃO</p>

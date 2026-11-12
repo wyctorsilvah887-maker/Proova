@@ -348,9 +348,9 @@ export default function DashPage() {
             </svg>
           </button>
           <Link href="/dash" className="flex items-center group -ml-2" onClick={clearHash}>
-            <div className="relative w-[180px] h-[58px] md:w-[280px] md:h-[90px] transition-transform group-hover:scale-105">
-              <Image src="/logo-proova-white-mode.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
-              <Image src="/logo-proova-landing-dark-mode.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
+            <div className="relative w-[180px] h-[60px] md:w-[280px] md:h-[93px] transition-transform group-hover:scale-105">
+              <Image src="/logo-proovaai-whitemode.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
+              <Image src="/logo-proovaai-darkmode.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </Link>
         </div>
@@ -666,8 +666,11 @@ export default function DashPage() {
         )}
       </main>
 
-      <footer className="py-12 border-t mt-auto text-center opacity-40 grayscale flex flex-col items-center gap-4">
-        <div className="relative w-[180px] h-[60px]"><Image src="/logo-proova-white-mode.png" alt="Footer Logo" fill className="object-contain dark:hidden" /><Image src="/logo-proova-landing-dark-mode.png" alt="Footer Logo" fill className="object-contain hidden dark:block" /></div>
+      <footer className="py-12 border-t mt-auto text-center opacity-40 flex flex-col items-center gap-4">
+        <div className="relative w-[180px] h-[60px]">
+          <Image src="/logo-proovaai-whitemode.png" alt="Footer Logo" fill className="object-contain dark:hidden" />
+          <Image src="/logo-proovaai-darkmode.png" alt="Footer Logo" fill className="object-contain hidden dark:block" />
+        </div>
         <p className="text-[8px] font-black uppercase tracking-[0.3em]">© 2026 Proova Technology • Inteligência Estratégica</p>
       </footer>
     </div>

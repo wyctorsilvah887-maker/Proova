@@ -55,22 +55,20 @@ export default function ManualPage() {
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center">
           <Link href="/dash" className="flex items-center group -ml-2 md:-ml-4">
-            <div className="relative w-[180px] h-[60px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
+            <div className="relative w-[180px] h-[60px] md:w-[320px] md:h-[106px] transition-transform group-hover:scale-105">
               <Image 
-                src="/logo-proova-white-mode.gif" 
+                src="/logo-proovaai-whitemode.png" 
                 alt="Logo Proova" 
                 fill 
                 className="object-contain object-left dark:hidden" 
                 priority 
-                unoptimized
               />
               <Image 
-                src="/logo-proova-dark-mode.gif" 
+                src="/logo-proovaai-darkmode.png" 
                 alt="Logo Proova" 
                 fill 
                 className="object-contain object-left hidden dark:block" 
                 priority 
-                unoptimized
               />
             </div>
           </Link>
@@ -240,20 +238,18 @@ export default function ManualPage() {
       </main>
 
       <footer className="py-20 border-t mt-auto flex flex-col items-center gap-10 bg-background/50 text-center">
-        <div className="flex items-center gap-2 relative w-[220px] h-[75px] md:w-[340px] md:h-[105px]">
+        <div className="flex items-center gap-2 relative w-[220px] h-[73px] md:w-[340px] md:h-[113px]">
           <Image 
-            src="/logo-proova-white-mode.gif" 
+            src="/logo-proovaai-whitemode.png" 
             alt="Logo Footer" 
             fill 
             className="object-contain dark:hidden opacity-30 grayscale" 
-            unoptimized
           />
           <Image 
-            src="/logo-proova-dark-mode.gif" 
+            src="/logo-proovaai-darkmode.png" 
             alt="Logo Footer" 
             fill 
             className="object-contain hidden dark:block opacity-30 grayscale" 
-            unoptimized
           />
         </div>
         <div className="space-y-2">

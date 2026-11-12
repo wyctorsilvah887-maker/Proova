@@ -322,9 +322,9 @@ export default function SettingsPage() {
             </svg>
           </button>
           <Link href="/dash" className="flex items-center group -ml-2">
-            <div className="relative w-[140px] h-[46px] md:w-[280px] md:h-[90px]">
-              <Image src="/logo-proova-white-mode.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
-              <Image src="/logo-proova-landing-dark-mode.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
+            <div className="relative w-[140px] h-[46px] md:w-[280px] md:h-[93px]">
+              <Image src="/logo-proovaai-whitemode.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
+              <Image src="/logo-proovaai-darkmode.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </Link>
         </div>
@@ -755,7 +755,14 @@ export default function SettingsPage() {
            </TabsContent>
         </Tabs>
       </main>
+
+      <footer className="py-12 border-t mt-auto text-center flex flex-col items-center gap-6">
+        <div className="relative w-[180px] h-[60px] opacity-30 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+          <Image src="/logo-proovaai-whitemode.png" alt="Logo Gray" fill className="object-contain dark:hidden" />
+          <Image src="/logo-proovaai-darkmode.png" alt="Logo Gray" fill className="object-contain hidden dark:block" />
+        </div>
+        <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-50">© 2026 Proova - Gestão Estratégica</p>
+      </footer>
     </div>
   );
 }
-

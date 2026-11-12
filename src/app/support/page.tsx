@@ -317,9 +317,9 @@ export default function SupportPage() {
             </svg>
           </button>
           <Link href="/dash" className="flex items-center group -ml-2">
-            <div className="relative w-[140px] h-[46px] md:w-[280px] md:h-[90px]">
-              <Image src="/logo-proova-white-mode.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
-              <Image src="/logo-proova-landing-dark-mode.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
+            <div className="relative w-[140px] h-[46px] md:w-[280px] md:h-[93px]">
+              <Image src="/logo-proovaai-whitemode.png" alt="Logo" fill className="object-contain object-left dark:hidden" priority />
+              <Image src="/logo-proovaai-darkmode.png" alt="Logo" fill className="object-contain object-left hidden dark:block" priority />
             </div>
           </Link>
         </div>

@@ -123,6 +123,10 @@ export default function LoginPage() {
 
       <div className="w-full max-w-md space-y-6 md:space-y-8 animate-in fade-in zoom-in duration-700 mt-8 md:mt-0">
         <div className="text-center space-y-2">
+          <div className="relative w-[180px] h-[60px] mx-auto mb-4">
+             <Image src="/logo-proovaai-whitemode.png" alt="Logo" fill className="object-contain dark:hidden" />
+             <Image src="/logo-proovaai-darkmode.png" alt="Logo" fill className="object-contain hidden dark:block" />
+          </div>
           <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">Login</h1>
           <p className="text-muted-foreground text-xs md:text-sm font-medium tracking-tight">Acesse sua máquina de prova social inteligente.</p>
         </div>

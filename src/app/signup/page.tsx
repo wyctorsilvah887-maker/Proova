@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
+import Image from "next/image";
 import { doc, setDoc, serverTimestamp, getDoc, writeBatch } from "firebase/firestore";
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useFirestore, useAuth, useUser } from "@/firebase";
@@ -181,6 +182,10 @@ export default function SignupPage() {
 
       <div className="w-full max-w-xl space-y-6 md:space-y-8 mt-8 md:mt-0 animate-in fade-in duration-700">
         <div className="flex flex-col items-center text-center space-y-2">
+          <div className="relative w-[180px] h-[60px] mx-auto mb-2">
+             <Image src="/logo-proovaai-whitemode.png" alt="Logo" fill className="object-contain dark:hidden" />
+             <Image src="/logo-proovaai-darkmode.png" alt="Logo" fill className="object-contain hidden dark:block" />
+          </div>
           <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">Criar Conta</h1>
           <p className="text-muted-foreground text-xs md:text-sm font-medium tracking-tight">
             {step === 0 && "Comece definindo sua atuação no mercado."}
