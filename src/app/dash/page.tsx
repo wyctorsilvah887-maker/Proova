@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -150,7 +151,6 @@ export default function DashPage() {
   const [configMode, setConfigMode] = useState<'location' | 'maps' | 'business'>('location');
   
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuButtonRef = useRef<HTMLButtonElement>(null);
   
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
@@ -184,6 +184,31 @@ export default function DashPage() {
 
   const { data: activeTickets } = useCollection(supportTicketQuery);
   const activeTicket = activeTickets?.[0] as any;
+
+  // Deep Linking para Modais via URL Hash
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash;
+      if (hash === '#link-coleta') setIsCollectLinkChoiceOpen(true);
+      if (hash === '#bio') setIsPublicPageChoiceOpen(true);
+      if (hash === '#qr') setIsQrDialogOpenManual(true);
+      if (hash === '#google-maps') { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }
+      if (hash === '#localizacao') { setConfigMode('location'); setIsGoogleMapsDialogOpen(true); }
+      if (hash === '#identidade') { setConfigMode('business'); setIsGoogleMapsDialogOpen(true); }
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    handleHashChange(); // Check on mount
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  // Helper para limpar hash ao fechar modais
+  const handleModalClose = (setOpenFn: (val: boolean) => void) => {
+    setOpenFn(false);
+    if (window.location.hash) {
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  };
 
   const isPremiumUser = useMemo(() => {
     const status = userData?.membershipStatus;
@@ -297,8 +322,7 @@ export default function DashPage() {
       completed: !!userData?.city, 
       unlocked: true, 
       action: () => {
-        setConfigMode('location');
-        setIsGoogleMapsDialogOpen(true);
+        window.location.hash = 'localizacao';
       } 
     });
 
@@ -310,8 +334,7 @@ export default function DashPage() {
         completed: !!userData?.googleMapsUrl, 
         unlocked: prev.completed, 
         action: () => {
-          setConfigMode('maps');
-          setIsGoogleMapsDialogOpen(true);
+          window.location.hash = 'google-maps';
         } 
       });
     }
@@ -322,7 +345,7 @@ export default function DashPage() {
       label: 'Coleta Ativa', 
       completed: (userData?.testimonialsCount || 0) > 0, 
       unlocked: prevStep.completed, 
-      action: () => setIsCollectLinkChoiceOpen(true) 
+      action: () => window.location.hash = 'link-coleta'
     });
 
     if (isAgency) {
@@ -405,9 +428,9 @@ export default function DashPage() {
         const isReviewLink = mapsUrl.includes('review') || mapsUrl.includes('writereview');
         
         if (!userData.googleMapsUrl) {
-          results.push({ id: 'maps-unlinked', label: 'Google Maps Desconectado', status: 'critical', description: 'Sua empresa não está recebendo redirecionamentos.', actionLabel: 'Vincular Agora', action: () => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }, icon: MapPin });
+          results.push({ id: 'maps-unlinked', label: 'Google Maps Desconectado', status: 'critical', description: 'Sua empresa não está recebendo redirecionamentos.', actionLabel: 'Vincular Agora', action: () => window.location.hash = 'google-maps', icon: MapPin });
         } else if (!isReviewLink) {
-          results.push({ id: 'maps-invalid', label: 'Link de Avaliação Indireto', status: 'attention', description: 'Seu link atual não abre direto na caixa de texto do Google.', actionLabel: 'Corrigir Link', action: () => { setConfigMode('maps'); setIsGoogleMapsDialogOpen(true); }, icon: ShieldAlert });
+          results.push({ id: 'maps-invalid', label: 'Link de Avaliação Indireto', status: 'attention', description: 'Seu link atual não abre direto na caixa de texto do Google.', actionLabel: 'Corrigir Link', action: () => window.location.hash = 'google-maps', icon: ShieldAlert });
         }
 
         if (userData.googlePlaceId && isEnterpriseUser) {
@@ -470,7 +493,7 @@ export default function DashPage() {
         state: userData?.state || ''
       });
       shadcnToast({ title: "Empresa Vinculada!", description: "Seu G-Boost está ativo." });
-      setIsGoogleMapsDialogOpen(false);
+      handleModalClose(setIsGoogleMapsDialogOpen);
       setSearchResults([]);
     } catch (err) {
       shadcnToast({ variant: "destructive", title: "Erro ao salvar" });
@@ -482,7 +505,7 @@ export default function DashPage() {
     try {
       await updateDoc(doc(db, 'users', user.uid), { city, state });
       shadcnToast({ title: "Localização Salva" });
-      setIsGoogleMapsDialogOpen(false); 
+      handleModalClose(setIsGoogleMapsDialogOpen); 
       setSearchQuery('');
     } catch (err) {
       shadcnToast({ variant: "destructive", title: "Erro ao salvar local" });
@@ -497,7 +520,7 @@ export default function DashPage() {
         companySlug: companySlugEdit.trim().toLowerCase().replace(/\s+/g, '-') 
       });
       shadcnToast({ title: "Identidade Atualizada", description: "Seu link de coleta foi modificado." });
-      setIsGoogleMapsDialogOpen(false);
+      handleModalClose(setIsGoogleMapsDialogOpen);
     } catch (err) {
       shadcnToast({ variant: "destructive", title: "Erro ao salvar identidade" });
     }
@@ -624,10 +647,10 @@ export default function DashPage() {
     setSelectedTemplateId(tpl.id);
   };
 
-  const toggleMenu = (e: React.MouseEvent | React.PointerEvent) => {
+  const toggleMenu = (e: React.PointerEvent | React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsMenuOpen(!isMenuOpen);
+    setIsMenuOpen((prev) => !prev);
   };
 
   if (authLoading || userDataLoading || (user && !userData)) {
@@ -660,10 +683,9 @@ export default function DashPage() {
       <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[110] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2">
           <button 
-            ref={menuButtonRef}
             type="button"
             onPointerDown={toggleMenu}
-            className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none focus:ring-0 z-[150] pointer-events-auto"
+            className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none focus:ring-0 z-[150] pointer-events-auto relative"
             aria-label={isMenuOpen ? "Fechar Menu" : "Abrir Menu"}
             aria-expanded={isMenuOpen}
           >
@@ -749,16 +771,20 @@ export default function DashPage() {
               <div className="mb-4">
                 <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas de Autoridade</p>
                 {[
-                  { label: 'Link de Coleta', icon: Link2, action: () => setIsCollectLinkChoiceOpen(true), disabled: !isGoogleDone },
-                  { label: 'Página Pública (Bio)', icon: Globe, action: () => setIsPublicPageChoiceOpen(true) },
+                  { label: 'Link de Coleta', icon: Link2, hash: '#link-coleta', disabled: !isGoogleDone },
+                  { label: 'Página Pública (Bio)', icon: Globe, hash: '#bio' },
                   { label: 'Social Cards (Stories)', icon: Share2, action: () => router.push('/social-cards') },
-                  { label: 'QR Balcão', icon: QrCode, action: () => setIsQrDialogOpenManual(true), disabled: !isGoogleDone },
+                  { label: 'QR Balcão', icon: QrCode, hash: '#qr', disabled: !isGoogleDone },
                 ].map((item, idx) => (
                   <button 
                     key={idx}
                     disabled={item.disabled}
                     onClick={() => {
-                      item.action();
+                      if (item.hash) {
+                        window.location.hash = item.hash;
+                      } else if (item.action) {
+                        item.action();
+                      }
                       setIsMenuOpen(false);
                     }}
                     className={cn(
@@ -992,7 +1018,7 @@ export default function DashPage() {
         </div>
       </main>
 
-      <Dialog open={isCollectLinkChoiceOpen} onOpenChange={setIsCollectLinkChoiceOpen}>
+      <Dialog open={isCollectLinkChoiceOpen} onOpenChange={(val) => handleModalClose(setIsCollectLinkChoiceOpen)}>
         <DialogContent className="rounded-[2.5rem] w-[95vw] max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[90vh] flex flex-col">
           <DialogHeader className="p-8 pb-4 text-center shrink-0">
             <DialogTitle className="text-xl md:text-2xl font-black font-headline tracking-tight uppercase">Link de Coleta</DialogTitle>
@@ -1004,7 +1030,7 @@ export default function DashPage() {
                 className="w-full h-24 md:h-20 rounded-2xl flex flex-col items-center justify-center gap-1 bg-primary hover:bg-primary/90 shadow-xl transition-all active:scale-95 group"
                 onClick={() => {
                   copyToClipboard(collectionLink, "Link de coleta");
-                  setIsCollectLinkChoiceOpen(false);
+                  handleModalClose(setIsCollectLinkChoiceOpen);
                 }}
               >
                 <div className="flex items-center gap-2">
@@ -1025,7 +1051,7 @@ export default function DashPage() {
                     return;
                   }
                   router.push('/settings');
-                  setIsCollectLinkChoiceOpen(false);
+                  handleModalClose(setIsCollectLinkChoiceOpen);
                 }}
               >
                 <div className="flex items-center gap-2">
@@ -1048,7 +1074,7 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isPublicPageChoiceOpen} onOpenChange={setIsPublicPageChoiceOpen}>
+      <Dialog open={isPublicPageChoiceOpen} onOpenChange={(val) => handleModalClose(setIsPublicPageChoiceOpen)}>
         <DialogContent className="rounded-[2.5rem] w-[95vw] max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[90vh] flex flex-col">
           <DialogHeader className="p-8 pb-4 text-center shrink-0">
             <DialogTitle className="text-xl md:text-2xl font-black font-headline tracking-tight uppercase">Link in Bio</DialogTitle>
@@ -1061,7 +1087,7 @@ export default function DashPage() {
                 onClick={() => {
                   const slug = userData?.companySlug || userData?.companyName?.toLowerCase().replace(/\s+/g, '-') || '';
                   router.push(`/pp/${slug}`); 
-                  setIsPublicPageChoiceOpen(false);
+                  handleModalClose(setIsPublicPageChoiceOpen);
                 }}
               >
                 <div className="flex items-center gap-2">
@@ -1075,7 +1101,7 @@ export default function DashPage() {
                 className="w-full h-24 md:h-20 rounded-2xl flex flex-col items-center justify-center gap-1 border-primary/20 text-primary hover:bg-primary/5 transition-all active:scale-95 group"
                 onClick={() => {
                   router.push('/ppeditor');
-                  setIsPublicPageChoiceOpen(false);
+                  handleModalClose(setIsPublicPageChoiceOpen);
                 }}
               >
                 <div className="flex items-center gap-2">
@@ -1106,110 +1132,7 @@ export default function DashPage() {
         </DialogContent>
       </Dialog>
       
-      <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
-        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[92vh] flex flex-col">
-          <DialogHeader className="p-4 sm:p-8 pb-2 text-center shrink-0">
-            <div className="flex items-center justify-center gap-2 mb-1">
-               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-               <DialogTitle className="text-lg sm:text-xl font-black font-headline uppercase tracking-tight">Social Design Studio</DialogTitle>
-            </div>
-            <DialogDescription className="text-[10px] sm:text-xs font-medium">Selecione um template e gere sua arte para post.</DialogDescription>
-          </DialogHeader>
-          <div className="flex-1 overflow-y-auto px-3 sm:px-6 pb-6 flex flex-col items-center gap-4 sm:gap-6 scrollbar-hide">
-            <div className="w-full shrink-0">
-              <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-2 sm:mb-3 ml-1">Templates Disponíveis:</p>
-              {isLoadingTemplates ? (
-                <div className="flex justify-center py-4"><Loader2 className="animate-spin h-5 w-5 text-primary" /></div>
-              ) : (
-                <ScrollArea className="w-full whitespace-nowrap rounded-xl border p-2 bg-muted/20">
-                  <div className="flex w-max space-x-3 p-1">
-                    {availableTemplates.map((tpl) => {
-                      const iVip = tpl.id.toLowerCase().includes('vip');
-                      const isLocked = iVip && !isPremiumUser;
-                      return (
-                        <button
-                          key={tpl.id}
-                          onClick={() => handleTemplateClick(tpl)}
-                          className={cn(
-                            "relative flex flex-col items-center gap-2 p-2 rounded-xl transition-all border-2",
-                            selectedTemplateId === tpl.id ? "border-primary bg-primary/5 shadow-md" : "border-transparent hover:border-primary/20",
-                            isLocked && "grayscale opacity-80"
-                          )}
-                        >
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg shadow-inner overflow-hidden relative bg-black">
-                            <Image src={tpl.imageUrl} alt={tpl.name} fill className="object-cover" />
-                            {isLocked && <div className="absolute inset-0 bg-black/40 flex items-center justify-center"><Lock className="w-4 h-4 text-white" /></div>}
-                          </div>
-                          <div className="flex flex-col items-center">
-                            <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-tighter">{tpl.name}</span>
-                            {iVip && <Badge className="h-3 text-[5px] font-black uppercase bg-primary/20 text-primary border-none px-1">VIP</Badge>}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <ScrollBar orientation="horizontal" />
-                </ScrollArea>
-              )}
-            </div>
-
-            <div className="w-full flex justify-center py-1 shrink-0">
-              <div 
-                ref={shareCardRef}
-                className={cn(
-                  "relative overflow-hidden shadow-2xl transition-all duration-700",
-                  "w-[min(92vw,400px)] aspect-square rounded-[2rem] sm:rounded-[2.5rem] flex flex-col items-center"
-                )}
-                style={{ backgroundColor: activeTemplate?.style.background || '#000000' }}
-              >
-                   {activeTemplate?.imageUrl && <div className="absolute inset-0 z-0"><Image src={activeTemplate.imageUrl} alt="Bg" fill className="object-cover" priority /></div>}
-                   <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-6 sm:p-12">
-                      <div className="text-center space-y-1 mt-2 sm:mt-4">
-                        <p className={cn("text-[9px] sm:text-[11px] font-black uppercase tracking-[0.2em]", activeTemplate?.style.color === '#ffffff' ? "text-white/80" : "text-black/80")}>RELATO DE CLIENTE</p>
-                      </div>
-                      <div className="flex-1 flex flex-col justify-center items-center w-full py-2 text-center">
-                        <div className="flex justify-center gap-1 mb-3 sm:mb-4">
-                            {[1,2,3,4,5].map((_, i) => <Star key={i} className="w-4 h-4 sm:w-7 sm:h-7 fill-[#fbbf24] text-[#fbbf24] drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" />)}
-                        </div>
-                        <div className="relative w-full max-w-[90%] sm:max-w-[85%]">
-                          <Quote className={cn("absolute -top-2 -left-2 sm:-top-3 sm:-left-3 w-4 h-4 sm:w-5 sm:h-5 opacity-20 rotate-180", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")} />
-                          <div className={cn("p-4 sm:p-7 rounded-[1.5rem] sm:rounded-[1.8rem] shadow-2xl ring-1", activeTemplate?.style.color === '#ffffff' ? "bg-white/5 backdrop-blur-xl border-white/10 ring-white/5" : "bg-black/5 backdrop-blur-md border-black/5 ring-black/5")}>
-                            <p className={cn("font-black font-headline leading-tight italic tracking-tight", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black", (selectedTestimonialForShare?.text?.length || 0) > 180 ? "text-[9px] sm:text-xs" : (selectedTestimonialForShare?.text?.length || 0) > 120 ? "text-[10px] sm:text-sm" : (selectedTestimonialForShare?.text?.length || 0) > 80 ? "text-xs sm:text-base" : "text-base sm:text-xl")}>"{selectedTestimonialForShare?.text}"</p>
-                          </div>
-                          <Quote className={cn("absolute -bottom-2 -right-2 sm:-bottom-3 sm:-right-3 w-4 h-4 sm:w-5 sm:h-5 opacity-20", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")} />
-                        </div>
-                      </div>
-                      <div className={cn("w-full pt-3 sm:pt-4 mb-2 sm:mb-4", activeTemplate?.style.color === '#ffffff' ? "border-t border-white/10" : "border-t border-black/10")}>
-                          <div className="flex flex-col items-center gap-1.5 sm:gap-2">
-                            <p className={cn("font-black text-[9px] sm:text-xs uppercase tracking-[0.3em]", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>{selectedTestimonialForShare?.userName}</p>
-                            <div className={cn("px-3 sm:px-4 py-0.5 sm:py-1 rounded-full border inline-flex items-center gap-1 sm:gap-1.5 backdrop-blur-md shadow-sm", activeTemplate?.style.color === '#ffffff' ? "bg-primary/20 border-primary/30" : "bg-primary/10 border-primary/20")}>
-                                <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-primary fill-primary/5" />
-                                <p className={cn("text-[5px] sm:text-[7px] font-black uppercase tracking-[0.15em]", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>coletado via Proova</p>
-                            </div>
-                          </div>
-                      </div>
-                   </div>
-              </div>
-            </div>
-
-            <Button 
-              className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-[10px] sm:text-xs bg-primary hover:bg-primary/90 text-white"
-              onClick={handleDownloadContent}
-              disabled={isExportingCard}
-            >
-              {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-4 h-4 sm:w-5 sm:h-5" />}
-              {selectedTestimonialForShare?.videoUrl ? 'Baixar Vídeo Review' : 'Gerar Arte PNG'}
-            </Button>
-          </div>
-          <DialogFooter className="p-4 sm:p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
-            <p className="text-[8px] sm:text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
-              <Zap className="w-3 h-3 text-primary" /> Dica: Poste este card no seu Story para aumentar seu alcance.
-            </p>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-      
-      <Dialog open={isGoogleMapsDialogOpen} onOpenChange={setIsGoogleMapsDialogOpen}>
+      <Dialog open={isGoogleMapsDialogOpen} onOpenChange={(val) => handleModalClose(setIsGoogleMapsDialogOpen)}>
         <DialogContent className="rounded-[2.5rem] w-[95vw] sm:max-w-md border-none shadow-2xl overflow-hidden p-0 flex flex-col max-h-[90vh]">
           <DialogHeader className="p-6 pb-2 pt-10 shrink-0 bg-background">
             <DialogTitle className="text-xl md:text-2xl font-black font-headline flex items-center gap-2">
@@ -1279,11 +1202,11 @@ export default function DashPage() {
               </section>
             )}
           </div>
-          <div className="p-6 bg-background border-t shrink-0"><Button variant="ghost" className="w-full text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => setIsGoogleMapsDialogOpen(false)}>Fechar Configurações</Button></div>
+          <div className="p-6 bg-background border-t shrink-0"><Button variant="ghost" className="w-full text-[10px] font-black uppercase tracking-widest text-muted-foreground" onClick={() => handleModalClose(setIsGoogleMapsDialogOpen)}>Fechar Configurações</Button></div>
         </DialogContent>
       </Dialog>
       
-      <Dialog open={isQrDialogOpenManual} onOpenChange={setIsQrDialogOpenManual}>
+      <Dialog open={isQrDialogOpenManual} onOpenChange={(val) => handleModalClose(setIsQrDialogOpenManual)}>
         <DialogContent className="rounded-[2.5rem] w-[95vw] sm:max-w-[420px] border-none shadow-2xl p-0 overflow-hidden bg-background flex flex-col max-h-[90vh]">
           <div className="h-2 bg-primary w-full shrink-0" />
           <div className="flex-1 overflow-y-auto scrollbar-hide">
