@@ -148,6 +148,7 @@ export default function DashPage() {
   const [isPublicPageChoiceOpen, setIsPublicPageChoiceOpen] = useState(false);
   const [isCollectLinkChoiceOpen, setIsCollectLinkChoiceOpen] = useState(false);
   const [configMode, setConfigMode] = useState<'location' | 'maps' | 'business'>('location');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
@@ -653,14 +654,22 @@ export default function DashPage() {
         </div>
       )}
 
-      <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
+      <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[110] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2">
           {/* Hamburger Menu on the extreme left */}
-          <Sheet>
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all active:scale-95">
-                <Menu className="w-6 h-6" />
-              </Button>
+              <button 
+                type="button"
+                className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none"
+                aria-label={isMenuOpen ? "Fechar Menu" : "Abrir Menu"}
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" className="size-5" aria-hidden="true">
+                  <line x1="4" y1="7" x2="20" y2="7" style={{ transitionDuration: '300ms' }} className={cn("origin-center transition-all", isMenuOpen ? "translate-y-[5px] rotate-45" : "")} />
+                  <line x1="4" y1="12" x2="20" y2="12" style={{ transitionDuration: '300ms' }} className={cn("origin-center transition-all", isMenuOpen ? "opacity-0" : "")} />
+                  <line x1="4" y1="17" x2="20" y2="17" style={{ transitionDuration: '300ms' }} className={cn("origin-center transition-all", isMenuOpen ? "-translate-y-[5px] -rotate-45" : "")} />
+                </svg>
+              </button>
             </SheetTrigger>
             <SheetContent side="left" className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden">
                <SheetHeader className="sr-only">
@@ -668,7 +677,7 @@ export default function DashPage() {
                  <SheetDescription>Acesse as ferramentas e configurações da sua clínica.</SheetDescription>
                </SheetHeader>
                
-               <div className="p-6 border-b bg-muted/10 shrink-0">
+               <div className="p-6 border-b bg-muted/10 shrink-0 mt-16 md:mt-20">
                   <div className="flex items-center gap-4 animate-in fade-in slide-in-from-left-4 duration-500">
                     <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
                       <User className="w-6 h-6 text-primary" />
@@ -728,6 +737,7 @@ export default function DashPage() {
                           disabled={item.disabled}
                           onClick={() => {
                             item.action();
+                            setIsMenuOpen(false);
                           }}
                           className={cn(
                             "w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group text-left disabled:opacity-40 disabled:cursor-not-allowed"
@@ -796,6 +806,7 @@ export default function DashPage() {
       </header>
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-10 max-w-7xl mx-auto w-full overflow-x-hidden pt-20 md:pt-24 pb-12">
+        {/* ... Restante do Dashboard inalterado ... */}
         {(!isSetupComplete && !userData?.isSetupProcessDone) && (
           <section className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
              <div className="flex items-center justify-between">

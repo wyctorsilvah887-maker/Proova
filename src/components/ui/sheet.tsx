@@ -65,10 +65,6 @@ const SheetContent = React.forwardRef<
       {...props}
     >
       {children}
-      <SheetPrimitive.Close className="absolute right-4 top-4 h-10 w-10 rounded-xl bg-background/80 backdrop-blur-md border border-primary/10 flex items-center justify-center text-muted-foreground hover:text-primary transition-all active:scale-95 focus:outline-none focus:ring-0 disabled:pointer-events-none data-[state=open]:bg-secondary/10">
-        <X className="h-5 w-5" />
-        <span className="sr-only">Fechar Menu</span>
-      </SheetPrimitive.Close>
     </SheetPrimitive.Content>
   </SheetPortal>
 ))
