@@ -1,4 +1,3 @@
-
 {
   "entities": {
     "User": {
@@ -17,12 +16,10 @@
         "googlePlaceId": { "type": "string" },
         "isAdmin": { "type": "boolean" },
         "membershipStatus": { "type": "string" },
-        "isSetupProcessDone": { "type": "boolean", "description": "Indica se o usuário já completou o checklist de onboarding pelo menos uma vez." },
-        "testimonialsCount": { "type": "number" },
-        "googleRedirectCount": { "type": "number" },
-        "ppVisitCount": { "type": "number" },
-        "whatsappClickCount": { "type": "number" },
-        "fcmToken": { "type": "string", "description": "Token para envio de notificações push via FCM." },
+        "isSetupProcessDone": { "type": "boolean" },
+        "googleConnected": { "type": "boolean", "description": "Indica se o usuário autorizou o Proova a gerenciar seu GBP." },
+        "lastGoogleSync": { "type": "string", "format": "date-time" },
+        "fcmToken": { "type": "string" },
         "createdAt": { "type": "string", "format": "date-time" }
       }
     },
@@ -45,29 +42,14 @@
         "type": { "type": "string", "enum": ["account", "pp"] },
         "createdAt": { "type": "string", "format": "date-time" }
       }
-    },
-    "PublicPage": {
-      "title": "PublicPage Configuration",
-      "type": "object",
-      "properties": {
-        "themeColor": { "type": "string" },
-        "heroTitle": { "type": "string" },
-        "selectedTestimonialIds": { "type": "array", "items": { "type": "string" } }
-      }
     }
   },
   "firestore": {
     "/slugs/{slug}": {
-      "schema": "Slug",
-      "description": "Cartório global de slugs únicos."
+      "schema": "Slug"
     },
-    "/users/{userId}/pp/{slug}": {
-      "schema": "PublicPage",
-      "description": "Configuração da Página Pública."
-    },
-    "/users/{userId}/support_messages/{messageId}": {
-      "schema": "SupportMessage",
-      "description": "Histórico do chat de suporte técnico."
+    "/users/{userId}": {
+      "schema": "User"
     }
   }
 }
