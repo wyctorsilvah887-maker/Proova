@@ -122,17 +122,6 @@ import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-ac
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useNotifications } from '@/hooks/use-notifications';
 import { LoadingScreen } from '@/components/loading-screen';
-import { getAvailableTemplates, type TemplateMetadata } from '@/app/actions/template-actions';
-
-interface AuditItem {
-  id: string;
-  label: string;
-  status: 'ok' | 'attention' | 'critical';
-  description: string;
-  actionLabel: string;
-  action: () => void;
-  icon: any;
-}
 
 export default function DashPage() {
   const { user, loading: authLoading } = useUser();
@@ -146,7 +135,8 @@ export default function DashPage() {
   const [activeHash, setActiveHash] = useState<string>('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-  const [isExportingCard, setIsExportingCard] = useState(false);
+  
+  const toggleButtonRef = useRef<HTMLButtonElement>(null);
 
   // States para formulários e buscas
   const [city, setCity] = useState('');
@@ -168,13 +158,10 @@ export default function DashPage() {
       const hash = window.location.hash.replace('#', '');
       setActiveHash(hash);
       
-      // Sync form states with user data when switching views
       if (userData) {
         if (hash === 'localizacao' || hash === 'google-maps') {
           setCity(userData.city || '');
           setState(userData.state || '');
-          setSearchQuery('');
-          setSearchResults([]);
         }
         if (hash === 'identidade') {
           setCompanyNameEdit(userData.companyName || '');
@@ -198,14 +185,10 @@ export default function DashPage() {
     return status === 'gold' || status === 'enterprise' || status === 'trial';
   }, [userData]);
 
-  const isEnterpriseUser = useMemo(() => userData?.membershipStatus === 'enterprise', [userData]);
   const isAgency = useMemo(() => userData?.businessType === 'agencia', [userData]);
   const isDigitalBusiness = useMemo(() => userData?.businessType === 'agencia' || userData?.businessType === 'servicos_digitais', [userData]);
 
   // Firestore Queries
-  const widgetsListQuery = useMemo(() => (db && user ? collection(db, 'users', user.uid, 'widgets') : null), [db, user]);
-  const { data: widgetsList } = useCollection(widgetsListQuery);
-
   const announcementsQuery = useMemo(() => (db ? collection(db, 'announcements') : null), [db]);
   const { data: announcementsList } = useCollection(announcementsQuery);
   const [isAnnouncementDismissed, setIsAnnouncementDismissed] = useState(false);
@@ -256,7 +239,6 @@ export default function DashPage() {
   const progressPercentage = (completedStepsCount / setupSteps.length) * 100;
   const isSetupComplete = completedStepsCount === setupSteps.length;
 
-  // Actions Handlers
   const copyToClipboard = (text: string, description: string) => {
     navigator.clipboard.writeText(text);
     shadcnToast({ title: "Copiado!", description: `${description} copiado.` });
@@ -317,7 +299,6 @@ export default function DashPage() {
     } catch (err) { shadcnToast({ variant: "destructive", title: "Erro na geração" }); } finally { setIsGeneratingPdf(false); }
   };
 
-  // Metrics
   const filteredMetrics = useMemo(() => {
     if (period === 'all') return { count: userData?.testimonialsCount || 0, label: 'Total acumulado' };
     const cutoff = new Date(Date.now() - parseInt(period) * 24 * 60 * 60 * 1000);
@@ -329,11 +310,6 @@ export default function DashPage() {
 
   const collectionLink = `${baseUrl}/c/${userData?.companySlug}`;
   const publicPageLink = `${baseUrl}/pp/${userData?.companySlug}`;
-
-  const toggleMenu = (e: React.PointerEvent | React.MouseEvent) => {
-    e.preventDefault(); e.stopPropagation();
-    setIsMenuOpen(!isMenuOpen);
-  };
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
@@ -357,8 +333,12 @@ export default function DashPage() {
       <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[110] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2">
           <button 
+            ref={toggleButtonRef}
             type="button"
-            onPointerDown={toggleMenu}
+            onPointerDown={(e) => {
+              e.preventDefault();
+              setIsMenuOpen(!isMenuOpen);
+            }}
             className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none z-[150] relative"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-5">
@@ -379,12 +359,20 @@ export default function DashPage() {
         </div>
       </header>
 
-      {/* Menu Lateral */}
+      {/* Menu Lateral Estratégico */}
       <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen} modal={false}>
-        <SheetContent side="left" className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden">
+        <SheetContent 
+          side="left" 
+          className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden z-[140]"
+          onPointerDownOutside={(e) => {
+            if (toggleButtonRef.current?.contains(e.target as Node)) {
+              e.preventDefault();
+            }
+          }}
+        >
           <SheetHeader className="sr-only">
             <SheetTitle>Menu de Navegação</SheetTitle>
-            <SheetDescription>Acesse as funcionalidades e configurações da sua conta.</SheetDescription>
+            <SheetDescription>Acesse as funcionalidades e configurações da sua conta Proova.</SheetDescription>
           </SheetHeader>
           
           <div className="p-6 border-b bg-muted/10 shrink-0 mt-20">
@@ -398,23 +386,46 @@ export default function DashPage() {
               </div>
             </div>
           </div>
+
           <ScrollArea className="flex-1">
-            <div className="px-4 py-6 space-y-6">
+            <div className="px-4 py-6 space-y-8">
+              {/* Seção 1: Atalhos do Dashboard */}
               <div>
-                <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Funcionalidades</p>
+                <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Configuração Rápida</p>
                 {[
+                  { label: 'Visão Geral', icon: LayoutGrid, onClick: () => { clearHash(); setIsMenuOpen(false); } },
                   { label: 'Link de Coleta', icon: Link2, hash: '#link-coleta' },
+                  { label: 'QR de Balcão', icon: QrCode, hash: '#qr' },
                   { label: 'Página Pública', icon: Globe, hash: '#bio' },
-                  { label: 'QR Balcão', icon: QrCode, hash: '#qr' },
-                  { label: 'Métricas', href: '/metrics', icon: BarChart3 },
-                  { label: 'Moderação', href: '/private', icon: Inbox, badge: pendingTestimonialsCount },
-                  { label: 'Configurações', href: '/settings', icon: Settings },
                 ].map((item: any, idx) => (
                   <button 
                     key={idx}
                     onClick={() => {
-                      if (item.hash) window.location.hash = item.hash;
-                      else if (item.href) router.push(item.href);
+                      if (item.onClick) item.onClick();
+                      else if (item.hash) { window.location.hash = item.hash; setIsMenuOpen(false); }
+                    }}
+                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                  >
+                    <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Seção 2: Páginas Dedicadas */}
+              <div>
+                <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas Proova</p>
+                {[
+                  { label: 'Social Cards', href: '/social-cards', icon: ImageIcon },
+                  { label: 'Mural de Elogios', href: '/widgets', icon: Layout, condition: isAgency },
+                  { label: 'Editor de Bio', href: '/ppeditor', icon: Edit3, condition: isPremiumUser },
+                  { label: 'Moderação Inbox', href: '/private', icon: Inbox, badge: pendingTestimonialsCount },
+                  { label: 'Métricas & ROI', href: '/metrics', icon: BarChart3 },
+                ].filter(item => item.condition !== false).map((item: any, idx) => (
+                  <button 
+                    key={idx}
+                    onClick={() => {
+                      router.push(item.href);
                       setIsMenuOpen(false);
                     }}
                     className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
@@ -427,14 +438,45 @@ export default function DashPage() {
                   </button>
                 ))}
               </div>
+
+              {/* Seção 3: Apoio e Gestão */}
+              <div>
+                <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Suporte & Conta</p>
+                {[
+                  { label: 'Suporte VIP', href: '/support', icon: Headphones },
+                  { label: 'Manual de Estratégia', href: '/manual', icon: BookOpen },
+                  { label: 'Configurações', href: '/settings', icon: Settings },
+                ].map((item: any, idx) => (
+                  <button 
+                    key={idx}
+                    onClick={() => {
+                      router.push(item.href);
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group"
+                  >
+                    <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </ScrollArea>
+
+          <div className="p-4 border-t shrink-0">
+             <Button 
+               variant="ghost" 
+               className="w-full h-12 rounded-xl text-destructive hover:bg-destructive/10 font-black uppercase tracking-widest text-[9px] gap-2"
+               onClick={() => signOut(auth)}
+             >
+                <LogOut className="w-4 h-4" /> Sair da Conta
+             </Button>
+          </div>
         </SheetContent>
       </Sheet>
 
       <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pt-24 md:pt-32 pb-12">
         
-        {/* VIEW DINÂMICA (SUBSTITUI O DASHBOARD) */}
         {activeHash ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
             <header className="flex items-center justify-between">
@@ -553,7 +595,6 @@ export default function DashPage() {
             </Card>
           </div>
         ) : (
-          /* CONTEÚDO PADRÃO DO DASHBOARD (OCULTADO QUANDO HASH ATIVO) */
           <div className="space-y-10 animate-in fade-in duration-700">
             {(!isSetupComplete && !userData?.isSetupProcessDone) && (
               <section className="space-y-4">
@@ -629,8 +670,4 @@ export default function DashPage() {
       </footer>
     </div>
   );
-}
-
-function copyToClipboard(text: string, description: string) {
-  navigator.clipboard.writeText(text);
 }
