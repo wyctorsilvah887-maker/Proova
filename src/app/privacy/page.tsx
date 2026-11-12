@@ -95,7 +95,7 @@ export default function PrivacyPage() {
                     <Settings2 className="w-4 h-4" />
                     <p className="text-[10px] font-black uppercase tracking-widest">Como Desconectar</p>
                   </div>
-                  <p className="text-xs leading-relaxed font-medium">Você pode revogar o acesso do Proova AI à sua conta Google a qualquer momento através do nosso painel de configurações ou diretamente nas <strong>Configurações de Segurança da sua Conta Google</strong> (sessão "Aplicativos de terceiros com acesso à conta").</p>
+                  <p className="text-xs leading-relaxed font-medium">Você pode revogar o acesso do Proova AI à sua conta Google a qualquer momento através do nosso painel de configurações ou diretamente nas <strong>Configurações de Segurança da sua Conta Google</strong> (seção "Aplicativos de terceiros com acesso à conta").</p>
                 </Card>
                 <Card className="p-6 rounded-2xl bg-background border shadow-sm space-y-3">
                   <div className="flex items-center gap-2 text-primary">
