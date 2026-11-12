@@ -42,7 +42,8 @@ import {
   ImageIcon,
   X,
   Menu,
-  BadgeCheck
+  BadgeCheck,
+  RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -86,6 +87,7 @@ import {
   TooltipContent,
 } from "@/components/ui/tooltip";
 import { searchGooglePlaces } from '@/app/actions/maps-actions';
+import { listGoogleBusinessAccounts, listGoogleBusinessLocations } from '@/app/actions/google-business-actions';
 import { Badge } from '@/components/ui/badge';
 
 export default function SettingsPage() {
@@ -111,11 +113,13 @@ export default function SettingsPage() {
   const [googlePlaceId, setGooglePlaceId] = useState('');
   const [googleMapsUrl, setGoogleMapsUrl] = useState('');
   
-  // Estados para Busca Google
+  // Estados para Busca e APIs Google
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearchingPlaces, setIsSearchingPlaces] = useState(false);
   const [isGoogleConnecting, setIsGoogleConnecting] = useState(false);
+  const [isFetchingLocations, setIsFetchingLocations] = useState(false);
+  const [googleLocations, setGoogleLocations] = useState<any[]>([]);
   
   const [isSaving, setIsSaving] = useState(false);
 
@@ -194,12 +198,28 @@ export default function SettingsPage() {
       });
 
       const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const accessToken = credential?.accessToken;
       
       const userRef = doc(db, 'users', user.uid);
       await updateDoc(userRef, {
         googleConnected: true,
         lastGoogleSync: serverTimestamp()
       });
+
+      if (accessToken) {
+        setIsFetchingLocations(true);
+        const accResult = await listGoogleBusinessAccounts(accessToken);
+        if (accResult.success && accResult.accounts.length > 0) {
+          // Pega a primeira conta (geralmente a conta pessoal)
+          const account = accResult.accounts[0];
+          const locResult = await listGoogleBusinessLocations(account.name, accessToken);
+          if (locResult.success) {
+            setGoogleLocations(locResult.locations);
+          }
+        }
+        setIsFetchingLocations(false);
+      }
 
       toast({ 
         title: "Google Conectado!", 
@@ -214,6 +234,7 @@ export default function SettingsPage() {
       });
     } finally {
       setIsGoogleConnecting(false);
+      setIsFetchingLocations(false);
     }
   };
 
@@ -228,18 +249,17 @@ export default function SettingsPage() {
     try {
       const batch = writeBatch(db);
       
-      // Validação de Slug se houver mudança
       if (isSlugChanging) {
         if (!isPremiumUser) {
           throw new Error("A alteração de link personalizado está disponível apenas nos planos Gold e Enterprise.");
         }
-        const slugCheck = await getDoc(doc(db, 'slugs', newSlug));
+        const slugRef = doc(db, 'slugs', newSlug);
+        const slugCheck = await getDoc(slugRef);
         if (slugCheck.exists()) {
           throw new Error("Este link já está sendo usado por outra empresa.");
         }
         
-        // Registra novo slug e remove o antigo
-        batch.set(doc(db, 'slugs', newSlug), { userId: user.uid, type: 'account', createdAt: serverTimestamp() });
+        batch.set(slugRef, { userId: user.uid, type: 'account', createdAt: serverTimestamp() });
         if (oldSlug) batch.delete(doc(db, 'slugs', oldSlug));
       }
 
@@ -263,6 +283,14 @@ export default function SettingsPage() {
       toast({ variant: "destructive", title: "Erro ao Salvar", description: err.message });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSelectGoogleLocation = (loc: any) => {
+    if (loc.placeId) {
+      setGooglePlaceId(loc.placeId);
+      setGoogleMapsUrl(`https://search.google.com/local/writereview?placeid=${loc.placeId}`);
+      toast({ title: "Local Selecionado", description: "Clique em salvar para confirmar." });
     }
   };
 
@@ -615,9 +643,29 @@ export default function SettingsPage() {
                        </div>
                        <div className="flex-1 space-y-2 text-center sm:text-left relative z-10">
                           <p className="text-base font-black uppercase tracking-tight">Vincular Localização</p>
-                          <p className="text-xs text-muted-foreground leading-relaxed font-medium">O G-Boost redireciona elogios 5 estrelas para o Google. Pesquise sua empresa abaixo para ativar.</p>
+                          <p className="text-xs text-muted-foreground leading-relaxed font-medium">O G-Boost redireciona elogios 5 estrelas para o Google. Selecione ou pesquise sua empresa abaixo para ativar.</p>
                        </div>
                     </div>
+
+                    {googleLocations.length > 0 && (
+                      <div className="space-y-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                        <Label className="text-[10px] font-black uppercase ml-1 opacity-60">Empresas Localizadas na sua Conta Google:</Label>
+                        <div className="grid gap-3">
+                          {googleLocations.map((loc: any) => (
+                            <div key={loc.name} onClick={() => handleSelectGoogleLocation(loc)} className={cn(
+                              "p-4 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between group",
+                              googlePlaceId === loc.placeId ? "bg-primary/5 border-primary" : "bg-muted/10 border-transparent hover:border-primary/20"
+                            )}>
+                              <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-lg bg-background flex items-center justify-center shadow-sm"><MapPin className="w-5 h-5 text-primary" /></div>
+                                <div><p className="font-black text-xs uppercase">{loc.title}</p><p className="text-[10px] text-muted-foreground truncate max-w-[250px]">{loc.storefrontAddress?.addressLines?.join(', ') || 'Endereço não disponível'}</p></div>
+                              </div>
+                              {googlePlaceId === loc.placeId && <CheckCircle2 className="w-5 h-5 text-primary" />}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
 
                     <div className="space-y-6 pt-4">
                       {googlePlaceId ? (
@@ -630,7 +678,9 @@ export default function SettingsPage() {
                                  <p className="text-[10px] text-muted-foreground font-mono opacity-60 truncate max-w-[200px]">{googlePlaceId}</p>
                               </div>
                            </div>
-                           <Button variant="ghost" onClick={() => { setGooglePlaceId(''); setGoogleMapsUrl(''); }} className="text-destructive hover:bg-destructive/10 text-[9px] font-black uppercase tracking-widest h-8 px-3 rounded-lg">Desvincular</Button>
+                           <div className="flex gap-2">
+                             <Button variant="ghost" onClick={() => { setGooglePlaceId(''); setGoogleMapsUrl(''); }} className="text-destructive hover:bg-destructive/10 text-[9px] font-black uppercase tracking-widest h-8 px-3 rounded-lg">Desvincular</Button>
+                           </div>
                         </div>
                       ) : (
                         <div className="space-y-4">
