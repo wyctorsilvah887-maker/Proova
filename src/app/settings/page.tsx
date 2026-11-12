@@ -644,7 +644,7 @@ export default function SettingsPage() {
                     <div className="p-6 rounded-[2rem] bg-primary/5 border-2 border-dashed border-primary/20 flex flex-col sm:flex-row items-center gap-6 md:gap-8 relative overflow-hidden group">
                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors" />
                        <div className="shrink-0 p-5 bg-white dark:bg-zinc-900 rounded-3xl shadow-xl border-2 border-primary/10 relative z-10 transition-transform group-hover:scale-110">
-                          <Image src="https://picsum.photos/seed/google-maps-saas/100/100" width={56} height={56} alt="Google Maps" className="grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" data-ai-hint="google maps logo" />
+                          <MapPin className="w-10 h-10 text-primary drop-shadow-[0_0_8px_rgba(249,115,22,0.4)]" />
                        </div>
                        <div className="flex-1 space-y-2 text-center sm:text-left relative z-10">
                           <p className="text-base font-black uppercase tracking-tight">Vincular Localização</p>
@@ -705,7 +705,7 @@ export default function SettingsPage() {
                                 disabled={isSearchingPlaces || !searchQuery.trim()}
                                 className="absolute right-2 top-2 h-10 w-10 rounded-xl hover:bg-primary/10 text-primary"
                               >
-                                {isSearchingPlaces ? <Loader2 className="animate-spin" /> : <Navigation className="w-5 h-5" />}
+                                {isSearchingPlaces ? <Loader2 className="animate-spin w-4 h-4" /> : <Navigation className="w-5 h-5" />}
                               </Button>
                            </div>
 
@@ -758,3 +758,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+
