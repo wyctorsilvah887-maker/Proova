@@ -631,7 +631,12 @@ export default function SettingsPage() {
                            disabled={isGoogleConnecting}
                            className="w-full sm:w-auto h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[9px] bg-foreground text-background hover:opacity-90 shadow-lg"
                          >
-                            {isGoogleConnecting ? <Loader2 className="animate-spin w-4 h-4" /> : "Conectar meu Perfil Google Meu Negócio"}
+                            {isGoogleConnecting ? <Loader2 className="animate-spin w-4 h-4" /> : (
+                              <>
+                                <span className="hidden sm:inline">Conectar meu Perfil Google Meu Negócio</span>
+                                <span className="sm:hidden">Conectar Perfil Google</span>
+                              </>
+                            )}
                          </Button>
                        )}
                     </div>
