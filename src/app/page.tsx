@@ -36,7 +36,7 @@ import {
   AlertTriangle,
   Bot,
   BrainCircuit,
-  Google
+  Layout
 } from "lucide-react";
 import { 
   Sheet, 
