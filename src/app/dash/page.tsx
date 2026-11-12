@@ -355,7 +355,7 @@ export default function DashPage() {
           </Link>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <ThemeToggle className="flex border-none bg-transparent shadow-none" />
+          <ThemeToggle className="flex border-none bg-transparent shadow-none hover:bg-transparent focus:bg-transparent" />
         </div>
       </header>
 
@@ -539,8 +539,8 @@ export default function DashPage() {
                         <p className="text-[10px] font-bold text-muted-foreground uppercase">{userData.companyName}</p>
                       </div>
                     </div>
-                    <Button className="w-full h-16 max-w-sm rounded-2xl text-lg font-black gap-3 shadow-xl" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
-                      {isGeneratingPdf ? <Loader2 className="animate-spin" /> : <Download className="w-6 h-6" />} Baixar PDF para Impressão
+                    <Button className="w-full h-14 md:h-16 max-w-sm rounded-2xl text-xs md:text-lg font-black gap-3 shadow-xl" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
+                      {isGeneratingPdf ? <Loader2 className="animate-spin" /> : <Download className="w-5 h-5 md:w-6 md:h-6" />} Baixar PDF para Impressão
                     </Button>
                   </div>
                 )}
