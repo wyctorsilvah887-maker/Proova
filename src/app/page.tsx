@@ -151,8 +151,8 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
                       {[
                         { href: '/pricing', label: 'Planos' },
                         { href: '/login', label: 'Login' },
-                        { href: '/terms', label: 'Termos' },
-                        { href: '/privacy', label: 'Privacidade' },
+                        { href: '/terms', label: 'Termos de Uso' },
+                        { href: '/privacy', label: 'Política de Privacidade' },
                       ].map((link) => (
                         <Link 
                           key={link.href}
@@ -519,8 +519,8 @@ const Footer = () => {
           <div className="flex flex-wrap justify-center gap-8 md:gap-12">
             <Link href="/pricing" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Planos SaaS</Link>
             <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Login Membro</Link>
-            <Link href="/terms" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2"><Scale className="w-4 h-4" /> Termos</Link>
-            <Link href="/privacy" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2"><Lock className="w-4 h-4" /> Privacidade</Link>
+            <Link href="/terms" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2"><Scale className="w-4 h-4" /> Termos de Uso</Link>
+            <Link href="/privacy" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2"><Lock className="w-4 h-4" /> Política de Privacidade</Link>
           </div>
           <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.3em] opacity-40">© 2026 PROOVA TECHNOLOGY - GESTÃO DE REPUTAÇÃO E IA</p>
         </div>
