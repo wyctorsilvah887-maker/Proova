@@ -69,117 +69,119 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
         ? "bg-background/95 backdrop-blur-md border-b shadow-sm" 
         : "bg-transparent border-b-transparent"
     )}>
-      <div className="flex items-center">
-        <Link href="/" className="flex items-center group -ml-2 md:-ml-4">
-          <div className="relative w-[200px] h-[66px] md:w-[320px] md:h-[106px] transition-transform group-hover:scale-105">
-            <Image 
-              src="/logo-proovaai-whitemode.png" 
-              alt="Logo Proova Light" 
-              fill 
-              className="dark:hidden object-contain object-left" 
-              priority 
-            />
-            <Image 
-              src="/logo-proovaai-darkmode.png" 
-              alt="Logo Proova Dark" 
-              fill 
-              className="hidden dark:block object-contain object-left" 
-              priority 
-            />
-          </div>
-        </Link>
-      </div>
-
-      <div className="flex items-center gap-2 md:gap-6">
-        <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" />
-        
-        <div className="hidden sm:flex items-center gap-6">
-          <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Acesso Membro</Link>
-          <Link href="/signup">
-            <Button className="font-black uppercase tracking-widest shadow-lg px-4 h-9 text-[9px] rounded-xl">Iniciar Estratégia</Button>
+      <nav className="flex items-center w-full justify-between max-w-7xl mx-auto">
+        <div className="flex items-center">
+          <Link href="/" className="flex items-center group -ml-2 md:-ml-4">
+            <div className="relative w-[200px] h-[66px] md:w-[320px] md:h-[106px] transition-transform group-hover:scale-105">
+              <Image 
+                src="/logo-proovaai-whitemode.png" 
+                alt="Logo Proova Light" 
+                fill 
+                className="dark:hidden object-contain object-left" 
+                priority 
+              />
+              <Image 
+                src="/logo-proovaai-darkmode.png" 
+                alt="Logo Proova Dark" 
+                fill 
+                className="hidden dark:block object-contain object-left" 
+                priority 
+              />
+            </div>
           </Link>
         </div>
 
-        <div className="sm:hidden">
-          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/5 transition-all">
-                {isMenuOpen ? (
-                  <X className="w-5 h-5 text-primary rotate-12 transition-transform duration-300" />
-                ) : (
-                  <Menu className="w-5 h-5 text-primary transition-transform duration-300" />
-                )}
-              </Button>
-            </SheetTrigger>
-            <SheetContent 
-              side="right" 
-              onCloseAutoFocus={(e) => e.preventDefault()}
-              className="fixed inset-0 top-20 h-[calc(100vh-5rem)] w-screen p-0 border-none bg-background z-[90] translate-x-0 translate-y-0 left-0 [&>button]:hidden"
-            >
-              <SheetHeader className="sr-only">
-                <SheetTitle>Menu de Navegação</SheetTitle>
-                <SheetDescription>Acesse as seções principais da plataforma Proova.</SheetDescription>
-              </SheetHeader>
-              <div className="flex flex-col h-full bg-background">
-                <div className="p-4 flex items-center justify-between shrink-0">
-                  <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/60">Gestão de Reputação</span>
-                </div>
-                <div className="flex-1 p-4 space-y-1 overflow-y-auto">
-                  {[
-                    { id: 'valor-reputacao', label: 'Reputação Local', icon: TrendingUp },
-                    { id: 'metodologia', label: 'Gestão via IA', icon: Bot },
-                    { id: 'planos', label: 'Planos SaaS', icon: Gem },
-                  ].map((item) => (
-                    <SheetClose asChild key={item.id}>
-                      <button 
-                        onClick={() => scrollToSection(item.id)}
-                        className="w-full flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest hover:text-primary transition-colors py-3.5 text-left"
-                      >
-                        <div className="p-2 rounded-lg bg-primary/5 text-primary">
-                          <item.icon className="w-4 h-4" />
-                        </div>
-                        <span className="flex items-center gap-1">
-                          <span className="text-primary font-black opacity-40">#</span>
-                          {item.label}
-                        </span>
-                      </button>
-                    </SheetClose>
-                  ))}
-                  
-                  <div className="pt-8 space-y-6">
-                    <div className="grid grid-cols-2 gap-2 pt-4 border-t border-border/10">
-                      {[
-                        { href: '/pricing', label: 'Planos' },
-                        { href: '/login', label: 'Login' },
-                        { href: '/terms', label: 'Termos de Uso' },
-                        { href: '/privacy', label: 'Política de Privacidade' },
-                      ].map((link) => (
-                        <Link 
-                          key={link.href}
-                          href={link.href}
-                          onClick={() => setIsMenuOpen(false)}
-                          className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-colors py-2 px-1"
-                        >
-                          {link.label}
-                        </Link>
-                      ))}
-                    </div>
+        <div className="flex items-center gap-2 md:gap-6">
+          <ThemeToggle className="border-none bg-transparent shadow-none hover:bg-transparent" />
+          
+          <div className="hidden sm:flex items-center gap-6">
+            <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Acesso Membro</Link>
+            <Link href="/signup">
+              <Button className="font-black uppercase tracking-widest shadow-lg px-4 h-9 text-[9px] rounded-xl">Iniciar Estratégia</Button>
+            </Link>
+          </div>
 
-                    <div className="space-y-3">
-                      <Link href="/login" className="block" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="outline" className="w-full h-11 rounded-xl font-black uppercase tracking-widest text-[8px]">Acessar Dashboard</Button>
-                      </Link>
-                      <Link href="/signup" className="block" onClick={() => setIsMenuOpen(false)}>
-                        <Button className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-2xl">Ativar Licença</Button>
-                      </Link>
+          <div className="sm:hidden">
+            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/5 transition-all">
+                  {isMenuOpen ? (
+                    <X className="w-5 h-5 text-primary rotate-12 transition-transform duration-300" />
+                  ) : (
+                    <Menu className="w-5 h-5 text-primary transition-transform duration-300" />
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent 
+                side="right" 
+                onCloseAutoFocus={(e) => e.preventDefault()}
+                className="fixed inset-0 top-20 h-[calc(100vh-5rem)] w-screen p-0 border-none bg-background z-[90] translate-x-0 translate-y-0 left-0 [&>button]:hidden"
+              >
+                <SheetHeader className="sr-only">
+                  <SheetTitle>Menu de Navegação</SheetTitle>
+                  <SheetDescription>Acesse as seções principais da plataforma Proova.</SheetDescription>
+                </SheetHeader>
+                <div className="flex flex-col h-full bg-background">
+                  <div className="p-4 flex items-center justify-between shrink-0">
+                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/60">Gestão de Reputação</span>
+                  </div>
+                  <div className="flex-1 p-4 space-y-1 overflow-y-auto">
+                    {[
+                      { id: 'valor-reputacao', label: 'Reputação Local', icon: TrendingUp },
+                      { id: 'metodologia', label: 'Gestão via IA', icon: Bot },
+                      { id: 'planos', label: 'Planos SaaS', icon: Gem },
+                    ].map((item) => (
+                      <SheetClose asChild key={item.id}>
+                        <button 
+                          onClick={() => scrollToSection(item.id)}
+                          className="w-full flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest hover:text-primary transition-colors py-3.5 text-left"
+                        >
+                          <div className="p-2 rounded-lg bg-primary/5 text-primary">
+                            <item.icon className="w-4 h-4" />
+                          </div>
+                          <span className="flex items-center gap-1">
+                            <span className="text-primary font-black opacity-40">#</span>
+                            {item.label}
+                          </span>
+                        </button>
+                      </SheetClose>
+                    ))}
+                    
+                    <div className="pt-8 space-y-6">
+                      <div className="grid grid-cols-2 gap-2 pt-4 border-t border-border/10">
+                        {[
+                          { href: '/pricing', label: 'Planos' },
+                          { href: '/login', label: 'Login' },
+                          { href: '/terms', label: 'Termos de Uso' },
+                          { href: '/privacy', label: 'Política de Privacidade' },
+                        ].map((link) => (
+                          <Link 
+                            key={link.href}
+                            href={link.href}
+                            onClick={() => setIsMenuOpen(false)}
+                            className="text-[8px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-colors py-2 px-1"
+                          >
+                            {link.label}
+                          </Link>
+                        ))}
+                      </div>
+
+                      <div className="space-y-3">
+                        <Link href="/login" className="block" onClick={() => setIsMenuOpen(false)}>
+                          <Button variant="outline" className="w-full h-11 rounded-xl font-black uppercase tracking-widest text-[8px]">Acessar Dashboard</Button>
+                        </Link>
+                        <Link href="/signup" className="block" onClick={() => setIsMenuOpen(false)}>
+                          <Button className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-2xl">Ativar Licença</Button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </SheetContent>
-          </Sheet>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
-      </div>
+      </nav>
     </header>
   );
 };
@@ -187,7 +189,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
 const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
   return (
     <section className="relative w-full pb-12 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh] pt-32">
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <div className="absolute top-[15%] left-[8%] animate-float opacity-20 text-primary">
           <BrainCircuit className="w-16 h-16 md:w-24 md:h-24" />
         </div>
@@ -201,22 +203,24 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
       
       <div className="container relative z-10 px-4 mx-auto">
         <div className="max-w-4xl mx-auto text-center space-y-6">
-          <div className={cn(
-            "inline-flex items-center text-primary px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-1000 bg-primary/5 rounded-full border border-primary/10",
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
-          )}>
-            SaaS DE GESTÃO DE REPUTAÇÃO E AUTOMAÇÃO COM IA
-          </div>
-          
-          <h1 className={cn(
-            "text-3xl font-black tracking-tighter sm:text-5xl md:text-7xl font-headline leading-[1] transition-all duration-1000",
-            isVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
-          )}>
-            Automatize suas respostas no <br className="hidden sm:block" />
-            <span className="inline-block relative bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">
-              Google Meu Negócio
-            </span> com IA
-          </h1>
+          <header>
+            <div className={cn(
+              "inline-flex items-center text-primary px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-1000 bg-primary/5 rounded-full border border-primary/10 mb-6",
+              isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
+            )}>
+              SaaS DE GESTÃO DE REPUTAÇÃO E AUTOMAÇÃO COM IA
+            </div>
+            
+            <h1 className={cn(
+              "text-3xl font-black tracking-tighter sm:text-5xl md:text-7xl font-headline leading-[1] transition-all duration-1000",
+              isVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
+            )}>
+              Automatize suas respostas no <br className="hidden sm:block" />
+              <span className="inline-block relative bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">
+                Google Meu Negócio
+              </span> com IA
+            </h1>
+          </header>
           
           <p className={cn(
             "max-w-2xl mx-auto text-muted-foreground text-sm md:text-xl font-medium leading-relaxed transition-all duration-1000 delay-300",
@@ -247,7 +251,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
       
       <div className="container px-4 mx-auto text-center space-y-16">
-        <div className={cn(
+        <header className={cn(
           "space-y-4 transition-all duration-1000",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         )}>
@@ -255,7 +259,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
             Gestão Unificada de <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-1">Autoridade Digital.</span>
           </h2>
           <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">O Proova se conecta diretamente ao Perfil da sua Empresa no Google para monitorar, responder e escalar seu ranking orgânico através de dados reais.</p>
-        </div>
+        </header>
 
         <div className="grid gap-12 lg:grid-cols-3">
           {[
@@ -278,7 +282,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
               color: "text-primary" 
             }
           ].map((item, idx) => (
-            <div key={idx} className={cn(
+            <article key={idx} className={cn(
               "space-y-4 transition-all duration-1000",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             )} style={{ transitionDelay: `${(idx + 1) * 200}ms` }}>
@@ -289,7 +293,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
               </div>
               <h3 className="text-xl font-bold font-headline px-4">{item.title}</h3>
               <p className="text-muted-foreground dark:text-zinc-500 text-sm leading-relaxed font-medium px-6">{item.desc}</p>
-            </div>
+            </article>
           ))}
         </div>
       </div>
@@ -302,14 +306,14 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
   return (
     <section id="metodologia" ref={ref} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
       <div className="container px-4 mx-auto">
-        <div className={cn(
+        <header className={cn(
           "text-center space-y-4 mb-24 transition-all duration-1000",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         )}>
           <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
             Como o Proova <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">Automatiza sua Reputação.</span>
           </h2>
-        </div>
+        </header>
         
         <div className="max-w-4xl mx-auto relative px-4 md:px-0">
           <div className="space-y-20 md:space-y-32">
@@ -327,14 +331,14 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                     {step.number}
                   </div>
                 </div>
-                <div className="space-y-3 md:space-y-4 pt-1 md:pt-2 flex-1">
+                <article className="space-y-3 md:space-y-4 pt-1 md:pt-2 flex-1">
                   <h3 className="text-xl md:text-4xl font-black font-headline tracking-tight">
                     {step.title}
                   </h3>
                   <p className="text-muted-foreground text-sm md:text-xl leading-relaxed font-medium max-w-2xl">
                     {step.desc}
                   </p>
-                </div>
+                </article>
               </div>
             ))}
           </div>
@@ -351,43 +355,44 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
       <div className="container px-4 mx-auto">
         <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-center">
           <div className={cn("space-y-8 transition-all duration-1000", isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10")}>
-            <div className="space-y-4">
+            <header className="space-y-4">
               <h2 className="text-3xl md:text-5xl font-black font-headline leading-tight tracking-tight">
                 Sua <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-3">Página de Autoridade</span> para o Link da Bio.
               </h2>
               <p className="text-sm md:text-lg text-muted-foreground font-medium">
                 Nossa tecnologia permite que você centralize seus melhores depoimentos e facilite o contato de novos pacientes através de um link único e profissional.
               </p>
-            </div>
+            </header>
 
             <div className="space-y-6">
               {[
                 { icon: Bot, title: 'IA Pilot', desc: 'Respostas inteligentes geradas automaticamente para economizar tempo da sua equipe.' },
                 { icon: LayoutGrid, title: 'Bio Link Studio', desc: 'Personalize cores, layouts e seções para que sua página de depoimentos reflita a identidade da sua clínica.' }
               ].map((item, idx) => (
-                <div key={idx} className="flex gap-6 group">
+                <article key={idx} className="flex gap-6 group">
                   <item.icon className="w-7 h-7 text-primary shrink-0 group-hover:scale-110 transition-transform duration-500" />
                   <div className="space-y-1">
                     <p className="font-black text-xl font-headline">{item.title}</p>
                     <p className="text-muted-foreground text-sm md:text-base leading-relaxed">{item.desc}</p>
                   </div>
-                </div>
+                </article>
               ))}
             </div>
           </div>
 
-          <div className={cn("relative transition-all duration-1000 delay-500 flex flex-col items-center", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10")}>
+          <aside className={cn("relative transition-all duration-1000 delay-500 flex flex-col items-center", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10")}>
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
             <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card ring-1 ring-primary/10 w-full h-[500px]">
               <iframe 
                 src="https://www.useproova.online/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova" 
                 width="100%" 
                 height="500px" 
+                title="Demonstração do Mural Proova"
                 style={{ border: 'none' }} 
-                allowtransparency="true"
+                allow="autoplay"
               ></iframe>
             </Card>
-          </div>
+          </aside>
         </div>
       </div>
     </section>
@@ -438,11 +443,11 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
   return (
     <section id="planos" ref={ref} className="w-full py-24 md:py-32 bg-background overflow-hidden min-h-[500px] border-t">
       <div className="container px-4 mx-auto max-w-4xl">
-        <div className={cn("text-center space-y-4 mb-16 transition-all duration-1000", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10")}>
+        <header className={cn("text-center space-y-4 mb-16 transition-all duration-1000", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10")}>
           <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
             Níveis de <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">Automação Estratégica.</span>
           </h2>
-        </div>
+        </header>
 
         <div className="space-y-4">
           {plans.map((plan) => {
@@ -512,7 +517,7 @@ const Footer = () => {
            <Image src="/logo-proovaai-whitemode.png" alt="Logo Proova Footer Light" fill className="dark:hidden object-contain" />
            <Image src="/logo-proovaai-darkmode.png" alt="Logo Proova Footer Dark" fill className="hidden dark:block object-contain" />
         </div>
-        <div className="space-y-8">
+        <nav className="space-y-8">
           <div className="flex flex-wrap justify-center gap-8 md:gap-12">
             <Link href="/pricing" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Planos SaaS</Link>
             <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Login Membro</Link>
@@ -520,7 +525,7 @@ const Footer = () => {
             <Link href="/privacy" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2"><Lock className="w-4 h-4" /> Política de Privacidade</Link>
           </div>
           <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.3em] opacity-40">© 2026 PROOVA TECHNOLOGY - GESTÃO DE REPUTAÇÃO E IA</p>
-        </div>
+        </nav>
       </div>
     </footer>
   );
@@ -654,18 +659,19 @@ export default function Home() {
         <PillarsSection ref={pillarsRef} isVisible={isPillarsVisible} />
         <VersatilitySection ref={versatilityRef} isVisible={isVersatilityVisible} />
         <PricingSection ref={pricingRef} isVisible={isPricingVisible} />
+        
         <section className="relative w-full py-24 md:py-36 bg-black text-white overflow-hidden">
-          <Image src="https://picsum.photos/seed/ctabg88/1920/1080" alt="CTA Bg" fill className="object-cover opacity-20 grayscale brightness-50" />
+          <Image src="https://picsum.photos/seed/ctabg88/1920/1080" alt="Chamada para Ação Final" fill className="object-cover opacity-20 grayscale brightness-50" />
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-primary/10" />
           <div className="container relative z-10 px-4 mx-auto text-center space-y-10">
-            <div className="space-y-4">
+            <header className="space-y-4">
               <h2 className="text-4xl md:text-7xl font-black font-headline tracking-tighter leading-[1]">
                 Gestão de Reputação em <span className="text-primary italic">Piloto Automático.</span>
               </h2>
               <p className="max-w-lg mx-auto text-base md:text-2xl font-medium text-white/80">
                 Assuma a liderança regional através da prova social estratégica e IA.
               </p>
-            </div>
+            </header>
             <Link href="/signup" className="w-full sm:w-auto">
               <Button size="lg" variant="secondary" className="w-full sm:w-auto h-16 md:h-20 px-12 rounded-2xl text-sm md:text-xl font-black shadow-2xl hover:scale-105 transition-all bg-white text-black hover:bg-white/90">
                 CRIAR MINHA CONTA AGORA
