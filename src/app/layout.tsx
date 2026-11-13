@@ -8,8 +8,8 @@ import { Toaster } from "@/components/ui/toaster";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Proova - Transforme Elogios em Vendas",
-  description: "Colete e exiba depoimentos de clientes em minutos.",
+  title: "Proova AI — Automação de Avaliações no Google Meu Negócio com IA",
+  description: "Responda avaliações do Google automaticamente com Inteligência Artificial, aumente sua nota no Maps e atraia mais clientes locais.",
   manifest: "/manifest.json",
   icons: {
     icon: [

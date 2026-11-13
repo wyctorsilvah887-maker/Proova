@@ -2,9 +2,9 @@ import { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Proova - Inteligência em Prova Social',
-    short_name: 'Proova',
-    description: 'Transforme elogios em vendas com autoridade digital.',
+    name: 'Proova AI — Automação de Avaliações com IA',
+    short_name: 'Proova AI',
+    description: 'Responda avaliações do Google automaticamente com Inteligência Artificial e aumente sua nota no Maps.',
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',
