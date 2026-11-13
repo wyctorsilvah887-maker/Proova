@@ -42,16 +42,6 @@ import {
   LayoutGrid
 } from "lucide-react";
 import { 
-  Sheet, 
-  SheetContent, 
-  SheetTrigger, 
-  SheetClose, 
-  SheetHeader, 
-  SheetTitle, 
-  SheetDescription 
-} from "@/components/ui/switch"; // Corrigido de switch para sheet se necessário, mas mantendo a estrutura do usuário
-// Nota: O import acima parece incorreto baseado no log, corrigindo para o padrão shadcn
-import { 
   Sheet as SheetUI, 
   SheetContent as SheetContentUI, 
   SheetTrigger as SheetTriggerUI, 
@@ -387,11 +377,11 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
   const mobileSlides = useMemo(() => [
     {
       light: PlaceHolderImages.find(img => img.id === 'app-mobile-light')?.imageUrl || "/paginappmobile-whitemode.webp",
-      dark: PlaceHolderImages.find(img => img.id === 'app-mobile-dark')?.imageUrl || "/paginappmobile-darkmode.webp"
+      dark: PlaceHolderImages.find(img => img.id === 'app-mobile-dark')?.imageUrl || "/paginappmobile-darkmod.webp"
     },
     {
       light: PlaceHolderImages.find(img => img.id === 'app-mobile-light-2')?.imageUrl || "/paginappmobile-whitemode2.webp",
-      dark: PlaceHolderImages.find(img => img.id === 'app-mobile-dark-2')?.imageUrl || "/paginappmobile-darkmode2.webp"
+      dark: PlaceHolderImages.find(img => img.id === 'app-mobile-dark-2')?.imageUrl || "/paginappmobile-darkmod2.webp"
     }
   ], []);
 
@@ -442,7 +432,7 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
           )}>
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
             
-            {/* Mobile View: Carousel - Adjusted for full image visibility */}
+            {/* Mobile View: Carousel */}
             <div className="relative w-full max-w-[280px] mx-auto lg:hidden">
               <Carousel setApi={setApiMobile} opts={{ loop: true }} className="w-full">
                 <CarouselContent>
@@ -624,7 +614,7 @@ const Footer = () => {
         <nav className="space-y-8">
           <div className="flex flex-wrap justify-center gap-8 md:gap-12">
             <Link href="/pricing" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Planos SaaS</Link>
-            <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Login Membro</Link>
+            <Link href="/login" className="text-[10px) font-black uppercase tracking-widest hover:text-primary transition-colors">Login Membro</Link>
             <Link href="/terms" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2"><Scale className="w-4 h-4" /> Termos de Uso</Link>
             <Link href="/privacy" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors flex items-center gap-2"><Lock className="w-4 h-4" /> Política de Privacidade</Link>
           </div>
@@ -712,53 +702,13 @@ export default function Home() {
     }
   };
 
-  const softwareSchema = {
-    "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "Proova AI",
-    "operatingSystem": "Web",
-    "applicationCategory": "BusinessApplication",
-    "aggregateRating": {
-      "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "ratingCount": "127"
-    },
-    "offers": {
-      "@type": "Offer",
-      "price": "147.00",
-      "priceCurrency": "BRL"
-    },
-    "description": "Responda avaliações do Google automaticamente com Inteligência Artificial, aumente sua nota no Maps e atraia mais clientes locais."
-  };
-
-  const organizationSchema = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Proova Technology",
-    "url": "https://useproova.online",
-    "logo": "https://useproova.online/logo-proovaai-whitemode.png",
-    "sameAs": [
-      "https://instagram.com/proovaai"
-    ]
-  };
-
   if (loading || user) return <LoadingScreen />;
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
-      <Script id="proova-bubble-widget" strategy="afterInteractive">
+      <Script id="proova-bubble-script" strategy="afterInteractive">
         {`(function() { var iframe = document.createElement('iframe'); iframe.src = 'https://www.useproovaai.com.br/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova'; iframe.style.position = 'fixed'; iframe.style.bottom = '20px'; iframe.style.left = '20px'; iframe.style.width = '300px'; iframe.style.height = '130px'; iframe.style.border = 'none'; iframe.style.zIndex = '999999'; iframe.allowTransparency = 'true'; document.body.appendChild(iframe); })();`}
       </Script>
-
-      {/* Schema Markup Injection */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-      />
 
       <Navigation isScrolled={isScrolled} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} scrollToSection={scrollToSection} />
       <main className="flex-1 pt-20">
