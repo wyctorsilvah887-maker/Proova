@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 /**
  * Página pública do Widget (Embed VIP)
  * Comportamento de Notificação Compacta (Bubble)
- * Otimizado para espaços pequenos.
+ * Otimizado para espaços pequenos com fundo 100% transparente.
  */
 export default function WidgetPublicPage({ params }: { params: Promise<{ userId: string, widgetId: string }> }) {
   const { userId, widgetId } = use(params);
@@ -22,6 +22,16 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Forçar transparência do body do layout global apenas para esta página
+  useEffect(() => {
+    document.documentElement.style.background = 'transparent';
+    document.body.style.background = 'transparent';
+    return () => {
+      document.documentElement.style.background = '';
+      document.body.style.background = '';
+    };
+  }, []);
 
   useEffect(() => {
     if (!db || !userId || !widgetId) return;
@@ -86,30 +96,30 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
 
   return (
-    <div className="h-full bg-transparent p-2 font-body overflow-hidden flex items-end justify-start">
+    <div className="h-screen w-full bg-transparent p-2 font-body overflow-hidden flex items-end justify-start">
       {t && (
         <div 
           className={cn(
-            "w-full max-w-[260px] transition-all duration-700 ease-in-out",
+            "w-full max-w-[280px] transition-all duration-700 ease-in-out",
             isVisible 
               ? "animate-in fade-in slide-in-from-bottom-4 duration-1000" 
               : "animate-out fade-out slide-out-to-bottom-4 duration-700 opacity-0"
           )}
         >
           <Card 
-            className="rounded-2xl p-3 bg-white dark:bg-zinc-950 text-black dark:text-white border-none relative overflow-hidden ring-1 ring-black/5 dark:ring-white/5"
+            className="rounded-2xl p-3 bg-white/95 dark:bg-zinc-950/90 backdrop-blur-sm text-black dark:text-white border-none relative overflow-hidden ring-1 ring-black/5 dark:ring-white/5"
             style={{ 
               boxShadow: hasSecondary 
-                ? `0 0 15px ${secondaryColor}30, 0 8px 20px -10px rgba(0,0,0,0.15)` 
-                : `0 8px 16px -8px rgba(0,0,0,0.12)`,
+                ? `0 0 20px ${secondaryColor}25, 0 10px 25px -10px rgba(0,0,0,0.2)` 
+                : `0 10px 30px -10px rgba(0,0,0,0.15)`,
             }}
           >
             <div className="flex gap-2.5 items-start">
               <div 
-                className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-muted/10" 
+                className="h-9 w-9 rounded-full border flex items-center justify-center shrink-0 bg-muted/10" 
                 style={{ borderColor: hasSecondary ? `${secondaryColor}30` : `${themeColor}30` }}
               >
-                <User className="w-3.5 h-3.5" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
+                <User className="w-4 h-4" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
               </div>
 
               <div className="min-w-0 flex-1 space-y-0.5">
@@ -144,6 +154,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
               </div>
             </div>
             
+            {/* Progress Bar Visual */}
             <div 
               className="absolute bottom-0 left-0 h-0.5 opacity-20 transition-all duration-[7000ms] ease-linear"
               style={{ 
