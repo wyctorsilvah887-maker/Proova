@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { generateReplyAction } from '@/ai/flows/generate-reply-flow';
+import { generateReviewResponse } from '@/lib/gemini';
 import mockData from '@/mocks/mock-reviews.json';
 
 /**
  * API Route para processar avaliações do mock-reviews.json.
- * Filtra avaliações sem resposta e gera sugestões via IA (Gemini).
+ * Filtra avaliações sem resposta e gera sugestões via IA centralizada no src/lib/gemini.ts.
  */
 export async function POST() {
   try {
@@ -15,7 +15,6 @@ export async function POST() {
     }
 
     const companyName = business.title;
-    const businessType = business.categoryName;
     const reviews = business.reviews || [];
 
     // 2. Filtra apenas as avaliações que ainda não foram respondidas pelo dono
@@ -31,21 +30,20 @@ export async function POST() {
       });
     }
 
-    // 3. Processar cada avaliação pendente enviando para a IA
+    // 3. Processar cada avaliação pendente enviando para a IA utilitária
     const results = await Promise.all(
       pendingReviews.map(async (review: any) => {
-        const { reply } = await generateReplyAction({
-          testimonialText: review.text || '(Avaliação apenas com estrelas)',
-          rating: review.stars,
-          companyName: companyName,
-          businessType: businessType
-        });
+        const reply = await generateReviewResponse(
+          review.text || '',
+          review.stars,
+          companyName
+        );
 
         return {
           reviewId: review.reviewId,
           reviewerName: review.name,
           stars: review.stars,
-          originalText: review.text,
+          originalText: review.text || '(Avaliação apenas com estrelas)',
           aiSuggestedReply: reply
         };
       })
