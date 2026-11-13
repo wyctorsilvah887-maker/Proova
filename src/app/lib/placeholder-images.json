@@ -44,6 +44,18 @@
       "imageHint": "person face"
     },
     {
+      "id": "app-mobile-light",
+      "description": "Preview da página pública no celular - Modo Claro",
+      "imageUrl": "/pagnappmobile-whitemode.webp",
+      "imageHint": "mobile preview light"
+    },
+    {
+      "id": "app-mobile-dark",
+      "description": "Preview da página pública no celular - Modo Escuro",
+      "imageUrl": "/pagnappmobile-darkmode.webp",
+      "imageHint": "mobile preview dark"
+    },
+    {
       "id": "manual-gboost",
       "description": "Guia visual do sistema G-Boost",
       "imageUrl": "https://picsum.photos/seed/m1/800/500",

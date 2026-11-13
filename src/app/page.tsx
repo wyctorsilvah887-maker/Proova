@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState, useRef, forwardRef } from "react";
@@ -352,6 +353,9 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 PillarsSection.displayName = "PillarsSection";
 
 const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
+  const lightImg = PlaceHolderImages.find(img => img.id === 'app-mobile-light')?.imageUrl || "/pagnappmobile-whitemode.webp";
+  const darkImg = PlaceHolderImages.find(img => img.id === 'app-mobile-dark')?.imageUrl || "/pagnappmobile-darkmode.webp";
+
   return (
     <section id="setores" ref={ref} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
       <div className="container px-4 mx-auto">
@@ -386,11 +390,18 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
             <div className="relative w-full aspect-[4/5] md:aspect-square lg:aspect-[4/3] rounded-[3rem] overflow-hidden shadow-2xl ring-1 ring-primary/10">
               <Image 
-                src={PlaceHolderImages.find(img => img.id === 'brand-design')?.imageUrl || "https://picsum.photos/seed/design1/800/600"} 
-                alt="Demonstração da Página Pública Proova" 
+                src={lightImg} 
+                alt="Demonstração da Página Pública Proova Light" 
                 fill 
-                className="object-cover"
-                data-ai-hint="brand design"
+                className="object-cover dark:hidden"
+                priority
+              />
+              <Image 
+                src={darkImg} 
+                alt="Demonstração da Página Pública Proova Dark" 
+                fill 
+                className="object-cover hidden dark:block"
+                priority
               />
             </div>
           </aside>
