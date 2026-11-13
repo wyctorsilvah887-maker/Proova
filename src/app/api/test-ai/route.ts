@@ -3,8 +3,7 @@ import mockData from '@/mocks/mock-reviews.json';
 import { generateReviewResponse } from '@/lib/gemini';
 
 /**
- * Rota de teste temporária para validar a geração de respostas via IA
- * consumindo o arquivo de mock local da Apify.
+ * Rota de teste para validar a geração de respostas via IA Gemini 3.0.
  */
 export async function GET() {
   try {
@@ -14,19 +13,18 @@ export async function GET() {
     }
 
     const reviews = place.reviews || [];
-
-    // Pega apenas as avaliações que ainda não foram respondidas pelo dono
     const pendingReviews = reviews.filter((r: any) => !r.responseFromOwnerText);
 
     const results = [];
 
-    // Processa apenas as 3 primeiras para um teste rápido e controlado
     for (const review of pendingReviews.slice(0, 3)) {
-      const aiResponse = await generateReviewResponse(
-        review.text || '', 
-        review.stars, 
-        place.title
-      );
+      const aiResponse = await generateReviewResponse({
+        authorName: review.name,
+        rating: review.stars,
+        reviewText: review.text,
+        businessName: place.title,
+        categoryName: place.categoryName || 'Negócio Local'
+      });
       
       results.push({
         author: review.name,

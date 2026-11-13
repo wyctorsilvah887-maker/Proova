@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -344,12 +343,13 @@ export default function DashPage() {
   };
 
   // Lógica para regerar resposta por IA
-  const handleRegenerateResponse = async (id: string, text: string, stars: number, isApi: boolean = false) => {
+  const handleRegenerateResponse = async (id: string, name: string, text: string, stars: number, isApi: boolean = false) => {
     if (isRegenerating || !userData) return;
     setIsRegenerating(id);
 
     try {
       const result = await generateReplyAction({
+        authorName: name,
         testimonialText: text,
         rating: stars,
         companyName: userData.companyName,
@@ -564,9 +564,9 @@ export default function DashPage() {
                 className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-5">
-                  <line x1="4" x2="20" y1="7" y2="7" className="origin-center translate-y-[5px] rotate-45" />
-                  <line x1="4" x2="20" y1="12" y2="12" className="origin-center opacity-0" />
-                  <line x1="4" x2="20" y1="17" y2="17" className="origin-center -translate-y-[5px] -rotate-45" />
+                  <line x1="4" y1="7" x2="20" y2="7" className="origin-center translate-y-[5px] rotate-45" />
+                  <line x1="4" y1="12" x2="20" y2="12" className="origin-center opacity-0" />
+                  <line x1="4" y1="17" x2="20" y2="17" className="origin-center -translate-y-[5px] -rotate-45" />
                 </svg>
               </button>
             </header>
@@ -609,7 +609,7 @@ export default function DashPage() {
                       <QRCodeSVG value={collectionLink} size={200} level="H" />
                       <div className="text-center space-y-1">
                         <p className="text-xs font-black text-primary uppercase tracking-[0.2em]">Escaneie para Avaliar</p>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase">{userData.companyName}</p>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase">{userData?.companyName}</p>
                       </div>
                     </div>
                     <Button className="w-full h-14 md:h-16 max-w-sm rounded-2xl text-xs md:text-lg font-black gap-3 shadow-xl" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
@@ -819,7 +819,7 @@ export default function DashPage() {
                             </p>
                             <div className="absolute top-4 right-4 flex gap-2">
                                <button 
-                                onClick={() => handleRegenerateResponse(s.reviewId, s.originalText, s.stars, true)}
+                                onClick={() => handleRegenerateResponse(s.reviewId, s.reviewerName, s.originalText, s.stars, true)}
                                 disabled={isRegenerating === s.reviewId}
                                 className="p-2 rounded-xl bg-background border shadow-sm hover:bg-muted transition-all active:scale-95 disabled:opacity-50"
                                 title="Regerar Resposta"
@@ -881,7 +881,7 @@ export default function DashPage() {
                               </p>
                               <div className="absolute top-4 right-4 flex gap-2">
                                  <button 
-                                  onClick={() => handleRegenerateResponse(t.id, t.text, t.rating)}
+                                  onClick={() => handleRegenerateResponse(t.id, t.userName, t.text, t.rating)}
                                   disabled={isRegenerating === t.id}
                                   className="p-2 rounded-xl bg-background border shadow-sm hover:bg-muted transition-all active:scale-95 disabled:opacity-50"
                                   title="Regerar Resposta"

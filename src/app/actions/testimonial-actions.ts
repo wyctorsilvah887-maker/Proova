@@ -1,4 +1,3 @@
-
 'use server';
 
 import { headers } from 'next/headers';
@@ -80,11 +79,12 @@ export async function submitTestimonialAction(data: {
     const status = userData.membershipStatus || 'base';
     const isPremium = status === 'gold' || status === 'enterprise' || status === 'trial';
 
-    // Piloto Automático: Gerar resposta via Gemini
+    // Piloto Automático: Gerar resposta via Gemini 3.0
     let aiReply = null;
-    if (isPremium && data.text.length > 5) {
+    if (isPremium) {
       const { reply } = await generateReplyAction({
-        testimonialText: data.text,
+        authorName: data.userName,
+        testimonialText: data.text || (data.videoUrl ? '[Depoimento em Vídeo]' : ''),
         rating: data.rating,
         companyName: userData.companyName,
         businessType: userData.businessType

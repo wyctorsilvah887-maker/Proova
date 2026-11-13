@@ -4,20 +4,19 @@ import mockData from '@/mocks/mock-reviews.json';
 
 /**
  * API Route para processar avaliações do mock-reviews.json.
- * Filtra avaliações sem resposta e gera sugestões via IA centralizada no src/lib/gemini.ts.
+ * Filtra avaliações sem resposta e gera sugestões via IA centralizada.
  */
 export async function POST() {
   try {
-    // 1. Pega as avaliações do primeiro estabelecimento do JSON
     const business = mockData[0];
     if (!business) {
       return NextResponse.json({ error: 'Nenhum dado de negócio localizado no mock.' }, { status: 404 });
     }
 
     const companyName = business.title;
+    const categoryName = business.categoryName || 'Negócio Local';
     const reviews = business.reviews || [];
 
-    // 2. Filtra apenas as avaliações que ainda não foram respondidas pelo dono
     const pendingReviews = reviews.filter(
       (review: any) => !review.responseFromOwnerText
     );
@@ -30,14 +29,15 @@ export async function POST() {
       });
     }
 
-    // 3. Processar cada avaliação pendente enviando para a IA utilitária
     const results = await Promise.all(
       pendingReviews.map(async (review: any) => {
-        const reply = await generateReviewResponse(
-          review.text || '',
-          review.stars,
-          companyName
-        );
+        const reply = await generateReviewResponse({
+          authorName: review.name,
+          rating: review.stars,
+          reviewText: review.text,
+          businessName: companyName,
+          categoryName: categoryName
+        });
 
         return {
           reviewId: review.reviewId,
