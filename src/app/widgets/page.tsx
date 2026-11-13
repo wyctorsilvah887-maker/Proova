@@ -185,8 +185,8 @@ export default function WidgetsPage() {
     iframe.style.position = 'fixed';
     iframe.style.bottom = '20px';
     iframe.style.left = '20px';
-    iframe.style.width = '350px';
-    iframe.style.height = '180px';
+    iframe.style.width = '300px';
+    iframe.style.height = '130px';
     iframe.style.border = 'none';
     iframe.style.zIndex = '999999';
     iframe.allowTransparency = 'true';

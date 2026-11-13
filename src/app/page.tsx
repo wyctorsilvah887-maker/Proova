@@ -550,7 +550,7 @@ export default function Home() {
   const pricingRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    // Injeção do Widget de Teste solicitado pelo usuário
+    // Injeção do Widget de Teste Compacto solicitado pelo usuário
     const injectWidget = () => {
       const existing = document.getElementById('proova-test-widget');
       if (existing) return;
@@ -561,8 +561,8 @@ export default function Home() {
       iframe.style.position = 'fixed';
       iframe.style.bottom = '20px';
       iframe.style.left = '20px';
-      iframe.style.width = '350px';
-      iframe.style.height = '180px';
+      iframe.style.width = '300px';
+      iframe.style.height = '130px';
       iframe.style.border = 'none';
       iframe.style.zIndex = '999999';
       // @ts-ignore

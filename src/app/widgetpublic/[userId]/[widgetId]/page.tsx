@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 /**
  * Página pública do Widget (Embed VIP)
  * Comportamento de Notificação Compacta (Bubble)
+ * Otimizado para espaços pequenos.
  */
 export default function WidgetPublicPage({ params }: { params: Promise<{ userId: string, widgetId: string }> }) {
   const { userId, widgetId } = use(params);
@@ -25,7 +26,6 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   useEffect(() => {
     if (!db || !userId || !widgetId) return;
 
-    // Busca dados da empresa para o texto da notificação
     const fetchUser = async () => {
       const uSnap = await getDoc(doc(db, 'users', userId));
       if (uSnap.exists()) setUserData(uSnap.data());
@@ -60,17 +60,13 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   const secondaryColor = widgetData?.secondaryColor || '';
   const companyName = userData?.companyName || 'nossa empresa';
 
-  // Lógica de Ciclo da Notificação (Entra -> Fica -> Sai -> Próximo)
   useEffect(() => {
     if (filteredTestimonials.length === 0) return;
 
     const showNext = () => {
       setIsVisible(true);
-      
-      // Tempo visível
       setTimeout(() => {
         setIsVisible(false);
-        // Espera animação de saída e muda o index
         setTimeout(() => {
           setCurrentIndex((prev) => (prev + 1) % filteredTestimonials.length);
         }, 800);
@@ -78,8 +74,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
     };
 
     showNext();
-    const interval = setInterval(showNext, 9000); // 7s visível + 2s transição/espera
-
+    const interval = setInterval(showNext, 9000);
     return () => clearInterval(interval);
   }, [filteredTestimonials.length]);
 
@@ -91,69 +86,64 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
 
   return (
-    <div className="min-h-screen bg-transparent p-3 sm:p-6 font-body overflow-hidden flex items-end justify-center sm:justify-start">
+    <div className="h-full bg-transparent p-2 font-body overflow-hidden flex items-end justify-start">
       {t && (
         <div 
           className={cn(
-            "w-full max-w-[280px] sm:max-w-[320px] transition-all duration-700 ease-in-out",
+            "w-full max-w-[260px] transition-all duration-700 ease-in-out",
             isVisible 
-              ? "animate-in fade-in slide-in-from-bottom-6 duration-1000" 
-              : "animate-out fade-out slide-out-to-bottom-6 duration-700 opacity-0"
+              ? "animate-in fade-in slide-in-from-bottom-4 duration-1000" 
+              : "animate-out fade-out slide-out-to-bottom-4 duration-700 opacity-0"
           )}
         >
           <Card 
-            className="rounded-2xl p-3.5 bg-white dark:bg-zinc-950 text-black dark:text-white border-none relative overflow-hidden ring-1 ring-black/5 dark:ring-white/5"
+            className="rounded-2xl p-3 bg-white dark:bg-zinc-950 text-black dark:text-white border-none relative overflow-hidden ring-1 ring-black/5 dark:ring-white/5"
             style={{ 
               boxShadow: hasSecondary 
-                ? `0 0 20px ${secondaryColor}30, 0 10px 30px -10px rgba(0,0,0,0.15)` 
-                : `0 12px 24px -10px rgba(0,0,0,0.12)`,
+                ? `0 0 15px ${secondaryColor}30, 0 8px 20px -10px rgba(0,0,0,0.15)` 
+                : `0 8px 16px -8px rgba(0,0,0,0.12)`,
             }}
           >
-            <div className="flex gap-3 items-start">
-              {/* Avatar Compacto */}
+            <div className="flex gap-2.5 items-start">
               <div 
-                className="h-9 w-9 rounded-full border flex items-center justify-center shrink-0 bg-muted/10" 
+                className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-muted/10" 
                 style={{ borderColor: hasSecondary ? `${secondaryColor}30` : `${themeColor}30` }}
               >
-                <User className="w-4 h-4" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
+                <User className="w-3.5 h-3.5" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
               </div>
 
               <div className="min-w-0 flex-1 space-y-0.5">
-                {/* Cabeçalho da Notificação */}
                 <div className="flex flex-col">
                   <div className="flex items-center justify-between gap-1">
-                    <span className="font-black text-[11px] truncate uppercase tracking-tight">{t.userName}</span>
+                    <span className="font-black text-[10px] truncate uppercase tracking-tight">{t.userName}</span>
                     <div className="flex shrink-0">
                       {[1, 2, 3, 4, 5].map((s) => (
                         <Star 
                           key={s} 
-                          className={cn("w-2.5 h-2.5 fill-current", s <= (t.rating || 5) ? "" : "opacity-10")} 
+                          className={cn("w-2 h-2 fill-current", s <= (t.rating || 5) ? "" : "opacity-10")} 
                           style={{ color: '#fbbf24' }} 
                         />
                       ))}
                     </div>
                   </div>
-                  <p className="text-[9px] font-bold text-muted-foreground leading-tight">
+                  <p className="text-[8px] font-bold text-muted-foreground leading-tight">
                     avaliou a <span className="text-foreground">{companyName}</span>
                   </p>
                 </div>
                 
-                {/* Prévia do Depoimento */}
                 {t.text && t.text !== '(Depoimento em Vídeo)' && (
-                  <p className="opacity-80 font-medium italic tracking-tight text-[10px] leading-snug line-clamp-2 pt-1">
+                  <p className="opacity-80 font-medium italic tracking-tight text-[9px] leading-tight line-clamp-2 pt-0.5">
                     "{t.text}"
                   </p>
                 )}
 
-                {/* Selo de Verificação Discreto */}
-                <div className="pt-2 flex items-center gap-1 opacity-40">
-                  <CheckCircle2 className="w-2.5 h-2.5 text-green-500" />
-                  <span className="text-[7px] font-black uppercase tracking-[0.1em]">Depoimento Verificado</span>
+                <div className="pt-1.5 flex items-center gap-1 opacity-30">
+                  <CheckCircle2 className="w-2 h-2 text-green-500" />
+                  <span className="text-[6px] font-black uppercase tracking-widest">Verificado</span>
                 </div>
               </div>
             </div>
             
-            {/* Barra de Progresso Suave */}
             <div 
               className="absolute bottom-0 left-0 h-0.5 opacity-20 transition-all duration-[7000ms] ease-linear"
               style={{ 
