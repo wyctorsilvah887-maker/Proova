@@ -318,9 +318,9 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
         <div className="max-w-4xl mx-auto relative px-4 md:px-0">
           <div className="space-y-20 md:space-y-32">
             {[
-              { number: '01', title: 'Conexão com Google', desc: 'Integração via API oficial para ler e gerir o perfil da sua clínica no Google Business Profile de forma segura.' },
-              { number: '02', title: 'IA Generativa (Gemini)', desc: 'O Proova utiliza modelos avançados de IA para responder pacientes com empatia, mantendo o tom de voz da sua marca.' },
-              { number: '03', title: 'Link in Bio de Autoridade', desc: 'Transforme sua biografia do Instagram em um hub de conversão com uma vitrine dinâmica de depoimentos e botão de contato direto.' }
+              { number: '01', title: '01. Conexão com Google', desc: 'Integração via API oficial para ler e gerir o perfil da sua clínica no Google Business Profile de forma segura.' },
+              { number: '02', title: '02. IA Generativa (Gemini)', desc: 'O Proova utiliza modelos avançados de IA para responder pacientes com empatia, mantendo o tom de voz da sua marca.' },
+              { number: '03', title: '03. Link in Bio de Autoridade', desc: 'Transforme sua biografia do Instagram em um hub de conversão com uma vitrine dinâmica de depoimentos e botão de contato direto.' }
             ].map((step, idx) => (
               <div key={idx} className={cn(
                 "flex items-start gap-8 md:gap-16 relative transition-all duration-1000", 
@@ -328,7 +328,7 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
               )} style={{ transitionDelay: `${idx * 200}ms` }}>
                 <div className="flex flex-col items-center shrink-0 w-11">
                   <div className="text-lg md:text-3xl font-black font-headline text-primary">
-                    {step.number}
+                    {step.number.split('.')[0]}
                   </div>
                 </div>
                 <article className="space-y-3 md:space-y-4 pt-1 md:pt-2 flex-1">
@@ -492,8 +492,8 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                         ))}
                       </div>
                       <Link href="/signup" className="w-full">
-                        <Button className={cn("w-full h-14 rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-tight sm:tracking-widest shadow-2xl transition-all active:scale-95 gap-2", plan.highlight ? "bg-white text-primary hover:bg-zinc-100" : "bg-primary text-white hover:bg-primary/90")}>
-                          Garantir Acesso ao Software <ArrowRight className="w-4 h-4" />
+                        <Button className={cn("w-full h-14 rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-tight sm:tracking-normal shadow-2xl transition-all active:scale-95 gap-2", plan.highlight ? "bg-white text-primary hover:bg-zinc-100" : "bg-primary text-white hover:bg-primary/90")}>
+                          Garantir meu acesso <ArrowRight className="w-4 h-4" />
                         </Button>
                       </Link>
                     </div>
