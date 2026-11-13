@@ -188,7 +188,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
 
 const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
   return (
-    <section className="relative w-full pb-12 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh] pt-32">
+    <section className="relative w-full pb-12 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh] pt-8 md:pt-16">
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden="true">
         <div className="absolute top-[15%] left-[8%] animate-float opacity-20 text-primary">
           <BrainCircuit className="w-16 h-16 md:w-24 md:h-24" />
