@@ -23,13 +23,19 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Forçar transparência do body do layout global apenas para esta página
+  // Forçar transparência absoluta do container do iframe
   useEffect(() => {
-    document.documentElement.style.background = 'transparent';
-    document.body.style.background = 'transparent';
+    const root = document.documentElement;
+    const body = document.body;
+    
+    root.style.setProperty('background', 'transparent', 'important');
+    body.style.setProperty('background', 'transparent', 'important');
+    body.style.setProperty('background-color', 'transparent', 'important');
+    
     return () => {
-      document.documentElement.style.background = '';
-      document.body.style.background = '';
+      root.style.background = '';
+      body.style.background = '';
+      body.style.backgroundColor = '';
     };
   }, []);
 
@@ -107,11 +113,11 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
           )}
         >
           <Card 
-            className="rounded-2xl p-3 bg-white/95 dark:bg-zinc-950/90 backdrop-blur-sm text-black dark:text-white border-none relative overflow-hidden ring-1 ring-black/5 dark:ring-white/5"
+            className="rounded-2xl p-3 bg-white/98 dark:bg-zinc-950/98 backdrop-blur-md text-black dark:text-white border-none relative overflow-hidden ring-1 ring-black/5 dark:ring-white/5"
             style={{ 
               boxShadow: hasSecondary 
-                ? `0 0 20px ${secondaryColor}25, 0 10px 25px -10px rgba(0,0,0,0.2)` 
-                : `0 10px 30px -10px rgba(0,0,0,0.15)`,
+                ? `0 0 25px ${secondaryColor}20, 0 15px 35px -10px rgba(0,0,0,0.25)` 
+                : `0 15px 40px -10px rgba(0,0,0,0.18)`,
             }}
           >
             <div className="flex gap-2.5 items-start">
