@@ -550,7 +550,7 @@ export default function Home() {
   const pricingRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    // Injeção do Widget de Teste Compacto solicitado pelo usuário
+    // Injeção do Widget de Teste Compacto no HEAD conforme solicitado
     const injectWidget = () => {
       const existing = document.getElementById('proova-test-widget');
       if (existing) return;
@@ -567,7 +567,7 @@ export default function Home() {
       iframe.style.zIndex = '999999';
       // @ts-ignore
       iframe.allowTransparency = 'true';
-      document.body.appendChild(iframe);
+      document.head.appendChild(iframe);
     };
 
     injectWidget();

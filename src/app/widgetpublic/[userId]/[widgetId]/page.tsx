@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 /**
  * Página pública do Widget (Embed VIP)
  * Comportamento de Notificação Compacta (Bubble)
- * Otimizado para espaços pequenos com fundo 100% transparente e opacidade de leitura.
+ * Otimizado para espaços pequenos com fundo 100% transparente e opacidade de leitura elevada (98%).
  */
 export default function WidgetPublicPage({ params }: { params: Promise<{ userId: string, widgetId: string }> }) {
   const { userId, widgetId } = use(params);
@@ -80,24 +80,22 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   const themeColor = widgetData?.themeColor || '#f97316';
   const companyName = userData?.companyName || 'nossa empresa';
 
-  // Lógica de rotação da "Bolha"
+  // Lógica de rotação da "Bolha" (Fica 6.5s visível, 3.5s oculta)
   useEffect(() => {
     if (filteredTestimonials.length === 0) return;
 
     const cycle = () => {
       setIsVisible(true);
-      // Fica visível por 6 segundos
       setTimeout(() => {
         setIsVisible(false);
-        // Espera sair da tela antes de mudar o index
         setTimeout(() => {
           setCurrentIndex((prev) => (prev + 1) % filteredTestimonials.length);
         }, 800);
-      }, 6000);
+      }, 6500);
     };
 
     const initialTimer = setTimeout(cycle, 1000);
-    const interval = setInterval(cycle, 10000); // Ciclo total de 10s
+    const interval = setInterval(cycle, 10000);
     
     return () => {
       clearTimeout(initialTimer);
@@ -174,7 +172,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
             </div>
             
             <div 
-              className="absolute bottom-0 left-0 h-0.5 opacity-20 transition-all duration-[6000ms] ease-linear"
+              className="absolute bottom-0 left-0 h-0.5 opacity-20 transition-all duration-[6500ms] ease-linear"
               style={{ 
                 width: isVisible ? '100%' : '0%',
                 backgroundColor: themeColor
