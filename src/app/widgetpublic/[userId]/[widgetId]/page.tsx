@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, use } from 'react';
@@ -13,7 +12,6 @@ import {
   CarouselItem,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { LoadingScreen } from '@/components/loading-screen';
 
 /**
  * Página pública do Widget (Embed VIP)
@@ -94,20 +92,8 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
     return filteredTestimonials;
   }, [filteredTestimonials, muralIndex, layout]);
 
-  if (isLoading) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center bg-transparent">
-        <Loader2 className="w-8 h-8 animate-spin text-primary opacity-20" />
-      </div>
-    );
-  }
-
-  if (!widgetData) {
-    return (
-      <div className="h-screen w-full flex items-center justify-center bg-transparent opacity-10">
-        <p className="text-[10px] font-black uppercase">Mural não encontrado</p>
-      </div>
-    );
+  if (isLoading || !widgetData) {
+    return null;
   }
 
   const TestimonialCard = ({ t, index = 0 }: { t: any, index?: number }) => {
@@ -137,7 +123,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
               <div className="min-w-0 flex-1">
                 <p className="font-black text-[11px] sm:text-[12px] tracking-tight truncate uppercase leading-none">{t.userName}</p>
                 <div className="flex gap-0.5 mt-1">
-                  {[1, 2, 3, 4, 5].map((s) => (
+                  {[1, 2, 3, 4, 5].map((s, i) => (
                     <Star key={s} className={cn("w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current", i < (t.rating || 5) ? "" : "opacity-10")} style={{ color: hasSecondary ? secondaryColor : themeColor }} />
                   ))}
                 </div>
