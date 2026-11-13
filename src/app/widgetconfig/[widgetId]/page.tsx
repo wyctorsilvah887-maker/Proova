@@ -35,7 +35,9 @@ import {
   X,
   Clock,
   ListChecks,
-  Code
+  Code,
+  Smartphone,
+  Globe
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -192,11 +194,28 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
     return currentSelection;
   }, [currentSelection, layout, muralIndex]);
 
-  const embedCode = `<iframe src="${baseUrl}/widgetpublic/${user?.uid}/${widgetId}" width="100%" height="600px" style="border:none;" allowtransparency="true"></iframe>`;
+  const iframeCode = `<iframe src="${baseUrl}/widgetpublic/${user?.uid}/${widgetId}" width="100%" height="600px" style="border:none;" allowtransparency="true"></iframe>`;
+  
+  const floatingScriptCode = `
+<script>
+  (function() {
+    var iframe = document.createElement('iframe');
+    iframe.src = '${baseUrl}/widgetpublic/${user?.uid}/${widgetId}';
+    iframe.style.position = 'fixed';
+    iframe.style.bottom = '20px';
+    iframe.style.left = '20px';
+    iframe.style.width = '350px';
+    iframe.style.height = '180px';
+    iframe.style.border = 'none';
+    iframe.style.zIndex = '999999';
+    iframe.allowTransparency = 'true';
+    document.body.appendChild(iframe);
+  })();
+</script>`.trim();
 
-  const copyEmbedCode = () => {
-    navigator.clipboard.writeText(embedCode);
-    toast({ title: "Código Copiado!", description: "Cole no seu site (WordPress, Wix, HTML, etc)." });
+  const copyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast({ title: "Código Copiado!", description: "Cole no seu site para ativar." });
   };
 
   const membershipLabel = useMemo(() => {
@@ -214,7 +233,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
 
   return (
     <div className="h-screen flex flex-col font-body w-full overflow-hidden bg-background text-foreground">
-      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[60] shadow-sm backdrop-blur-md bg-background/95">
+      <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 fixed top-0 w-full z-[120] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-3 flex-1">
           <Link href="/widgets">
             <button className="h-10 px-2 gap-2 text-muted-foreground hover:text-primary transition-all flex items-center group">
@@ -298,7 +317,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
                              { id: 'grid', label: 'Grade VIP', icon: LayoutGrid, desc: 'Scroll Infinito' },
                              { id: 'mural', label: 'Mural', icon: Layout, desc: 'Pinterest Style' },
                              { id: 'carousel', label: 'Carrossel', icon: Play, desc: 'Um por vez' },
-                             { id: 'popup', label: 'Popup', icon: MessageCircle, desc: 'Notificação' },
+                             { id: 'popup', label: 'Notificação', icon: MessageCircle, desc: 'Flutuante' },
                            ].map(l => (
                              <button 
                                key={l.id} 
@@ -379,10 +398,11 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
                  
                  <div className="pt-16 pb-12 px-6 min-h-[500px] flex flex-col items-center">
                     <div className={cn(
-                      "w-full",
+                      "w-full h-full",
                       (layout === 'popup' || layout === 'carousel') ? "max-w-md mx-auto" : (
                         layout === 'mural' ? "grid grid-cols-1 sm:grid-cols-2 gap-12" : "grid grid-cols-1 sm:grid-cols-2 gap-12"
-                      )
+                      ),
+                      layout === 'popup' && "flex items-end pb-8"
                     )}>
                       {currentSelection.length === 0 ? (
                         <div className="col-span-full py-20 text-center opacity-10 flex flex-col items-center gap-4 animate-pulse">
@@ -396,7 +416,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
                             className={cn(
                               "p-6 rounded-[2rem] bg-card shadow-2xl border-none transition-all duration-700",
                               layout === 'mural' && !isAnimating && (idx % 2 === 0 ? "animate-in slide-in-from-left-4" : "animate-in slide-in-from-right-4"),
-                              layout === 'popup' && !isAnimating && "animate-in zoom-in-95 duration-1000"
+                              layout === 'popup' && !isAnimating && "animate-in slide-in-from-bottom-8 zoom-in-95 duration-1000"
                             )}
                             style={{ 
                               boxShadow: secondaryColor ? `0 0 35px ${secondaryColor}30, 0 20px 40px -15px rgba(0,0,0,0.2)` : `0 20px 40px -15px ${themeColor}20`,
@@ -424,7 +444,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
 
               <div className="flex flex-col sm:flex-row gap-4">
                  <Button variant="outline" className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest gap-2 bg-background border-primary/20 text-primary hover:bg-primary/5" onClick={() => setIsEmbedDialogOpen(true)}>
-                    <Code className="w-5 h-5" /> Copiar Código Embed
+                    <Code className="w-5 h-5" /> Opções de Instalação
                  </Button>
                  <Button className="flex-1 h-14 rounded-2xl font-black uppercase tracking-widest gap-2 bg-foreground text-background hover:opacity-90 shadow-xl" onClick={() => router.push(`/widgetpublic/${user?.uid}/${widgetId}`)}>
                     <Eye className="w-5 h-5" /> Tela Cheia
@@ -435,37 +455,77 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
       </main>
 
       <Dialog open={isEmbedDialogOpen} onOpenChange={setIsEmbedDialogOpen}>
-         <DialogContent className="rounded-[2.5rem] w-[95vw] sm:max-w-lg border-none shadow-2xl p-0 overflow-hidden bg-background">
+         <DialogContent className="rounded-[2.5rem] w-[95vw] sm:max-w-2xl border-none shadow-2xl p-0 overflow-hidden bg-background">
             <div className="h-2 bg-primary w-full" />
             <div className="p-8 space-y-6">
                <DialogHeader className="text-center space-y-3">
                   <div className="mx-auto w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center text-primary shadow-inner">
-                     <Code className="w-7 h-7" />
+                     <Zap className="w-7 h-7" />
                   </div>
-                  <DialogTitle className="text-xl md:text-2xl font-black uppercase tracking-tight">Instale no seu Site</DialogTitle>
-                  <DialogDescription className="text-xs font-medium">Copie o código abaixo e cole no local onde deseja exibir seus depoimentos.</DialogDescription>
+                  <DialogTitle className="text-xl md:text-2xl font-black uppercase tracking-tight">Ativar Prova Social no seu Site</DialogTitle>
+                  <DialogDescription className="text-xs font-medium">Escolha o método que melhor se adapta ao seu design.</DialogDescription>
                </DialogHeader>
 
-               <div className="bg-muted/30 p-5 rounded-2xl border-2 border-dashed border-primary/10 relative group">
-                  <pre className="text-[10px] font-mono leading-relaxed break-all whitespace-pre-wrap opacity-60">
-                     {embedCode}
-                  </pre>
-                  <button 
-                    onClick={copyEmbedCode}
-                    className="absolute top-2 right-2 p-2 bg-background border rounded-lg shadow-sm hover:text-primary transition-colors"
-                  >
-                     <Copy className="w-4 h-4" />
-                  </button>
-               </div>
+               <Tabs defaultValue="script" className="w-full">
+                  <TabsList className="grid grid-cols-2 h-14 bg-muted/20 p-1 rounded-2xl mb-6">
+                     <TabsTrigger value="script" className="rounded-xl text-[10px] font-black uppercase tracking-widest gap-2">
+                        <Smartphone className="w-4 h-4" /> Script Flutuante
+                     </TabsTrigger>
+                     <TabsTrigger value="iframe" className="rounded-xl text-[10px] font-black uppercase tracking-widest gap-2">
+                        <LayoutGrid className="w-4 h-4" /> Iframe Estático
+                     </TabsTrigger>
+                  </TabsList>
 
-               <div className="space-y-4 pt-2">
+                  <TabsContent value="script" className="space-y-4 outline-none">
+                     <div className="bg-primary/5 p-5 rounded-2xl border border-primary/10 space-y-4">
+                        <div className="flex items-center gap-2">
+                           <Badge className="bg-primary text-white text-[8px] font-black">RECOMENDADO</Badge>
+                           <p className="text-[10px] font-black uppercase opacity-60">Instalação via Head</p>
+                        </div>
+                        <p className="text-xs font-medium leading-relaxed">Este método cria uma **bolha de notificação** que flutua sobre o seu site, ideal para não quebrar o layout e converter visitantes em qualquer página.</p>
+                        <div className="bg-zinc-900 p-4 rounded-xl relative group overflow-hidden">
+                           <pre className="text-[10px] text-primary/80 font-mono leading-relaxed break-all whitespace-pre-wrap max-h-40 overflow-y-auto">
+                              {floatingScriptCode}
+                           </pre>
+                           <Button 
+                             size="sm" 
+                             className="absolute top-2 right-2 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white gap-1.5"
+                             onClick={() => copyCode(floatingScriptCode)}
+                           >
+                             <Copy className="w-3.5 h-3.5" /> Copiar
+                           </Button>
+                        </div>
+                        <p className="text-[9px] text-muted-foreground italic font-medium">Cole este código preferencialmente antes da tag de fechamento <code>&lt;/head&gt;</code>.</p>
+                     </div>
+                  </TabsContent>
+
+                  <TabsContent value="iframe" className="space-y-4 outline-none">
+                     <div className="bg-muted/30 p-5 rounded-2xl border border-muted-foreground/10 space-y-4">
+                        <div className="flex items-center gap-2">
+                           <p className="text-[10px] font-black uppercase opacity-60">Instalação via Bloco HTML</p>
+                        </div>
+                        <p className="text-xs font-medium leading-relaxed">Use este método se você quiser reservar um espaço específico no corpo do seu site (Ex: Seção de Depoimentos na Home).</p>
+                        <div className="bg-zinc-900 p-4 rounded-xl relative group">
+                           <pre className="text-[10px] text-zinc-400 font-mono leading-relaxed break-all whitespace-pre-wrap">
+                              {iframeCode}
+                           </pre>
+                           <Button 
+                             size="sm" 
+                             className="absolute top-2 right-2 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white gap-1.5"
+                             onClick={() => copyCode(iframeCode)}
+                           >
+                             <Copy className="w-3.5 h-3.5" /> Copiar
+                           </Button>
+                        </div>
+                     </div>
+                  </TabsContent>
+               </Tabs>
+
+               <div className="pt-4 border-t">
                   <div className="flex items-start gap-3 p-4 rounded-xl bg-orange-500/5 border border-orange-500/10">
                      <AlertCircle className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" />
-                     <p className="text-[10px] font-medium leading-relaxed"><b>Dica Proova:</b> Para melhores resultados, posicione o mural logo abaixo do seu botão de compra ou formulário de contato.</p>
+                     <p className="text-[10px] font-medium leading-relaxed"><b>Dica Proova:</b> O Script Flutuante é ideal para Landing Pages e sites WordPress, pois aparece automaticamente em todas as páginas sem precisar ajustar o design.</p>
                   </div>
-                  <Button className="w-full h-14 rounded-xl font-black uppercase tracking-widest gap-2 bg-primary shadow-xl" onClick={copyEmbedCode}>
-                     Copiar Agora <CheckCircle2 className="w-5 h-5" />
-                  </Button>
                </div>
             </div>
          </DialogContent>
