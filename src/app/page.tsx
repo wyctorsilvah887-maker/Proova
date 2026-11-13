@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef, forwardRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import Script from "next/script";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
@@ -642,10 +641,33 @@ export default function Home() {
   const pricingRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    // Injeta o widget apenas na Landing Page com ciclo de vida controlado
+    const iframe = document.createElement('iframe');
+    iframe.id = 'proova-mural-widget';
+    iframe.src = 'https://www.useproovaai.com.br/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova';
+    iframe.style.position = 'fixed';
+    iframe.style.bottom = '20px';
+    iframe.style.left = '20px';
+    iframe.style.width = '300px';
+    iframe.style.height = '130px';
+    iframe.style.border = 'none';
+    iframe.style.zIndex = '999999';
+    iframe.allowTransparency = 'true';
+    document.body.appendChild(iframe);
+
+    // Cleanup: Remove o widget ao navegar para outra página
+    return () => {
+      const existingIframe = document.getElementById('proova-mural-widget');
+      if (existingIframe) {
+        existingIframe.remove();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     
-    // Fallback de segurança
     const fallbackTimer = setTimeout(() => {
       setIsHeroVisible(true);
       setIsAgitationVisible(true);
@@ -705,10 +727,6 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
-      <Script id="proova-bubble-script" strategy="afterInteractive">
-        {`(function() { var iframe = document.createElement('iframe'); iframe.src = 'https://www.useproovaai.com.br/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova'; iframe.style.position = 'fixed'; iframe.style.bottom = '20px'; iframe.style.left = '20px'; iframe.style.width = '300px'; iframe.style.height = '130px'; iframe.style.border = 'none'; iframe.style.zIndex = '999999'; iframe.allowTransparency = 'true'; document.body.appendChild(iframe); })();`}
-      </Script>
-
       <Navigation isScrolled={isScrolled} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} scrollToSection={scrollToSection} />
       <main className="flex-1 pt-20">
         <HeroSection isVisible={isHeroVisible} />
