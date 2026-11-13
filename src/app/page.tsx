@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState, useRef, forwardRef, useMemo } from "react";
@@ -706,7 +705,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
-      <Script id="proova-bubble-script">
+      <Script id="proova-bubble-script" strategy="afterInteractive">
         {`(function() { var iframe = document.createElement('iframe'); iframe.src = 'https://www.useproovaai.com.br/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova'; iframe.style.position = 'fixed'; iframe.style.bottom = '20px'; iframe.style.left = '20px'; iframe.style.width = '300px'; iframe.style.height = '130px'; iframe.style.border = 'none'; iframe.style.zIndex = '999999'; iframe.allowTransparency = 'true'; document.body.appendChild(iframe); })();`}
       </Script>
 
