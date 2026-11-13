@@ -58,6 +58,7 @@ import { useUser } from "@/firebase";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 import { LoadingScreen } from "@/components/loading-screen";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 // --- SUB-COMPONENTS ---
 
@@ -382,16 +383,15 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
 
           <aside className={cn("relative transition-all duration-1000 delay-500 flex flex-col items-center", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10")}>
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
-            <Card className="relative border-none shadow-2xl rounded-[3rem] overflow-hidden bg-card ring-1 ring-primary/10 w-full h-[500px]">
-              <iframe 
-                src="https://www.useproova.online/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova" 
-                width="100%" 
-                height="500px" 
-                title="Demonstração do Mural Proova"
-                style={{ border: 'none' }} 
-                allow="autoplay"
-              ></iframe>
-            </Card>
+            <div className="relative w-full aspect-[4/5] md:aspect-square lg:aspect-[4/3] rounded-[3rem] overflow-hidden shadow-2xl ring-1 ring-primary/10">
+              <Image 
+                src={PlaceHolderImages.find(img => img.id === 'brand-design')?.imageUrl || "https://picsum.photos/seed/design1/800/600"} 
+                alt="Demonstração da Página Pública Proova" 
+                fill 
+                className="object-cover"
+                data-ai-hint="brand design"
+              />
+            </div>
           </aside>
         </div>
       </div>

@@ -78,24 +78,26 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   }, [widgetData, allTestimonials]);
 
   const themeColor = widgetData?.themeColor || '#f97316';
-  const secondaryColor = widgetData?.secondaryColor || '';
   const companyName = userData?.companyName || 'nossa empresa';
 
+  // Lógica de rotação da "Bolha"
   useEffect(() => {
     if (filteredTestimonials.length === 0) return;
 
-    const showNext = () => {
+    const cycle = () => {
       setIsVisible(true);
+      // Fica visível por 6 segundos
       setTimeout(() => {
         setIsVisible(false);
+        // Espera sair da tela antes de mudar o index
         setTimeout(() => {
           setCurrentIndex((prev) => (prev + 1) % filteredTestimonials.length);
         }, 800);
-      }, 7000);
+      }, 6000);
     };
 
-    const initialTimer = setTimeout(showNext, 1000);
-    const interval = setInterval(showNext, 9500);
+    const initialTimer = setTimeout(cycle, 1000);
+    const interval = setInterval(cycle, 10000); // Ciclo total de 10s
     
     return () => {
       clearTimeout(initialTimer);
@@ -105,16 +107,13 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
 
   if (isLoading || !widgetData || filteredTestimonials.length === 0) {
     return (
-      <>
-        <style dangerouslySetInnerHTML={{ __html: `
-          html, body { background: transparent !important; background-color: transparent !important; opacity: 0 !important; }
-        ` }} />
-      </>
+      <style dangerouslySetInnerHTML={{ __html: `
+        html, body { background: transparent !important; background-color: transparent !important; opacity: 0 !important; }
+      ` }} />
     );
   }
 
   const t = filteredTestimonials[currentIndex];
-  const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
 
   return (
     <div className="h-screen w-full bg-transparent p-2 font-body overflow-hidden flex items-end justify-start">
@@ -133,18 +132,13 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
         >
           <Card 
             className="rounded-2xl p-3 bg-white/98 dark:bg-zinc-950/98 backdrop-blur-md text-black dark:text-white border-none relative overflow-hidden ring-1 ring-black/5 dark:ring-white/5 shadow-2xl"
-            style={{ 
-              boxShadow: hasSecondary 
-                ? `0 0 25px ${secondaryColor}20, 0 15px 35px -10px rgba(0,0,0,0.25)` 
-                : `0 15px 40px -10px rgba(0,0,0,0.18)`,
-            }}
           >
             <div className="flex gap-2.5 items-start">
               <div 
                 className="h-9 w-9 rounded-full border flex items-center justify-center shrink-0 bg-muted/10" 
-                style={{ borderColor: hasSecondary ? `${secondaryColor}30` : `${themeColor}30` }}
+                style={{ borderColor: themeColor + '30' }}
               >
-                <User className="w-4 h-4" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
+                <User className="w-4 h-4" style={{ color: themeColor }} />
               </div>
 
               <div className="min-w-0 flex-1 space-y-0.5">
@@ -180,7 +174,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
             </div>
             
             <div 
-              className="absolute bottom-0 left-0 h-0.5 opacity-20 transition-all duration-[7000ms] ease-linear"
+              className="absolute bottom-0 left-0 h-0.5 opacity-20 transition-all duration-[6000ms] ease-linear"
               style={{ 
                 width: isVisible ? '100%' : '0%',
                 backgroundColor: themeColor
