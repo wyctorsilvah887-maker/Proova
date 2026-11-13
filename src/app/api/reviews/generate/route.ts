@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { generateReplyAction } from '@/ai/flows/generate-reply-flow';
-import fs from 'fs/promises';
-import path from 'path';
+import mockData from '@/mocks/mock-reviews.json';
 
 /**
  * API Route para processar avaliações do mock-reviews.json.
@@ -9,13 +8,8 @@ import path from 'path';
  */
 export async function POST() {
   try {
-    // 1. Caminho para o arquivo mock
-    const filePath = path.join(process.cwd(), 'src/mocks/mock-reviews.json');
-    const fileContent = await fs.readFile(filePath, 'utf8');
-    const data = JSON.parse(fileContent);
-
-    // Consideramos o primeiro negócio da lista do mock
-    const business = data[0];
+    // 1. Pega as avaliações do primeiro estabelecimento do JSON
+    const business = mockData[0];
     if (!business) {
       return NextResponse.json({ error: 'Nenhum dado de negócio localizado no mock.' }, { status: 404 });
     }
@@ -24,8 +18,10 @@ export async function POST() {
     const businessType = business.categoryName;
     const reviews = business.reviews || [];
 
-    // 2. Filtrar apenas avaliações sem resposta do proprietário
-    const pendingReviews = reviews.filter((review: any) => !review.responseFromOwnerText);
+    // 2. Filtra apenas as avaliações que ainda não foram respondidas pelo dono
+    const pendingReviews = reviews.filter(
+      (review: any) => !review.responseFromOwnerText
+    );
 
     if (pendingReviews.length === 0) {
       return NextResponse.json({ 
