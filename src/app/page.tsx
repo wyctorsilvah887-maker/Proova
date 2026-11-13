@@ -212,9 +212,9 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
             "text-3xl font-black tracking-tighter sm:text-5xl md:text-7xl font-headline leading-[1] transition-all duration-1000",
             isVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
           )}>
-            Sua Clínica no Piloto <br className="hidden sm:block" />
+            Automatize suas respostas no <br className="hidden sm:block" />
             <span className="inline-block relative bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">
-              AUTOMÁTICO
+              Google Meu Negócio
             </span> com IA
           </h1>
           
@@ -251,10 +251,9 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
           "space-y-4 transition-all duration-1000",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         )}>
-          <h2 className="text-primary font-black uppercase tracking-[0.3em] text-[10px]">Gestão Unificada de Autoridade</h2>
-          <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
-            Integração Oficial com <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-1">Google Business.</span>
-          </h3>
+          <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
+            Gestão Unificada de <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-1">Autoridade Digital.</span>
+          </h2>
           <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">O Proova se conecta diretamente ao Perfil da sua Empresa no Google para monitorar, responder e escalar seu ranking orgânico através de dados reais.</p>
         </div>
 
@@ -288,7 +287,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
                   <item.icon className="w-10 h-10" />
                 </div>
               </div>
-              <h4 className="text-xl font-bold font-headline px-4">{item.title}</h4>
+              <h3 className="text-xl font-bold font-headline px-4">{item.title}</h3>
               <p className="text-muted-foreground dark:text-zinc-500 text-sm leading-relaxed font-medium px-6">{item.desc}</p>
             </div>
           ))}
@@ -307,10 +306,9 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
           "text-center space-y-4 mb-24 transition-all duration-1000",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         )}>
-          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Funcionalidades do Produto</h2>
-          <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
+          <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
             Como o Proova <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">Automatiza sua Reputação.</span>
-          </h3>
+          </h2>
         </div>
         
         <div className="max-w-4xl mx-auto relative px-4 md:px-0">
@@ -330,9 +328,9 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                   </div>
                 </div>
                 <div className="space-y-3 md:space-y-4 pt-1 md:pt-2 flex-1">
-                  <h4 className="text-xl md:text-4xl font-black font-headline tracking-tight">
+                  <h3 className="text-xl md:text-4xl font-black font-headline tracking-tight">
                     {step.title}
-                  </h4>
+                  </h3>
                   <p className="text-muted-foreground text-sm md:text-xl leading-relaxed font-medium max-w-2xl">
                     {step.desc}
                   </p>
@@ -441,10 +439,9 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
     <section id="planos" ref={ref} className="w-full py-24 md:py-32 bg-background overflow-hidden min-h-[500px] border-t">
       <div className="container px-4 mx-auto max-w-4xl">
         <div className={cn("text-center space-y-4 mb-16 transition-all duration-1000", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10")}>
-          <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-primary">Licenciamento SaaS</h2>
-          <h3 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
+          <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
             Níveis de <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">Automação Estratégica.</span>
-          </h3>
+          </h2>
         </div>
 
         <div className="space-y-4">
