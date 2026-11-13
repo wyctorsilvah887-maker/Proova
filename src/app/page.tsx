@@ -550,7 +550,7 @@ export default function Home() {
   const pricingRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    // Injeção do Widget de Teste Compacto no HEAD conforme solicitado
+    // Injeção do Widget de Teste Compacto no BODY conforme solicitado (corrigido de HEAD para BODY)
     const injectWidget = () => {
       const existing = document.getElementById('proova-test-widget');
       if (existing) return;
@@ -567,7 +567,7 @@ export default function Home() {
       iframe.style.zIndex = '999999';
       // @ts-ignore
       iframe.allowTransparency = 'true';
-      document.head.appendChild(iframe);
+      document.body.appendChild(iframe);
     };
 
     injectWidget();
@@ -689,7 +689,6 @@ export default function Home() {
         <AgitationSection ref={agitationRef} isVisible={isAgitationVisible} />
         <PillarsSection ref={pillarsRef} isVisible={isPillarsVisible} />
         <VersatilitySection ref={versatilityRef} isVisible={isVersatilityVisible} />
-        <PricingSection ref={pricingRef} isVisible={isPricingVisible} />
         
         <section className="relative w-full py-24 md:py-36 bg-black text-white overflow-hidden">
           <Image src="https://picsum.photos/seed/ctabg88/1920/1080" alt="Chamada para Ação Final" fill className="object-cover opacity-20 grayscale brightness-50" />
