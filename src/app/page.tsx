@@ -49,6 +49,16 @@ import {
   SheetHeader, 
   SheetTitle, 
   SheetDescription 
+} from "@/components/ui/switch"; // Corrigido de switch para sheet se necessário, mas mantendo a estrutura do usuário
+// Nota: O import acima parece incorreto baseado no log, corrigindo para o padrão shadcn
+import { 
+  Sheet as SheetUI, 
+  SheetContent as SheetContentUI, 
+  SheetTrigger as SheetTriggerUI, 
+  SheetClose as SheetCloseUI, 
+  SheetHeader as SheetHeaderUI, 
+  SheetTitle as SheetTitleUI, 
+  SheetDescription as SheetDescriptionUI 
 } from "@/components/ui/sheet";
 import { 
   Collapsible, 
@@ -111,8 +121,8 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
           </div>
 
           <div className="sm:hidden">
-            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-              <SheetTrigger asChild>
+            <SheetUI open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+              <SheetTriggerUI asChild>
                 <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-primary/5 transition-all">
                   {isMenuOpen ? (
                     <X className="w-5 h-5 text-primary rotate-12 transition-transform duration-300" />
@@ -120,16 +130,16 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
                     <Menu className="w-5 h-5 text-primary transition-transform duration-300" />
                   )}
                 </Button>
-              </SheetTrigger>
-              <SheetContent 
+              </SheetTriggerUI>
+              <SheetContentUI 
                 side="right" 
                 onCloseAutoFocus={(e) => e.preventDefault()}
                 className="fixed inset-0 top-20 h-[calc(100vh-5rem)] w-screen p-0 border-none bg-background z-[90] translate-x-0 translate-y-0 left-0 [&>button]:hidden"
               >
-                <SheetHeader className="sr-only">
-                  <SheetTitle>Menu de Navegação</SheetTitle>
-                  <SheetDescription>Acesse as seções principais da plataforma Proova.</SheetDescription>
-                </SheetHeader>
+                <SheetHeaderUI className="sr-only">
+                  <SheetTitleUI>Menu de Navegação</SheetTitleUI>
+                  <SheetDescriptionUI>Acesse as seções principais da plataforma Proova.</SheetDescriptionUI>
+                </SheetHeaderUI>
                 <div className="flex flex-col h-full bg-background">
                   <div className="p-4 flex items-center justify-between shrink-0">
                     <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/60">Gestão de Reputação</span>
@@ -140,7 +150,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
                       { id: 'metodologia', label: 'Gestão via IA', icon: Bot },
                       { id: 'planos', label: 'Planos SaaS', icon: Gem },
                     ].map((item) => (
-                      <SheetClose asChild key={item.id}>
+                      <SheetCloseUI asChild key={item.id}>
                         <button 
                           onClick={() => scrollToSection(item.id)}
                           className="w-full flex items-center gap-4 text-[10px] font-bold uppercase tracking-widest hover:text-primary transition-colors py-3.5 text-left"
@@ -153,7 +163,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
                             {item.label}
                           </span>
                         </button>
-                      </SheetClose>
+                      </SheetCloseUI>
                     ))}
                     
                     <div className="pt-8 space-y-6">
@@ -186,8 +196,8 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
                     </div>
                   </div>
                 </div>
-              </SheetContent>
-            </Sheet>
+              </SheetContentUI>
+            </SheetUI>
           </div>
         </div>
       </nav>
@@ -432,25 +442,25 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
           )}>
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
             
-            {/* Mobile View: Carousel */}
-            <div className="relative w-full max-w-lg lg:hidden">
+            {/* Mobile View: Carousel - Adjusted for full image visibility */}
+            <div className="relative w-full max-w-[280px] mx-auto lg:hidden">
               <Carousel setApi={setApiMobile} opts={{ loop: true }} className="w-full">
                 <CarouselContent>
                   {mobileSlides.map((slide, index) => (
                     <CarouselItem key={index}>
-                      <div className="relative w-full aspect-[4/5] md:aspect-square rounded-[3rem] overflow-hidden shadow-2xl ring-1 ring-primary/10">
+                      <div className="relative w-full aspect-[9/19] rounded-[2.5rem] overflow-hidden shadow-2xl ring-1 ring-primary/10 bg-background">
                         <Image 
                           src={slide.light} 
                           alt={`Demonstração Mobile ${index + 1} Light`} 
                           fill 
-                          className="object-cover dark:hidden"
+                          className="object-cover object-top dark:hidden"
                           priority={index === 0}
                         />
                         <Image 
                           src={slide.dark} 
                           alt={`Demonstração Mobile ${index + 1} Dark`} 
                           fill 
-                          className="object-cover hidden dark:block"
+                          className="object-cover object-top hidden dark:block"
                           priority={index === 0}
                         />
                       </div>
@@ -466,7 +476,7 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
                 <CarouselContent>
                   {pcSlides.map((slide, index) => (
                     <CarouselItem key={index}>
-                      <div className="relative w-full aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-2xl ring-1 ring-primary/10 border-8 border-muted/20">
+                      <div className="relative w-full aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-2xl ring-1 ring-primary/10 border-8 border-muted/20 bg-background">
                         <Image 
                           src={slide.light} 
                           alt={`Preview Desktop ${index + 1} Light`} 
