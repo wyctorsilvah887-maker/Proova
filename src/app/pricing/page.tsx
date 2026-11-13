@@ -297,7 +297,7 @@ export default function PricingPage() {
                           onClick={() => plan.checkoutUrl && window.open(plan.checkoutUrl, '_blank')}
                           disabled={plan.disabled}
                           className={cn(
-                            "w-full h-14 md:h-16 rounded-2xl text-[10px] md:text-sm font-black uppercase tracking-widest shadow-2xl transition-all active:scale-95 gap-3",
+                            "w-full h-14 md:h-16 rounded-2xl text-[9px] sm:text-sm font-black uppercase tracking-tight sm:tracking-widest shadow-2xl transition-all active:scale-95 gap-3",
                             plan.highlight 
                               ? "bg-white text-primary hover:bg-zinc-100" 
                               : "bg-primary text-white hover:bg-primary/90"

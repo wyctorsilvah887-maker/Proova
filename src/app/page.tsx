@@ -123,7 +123,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
                 </SheetHeader>
                 <div className="flex flex-col h-full bg-background">
                   <div className="p-4 flex items-center justify-between shrink-0">
-                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/60">Gestão de Reputação</span>
+                    <span className="text-8px] font-black uppercase tracking-[0.3em] text-primary/60">Gestão de Reputação</span>
                   </div>
                   <div className="flex-1 p-4 space-y-1 overflow-y-auto">
                     {[
@@ -492,7 +492,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                         ))}
                       </div>
                       <Link href="/signup" className="w-full">
-                        <Button className={cn("w-full h-14 rounded-2xl text-xs font-black uppercase tracking-widest shadow-2xl transition-all active:scale-95 gap-2", plan.highlight ? "bg-white text-primary hover:bg-zinc-100" : "bg-primary text-white hover:bg-primary/90")}>
+                        <Button className={cn("w-full h-14 rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-tight sm:tracking-widest shadow-2xl transition-all active:scale-95 gap-2", plan.highlight ? "bg-white text-primary hover:bg-zinc-100" : "bg-primary text-white hover:bg-primary/90")}>
                           Garantir Acesso ao Software <ArrowRight className="w-4 h-4" />
                         </Button>
                       </Link>
