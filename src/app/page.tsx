@@ -123,7 +123,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
                 </SheetHeader>
                 <div className="flex flex-col h-full bg-background">
                   <div className="p-4 flex items-center justify-between shrink-0">
-                    <span className="text-8px] font-black uppercase tracking-[0.3em] text-primary/60">Gestão de Reputação</span>
+                    <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary/60">Gestão de Reputação</span>
                   </div>
                   <div className="flex-1 p-4 space-y-1 overflow-y-auto">
                     {[
@@ -432,10 +432,11 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
       benefits: [
         "Tudo do Plano Gold + Exclusivos",
         "Coleta de Vídeo Reviews 4K",
-        "Suporte VIP Dedicado no App",
+        "Suporte VIP Dedicado com Consultor",
         "Métricas de ROI Avançadas",
         "Design de Página Ultra Customizado",
-        "Consultoria de Reputação Mensal"
+        "Consultoria de Reputação Mensal",
+        "Uplink para Domínio Próprio (sob consulta)"
       ]
     }
   ];

@@ -109,7 +109,7 @@ export default function PricingPage() {
       description: "Aceleração de Vendas",
       icon: Star,
       highlight: true,
-      cta: status === 'gold' ? "Plano Ativo" : "Garantir Acesso Gold",
+      cta: status === 'gold' ? "Plano Ativo" : "Garantir meu acesso",
       disabled: status === 'gold',
       checkoutUrl: "https://pay.cakto.com.br/gold-proova",
       benefits: [
@@ -130,7 +130,7 @@ export default function PricingPage() {
       description: "Domínio de Mercado",
       icon: Zap,
       highlight: false,
-      cta: (status === 'pro' || status === 'enterprise') ? "Plano Ativo" : "Garantir Acesso PRO",
+      cta: (status === 'pro' || status === 'enterprise') ? "Plano Ativo" : "Garantir meu acesso",
       disabled: status === 'pro' || status === 'enterprise',
       checkoutUrl: "https://pay.cakto.com.br/enterprise-proova",
       benefits: [
@@ -140,7 +140,7 @@ export default function PricingPage() {
         "Métricas de ROI Avançadas",
         "Design de Página Ultra Customizado",
         "Consultoria de Reputação Mensal",
-        "Uplink para Domínio Próprio"
+        "Uplink para Domínio Próprio (sob consulta)"
       ]
     }
   ];
