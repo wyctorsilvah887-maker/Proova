@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
@@ -177,6 +176,31 @@ export default function WidgetsPage() {
     }
   };
 
+  const copyEmbedCode = (wId: string) => {
+    const script = `
+<script>
+  (function() {
+    var iframe = document.createElement('iframe');
+    iframe.src = '${baseUrl}/widgetpublic/${user?.uid}/${wId}';
+    iframe.style.position = 'fixed';
+    iframe.style.bottom = '20px';
+    iframe.style.left = '20px';
+    iframe.style.width = '350px';
+    iframe.style.height = '180px';
+    iframe.style.border = 'none';
+    iframe.style.zIndex = '999999';
+    iframe.allowTransparency = 'true';
+    document.body.appendChild(iframe);
+  })();
+</script>`.trim();
+
+    navigator.clipboard.writeText(script);
+    toast({ 
+      title: "Código Copiado!", 
+      description: "Cole este script no <head> do seu site para ativar as notificações flutuantes." 
+    });
+  };
+
   if (authLoading || userDataLoading || (user && !userData)) {
     return <LoadingScreen />;
   }
@@ -269,7 +293,13 @@ export default function WidgetsPage() {
                      <div className="flex flex-col gap-2">
                         <Button onClick={() => router.push(`/widgetconfig/${w.id}`)} className="w-full h-10 rounded-xl font-bold uppercase text-[9px] bg-foreground text-background hover:opacity-90 gap-2"><Settings2 className="w-3.5 h-3.5" /> Configurar</Button>
                         <div className="grid grid-cols-2 gap-2">
-                           <Button variant="outline" className="h-9 rounded-xl font-bold text-[8px] gap-1.5 border-primary/20 text-primary" onClick={() => { navigator.clipboard.writeText(`${baseUrl}/widgetpublic/${user?.uid}/${w.id}`); toast({ title: "Link Copiado!" }); }}><Code className="w-3 h-3" /> Embed</Button>
+                           <Button 
+                             variant="outline" 
+                             className="h-9 rounded-xl font-bold text-[8px] gap-1.5 border-primary/20 text-primary" 
+                             onClick={() => copyEmbedCode(w.id)}
+                           >
+                             <Code className="w-3 h-3" /> Embed
+                           </Button>
                            <Button variant="ghost" className="h-9 rounded-xl font-bold text-[8px] gap-1.5 text-destructive" onClick={() => setWidgetToDelete(w)}><Trash2 className="w-3 h-3" /> Excluir</Button>
                         </div>
                      </div>
@@ -279,6 +309,14 @@ export default function WidgetsPage() {
           </div>
         )}
       </main>
+
+      <footer className="py-12 border-t mt-auto text-center flex flex-col items-center gap-6">
+        <div className="relative w-[180px] h-[60px] opacity-30 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+          <Image src="/logo-proovaai-whitemode.png" alt="Logo Gray" fill className="object-contain dark:hidden" />
+          <Image src="/logo-proovaai-darkmode.png" alt="Logo Gray" fill className="object-contain hidden dark:block" />
+        </div>
+        <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-black opacity-50">© 2026 Proova - Gestão Estratégica</p>
+      </footer>
 
       <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
          <DialogContent className="rounded-[2.5rem] w-[95vw] sm:max-w-md border-none shadow-2xl p-8">
