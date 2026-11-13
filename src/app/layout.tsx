@@ -10,6 +10,7 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Proova AI — Automação de Avaliações no Google Meu Negócio com IA",
   description: "Responda avaliações do Google automaticamente com Inteligência Artificial, aumente sua nota no Maps e atraia mais clientes locais.",
+  metadataBase: new URL('https://useproova.online'),
   manifest: "/manifest.json",
   icons: {
     icon: [
@@ -38,6 +39,28 @@ export const metadata: Metadata = {
         type: "image/png",
       },
     ],
+  },
+  openGraph: {
+    title: "Proova AI — Automação de Avaliações no Google Meu Negócio com IA",
+    description: "Responda avaliações do Google automaticamente com Inteligência Artificial, aumente sua nota no Maps e atraia mais clientes locais.",
+    url: 'https://useproova.online',
+    siteName: 'Proova AI',
+    images: [
+      {
+        url: 'https://picsum.photos/seed/proova-og/1200/630',
+        width: 1200,
+        height: 630,
+        alt: 'Proova AI — Gestão de Reputação com IA',
+      },
+    ],
+    locale: 'pt_BR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "Proova AI — Automação de Avaliações no Google Meu Negócio com IA",
+    description: "Responda avaliações do Google automaticamente com Inteligência Artificial, aumente sua nota no Maps e atraia mais clientes locais.",
+    images: ['https://picsum.photos/seed/proova-og/1200/630'],
   },
 };
 
