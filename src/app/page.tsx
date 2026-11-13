@@ -550,6 +550,36 @@ export default function Home() {
   const pricingRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    // Injeção do Widget de Teste solicitado pelo usuário
+    const injectWidget = () => {
+      const existing = document.getElementById('proova-test-widget');
+      if (existing) return;
+
+      const iframe = document.createElement('iframe');
+      iframe.id = 'proova-test-widget';
+      iframe.src = 'https://6000-firebase-studio-1777301707689.cluster-mdgxqvvkkbfpqrfigfiuugu5pk.cloudworkstations.dev/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova';
+      iframe.style.position = 'fixed';
+      iframe.style.bottom = '20px';
+      iframe.style.left = '20px';
+      iframe.style.width = '350px';
+      iframe.style.height = '180px';
+      iframe.style.border = 'none';
+      iframe.style.zIndex = '999999';
+      // @ts-ignore
+      iframe.allowTransparency = 'true';
+      document.body.appendChild(iframe);
+    };
+
+    injectWidget();
+    
+    // Cleanup on unmount
+    return () => {
+      const el = document.getElementById('proova-test-widget');
+      if (el) el.remove();
+    };
+  }, []);
+
+  useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     
