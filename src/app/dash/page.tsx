@@ -209,7 +209,15 @@ export default function DashPage() {
   const { data: allFetchedTestimonials } = useCollection(allTestimonialsQuery);
 
   const pendingTestimonialsCount = useMemo(() => (allFetchedTestimonials || []).filter((t: any) => t.status === 'pending').length, [allFetchedTestimonials]);
-  const approvedTestimonials = useMemo(() => (allFetchedTestimonials || []).filter((t: any) => t.status === 'approved'), [allFetchedTestimonials]);
+  const approvedTestimonials = useMemo(() => {
+    return (allFetchedTestimonials || [])
+      .filter((t: any) => t.status === 'approved')
+      .sort((a: any, b: any) => {
+        const dateA = a.createdAt?.toDate?.() || new Date(0);
+        const dateB = b.createdAt?.toDate?.() || new Date(0);
+        return dateB.getTime() - dateA.getTime();
+      });
+  }, [allFetchedTestimonials]);
 
   // Nova métrica: Respostas IA
   const aiRepliesCount = useMemo(() => (approvedTestimonials || []).filter((t: any) => !!t.aiReply).length, [approvedTestimonials]);
@@ -688,6 +696,77 @@ export default function DashPage() {
                 </div>
               </Card>
             </div>
+
+            {/* Seção Principal: Avaliações Recentes & IA (O Coração do Produto) */}
+            <section className="space-y-6 pt-6">
+              <div className="flex items-center justify-between px-2">
+                <div className="flex items-center gap-2">
+                   <Sparkles className="w-5 h-5 text-primary" />
+                   <h2 className="text-sm md:text-lg font-black uppercase tracking-tight">Avaliações Recentes & IA</h2>
+                </div>
+                <Link href="/private" className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">Ver Todas</Link>
+              </div>
+
+              <div className="space-y-4">
+                {approvedTestimonials.length === 0 ? (
+                  <Card className="p-12 text-center border-2 border-dashed rounded-[2rem] opacity-30 bg-muted/20">
+                     <MessageSquare className="w-12 h-12 mx-auto mb-4" />
+                     <p className="text-xs font-bold uppercase tracking-widest">Aguardando as primeiras avaliações...</p>
+                  </Card>
+                ) : (
+                  approvedTestimonials.slice(0, 5).map((t: any) => (
+                    <Card key={t.id} className="border-none shadow-lg rounded-[2rem] overflow-hidden bg-background group hover:shadow-xl transition-all">
+                       <CardContent className="p-6 md:p-8 space-y-6">
+                          {/* Cabeçalho do Card: Cliente */}
+                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                             <div className="flex items-center gap-3">
+                                <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-xs uppercase shadow-inner">
+                                   {t.userName?.substring(0, 2)}
+                                </div>
+                                <div>
+                                   <p className="font-black text-xs uppercase tracking-tight leading-none">{t.userName}</p>
+                                   <div className="flex items-center gap-2 mt-1">
+                                      <div className="flex">
+                                         {[1,2,3,4,5].map(s => <Star key={s} className={cn("w-3 h-3", s <= t.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20")} />)}
+                                      </div>
+                                      <span className="text-[8px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                                         <Clock className="w-2.5 h-2.5" /> 
+                                         {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Agora'}
+                                      </span>
+                                   </div>
+                                </div>
+                             </div>
+                             <Badge variant="outline" className="w-fit text-[7px] font-black uppercase tracking-widest border-primary/20 text-primary">Original Google Maps</Badge>
+                          </div>
+
+                          {/* Texto Original */}
+                          <p className="text-sm font-medium leading-relaxed italic opacity-80 pl-4 border-l-2 border-primary/10">
+                             "{t.text}"
+                          </p>
+
+                          {/* Bloco da Resposta IA */}
+                          {t.aiReply && (
+                            <div className="mt-4 p-5 rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5 space-y-3 relative group/reply">
+                               <div className="flex items-center gap-2">
+                                  <div className="p-1.5 rounded-lg bg-primary text-white">
+                                     <Sparkles className="w-3 h-3" />
+                                  </div>
+                                  <span className="text-[9px] font-black uppercase tracking-widest text-primary">Resposta Gerada pela IA</span>
+                               </div>
+                               <p className="text-xs md:text-sm font-bold leading-relaxed text-foreground/90">
+                                  {t.aiReply}
+                                </p>
+                                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover/reply:opacity-100 transition-opacity">
+                                   <button onClick={() => copyToClipboard(t.aiReply, "Resposta IA")} className="p-2 rounded-xl bg-background border shadow-sm hover:bg-muted transition-all"><Copy className="w-3 h-3 text-muted-foreground" /></button>
+                                </div>
+                            </div>
+                          )}
+                       </CardContent>
+                    </Card>
+                  ))
+                )}
+              </div>
+            </section>
           </div>
         )}
       </main>
