@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef, forwardRef } from "react";
 import { useRouter } from "next/navigation";
+import Script from "next/script";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
@@ -550,38 +551,6 @@ export default function Home() {
   const pricingRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    // Injeção do Widget de Teste Compacto no BODY para garantir visibilidade
-    const injectWidget = () => {
-      const existing = document.getElementById('proova-test-widget');
-      if (existing) return;
-
-      const iframe = document.createElement('iframe');
-      iframe.id = 'proova-test-widget';
-      // URL de teste utilizando o ID mestre da plataforma
-      iframe.src = '/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova';
-      iframe.style.position = 'fixed';
-      iframe.style.bottom = '20px';
-      iframe.style.left = '20px';
-      iframe.style.width = '300px';
-      iframe.style.height = '130px';
-      iframe.style.border = 'none';
-      iframe.style.zIndex = '999999';
-      // @ts-ignore
-      iframe.allowTransparency = 'true';
-      document.body.appendChild(iframe);
-    };
-
-    if (typeof window !== 'undefined') {
-      injectWidget();
-    }
-    
-    return () => {
-      const el = document.getElementById('proova-test-widget');
-      if (el) el.remove();
-    };
-  }, []);
-
-  useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     
@@ -675,6 +644,10 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
+      <Script id="proova-bubble-widget">
+        {`(function() { var iframe = document.createElement('iframe'); iframe.src = 'https://www.useproovaai.com.br/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova'; iframe.style.position = 'fixed'; iframe.style.bottom = '20px'; iframe.style.left = '20px'; iframe.style.width = '300px'; iframe.style.height = '130px'; iframe.style.border = 'none'; iframe.style.zIndex = '999999'; iframe.allowTransparency = 'true'; document.body.appendChild(iframe); })();`}
+      </Script>
+
       {/* Schema Markup Injection */}
       <script
         type="application/ld+json"
