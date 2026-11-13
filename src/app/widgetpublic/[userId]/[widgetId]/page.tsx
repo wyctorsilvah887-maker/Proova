@@ -10,7 +10,7 @@ import { cn } from '@/lib/utils';
 /**
  * Página pública do Widget (Embed VIP)
  * Comportamento de Notificação Compacta (Bubble)
- * Otimizado para espaços pequenos com fundo 100% transparente.
+ * Otimizado para espaços pequenos com fundo 100% transparente e opacidade de leitura.
  */
 export default function WidgetPublicPage({ params }: { params: Promise<{ userId: string, widgetId: string }> }) {
   const { userId, widgetId } = use(params);
@@ -23,19 +23,26 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Forçar transparência absoluta do container do iframe
+  // Forçar transparência absoluta do container do iframe via CSS imediato e useEffect
   useEffect(() => {
     const root = document.documentElement;
     const body = document.body;
     
-    root.style.setProperty('background', 'transparent', 'important');
-    body.style.setProperty('background', 'transparent', 'important');
-    body.style.setProperty('background-color', 'transparent', 'important');
+    const setTransparent = () => {
+      root.style.setProperty('background', 'transparent', 'important');
+      root.style.setProperty('background-color', 'transparent', 'important');
+      body.style.setProperty('background', 'transparent', 'important');
+      body.style.setProperty('background-color', 'transparent', 'important');
+    };
+
+    setTransparent();
+    // Re-aplica em intervalos curtos caso algum script de tema tente sobrescrever
+    const interval = setInterval(setTransparent, 100);
     
     return () => {
+      clearInterval(interval);
       root.style.background = '';
       body.style.background = '';
-      body.style.backgroundColor = '';
     };
   }, []);
 
@@ -95,7 +102,11 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   }, [filteredTestimonials.length]);
 
   if (isLoading || !widgetData || filteredTestimonials.length === 0) {
-    return null;
+    return (
+      <style dangerouslySetInnerHTML={{ __html: `
+        html, body { background: transparent !important; background-color: transparent !important; }
+      ` }} />
+    );
   }
 
   const t = filteredTestimonials[currentIndex];
@@ -103,6 +114,10 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
 
   return (
     <div className="h-screen w-full bg-transparent p-2 font-body overflow-hidden flex items-end justify-start">
+      <style dangerouslySetInnerHTML={{ __html: `
+        html, body { background: transparent !important; background-color: transparent !important; }
+      ` }} />
+      
       {t && (
         <div 
           className={cn(
@@ -160,7 +175,6 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
               </div>
             </div>
             
-            {/* Progress Bar Visual */}
             <div 
               className="absolute bottom-0 left-0 h-0.5 opacity-20 transition-all duration-[7000ms] ease-linear"
               style={{ 
