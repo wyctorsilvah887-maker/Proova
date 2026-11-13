@@ -376,12 +376,12 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
 
   const mobileSlides = useMemo(() => [
     {
-      light: PlaceHolderImages.find(img => img.id === 'app-mobile-light')?.imageUrl || "/pagnappmobile-whitemode.webp",
-      dark: PlaceHolderImages.find(img => img.id === 'app-mobile-dark')?.imageUrl || "/pagnappmobile-darkmode.webp"
+      light: PlaceHolderImages.find(img => img.id === 'app-mobile-light')?.imageUrl || "/paginappmobile-whitemode.webp",
+      dark: PlaceHolderImages.find(img => img.id === 'app-mobile-dark')?.imageUrl || "/paginappmobile-darkmode.webp"
     },
     {
-      light: PlaceHolderImages.find(img => img.id === 'app-mobile-light-2')?.imageUrl || "/pagnappmobile-whitemode2.webp",
-      dark: PlaceHolderImages.find(img => img.id === 'app-mobile-dark-2')?.imageUrl || "/pagnappmobile-darkmode2.webp"
+      light: PlaceHolderImages.find(img => img.id === 'app-mobile-light-2')?.imageUrl || "/paginappmobile-whitemode2.webp",
+      dark: PlaceHolderImages.find(img => img.id === 'app-mobile-dark-2')?.imageUrl || "/paginappmobile-darkmode2.webp"
     }
   ], []);
 
