@@ -148,10 +148,36 @@ export default function DashPage() {
   const [companyNameEdit, setCompanyNameEdit] = useState('');
   const [companySlugEdit, setCompanySlugEdit] = useState('');
 
+  // Estados para novas avaliações via API (Mock/Apify)
+  const [apiSuggestions, setApiSuggestions] = useState<any[]>([]);
+  const [isLoadingApi, setIsLoadingApi] = useState(false);
+
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
   const { permission, requestPermission, isSupported: pushSupported } = useNotifications(user?.uid);
+
+  // Consumir rota de IA para alimentar o painel
+  useEffect(() => {
+    const fetchApiReviews = async () => {
+      setIsLoadingApi(true);
+      try {
+        const res = await fetch('/api/reviews/generate', { method: 'POST' });
+        const data = await res.json();
+        if (data.success && data.suggestions) {
+          setApiSuggestions(data.suggestions);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar sugestões da API:", err);
+      } finally {
+        setIsLoadingApi(false);
+      }
+    };
+
+    if (user) {
+      fetchApiReviews();
+    }
+  }, [user]);
 
   // Deep Linking Logic
   useEffect(() => {
@@ -219,12 +245,11 @@ export default function DashPage() {
       });
   }, [allFetchedTestimonials]);
 
-  // Nova métrica: Respostas IA
-  const aiRepliesCount = useMemo(() => (approvedTestimonials || []).filter((t: any) => !!t.aiReply).length, [approvedTestimonials]);
-  const aiAutomationPercentage = useMemo(() => {
-    if (!approvedTestimonials || approvedTestimonials.length === 0) return 0;
-    return Math.round((aiRepliesCount / approvedTestimonials.length) * 100);
-  }, [aiRepliesCount, approvedTestimonials]);
+  const aiRepliesCount = useMemo(() => {
+    const firestoreCount = (approvedTestimonials || []).filter((t: any) => !!t.aiReply).length;
+    const apiCount = apiSuggestions.length;
+    return firestoreCount + apiCount;
+  }, [approvedTestimonials, apiSuggestions]);
 
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
@@ -316,11 +341,11 @@ export default function DashPage() {
   };
 
   const filteredMetrics = useMemo(() => {
-    if (period === 'all') return { count: userData?.testimonialsCount || 0, label: 'Total acumulado' };
+    if (period === 'all') return { count: (userData?.testimonialsCount || 0) + apiSuggestions.length, label: 'Total acumulado' };
     const cutoff = new Date(Date.now() - parseInt(period) * 24 * 60 * 60 * 1000);
-    const count = (approvedTestimonials || []).filter((t: any) => (t.createdAt?.toDate?.() || new Date()) >= cutoff).length;
+    const count = (approvedTestimonials || []).filter((t: any) => (t.createdAt?.toDate?.() || new Date()) >= cutoff).length + apiSuggestions.length;
     return { count, label: `Últimos ${period} dias` };
-  }, [approvedTestimonials, period, userData]);
+  }, [approvedTestimonials, period, userData, apiSuggestions]);
 
   if (authLoading || userDataLoading || !userData) return <LoadingScreen />;
 
@@ -708,63 +733,120 @@ export default function DashPage() {
               </div>
 
               <div className="space-y-4">
-                {approvedTestimonials.length === 0 ? (
+                {(isLoadingApi || testimonialsLoading) && (
+                   <div className="flex flex-col items-center justify-center py-10 gap-3">
+                      <Loader2 className="animate-spin h-8 w-8 text-primary" />
+                      <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Processando Inteligência Digital...</p>
+                   </div>
+                )}
+
+                {!isLoadingApi && apiSuggestions.length === 0 && approvedTestimonials.length === 0 && (
                   <Card className="p-12 text-center border-2 border-dashed rounded-[2rem] opacity-30 bg-muted/20">
                      <MessageSquare className="w-12 h-12 mx-auto mb-4" />
                      <p className="text-xs font-bold uppercase tracking-widest">Aguardando as primeiras avaliações...</p>
                   </Card>
-                ) : (
-                  approvedTestimonials.slice(0, 5).map((t: any) => (
-                    <Card key={t.id} className="border-none shadow-lg rounded-[2rem] overflow-hidden bg-background group hover:shadow-xl transition-all">
-                       <CardContent className="p-6 md:p-8 space-y-6">
-                          {/* Cabeçalho do Card: Cliente */}
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                             <div className="flex items-center gap-3">
-                                <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-xs uppercase shadow-inner">
-                                   {t.userName?.substring(0, 2)}
-                                </div>
-                                <div>
-                                   <p className="font-black text-xs uppercase tracking-tight leading-none">{t.userName}</p>
-                                   <div className="flex items-center gap-2 mt-1">
-                                      <div className="flex">
-                                         {[1,2,3,4,5].map(s => <Star key={s} className={cn("w-3 h-3", s <= t.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20")} />)}
-                                      </div>
-                                      <span className="text-[8px] font-bold text-muted-foreground uppercase flex items-center gap-1">
-                                         <Clock className="w-2.5 h-2.5" /> 
-                                         {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Agora'}
-                                      </span>
-                                   </div>
-                                </div>
-                             </div>
-                             <Badge variant="outline" className="w-fit text-[7px] font-black uppercase tracking-widest border-primary/20 text-primary">Original Google Maps</Badge>
-                          </div>
-
-                          {/* Texto Original */}
-                          <p className="text-sm font-medium leading-relaxed italic opacity-80 pl-4 border-l-2 border-primary/10">
-                             "{t.text}"
-                          </p>
-
-                          {/* Bloco da Resposta IA */}
-                          {t.aiReply && (
-                            <div className="mt-4 p-5 rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5 space-y-3 relative group/reply">
-                               <div className="flex items-center gap-2">
-                                  <div className="p-1.5 rounded-lg bg-primary text-white">
-                                     <Sparkles className="w-3 h-3" />
-                                  </div>
-                                  <span className="text-[9px] font-black uppercase tracking-widest text-primary">Resposta Gerada pela IA</span>
-                               </div>
-                               <p className="text-xs md:text-sm font-bold leading-relaxed text-foreground/90">
-                                  {t.aiReply}
-                                </p>
-                                <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover/reply:opacity-100 transition-opacity">
-                                   <button onClick={() => copyToClipboard(t.aiReply, "Resposta IA")} className="p-2 rounded-xl bg-background border shadow-sm hover:bg-muted transition-all"><Copy className="w-3 h-3 text-muted-foreground" /></button>
-                                </div>
-                            </div>
-                          )}
-                       </CardContent>
-                    </Card>
-                  ))
                 )}
+
+                {/* Renderizar Sugestões da API (Mock/Apify) */}
+                {apiSuggestions.map((s: any) => (
+                  <Card key={s.reviewId} className="border-none shadow-lg rounded-[2rem] overflow-hidden bg-background group hover:shadow-xl transition-all border-l-4 border-l-primary/30">
+                     <CardContent className="p-6 md:p-8 space-y-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                           <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-xs uppercase shadow-inner">
+                                 {s.reviewerName?.substring(0, 2)}
+                              </div>
+                              <div>
+                                 <p className="font-black text-xs uppercase tracking-tight leading-none">{s.reviewerName}</p>
+                                 <div className="flex items-center gap-2 mt-1">
+                                    <div className="flex">
+                                       {[1,2,3,4,5].map(star => <Star key={star} className={cn("w-3.5 h-3.5", star <= s.stars ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20")} />)}
+                                    </div>
+                                    <Badge variant="secondary" className="text-[7px] font-black uppercase h-4 px-1.5 border-none bg-primary/10 text-primary">GOOGLE MAPS</Badge>
+                                 </div>
+                              </div>
+                           </div>
+                           <span className="text-[8px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                              <Clock className="w-2.5 h-2.5" /> Recentemente
+                           </span>
+                        </div>
+
+                        <p className="text-sm font-medium leading-relaxed italic opacity-80 pl-4 border-l-2 border-primary/10">
+                           "{s.originalText}"
+                        </p>
+
+                        <div className="mt-4 p-5 rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5 space-y-3 relative group/reply">
+                           <div className="flex items-center gap-2">
+                              <div className="p-1.5 rounded-lg bg-primary text-white">
+                                 <Sparkles className="w-3 h-3" />
+                              </div>
+                              <span className="text-[9px] font-black uppercase tracking-widest text-primary">Resposta Sugerida pela IA</span>
+                           </div>
+                           <p className="text-xs md:text-sm font-bold leading-relaxed text-foreground/90">
+                              {s.aiSuggestedReply}
+                            </p>
+                            <div className="absolute top-4 right-4 flex gap-2">
+                               <button 
+                                onClick={() => copyToClipboard(s.aiSuggestedReply, "Resposta IA")} 
+                                className="p-2 rounded-xl bg-background border shadow-sm hover:bg-muted transition-all active:scale-95"
+                                title="Copiar Resposta"
+                               >
+                                  <Copy className="w-3.5 h-3.5 text-primary" />
+                               </button>
+                            </div>
+                        </div>
+                     </CardContent>
+                  </Card>
+                ))}
+
+                {/* Renderizar Depoimentos do Firestore */}
+                {approvedTestimonials.slice(0, 5).map((t: any) => (
+                  <Card key={t.id} className="border-none shadow-lg rounded-[2rem] overflow-hidden bg-background group hover:shadow-xl transition-all">
+                     <CardContent className="p-6 md:p-8 space-y-6">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                           <div className="flex items-center gap-3">
+                              <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-xs uppercase shadow-inner">
+                                 {t.userName?.substring(0, 2)}
+                              </div>
+                              <div>
+                                 <p className="font-black text-xs uppercase tracking-tight leading-none">{t.userName}</p>
+                                 <div className="flex items-center gap-2 mt-1">
+                                    <div className="flex">
+                                       {[1,2,3,4,5].map(s => <Star key={s} className={cn("w-3 h-3", s <= t.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20")} />)}
+                                    </div>
+                                    <span className="text-[8px] font-bold text-muted-foreground uppercase flex items-center gap-1">
+                                       <Clock className="w-2.5 h-2.5" /> 
+                                       {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Agora'}
+                                    </span>
+                                 </div>
+                              </div>
+                           </div>
+                           <Badge variant="outline" className="w-fit text-[7px] font-black uppercase tracking-widest border-primary/20 text-primary">Original Proova</Badge>
+                        </div>
+
+                        <p className="text-sm font-medium leading-relaxed italic opacity-80 pl-4 border-l-2 border-primary/10">
+                           "{t.text}"
+                        </p>
+
+                        {t.aiReply && (
+                          <div className="mt-4 p-5 rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5 space-y-3 relative group/reply">
+                             <div className="flex items-center gap-2">
+                                <div className="p-1.5 rounded-lg bg-primary text-white">
+                                   <Sparkles className="w-3 h-3" />
+                                </div>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-primary">Resposta Gerada pela IA</span>
+                             </div>
+                             <p className="text-xs md:text-sm font-bold leading-relaxed text-foreground/90">
+                                {t.aiReply}
+                              </p>
+                              <div className="absolute top-4 right-4 flex gap-2">
+                                 <button onClick={() => copyToClipboard(t.aiReply, "Resposta IA")} className="p-2 rounded-xl bg-background border shadow-sm hover:bg-muted transition-all active:scale-95"><Copy className="w-3.5 h-3.5 text-primary" /></button>
+                              </div>
+                          </div>
+                        )}
+                     </CardContent>
+                  </Card>
+                ))}
               </div>
             </section>
           </div>
@@ -780,8 +862,4 @@ export default function DashPage() {
       </footer>
     </div>
   );
-}
-
-function copyToClipboard(text: string, description: string) {
-  navigator.clipboard.writeText(text);
 }
