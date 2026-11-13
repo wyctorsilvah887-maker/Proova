@@ -144,10 +144,10 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
                   <div className="flex items-center justify-between gap-1">
                     <span className="font-black text-[10px] truncate uppercase tracking-tight">{t.userName}</span>
                     <div className="flex shrink-0">
-                      {[1, 2, 3, 4, 5].map((s) => (
+                      {Array.from({ length: 5 }).map((_, i) => (
                         <Star 
-                          key={s} 
-                          className={cn("w-2 h-2 fill-current", s <= (t.rating || 5) ? "" : "opacity-10")} 
+                          key={i} 
+                          className={cn("w-2 h-2 fill-current", i < (t.rating || 5) ? "" : "opacity-10")} 
                           style={{ color: '#fbbf24' }} 
                         />
                       ))}

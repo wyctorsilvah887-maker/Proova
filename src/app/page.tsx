@@ -550,14 +550,15 @@ export default function Home() {
   const pricingRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    // Injeção do Widget de Teste Compacto no BODY conforme solicitado (corrigido de HEAD para BODY)
+    // Injeção do Widget de Teste Compacto no BODY para garantir visibilidade
     const injectWidget = () => {
       const existing = document.getElementById('proova-test-widget');
       if (existing) return;
 
       const iframe = document.createElement('iframe');
       iframe.id = 'proova-test-widget';
-      iframe.src = 'https://6000-firebase-studio-1777301707689.cluster-mdgxqvvkkbfpqrfigfiuugu5pk.cloudworkstations.dev/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova';
+      // URL de teste utilizando o ID mestre da plataforma
+      iframe.src = '/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova';
       iframe.style.position = 'fixed';
       iframe.style.bottom = '20px';
       iframe.style.left = '20px';
@@ -570,9 +571,10 @@ export default function Home() {
       document.body.appendChild(iframe);
     };
 
-    injectWidget();
+    if (typeof window !== 'undefined') {
+      injectWidget();
+    }
     
-    // Cleanup on unmount
     return () => {
       const el = document.getElementById('proova-test-widget');
       if (el) el.remove();
