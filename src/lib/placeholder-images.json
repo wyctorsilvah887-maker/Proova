@@ -41,6 +41,30 @@
       "description": "Avatar do usuário Carla",
       "imageUrl": "https://picsum.photos/seed/av3/64/64",
       "imageHint": "person face"
+    },
+    {
+      "id": "app-mobile-light",
+      "description": "Preview da página pública no celular - Modo Claro",
+      "imageUrl": "/pagnappmobile-whitemode.webp",
+      "imageHint": "mobile preview light"
+    },
+    {
+      "id": "app-mobile-dark",
+      "description": "Preview da página pública no celular - Modo Escuro",
+      "imageUrl": "/pagnappmobile-darkmode.webp",
+      "imageHint": "mobile preview dark"
+    },
+    {
+      "id": "app-mobile-light-2",
+      "description": "Preview da página pública no celular 2 - Modo Claro",
+      "imageUrl": "/pagnappmobile-whitemode2.webp",
+      "imageHint": "mobile preview light 2"
+    },
+    {
+      "id": "app-mobile-dark-2",
+      "description": "Preview da página pública no celular 2 - Modo Escuro",
+      "imageUrl": "/pagnappmobile-darkmode2.webp",
+      "imageHint": "mobile preview dark 2"
     }
   ]
 }

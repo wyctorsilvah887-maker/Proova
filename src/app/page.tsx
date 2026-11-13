@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState, useRef, forwardRef } from "react";
+import { useEffect, useState, useRef, forwardRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Script from "next/script";
 import { Button } from "@/components/ui/button";
@@ -55,6 +55,12 @@ import {
   CollapsibleContent, 
   CollapsibleTrigger 
 } from "@/components/ui/collapsible";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
 import { useUser } from "@/firebase";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -353,8 +359,26 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 PillarsSection.displayName = "PillarsSection";
 
 const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
-  const lightImg = PlaceHolderImages.find(img => img.id === 'app-mobile-light')?.imageUrl || "/pagnappmobile-whitemode.webp";
-  const darkImg = PlaceHolderImages.find(img => img.id === 'app-mobile-dark')?.imageUrl || "/pagnappmobile-darkmode.webp";
+  const [api, setApi] = useState<CarouselApi>();
+
+  useEffect(() => {
+    if (!api) return;
+    const interval = setInterval(() => {
+      api.scrollNext();
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [api]);
+
+  const slides = useMemo(() => [
+    {
+      light: PlaceHolderImages.find(img => img.id === 'app-mobile-light')?.imageUrl || "/pagnappmobile-whitemode.webp",
+      dark: PlaceHolderImages.find(img => img.id === 'app-mobile-dark')?.imageUrl || "/pagnappmobile-darkmode.webp"
+    },
+    {
+      light: PlaceHolderImages.find(img => img.id === 'app-mobile-light-2')?.imageUrl || "/pagnappmobile-whitemode2.webp",
+      dark: PlaceHolderImages.find(img => img.id === 'app-mobile-dark-2')?.imageUrl || "/pagnappmobile-darkmode2.webp"
+    }
+  ], []);
 
   return (
     <section id="setores" ref={ref} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
@@ -388,21 +412,31 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
 
           <aside className={cn("relative transition-all duration-1000 delay-500 flex flex-col items-center", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10")}>
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
-            <div className="relative w-full aspect-[4/5] md:aspect-square lg:aspect-[4/3] rounded-[3rem] overflow-hidden shadow-2xl ring-1 ring-primary/10">
-              <Image 
-                src={lightImg} 
-                alt="Demonstração da Página Pública Proova Light" 
-                fill 
-                className="object-cover dark:hidden"
-                priority
-              />
-              <Image 
-                src={darkImg} 
-                alt="Demonstração da Página Pública Proova Dark" 
-                fill 
-                className="object-cover hidden dark:block"
-                priority
-              />
+            <div className="relative w-full max-w-lg">
+              <Carousel setApi={setApi} opts={{ loop: true }} className="w-full">
+                <CarouselContent>
+                  {slides.map((slide, index) => (
+                    <CarouselItem key={index}>
+                      <div className="relative w-full aspect-[4/5] md:aspect-square lg:aspect-[4/3] rounded-[3rem] overflow-hidden shadow-2xl ring-1 ring-primary/10">
+                        <Image 
+                          src={slide.light} 
+                          alt={`Demonstração ${index + 1} Light`} 
+                          fill 
+                          className="object-cover dark:hidden"
+                          priority={index === 0}
+                        />
+                        <Image 
+                          src={slide.dark} 
+                          alt={`Demonstração ${index + 1} Dark`} 
+                          fill 
+                          className="object-cover hidden dark:block"
+                          priority={index === 0}
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
             </div>
           </aside>
         </div>
