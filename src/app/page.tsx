@@ -380,6 +380,11 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
     }
   ], []);
 
+  const pcImages = useMemo(() => ({
+    light: PlaceHolderImages.find(img => img.id === 'app-pc-light')?.imageUrl || "/paginapppc-whitemode.webp",
+    dark: PlaceHolderImages.find(img => img.id === 'app-pc-dark')?.imageUrl || "/paginapppc-darkmode.webp"
+  }), []);
+
   return (
     <section id="setores" ref={ref} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
       <div className="container px-4 mx-auto">
@@ -411,26 +416,28 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
           </div>
 
           <aside className={cn(
-            "relative transition-all duration-1000 delay-500 flex flex-col items-center lg:hidden", 
+            "relative transition-all duration-1000 delay-500 flex flex-col items-center", 
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           )}>
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
-            <div className="relative w-full max-w-lg">
+            
+            {/* Mobile View: Carousel */}
+            <div className="relative w-full max-w-lg lg:hidden">
               <Carousel setApi={setApi} opts={{ loop: true }} className="w-full">
                 <CarouselContent>
                   {slides.map((slide, index) => (
                     <CarouselItem key={index}>
-                      <div className="relative w-full aspect-[4/5] md:aspect-square lg:aspect-[4/3] rounded-[3rem] overflow-hidden shadow-2xl ring-1 ring-primary/10">
+                      <div className="relative w-full aspect-[4/5] md:aspect-square rounded-[3rem] overflow-hidden shadow-2xl ring-1 ring-primary/10">
                         <Image 
                           src={slide.light} 
-                          alt={`Demonstração ${index + 1} Light`} 
+                          alt={`Demonstração Mobile ${index + 1} Light`} 
                           fill 
                           className="object-cover dark:hidden"
                           priority={index === 0}
                         />
                         <Image 
                           src={slide.dark} 
-                          alt={`Demonstração ${index + 1} Dark`} 
+                          alt={`Demonstração Mobile ${index + 1} Dark`} 
                           fill 
                           className="object-cover hidden dark:block"
                           priority={index === 0}
@@ -440,6 +447,24 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
                   ))}
                 </CarouselContent>
               </Carousel>
+            </div>
+
+            {/* Desktop View: Static Image */}
+            <div className="hidden lg:block relative w-full max-w-3xl">
+              <div className="relative w-full aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-2xl ring-1 ring-primary/10 border-8 border-muted/20">
+                <Image 
+                  src={pcImages.light} 
+                  alt="Preview Desktop Light" 
+                  fill 
+                  className="object-cover dark:hidden"
+                />
+                <Image 
+                  src={pcImages.dark} 
+                  alt="Preview Desktop Dark" 
+                  fill 
+                  className="object-cover hidden dark:block"
+                />
+              </div>
             </div>
           </aside>
         </div>

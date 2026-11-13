@@ -56,28 +56,28 @@
       "imageHint": "mobile preview dark"
     },
     {
-      "id": "manual-gboost",
-      "description": "Guia visual do sistema G-Boost",
-      "imageUrl": "https://picsum.photos/seed/m1/800/500",
-      "imageHint": "google maps ranking"
+      "id": "app-mobile-light-2",
+      "description": "Preview da página pública no celular 2 - Modo Claro",
+      "imageUrl": "/pagnappmobile-whitemode2.webp",
+      "imageHint": "mobile preview light 2"
     },
     {
-      "id": "manual-shield",
-      "description": "Guia visual do Reputation Shield",
-      "imageUrl": "https://picsum.photos/seed/m2/800/500",
-      "imageHint": "security private inbox"
+      "id": "app-mobile-dark-2",
+      "description": "Preview da página pública no celular 2 - Modo Escuro",
+      "imageUrl": "/pagnappmobile-darkmode2.webp",
+      "imageHint": "mobile preview dark 2"
     },
     {
-      "id": "manual-widgets",
-      "description": "Guia visual dos Widgets e Murais",
-      "imageUrl": "https://picsum.photos/seed/m3/800/500",
-      "imageHint": "website masonry layout"
+      "id": "app-pc-light",
+      "description": "Preview da página pública no PC - Modo Claro",
+      "imageUrl": "/paginapppc-whitemode.webp",
+      "imageHint": "pc preview light"
     },
     {
-      "id": "manual-social",
-      "description": "Guia visual dos Social Cards",
-      "imageUrl": "https://picsum.photos/seed/m4/800/500",
-      "imageHint": "instagram content post"
+      "id": "app-pc-dark",
+      "description": "Preview da página pública no PC - Modo Escuro",
+      "imageUrl": "/paginapppc-darkmode.webp",
+      "imageHint": "pc preview dark"
     }
   ]
 }
