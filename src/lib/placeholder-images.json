@@ -25,46 +25,52 @@
       "imageHint": "brand design customization"
     },
     {
-      "id": "avatar-1",
-      "description": "Avatar do usuário Alice",
-      "imageUrl": "https://picsum.photos/seed/av1/64/64",
-      "imageHint": "person face"
-    },
-    {
-      "id": "avatar-2",
-      "description": "Avatar do usuário Bruno",
-      "imageUrl": "https://picsum.photos/seed/av2/64/64",
-      "imageHint": "person face"
-    },
-    {
-      "id": "avatar-3",
-      "description": "Avatar do usuário Carla",
-      "imageUrl": "https://picsum.photos/seed/av3/64/64",
-      "imageHint": "person face"
-    },
-    {
       "id": "app-mobile-light",
       "description": "Preview da página pública no celular - Modo Claro",
-      "imageUrl": "/pagnappmobile-whitemode.webp",
+      "imageUrl": "/paginappmobile-whitemode.webp",
       "imageHint": "mobile preview light"
     },
     {
       "id": "app-mobile-dark",
       "description": "Preview da página pública no celular - Modo Escuro",
-      "imageUrl": "/pagnappmobile-darkmode.webp",
+      "imageUrl": "/paginappmobile-darkmode.webp",
       "imageHint": "mobile preview dark"
     },
     {
       "id": "app-mobile-light-2",
       "description": "Preview da página pública no celular 2 - Modo Claro",
-      "imageUrl": "/pagnappmobile-whitemode2.webp",
+      "imageUrl": "/paginappmobile-whitemode2.webp",
       "imageHint": "mobile preview light 2"
     },
     {
       "id": "app-mobile-dark-2",
       "description": "Preview da página pública no celular 2 - Modo Escuro",
-      "imageUrl": "/pagnappmobile-darkmode2.webp",
+      "imageUrl": "/paginappmobile-darkmode2.webp",
       "imageHint": "mobile preview dark 2"
+    },
+    {
+      "id": "app-pc-light",
+      "description": "Preview da página pública no PC - Modo Claro",
+      "imageUrl": "/paginapppc-whitemode.webp",
+      "imageHint": "pc preview light"
+    },
+    {
+      "id": "app-pc-dark",
+      "description": "Preview da página pública no PC - Modo Escuro",
+      "imageUrl": "/paginapppc-darkmode.webp",
+      "imageHint": "pc preview dark"
+    },
+    {
+      "id": "app-pc-light-2",
+      "description": "Preview da página pública no PC 2 - Modo Claro",
+      "imageUrl": "/paginapppc-whitemode2.webp",
+      "imageHint": "pc preview light 2"
+    },
+    {
+      "id": "app-pc-dark-2",
+      "description": "Preview da página pública no PC 2 - Modo Escuro",
+      "imageUrl": "/paginapppc-darkmode2.webp",
+      "imageHint": "pc preview dark 2"
     }
   ]
 }
