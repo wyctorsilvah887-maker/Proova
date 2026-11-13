@@ -232,7 +232,7 @@ export default function DashPage() {
   }, [announcementsList]);
 
   const allTestimonialsQuery = useMemo(() => (db && user ? collection(db, 'users', user.uid, 'testimonials') : null), [db, user]);
-  const { data: allFetchedTestimonials } = useCollection(allTestimonialsQuery);
+  const { data: allFetchedTestimonials, loading: testimonialsLoading } = useCollection(allTestimonialsQuery);
 
   const pendingTestimonialsCount = useMemo(() => (allFetchedTestimonials || []).filter((t: any) => t.status === 'pending').length, [allFetchedTestimonials]);
   const approvedTestimonials = useMemo(() => {
