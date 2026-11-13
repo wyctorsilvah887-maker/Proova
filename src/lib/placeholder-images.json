@@ -33,7 +33,7 @@
     {
       "id": "app-mobile-dark",
       "description": "Preview da página pública no celular - Modo Escuro",
-      "imageUrl": "/paginappmobile-darkmode.webp",
+      "imageUrl": "/paginappmobile-darkmod.webp",
       "imageHint": "mobile preview dark"
     },
     {
@@ -45,7 +45,7 @@
     {
       "id": "app-mobile-dark-2",
       "description": "Preview da página pública no celular 2 - Modo Escuro",
-      "imageUrl": "/paginappmobile-darkmode2.webp",
+      "imageUrl": "/paginappmobile-darkmod2.webp",
       "imageHint": "mobile preview dark 2"
     },
     {
