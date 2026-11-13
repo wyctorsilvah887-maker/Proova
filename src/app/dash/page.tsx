@@ -80,7 +80,8 @@ import {
   Headphones,
   Bell,
   BellRing,
-  Menu
+  Menu,
+  Bot
 } from 'lucide-react';
 import { 
   DropdownMenu, 
@@ -209,6 +210,13 @@ export default function DashPage() {
 
   const pendingTestimonialsCount = useMemo(() => (allFetchedTestimonials || []).filter((t: any) => t.status === 'pending').length, [allFetchedTestimonials]);
   const approvedTestimonials = useMemo(() => (allFetchedTestimonials || []).filter((t: any) => t.status === 'approved'), [allFetchedTestimonials]);
+
+  // Nova métrica: Respostas IA
+  const aiRepliesCount = useMemo(() => (approvedTestimonials || []).filter((t: any) => !!t.aiReply).length, [approvedTestimonials]);
+  const aiAutomationPercentage = useMemo(() => {
+    if (!approvedTestimonials || approvedTestimonials.length === 0) return 0;
+    return Math.round((aiRepliesCount / approvedTestimonials.length) * 100);
+  }, [aiRepliesCount, approvedTestimonials]);
 
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
@@ -646,18 +654,36 @@ export default function DashPage() {
               </div>
             </header>
 
-            <div className="grid grid-cols-1 gap-4 md:gap-6">
-              <Card className="border-none shadow-xl rounded-[2rem] p-6 md:p-12 transition-all group relative overflow-hidden bg-background">
-                <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 rounded-full blur-3xl -mr-24 -mt-24" />
-                <div className="flex items-center justify-between mb-8 relative z-10">
-                  <div className="p-3 rounded-2xl bg-primary/10 text-primary transition-all"><BarChart3 className="w-6 h-6" /></div>
-                  <Badge variant="outline" className="text-[9px] font-black uppercase border-primary/30 text-primary">{filteredMetrics.label}</Badge>
+            {/* Topo Compacto: Métricas Lado a Lado */}
+            <div className="grid grid-cols-2 gap-3 md:gap-6">
+              {/* Card 1: Elogios Coletados */}
+              <Card className="border-none shadow-xl rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-8 transition-all group relative overflow-hidden bg-background">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16" />
+                <div className="flex items-center justify-between mb-4 relative z-10">
+                  <div className="p-2 rounded-xl bg-primary/10 text-primary"><Star className="w-4 h-4 fill-primary" /></div>
+                  <Badge variant="outline" className="hidden xs:flex text-[7px] md:text-[9px] font-black uppercase border-primary/30 text-primary">{filteredMetrics.label}</Badge>
                 </div>
-                <div className="flex items-baseline gap-4 relative z-10">
-                  <span className="text-7xl md:text-9xl font-black tracking-tighter">{filteredMetrics.count}</span>
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1.5"><Star className="w-5 h-5 fill-yellow-400 text-yellow-400 animate-pulse" /><span className="text-xl font-black uppercase">Elogios</span></div>
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Coletados via Proova</p>
+                <div className="flex items-baseline gap-2 relative z-10">
+                  <span className="text-3xl md:text-6xl font-black tracking-tighter">{filteredMetrics.count}</span>
+                  <div className="space-y-0">
+                    <span className="text-[10px] md:text-xs font-black uppercase block">Elogios</span>
+                    <p className="text-[7px] md:text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Via Proova</p>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Card 2: Respostas IA (Automação Ativa) */}
+              <Card className="border-none shadow-xl rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-8 transition-all group relative overflow-hidden bg-background border border-primary/10">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16" />
+                <div className="flex items-center justify-between mb-4 relative z-10">
+                  <div className="p-2 rounded-xl bg-primary/10 text-primary"><Bot className="w-4 h-4" /></div>
+                  <Badge variant="secondary" className="hidden xs:flex text-[7px] md:text-[9px] font-black uppercase bg-primary text-white border-none">100% IA</Badge>
+                </div>
+                <div className="flex items-baseline gap-2 relative z-10">
+                  <span className="text-3xl md:text-6xl font-black tracking-tighter text-primary">{aiRepliesCount}</span>
+                  <div className="space-y-0">
+                    <span className="text-[10px] md:text-xs font-black uppercase block">Respostas</span>
+                    <p className="text-[7px] md:text-[9px] font-bold text-primary/60 uppercase tracking-widest">Pilotadas via IA</p>
                   </div>
                 </div>
               </Card>
