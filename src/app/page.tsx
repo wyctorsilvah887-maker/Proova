@@ -359,17 +359,22 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 PillarsSection.displayName = "PillarsSection";
 
 const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
-  const [api, setApi] = useState<CarouselApi>();
+  const [apiMobile, setApiMobile] = useState<CarouselApi>();
+  const [apiPc, setApiPc] = useState<CarouselApi>();
 
   useEffect(() => {
-    if (!api) return;
-    const interval = setInterval(() => {
-      api.scrollNext();
-    }, 4000);
+    if (!apiMobile) return;
+    const interval = setInterval(() => apiMobile.scrollNext(), 4000);
     return () => clearInterval(interval);
-  }, [api]);
+  }, [apiMobile]);
 
-  const slides = useMemo(() => [
+  useEffect(() => {
+    if (!apiPc) return;
+    const interval = setInterval(() => apiPc.scrollNext(), 4500);
+    return () => clearInterval(interval);
+  }, [apiPc]);
+
+  const mobileSlides = useMemo(() => [
     {
       light: PlaceHolderImages.find(img => img.id === 'app-mobile-light')?.imageUrl || "/pagnappmobile-whitemode.webp",
       dark: PlaceHolderImages.find(img => img.id === 'app-mobile-dark')?.imageUrl || "/pagnappmobile-darkmode.webp"
@@ -380,10 +385,16 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
     }
   ], []);
 
-  const pcImages = useMemo(() => ({
-    light: PlaceHolderImages.find(img => img.id === 'app-pc-light')?.imageUrl || "/paginapppc-whitemode.webp",
-    dark: PlaceHolderImages.find(img => img.id === 'app-pc-dark')?.imageUrl || "/paginapppc-darkmode.webp"
-  }), []);
+  const pcSlides = useMemo(() => [
+    {
+      light: PlaceHolderImages.find(img => img.id === 'app-pc-light')?.imageUrl || "/paginapppc-whitemode.webp",
+      dark: PlaceHolderImages.find(img => img.id === 'app-pc-dark')?.imageUrl || "/paginapppc-darkmode.webp"
+    },
+    {
+      light: PlaceHolderImages.find(img => img.id === 'app-pc-light-2')?.imageUrl || "/paginapppc-whitemode2.webp",
+      dark: PlaceHolderImages.find(img => img.id === 'app-pc-dark-2')?.imageUrl || "/paginapppc-darkmode2.webp"
+    }
+  ], []);
 
   return (
     <section id="setores" ref={ref} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
@@ -423,9 +434,9 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
             
             {/* Mobile View: Carousel */}
             <div className="relative w-full max-w-lg lg:hidden">
-              <Carousel setApi={setApi} opts={{ loop: true }} className="w-full">
+              <Carousel setApi={setApiMobile} opts={{ loop: true }} className="w-full">
                 <CarouselContent>
-                  {slides.map((slide, index) => (
+                  {mobileSlides.map((slide, index) => (
                     <CarouselItem key={index}>
                       <div className="relative w-full aspect-[4/5] md:aspect-square rounded-[3rem] overflow-hidden shadow-2xl ring-1 ring-primary/10">
                         <Image 
@@ -449,22 +460,30 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
               </Carousel>
             </div>
 
-            {/* Desktop View: Static Image */}
+            {/* Desktop View: Carousel */}
             <div className="hidden lg:block relative w-full max-w-3xl">
-              <div className="relative w-full aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-2xl ring-1 ring-primary/10 border-8 border-muted/20">
-                <Image 
-                  src={pcImages.light} 
-                  alt="Preview Desktop Light" 
-                  fill 
-                  className="object-cover dark:hidden"
-                />
-                <Image 
-                  src={pcImages.dark} 
-                  alt="Preview Desktop Dark" 
-                  fill 
-                  className="object-cover hidden dark:block"
-                />
-              </div>
+              <Carousel setApi={setApiPc} opts={{ loop: true }} className="w-full">
+                <CarouselContent>
+                  {pcSlides.map((slide, index) => (
+                    <CarouselItem key={index}>
+                      <div className="relative w-full aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-2xl ring-1 ring-primary/10 border-8 border-muted/20">
+                        <Image 
+                          src={slide.light} 
+                          alt={`Preview Desktop ${index + 1} Light`} 
+                          fill 
+                          className="object-cover dark:hidden"
+                        />
+                        <Image 
+                          src={slide.dark} 
+                          alt={`Preview Desktop ${index + 1} Dark`} 
+                          fill 
+                          className="object-cover hidden dark:block"
+                        />
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+              </Carousel>
             </div>
           </aside>
         </div>
@@ -717,7 +736,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
-      <Script id="proova-bubble-widget">
+      <Script id="proova-bubble-widget" strategy="afterInteractive">
         {`(function() { var iframe = document.createElement('iframe'); iframe.src = 'https://www.useproovaai.com.br/widgetpublic/EE6Mqdqq4Pc4maNgFy7rNq52ms13/primeiromuralproova'; iframe.style.position = 'fixed'; iframe.style.bottom = '20px'; iframe.style.left = '20px'; iframe.style.width = '300px'; iframe.style.height = '130px'; iframe.style.border = 'none'; iframe.style.zIndex = '999999'; iframe.allowTransparency = 'true'; document.body.appendChild(iframe); })();`}
       </Script>
 

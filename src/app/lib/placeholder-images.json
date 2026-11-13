@@ -78,6 +78,18 @@
       "description": "Preview da página pública no PC - Modo Escuro",
       "imageUrl": "/paginapppc-darkmode.webp",
       "imageHint": "pc preview dark"
+    },
+    {
+      "id": "app-pc-light-2",
+      "description": "Preview da página pública no PC 2 - Modo Claro",
+      "imageUrl": "/paginapppc-whitemode2.webp",
+      "imageHint": "pc preview light 2"
+    },
+    {
+      "id": "app-pc-dark-2",
+      "description": "Preview da página pública no PC 2 - Modo Escuro",
+      "imageUrl": "/paginapppc-darkmode2.webp",
+      "imageHint": "pc preview dark 2"
     }
   ]
 }
