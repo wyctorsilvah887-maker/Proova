@@ -410,7 +410,10 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
             </div>
           </div>
 
-          <aside className={cn("relative transition-all duration-1000 delay-500 flex flex-col items-center", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10")}>
+          <aside className={cn(
+            "relative transition-all duration-1000 delay-500 flex flex-col items-center lg:hidden", 
+            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
+          )}>
             <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
             <div className="relative w-full max-w-lg">
               <Carousel setApi={setApi} opts={{ loop: true }} className="w-full">
