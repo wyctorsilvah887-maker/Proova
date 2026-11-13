@@ -2,20 +2,21 @@
 
 import { useState, useMemo, useEffect, use } from 'react';
 import { useFirestore } from '@/firebase';
-import { doc, onSnapshot, collection, query, where } from 'firebase/firestore';
-import { Star, CheckCircle2, Clock, User } from 'lucide-react';
+import { doc, onSnapshot, collection, query, where, getDoc } from 'firebase/firestore';
+import { Star, CheckCircle2, User } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 
 /**
  * Página pública do Widget (Embed VIP)
- * Comportamento de Notificação Flutuante (Bubble)
+ * Comportamento de Notificação Compacta (Bubble)
  */
 export default function WidgetPublicPage({ params }: { params: Promise<{ userId: string, widgetId: string }> }) {
   const { userId, widgetId } = use(params);
   const db = useFirestore();
 
   const [widgetData, setWidgetData] = useState<any>(null);
+  const [userData, setUserData] = useState<any>(null);
   const [allTestimonials, setAllTestimonials] = useState<any[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
@@ -23,6 +24,13 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
 
   useEffect(() => {
     if (!db || !userId || !widgetId) return;
+
+    // Busca dados da empresa para o texto da notificação
+    const fetchUser = async () => {
+      const uSnap = await getDoc(doc(db, 'users', userId));
+      if (uSnap.exists()) setUserData(uSnap.data());
+    };
+    fetchUser();
 
     const widgetRef = doc(db, 'users', userId, 'widgets', widgetId);
     const unsubWidget = onSnapshot(widgetRef, (docSnap) => {
@@ -45,33 +53,34 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
     if (!widgetData || !allTestimonials.length) return [];
     const selectedIds = widgetData.selectedTestimonialIds || [];
     const filtered = allTestimonials.filter(t => selectedIds.includes(t.id));
-    return filtered.length > 0 ? filtered : allTestimonials.slice(0, 5);
+    return filtered.length > 0 ? filtered : allTestimonials.slice(0, 10);
   }, [widgetData, allTestimonials]);
 
   const themeColor = widgetData?.themeColor || '#f97316';
   const secondaryColor = widgetData?.secondaryColor || '';
+  const companyName = userData?.companyName || 'nossa empresa';
 
   // Lógica de Ciclo da Notificação (Entra -> Fica -> Sai -> Próximo)
   useEffect(() => {
     if (filteredTestimonials.length === 0) return;
 
-    // Inicia o ciclo
-    setIsVisible(true);
-
-    const cycle = setInterval(() => {
-      // 1. Inicia Saída
-      setIsVisible(false);
-
-      // 2. Espera a animação de saída e troca o index
+    const showNext = () => {
+      setIsVisible(true);
+      
+      // Tempo visível
       setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % filteredTestimonials.length);
-        // 3. Inicia Entrada do próximo
-        setIsVisible(true);
-      }, 1000); // Tempo para o card sumir e trocar
+        setIsVisible(false);
+        // Espera animação de saída e muda o index
+        setTimeout(() => {
+          setCurrentIndex((prev) => (prev + 1) % filteredTestimonials.length);
+        }, 800);
+      }, 7000);
+    };
 
-    }, 8000); // Fica visível por ~7s + 1s de transição
+    showNext();
+    const interval = setInterval(showNext, 9000); // 7s visível + 2s transição/espera
 
-    return () => clearInterval(cycle);
+    return () => clearInterval(interval);
   }, [filteredTestimonials.length]);
 
   if (isLoading || !widgetData || filteredTestimonials.length === 0) {
@@ -82,68 +91,75 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent';
 
   return (
-    <div className="min-h-screen bg-transparent p-4 sm:p-6 font-body overflow-hidden flex items-end justify-center sm:justify-start">
+    <div className="min-h-screen bg-transparent p-3 sm:p-6 font-body overflow-hidden flex items-end justify-center sm:justify-start">
       {t && (
         <div 
           className={cn(
-            "w-full max-w-[320px] transition-all duration-700 ease-in-out",
+            "w-full max-w-[280px] sm:max-w-[320px] transition-all duration-700 ease-in-out",
             isVisible 
-              ? "animate-in fade-in slide-in-from-bottom-8 duration-1000" 
-              : "animate-out fade-out slide-out-to-bottom-8 duration-700 opacity-0"
+              ? "animate-in fade-in slide-in-from-bottom-6 duration-1000" 
+              : "animate-out fade-out slide-out-to-bottom-6 duration-700 opacity-0"
           )}
         >
           <Card 
-            className="rounded-2xl p-4 sm:p-5 bg-white dark:bg-black text-black dark:text-white border-none relative overflow-hidden"
+            className="rounded-2xl p-3.5 bg-white dark:bg-zinc-950 text-black dark:text-white border-none relative overflow-hidden ring-1 ring-black/5 dark:ring-white/5"
             style={{ 
               boxShadow: hasSecondary 
-                ? `0 0 25px ${secondaryColor}40, 0 15px 40px -10px rgba(0,0,0,0.15)` 
-                : `0 10px 30px -10px ${themeColor}20`,
+                ? `0 0 20px ${secondaryColor}30, 0 10px 30px -10px rgba(0,0,0,0.15)` 
+                : `0 12px 24px -10px rgba(0,0,0,0.12)`,
             }}
           >
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div 
-                  className="h-8 w-8 rounded-full border flex items-center justify-center shrink-0 bg-muted/20" 
-                  style={{ borderColor: hasSecondary ? `${secondaryColor}40` : `${themeColor}40` }}
-                >
-                  <User className="w-4 h-4" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-black text-[11px] sm:text-[12px] tracking-tight truncate uppercase leading-none">{t.userName}</p>
-                  <div className="flex gap-0.5 mt-1">
-                    {[1, 2, 3, 4, 5].map((s) => (
-                      <Star 
-                        key={s} 
-                        className={cn("w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current", s <= (t.rating || 5) ? "" : "opacity-10")} 
-                        style={{ color: hasSecondary ? secondaryColor : themeColor }} 
-                      />
-                    ))}
-                  </div>
-                </div>
+            <div className="flex gap-3 items-start">
+              {/* Avatar Compacto */}
+              <div 
+                className="h-9 w-9 rounded-full border flex items-center justify-center shrink-0 bg-muted/10" 
+                style={{ borderColor: hasSecondary ? `${secondaryColor}30` : `${themeColor}30` }}
+              >
+                <User className="w-4 h-4" style={{ color: hasSecondary ? secondaryColor : themeColor }} />
               </div>
-              
-              {t.text && t.text !== '(Depoimento em Vídeo)' && (
-                <p className="opacity-75 font-bold italic tracking-tight text-[10px] leading-relaxed line-clamp-3">
-                  "{t.text}"
-                </p>
-              )}
 
-              <div className="pt-3 border-t border-muted/20 flex items-center justify-between opacity-50">
-                <span className="text-[7px] font-black uppercase tracking-widest flex items-center gap-1">
-                  <Clock className="w-2.5 h-2.5" />
-                  {t.createdAt?.toDate ? t.createdAt.toDate().toLocaleDateString('pt-BR') : 'Agora'}
-                </span>
-                <span className="text-[7px] font-black uppercase tracking-widest flex items-center gap-1">
+              <div className="min-w-0 flex-1 space-y-0.5">
+                {/* Cabeçalho da Notificação */}
+                <div className="flex flex-col">
+                  <div className="flex items-center justify-between gap-1">
+                    <span className="font-black text-[11px] truncate uppercase tracking-tight">{t.userName}</span>
+                    <div className="flex shrink-0">
+                      {[1, 2, 3, 4, 5].map((s) => (
+                        <Star 
+                          key={s} 
+                          className={cn("w-2.5 h-2.5 fill-current", s <= (t.rating || 5) ? "" : "opacity-10")} 
+                          style={{ color: '#fbbf24' }} 
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-[9px] font-bold text-muted-foreground leading-tight">
+                    avaliou a <span className="text-foreground">{companyName}</span>
+                  </p>
+                </div>
+                
+                {/* Prévia do Depoimento */}
+                {t.text && t.text !== '(Depoimento em Vídeo)' && (
+                  <p className="opacity-80 font-medium italic tracking-tight text-[10px] leading-snug line-clamp-2 pt-1">
+                    "{t.text}"
+                  </p>
+                )}
+
+                {/* Selo de Verificação Discreto */}
+                <div className="pt-2 flex items-center gap-1 opacity-40">
                   <CheckCircle2 className="w-2.5 h-2.5 text-green-500" />
-                  Verificado
-                </span>
+                  <span className="text-[7px] font-black uppercase tracking-[0.1em]">Depoimento Verificado</span>
+                </div>
               </div>
             </div>
             
-            {/* Indicador de tempo/progresso na base (opcional, mas dá um toque premium) */}
+            {/* Barra de Progresso Suave */}
             <div 
-              className="absolute bottom-0 left-0 h-0.5 bg-primary/30 transition-all duration-[7000ms] ease-linear"
-              style={{ width: isVisible ? '100%' : '0%' }}
+              className="absolute bottom-0 left-0 h-0.5 opacity-20 transition-all duration-[7000ms] ease-linear"
+              style={{ 
+                width: isVisible ? '100%' : '0%',
+                backgroundColor: themeColor
+              }}
             />
           </Card>
         </div>
