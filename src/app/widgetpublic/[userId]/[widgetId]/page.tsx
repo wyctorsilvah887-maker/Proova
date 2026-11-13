@@ -23,7 +23,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Forçar transparência absoluta do container do iframe via CSS imediato e useEffect
+  // Forçar transparência absoluta IMEDIATA e impedir qualquer flash de cor
   useEffect(() => {
     const root = document.documentElement;
     const body = document.body;
@@ -33,16 +33,14 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
       root.style.setProperty('background-color', 'transparent', 'important');
       body.style.setProperty('background', 'transparent', 'important');
       body.style.setProperty('background-color', 'transparent', 'important');
+      body.style.setProperty('opacity', '1', 'important');
     };
 
     setTransparent();
-    // Re-aplica em intervalos curtos caso algum script de tema tente sobrescrever
-    const interval = setInterval(setTransparent, 100);
+    const interval = setInterval(setTransparent, 50);
     
     return () => {
       clearInterval(interval);
-      root.style.background = '';
-      body.style.background = '';
     };
   }, []);
 
@@ -96,16 +94,22 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
       }, 7000);
     };
 
-    showNext();
-    const interval = setInterval(showNext, 9000);
-    return () => clearInterval(interval);
+    const initialTimer = setTimeout(showNext, 1000);
+    const interval = setInterval(showNext, 9500);
+    
+    return () => {
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
   }, [filteredTestimonials.length]);
 
   if (isLoading || !widgetData || filteredTestimonials.length === 0) {
     return (
-      <style dangerouslySetInnerHTML={{ __html: `
-        html, body { background: transparent !important; background-color: transparent !important; }
-      ` }} />
+      <>
+        <style dangerouslySetInnerHTML={{ __html: `
+          html, body { background: transparent !important; background-color: transparent !important; opacity: 0 !important; }
+        ` }} />
+      </>
     );
   }
 
@@ -128,7 +132,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
           )}
         >
           <Card 
-            className="rounded-2xl p-3 bg-white/98 dark:bg-zinc-950/98 backdrop-blur-md text-black dark:text-white border-none relative overflow-hidden ring-1 ring-black/5 dark:ring-white/5"
+            className="rounded-2xl p-3 bg-white/98 dark:bg-zinc-950/98 backdrop-blur-md text-black dark:text-white border-none relative overflow-hidden ring-1 ring-black/5 dark:ring-white/5 shadow-2xl"
             style={{ 
               boxShadow: hasSecondary 
                 ? `0 0 25px ${secondaryColor}20, 0 15px 35px -10px rgba(0,0,0,0.25)` 
