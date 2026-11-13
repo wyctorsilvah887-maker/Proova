@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useEffect, useState, useRef } from 'react';
@@ -123,6 +124,7 @@ import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-ac
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useNotifications } from '@/hooks/use-notifications';
 import { LoadingScreen } from '@/components/loading-screen';
+import { generateReplyAction } from '@/ai/flows/generate-reply-flow';
 
 export default function DashPage() {
   const { user, loading: authLoading } = useUser();
@@ -151,6 +153,7 @@ export default function DashPage() {
   // Estados para novas avaliações via API (Mock/Apify)
   const [apiSuggestions, setApiSuggestions] = useState<any[]>([]);
   const [isLoadingApi, setIsLoadingApi] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState<string | null>(null);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
@@ -340,6 +343,35 @@ export default function DashPage() {
     } catch (err) { shadcnToast({ variant: "destructive", title: "Erro na geração" }); } finally { setIsGeneratingPdf(false); }
   };
 
+  // Lógica para regerar resposta por IA
+  const handleRegenerateResponse = async (id: string, text: string, stars: number, isApi: boolean = false) => {
+    if (isRegenerating || !userData) return;
+    setIsRegenerating(id);
+
+    try {
+      const result = await generateReplyAction({
+        testimonialText: text,
+        rating: stars,
+        companyName: userData.companyName,
+        businessType: userData.businessType
+      });
+
+      if (isApi) {
+        setApiSuggestions(prev => prev.map(s => s.reviewId === id ? { ...s, aiSuggestedReply: result.reply } : s));
+      } else {
+        if (!db || !user) return;
+        const tRef = doc(db, 'users', user.uid, 'testimonials', id);
+        await updateDoc(tRef, { aiReply: result.reply });
+      }
+
+      shadcnToast({ title: "Resposta Atualizada ✨", description: "O Gemini gerou uma nova sugestão estratégica." });
+    } catch (err) {
+      shadcnToast({ variant: "destructive", title: "Erro na IA", description: "Não foi possível regerar a resposta agora." });
+    } finally {
+      setIsRegenerating(null);
+    }
+  };
+
   const filteredMetrics = useMemo(() => {
     if (period === 'all') return { count: (userData?.testimonialsCount || 0) + apiSuggestions.length, label: 'Total acumulado' };
     const cutoff = new Date(Date.now() - parseInt(period) * 24 * 60 * 60 * 1000);
@@ -383,9 +415,9 @@ export default function DashPage() {
             className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none z-[150] relative"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-5">
-              <line x1="4" y1="7" x2="20" y2="7" className={cn("origin-center transition-all", isMenuOpen ? "translate-y-[5px] rotate-45" : "")} />
-              <line x1="4" y1="12" x2="20" y2="12" className={cn("origin-center transition-all", isMenuOpen ? "opacity-0" : "")} />
-              <line x1="4" y1="17" x2="20" y2="17" className={cn("origin-center transition-all", isMenuOpen ? "-translate-y-[5px] -rotate-45" : "")} />
+              <line x1="4" x2="20" y1="7" y2="7" className={cn("origin-center transition-all", isMenuOpen ? "translate-y-[5px] rotate-45" : "")} />
+              <line x1="4" x2="20" y1="12" y2="12" className={cn("origin-center transition-all", isMenuOpen ? "opacity-0" : "")} />
+              <line x1="4" x2="20" y1="17" y2="17" className={cn("origin-center transition-all", isMenuOpen ? "-translate-y-[5px] -rotate-45" : "")} />
             </svg>
           </button>
           <Link href="/dash" className="flex items-center group -ml-2" onClick={clearHash}>
@@ -532,9 +564,9 @@ export default function DashPage() {
                 className="h-10 w-10 rounded-xl hover:bg-primary/5 text-primary border border-primary/10 transition-all flex items-center justify-center focus:outline-none"
               >
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-5">
-                  <line x1="4" y1="7" x2="20" y2="7" className="origin-center translate-y-[5px] rotate-45" />
-                  <line x1="4" y1="12" x2="20" y2="12" className="origin-center opacity-0" />
-                  <line x1="4" y1="17" x2="20" y2="17" className="origin-center -translate-y-[5px] -rotate-45" />
+                  <line x1="4" x2="20" y1="7" y2="7" className="origin-center translate-y-[5px] rotate-45" />
+                  <line x1="4" x2="20" y1="12" y2="12" className="origin-center opacity-0" />
+                  <line x1="4" x2="20" y1="17" y2="17" className="origin-center -translate-y-[5px] -rotate-45" />
                 </svg>
               </button>
             </header>
@@ -787,6 +819,14 @@ export default function DashPage() {
                             </p>
                             <div className="absolute top-4 right-4 flex gap-2">
                                <button 
+                                onClick={() => handleRegenerateResponse(s.reviewId, s.originalText, s.stars, true)}
+                                disabled={isRegenerating === s.reviewId}
+                                className="p-2 rounded-xl bg-background border shadow-sm hover:bg-muted transition-all active:scale-95 disabled:opacity-50"
+                                title="Regerar Resposta"
+                               >
+                                  <RefreshCw className={cn("w-3.5 h-3.5 text-primary", isRegenerating === s.reviewId && "animate-spin")} />
+                               </button>
+                               <button 
                                 onClick={() => copyToClipboard(s.aiSuggestedReply, "Resposta IA")} 
                                 className="p-2 rounded-xl bg-background border shadow-sm hover:bg-muted transition-all active:scale-95"
                                 title="Copiar Resposta"
@@ -840,6 +880,14 @@ export default function DashPage() {
                                 {t.aiReply}
                               </p>
                               <div className="absolute top-4 right-4 flex gap-2">
+                                 <button 
+                                  onClick={() => handleRegenerateResponse(t.id, t.text, t.rating)}
+                                  disabled={isRegenerating === t.id}
+                                  className="p-2 rounded-xl bg-background border shadow-sm hover:bg-muted transition-all active:scale-95 disabled:opacity-50"
+                                  title="Regerar Resposta"
+                                 >
+                                    <RefreshCw className={cn("w-3.5 h-3.5 text-primary", isRegenerating === t.id && "animate-spin")} />
+                                 </button>
                                  <button onClick={() => copyToClipboard(t.aiReply, "Resposta IA")} className="p-2 rounded-xl bg-background border shadow-sm hover:bg-muted transition-all active:scale-95"><Copy className="w-3.5 h-3.5 text-primary" /></button>
                               </div>
                           </div>
