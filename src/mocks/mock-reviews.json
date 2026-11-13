@@ -1,0 +1,357 @@
+[{
+  "title": "Odonto+ Saúde - Teixeira",
+  "subTitle": null,
+  "description": null,
+  "ownerDescription": null,
+  "price": null,
+  "categoryName": "Dentist",
+  "address": "Praça Pedro Batista, 8, Teixeira - PB, 58735-000, Brazil",
+  "neighborhood": null,
+  "street": "Praça Pedro Batista, 8",
+  "city": "Teixeira",
+  "postalCode": "58735-000",
+  "state": "Paraíba",
+  "countryCode": "BR",
+  "website": "https://www.instagram.com/odontomaissaudetx?igsh=MXAzeWtqMDZ0bGpp",
+  "phone": "+55 83 98646-1187",
+  "phoneUnformatted": "+5583986461187",
+  "claimThisBusiness": false,
+  "location": {
+    "lat": -7.2209458,
+    "lng": -37.2519844
+  },
+  "locatedIn": null,
+  "floor": null,
+  "plusCode": "QPHX+J6 Teixeira, Paraíba, Brazil",
+  "menu": null,
+  "servicesLink": null,
+  "totalScore": 4.9,
+  "permanentlyClosed": false,
+  "temporarilyClosed": false,
+  "placeId": "ChIJdQb2igdXrwcRC32WYg5c9xs",
+  "categories": [
+    "Dentist"
+  ],
+  "fid": "0x7af57078af60675:0x1bf75c0e62967d0b",
+  "cid": "2015180575124913419",
+  "reviewsCount": 48,
+  "reviewsDistribution": {
+    "oneStar": 1,
+    "twoStar": 0,
+    "threeStar": 1,
+    "fourStar": 0,
+    "fiveStar": 46
+  },
+  "imagesCount": 14,
+  "imageCategories": [
+    "All",
+    "By owner",
+    "Street View & 360°"
+  ],
+  "scrapedAt": "2026-11-13T16:22:56.465Z",
+  "reserveTableUrl": null,
+  "googleFoodUrl": null,
+  "hotelStars": null,
+  "hotelDescription": null,
+  "checkInDate": null,
+  "checkOutDate": null,
+  "hotelAds": [],
+  "popularTimesLiveText": null,
+  "popularTimesLivePercent": null,
+  "popularTimesHistogram": {},
+  "openingHours": [
+    {
+      "day": "Monday",
+      "hours": "8 AM to 12 PM, 2 to 6 PM"
+    },
+    {
+      "day": "Tuesday",
+      "hours": "8 AM to 12 PM, 2 to 6 PM"
+    },
+    {
+      "day": "Wednesday",
+      "hours": "8 AM to 12 PM, 2 to 6 PM"
+    },
+    {
+      "day": "Thursday",
+      "hours": "8 AM to 12 PM, 2 to 6 PM"
+    },
+    {
+      "day": "Friday",
+      "hours": "8 AM to 12 PM, 2 to 6 PM"
+    },
+    {
+      "day": "Saturday",
+      "hours": "8 AM to 12 PM"
+    },
+    {
+      "day": "Sunday",
+      "hours": "Closed"
+    }
+  ],
+  "wasOpenAtScrapeTime": false,
+  "peopleAlsoSearch": [
+    {
+      "category": "People also search for",
+      "title": "Consultório Dr. Pablo Nunes - Teixeira Pb",
+      "reviewsCount": 0,
+      "totalScore": 0
+    },
+    {
+      "category": "People also search for",
+      "title": "Dr. Paulo Ricart - Odontologia Especializada",
+      "reviewsCount": 0,
+      "totalScore": 0
+    },
+    {
+      "category": "People also search for",
+      "title": "Consultório Odontológico Dra. Maria da Cruz Leite e Dra. Thauanna Rodrigues",
+      "reviewsCount": 0,
+      "totalScore": 0
+    },
+    {
+      "category": "People also search for",
+      "title": "FisioMais",
+      "reviewsCount": 4,
+      "totalScore": 4.3
+    },
+    {
+      "category": "People also search for",
+      "title": "Consultório Odontológico Dr. Waldemir Abrantes",
+      "reviewsCount": 1,
+      "totalScore": 4
+    }
+  ],
+  "placesTags": [],
+  "reviewsTags": [
+    {
+      "title": "receptionist Erika",
+      "count": 2
+    },
+    {
+      "title": "professionals",
+      "count": 3
+    },
+    {
+      "title": "educated",
+      "count": 2
+    },
+    {
+      "title": "notice",
+      "count": 2
+    },
+    {
+      "title": "receptionist",
+      "count": 10
+    },
+    {
+      "title": "clinic",
+      "count": 4
+    }
+  ],
+  "additionalInfo": {
+    "Accessibility": [
+      {
+        "Wheelchair accessible restroom": true
+      }
+    ],
+    "Amenities": [
+      {
+        "Restroom": true
+      }
+    ],
+    "Planning": [
+      {
+        "Appointments recommended": true
+      }
+    ],
+    "Payments": [
+      {
+        "Credit cards": true
+      },
+      {
+        "Debit cards": true
+      },
+      {
+        "NFC mobile payments": true
+      }
+    ]
+  },
+  "gasPrices": [],
+  "questionsAndAnswers": [],
+  "updatesFromCustomers": {
+    "text": null,
+    "language": null,
+    "postDate": "a year ago",
+    "postedBy": {
+      "name": "LP Comunicação Digital",
+      "url": "https://www.google.com/maps/contrib/112632792698448537422?hl=en-US",
+      "title": "Local Guide",
+      "totalReviews": 0
+    },
+    "media": [
+      {
+        "link": "https://gz0.googleusercontent.com/grass-cs/AABkmLfvx_Vurk5e5U4jYzarDNMdHJ9_51-qpBCn6lm0RJrF1uBWeNmZhCXds5sIDXh6hPSG-Fq1n1fOPvRYZ8MqrtlHp88FO9pr3oXbkkEeNHAoz7ikM3TA53dF9Z6MOfq7Szb5YTyt=k-no",
+        "postDate": "a year ago"
+      },
+      {
+        "link": "https://gz0.googleusercontent.com/grass-cs/AABkmLfDLgFDyAii-WN_NxvX80gCW_z9R5g2TUYlAPl-T2sw8AWAeq6OU465UifNHk6QdZNA7gjSJqOBaiDGrDldj9YKF0vuljo9QmkvBBqLkeC2o3e102TeUbzm8IX1AIPhE1ZAsUc=k-no",
+        "postDate": "a year ago"
+      },
+      {
+        "link": "https://gz0.googleusercontent.com/grass-cs/AABkmLf6jV4BmKtguUI2HhecXxwuBtqG8Nk-GW46uhz9fN0HlF3MojZcFXCOU0Ag77VH-qng64rf3dQEwbZfKo04dPRjJYmVrwrReLIo3BPsUVa30KuEnh2JngqrFK_dwUQGcANuBuYNuw=k-no",
+        "postDate": "a year ago"
+      }
+    ]
+  },
+  "url": "https://www.google.com/maps/search/?api=1&query=Odonto%2B%20Sa%C3%BAde%20-%20Teixeira&query_place_id=ChIJdQb2igdXrwcRC32WYg5c9xs",
+  "language": "en",
+  "isAdvertisement": false,
+  "imageUrl": "https://gz0.googleusercontent.com/grass-cs/AABkmLdq-Fdq6Bl69nxKgnGSoXEECCqwB0XY8i0jti7j4fyof-bdnTlXd7e3X5MawWB-s5WEpDXex_rM9t3577ot_xdeWznMUmlKZ633JVBCKhrLkGmsp4cL0Cs8PnhK3C2tN-QQlsI=w411-h308-k-no",
+  "kgmid": "/g/11kb1ky2j8",
+  "businessProfileId": "15669472951174177794",
+  "searchString": "Direct Detail URL: https://www.google.com/maps/place/Odonto%2B+Sa%C3%BAde+-+Teixeira/@-7.2209458,-37.2545593,17z/data=!3m1!4b1!4m6!3m5!1s0x7af57078af60675:0x1bf75c0e62967d0b!8m2!3d-7.2209458!4d-37.2519844!16s%2Fg%2F11kb1ky2j8?entry=ttu&g_ep=EgoyMDI2MTExMC4wIKXMDSoASAFQAw%3D%3D",
+  "inputStartUrl": "https://www.google.com/maps/place/Odonto%2B+Sa%C3%BAde+-+Teixeira/@-7.2209458,-37.2545593,17z/data=!3m1!4b1!4m6!3m5!1s0x7af57078af60675:0x1bf75c0e62967d0b!8m2!3d-7.2209458!4d-37.2519844!16s%2Fg%2F11kb1ky2j8?entry=ttu&g_ep=EgoyMDI2MTExMC4wIKXMDSoASAFQAw%3D%3D",
+  "webResults": [],
+  "tableReservationLinks": [],
+  "tableReservationProviders": [],
+  "bookingLinks": [],
+  "restaurantData": {
+    "tableReservationProvider": null
+  },
+  "ownerUpdates": [],
+  "imageUrls": [],
+  "reviews": [
+    {
+      "textTranslated": "Excellent service, both from reception and the dentist, I highly recommend it!",
+      "translatedLanguage": "en",
+      "text": "Ótimo atendimento, tanto da recepção como o dentista, super recomendo!",
+      "originalLanguage": "pt",
+      "publishAt": "4 months ago",
+      "publishedAtDate": "2026-06-26T18:48:35.642Z",
+      "likesCount": 0,
+      "reviewId": "Ci9DQUlRQUNvZENodHljRjlvT2xkNlpVeFRkQzAxVWxGM2NDMU1VSGxuZW5sb1IzYxAB",
+      "reviewUrl": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2xkNlpVeFRkQzAxVWxGM2NDMU1VSGxuZW5sb1IzYxAB!2m1!1s0x0:0x1bf75c0e62967d0b!3m1!1s2@1:CAIQACodChtycF9oOld6ZUxTdC01UlF3cC1MUHlnenloR3c%7C%7C?hl=en-US",
+      "reviewOrigin": "Google",
+      "stars": 5,
+      "rating": null,
+      "responseFromOwnerDate": null,
+      "responseFromOwnerText": null,
+      "reviewImageUrls": [],
+      "reviewContext": {},
+      "reviewDetailedRating": {},
+      "visitedIn": null,
+      "reviewerNumberOfReviews": 1,
+      "isLocalGuide": false,
+      "reviewerId": "101425558634107983895",
+      "reviewerPhotoUrl": "https://lh3.googleusercontent.com/a/ACg8ocLXrk_NZXbKhCjtBI2CXlUen4hjuXOgZODQxOl1wZyVa7IYSg=s64-c-rp-mo-br100",
+      "reviewerUrl": "https://www.google.com/maps/contrib/101425558634107983895/reviews?hl=en-US",
+      "name": "Vitoria Avelino"
+    },
+    {
+      "textTranslated": "Excellent service, congratulations to the staff and receptionist Erika.",
+      "translatedLanguage": "en",
+      "text": "Excelente atendimento, parabéns aos profissionais do local e a recepcionista erika.",
+      "originalLanguage": "pt",
+      "publishAt": "4 months ago",
+      "publishedAtDate": "2026-06-22T17:57:55.823Z",
+      "likesCount": 0,
+      "reviewId": "Ci9DQUlRQUNvZENodHljRjlvT2toclZqZDZWWE50VVhWeFVucEVOWEY0T0d4RWIwRRAB",
+      "reviewUrl": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2toclZqZDZWWE50VVhWeFVucEVOWEY0T0d4RWIwRRAB!2m1!1s0x0:0x1bf75c0e62967d0b!3m1!1s2@1:CAIQACodChtycF9oOkhrVjd6VXNtUXVxUnpENXF4OGxEb0E%7C%7C?hl=en-US",
+      "reviewOrigin": "Google",
+      "stars": 5,
+      "rating": null,
+      "responseFromOwnerDate": null,
+      "responseFromOwnerText": null,
+      "reviewImageUrls": [],
+      "reviewContext": {},
+      "reviewDetailedRating": {},
+      "visitedIn": null,
+      "reviewerNumberOfReviews": 1,
+      "isLocalGuide": false,
+      "reviewerId": "108638229678480279093",
+      "reviewerPhotoUrl": "https://lh3.googleusercontent.com/a/ACg8ocIDG3PGERxdPu21EpeOEPX85ASBlMg5SoBuLerYUlffSHufzw=s64-c-rp-mo-br100",
+      "reviewerUrl": "https://www.google.com/maps/contrib/108638229678480279093/reviews?hl=en-US",
+      "name": "Camille Evelly"
+    },
+    {
+      "textTranslated": null,
+      "translatedLanguage": "en",
+      "text": "",
+      "originalLanguage": "",
+      "publishAt": "4 months ago",
+      "publishedAtDate": "2026-06-21T22:42:22.503Z",
+      "likesCount": 0,
+      "reviewId": "Ci9DQUlRQUNvZENodHljRjlvT2tKb01reG1ZbFpqWkMxQlJHWTVVa2RLWjAwNU5FRRAB",
+      "reviewUrl": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2tKb01reG1ZbFpqWkMxQlJHWTVVa2RLWjAwNU5FRRAB!2m1!1s0x0:0x1bf75c0e62967d0b!3m1!1s2@1:CAIQACodChtycF9oOkJoMkxmYlZjZC1BRGY5UkdKZ005NEE%7C%7C?hl=en-US",
+      "reviewOrigin": "Google",
+      "stars": 5,
+      "rating": null,
+      "responseFromOwnerDate": null,
+      "responseFromOwnerText": null,
+      "reviewImageUrls": [],
+      "reviewContext": {},
+      "reviewDetailedRating": {},
+      "visitedIn": null,
+      "reviewerNumberOfReviews": 0,
+      "isLocalGuide": false,
+      "reviewerId": "116306723892004937695",
+      "reviewerPhotoUrl": "https://lh3.googleusercontent.com/a-/ALV-UjUTJLaQbE1AM_fe8kQnmmGvl_GVY5taCjLVaAcoE7j2fYLwQOt0=s64-c-rp-mo-br100",
+      "reviewerUrl": "https://www.google.com/maps/contrib/116306723892004937695/reviews?hl=en-US",
+      "name": "cristina pereira"
+    },
+    {
+      "textTranslated": null,
+      "translatedLanguage": "en",
+      "text": "",
+      "originalLanguage": "",
+      "publishAt": "4 months ago",
+      "publishedAtDate": "2026-06-21T22:37:34.935Z",
+      "likesCount": 0,
+      "reviewId": "Ci9DQUlRQUNvZENodHljRjlvT2xvNGMyVjBhQzAwZHpoSVgwbEljV3B4Y1VvMWVYYxAB",
+      "reviewUrl": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2xvNGMyVjBhQzAwZHpoSVgwbEljV3B4Y1VvMWVYYxAB!2m1!1s0x0:0x1bf75c0e62967d0b!3m1!1s2@1:CAIQACodChtycF9oOlo4c2V0aC00dzhIX0lIcWpxcUo1eXc%7C%7C?hl=en-US",
+      "reviewOrigin": "Google",
+      "stars": 5,
+      "rating": null,
+      "responseFromOwnerDate": null,
+      "responseFromOwnerText": null,
+      "reviewImageUrls": [],
+      "reviewContext": {},
+      "reviewDetailedRating": {},
+      "visitedIn": null,
+      "reviewerNumberOfReviews": 0,
+      "isLocalGuide": false,
+      "reviewerId": "116949195864503293029",
+      "reviewerPhotoUrl": "https://lh3.googleusercontent.com/a-/ALV-UjU3AYRM-peL-idF3zR1qVelmbSXwVGpTRNphWLdUS8Kn9O7hRe_=s64-c-rp-mo-br100",
+      "reviewerUrl": "https://www.google.com/maps/contrib/116949195864503293029/reviews?hl=en-US",
+      "name": "Izabel Cristina"
+    },
+    {
+      "textTranslated": null,
+      "translatedLanguage": "en",
+      "text": "",
+      "originalLanguage": "",
+      "publishAt": "4 months ago",
+      "publishedAtDate": "2026-06-16T22:38:09.915Z",
+      "likesCount": 0,
+      "reviewId": "Ci9DQUlRQUNvZENodHljRjlvT2pCS2FVNTRhbDgwVmtvelRYSklRVzF0TmpaQlRGRRAB",
+      "reviewUrl": "https://www.google.com/maps/reviews/data=!4m8!14m7!1m6!2m5!1sCi9DQUlRQUNvZENodHljRjlvT2pCS2FVNTRhbDgwVmtvelRYSklRVzF0TmpaQlRGRRAB!2m1!1s0x0:0x1bf75c0e62967d0b!3m1!1s2@1:CAIQACodChtycF9oOjBKaU54al80VkozTXJIQW1tNjZBTFE%7C%7C?hl=en-US",
+      "reviewOrigin": "Google",
+      "stars": 5,
+      "rating": null,
+      "responseFromOwnerDate": null,
+      "responseFromOwnerText": null,
+      "reviewImageUrls": [],
+      "reviewContext": {},
+      "reviewDetailedRating": {},
+      "visitedIn": null,
+      "reviewerNumberOfReviews": 0,
+      "isLocalGuide": false,
+      "reviewerId": "109001749042202839851",
+      "reviewerPhotoUrl": "https://lh3.googleusercontent.com/a-/ALV-UjW8VZHNMGoIL6Ro877NBvZBNPVrjRiPd-_u-SRtJHJrFQGCUNWMew=s64-c-rp-mo-br100",
+      "reviewerUrl": "https://www.google.com/maps/contrib/109001749042202839851/reviews?hl=en-US",
+      "name": "Wemilyguimaraes Guimaraes"
+    }
+  ],
+  "leadsEnrichment": []
+}]
