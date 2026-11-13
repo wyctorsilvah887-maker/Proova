@@ -603,10 +603,50 @@ export default function Home() {
     }
   };
 
+  const softwareSchema = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Proova AI",
+    "operatingSystem": "Web",
+    "applicationCategory": "BusinessApplication",
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "ratingCount": "127"
+    },
+    "offers": {
+      "@type": "Offer",
+      "price": "147.00",
+      "priceCurrency": "BRL"
+    },
+    "description": "Responda avaliações do Google automaticamente com Inteligência Artificial, aumente sua nota no Maps e atraia mais clientes locais."
+  };
+
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Proova Technology",
+    "url": "https://useproova.online",
+    "logo": "https://useproova.online/logo-proovaai-whitemode.png",
+    "sameAs": [
+      "https://instagram.com/proovaai"
+    ]
+  };
+
   if (loading || user) return <LoadingScreen />;
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
+      {/* Schema Markup Injection */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+
       <Navigation isScrolled={isScrolled} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} scrollToSection={scrollToSection} />
       <main className="flex-1 pt-20">
         <HeroSection isVisible={isHeroVisible} />
