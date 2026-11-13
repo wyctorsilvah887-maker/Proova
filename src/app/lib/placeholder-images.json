@@ -26,24 +26,6 @@
       "imageHint": "brand design customization"
     },
     {
-      "id": "avatar-1",
-      "description": "Avatar do usuário Alice",
-      "imageUrl": "https://picsum.photos/seed/av1/64/64",
-      "imageHint": "person face"
-    },
-    {
-      "id": "avatar-2",
-      "description": "Avatar do usuário Bruno",
-      "imageUrl": "https://picsum.photos/seed/av2/64/64",
-      "imageHint": "person face"
-    },
-    {
-      "id": "avatar-3",
-      "description": "Avatar do usuário Carla",
-      "imageUrl": "https://picsum.photos/seed/av3/64/64",
-      "imageHint": "person face"
-    },
-    {
       "id": "app-mobile-light",
       "description": "Preview da página pública no celular - Modo Claro",
       "imageUrl": "/pagnappmobile-whitemode.webp",
