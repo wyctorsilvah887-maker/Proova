@@ -50,12 +50,12 @@ Sua missão é ajudar o usuário de nome {{userName}} (Plano: {{membershipStatus
 
 /**
  * Função de ação que processa a dúvida do usuário.
- * Especificamos explicitamente o modelo gemini-1.5-flash para máxima compatibilidade.
+ * Atualizado para utilizar o modelo gemini-3.0 para respostas mais precisas.
  */
 export async function supportAiAction(input: SupportAiInput): Promise<SupportAiOutput> {
   try {
     const { output } = await supportPrompt(input, {
-      model: 'googleai/gemini-1.5-flash',
+      model: 'googleai/gemini-3.0',
     });
 
     if (!output) {
