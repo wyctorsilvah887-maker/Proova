@@ -7,9 +7,21 @@ const COOLDOWN_MS = 15 * 60 * 1000;
 /** "Atualizar agora": o dono logado pede uma busca imediata (com intervalo mínimo). */
 export async function POST(req: Request) {
   const token = (req.headers.get('authorization') || '').replace(/^Bearer /, '');
+  if (!token) return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+
+  // Configuração do servidor (chave do Firebase) separada de token inválido, para o erro real aparecer nos logs.
+  let auth: ReturnType<typeof adminAuth>;
+  try { auth = adminAuth(); }
+  catch (e) {
+    console.error('[reviews refresh] firebase-admin mal configurado:', (e as Error).message);
+    return NextResponse.json({ error: 'server_config' }, { status: 500 });
+  }
   let uid: string;
-  try { uid = (await adminAuth().verifyIdToken(token)).uid; }
-  catch { return NextResponse.json({ error: 'unauthorized' }, { status: 401 }); }
+  try { uid = (await auth.verifyIdToken(token)).uid; }
+  catch (e) {
+    console.error('[reviews refresh] token recusado:', (e as any)?.code, (e as Error).message);
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
 
   const user = (await adminDb().doc(`users/${uid}`).get()).data();
   if (!user) return NextResponse.json({ error: 'not found' }, { status: 404 });
