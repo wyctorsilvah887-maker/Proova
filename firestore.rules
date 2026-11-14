@@ -103,6 +103,16 @@ service cloud.firestore {
         );
       }
 
+      // Avaliações do Google (gravadas só pelo servidor via firebase-admin).
+      // O dono lê e só pode mudar o andamento (status/copiedAt).
+      match /googleReviews/{reviewId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow update: if request.auth != null && request.auth.uid == userId
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'copiedAt'])
+          && request.resource.data.status in ['pending', 'copied', 'dismissed', 'replied'];
+        allow create, delete: if false;
+      }
+
       // Página Pública (PP)
       match /pp/{slug} {
         allow read: if true;
