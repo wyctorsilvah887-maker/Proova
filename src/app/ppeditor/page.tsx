@@ -446,7 +446,7 @@ const PublicPageSettings = ({
                    <div className="mx-auto w-14 h-14 bg-primary/10 rounded-[1.5rem] flex items-center justify-center text-primary shadow-inner"><Gem className="w-7 h-7" /></div>
                    <div className="space-y-2">
                      <h4 className="text-sm font-black uppercase tracking-tight">Conteúdo VIP Ativado</h4>
-                     <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">Assine o plano Gold para liberar edição rica de texto, cores personalizadas e seções ilimitadas.</p>
+                     <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">Assine o plano Proova AI Premium para liberar edição rica de texto, cores personalizadas e seções ilimitadas.</p>
                    </div>
                    <Button onClick={() => router.push('/pricing')} className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] bg-primary shadow-lg hover:bg-primary/90">Garantir Acesso Gold</Button>
                  </div>
@@ -884,7 +884,7 @@ export default function PPEditorPage() {
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
     if (status === 'enterprise') return 'PRO';
-    if (status === 'gold') return 'GOLD';
+    if (status === 'gold') return 'PREMIUM';
     if (status === 'trial') return 'TRIAL';
     if (status === 'expired') return 'EXPIRADO';
     return 'PLANO BASE';

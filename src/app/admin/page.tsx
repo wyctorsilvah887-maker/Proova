@@ -243,7 +243,7 @@ export default function AdminPage() {
                                </div>
                             </TableCell>
                             <TableCell>
-                               <Badge variant="secondary" className="text-[8px] font-black uppercase text-primary">{u.membershipStatus === 'enterprise' ? 'PRO' : u.membershipStatus}</Badge>
+                               <Badge variant="secondary" className="text-[8px] font-black uppercase text-primary">{u.membershipStatus === 'enterprise' ? 'PRO' : u.membershipStatus === 'gold' ? 'PREMIUM' : u.membershipStatus}</Badge>
                             </TableCell>
                             <TableCell>
                                <div className="w-20">
@@ -319,8 +319,8 @@ export default function AdminPage() {
                      </SelectTrigger>
                      <SelectContent>
                         <SelectItem value="base">Base (Grátis)</SelectItem>
-                        <SelectItem value="gold">Gold</SelectItem>
-                        <SelectItem value="enterprise">PRO (Antigo Enterprise)</SelectItem>
+                        <SelectItem value="gold">Proova AI Premium</SelectItem>
+                        <SelectItem value="enterprise">Proova AI PRO</SelectItem>
                         <SelectItem value="trial">Trial</SelectItem>
                         <SelectItem value="expired">Expirado</SelectItem>
                      </SelectContent>

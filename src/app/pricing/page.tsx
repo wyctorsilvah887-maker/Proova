@@ -90,7 +90,7 @@ export default function PricingPage() {
 
   const membershipLabel = useMemo(() => {
     if (status === 'enterprise' || status === 'pro') return 'PRO';
-    if (status === 'gold') return 'GOLD';
+    if (status === 'gold') return 'PREMIUM';
     if (status === 'trial') return 'TRIAL';
     if (status === 'guest') return 'Visitante';
     return 'PLANO BASE';
@@ -103,7 +103,7 @@ export default function PricingPage() {
   const plans = [
     {
       id: 'gold',
-      name: "Plano Gold",
+      name: "Proova AI Premium",
       price: "R$ 147",
       period: "/mês",
       description: "Aceleração de Vendas",
@@ -124,7 +124,7 @@ export default function PricingPage() {
     },
     {
       id: 'pro',
-      name: "Plano PRO",
+      name: "Proova AI PRO",
       price: "R$ 270",
       period: "/mês",
       description: "Domínio de Mercado",
@@ -134,7 +134,7 @@ export default function PricingPage() {
       disabled: status === 'pro' || status === 'enterprise',
       checkoutUrl: "https://pay.cakto.com.br/enterprise-proova",
       benefits: [
-        "Tudo do Plano Gold + Exclusivos",
+        "Tudo do Proova AI Premium + Exclusivos",
         "Coleta de Vídeo Reviews 4K",
         "Suporte VIP Dedicado com Consultor",
         "Métricas de ROI Avançadas",
@@ -332,7 +332,7 @@ export default function PricingPage() {
              {[
                { q: "Posso cancelar minha assinatura quando quiser?", a: "Sim. A Proova não possui fidelidade. Você pode cancelar sua assinatura mensal diretamente no painel ou via suporte a qualquer momento, sem taxas ocultas." },
                { q: "O G-Boost realmente melhora meu posicionamento no Google?", a: "Absolutamente. O algoritmo do Google Maps prioriza perfis que recebem avaliações constantes e positivas. Ao automatizar o convite para elogios 5 estrelas, você aumenta sua visibilidade organicamente." },
-               { q: "Como funciona o suporte VIP?", a: "Clientes Gold e PRO possuem fila prioritária em nosso chat de suporte e atendimento especializado por consultores estratégicos de prova social." }
+               { q: "Como funciona o suporte VIP?", a: "Clientes Premium e PRO possuem fila prioritária em nosso chat de suporte e atendimento especializado por consultores estratégicos de prova social." }
              ].map((faq, idx) => (
                <AccordionItem key={idx} value={`item-${idx}`} className="border rounded-[1.5rem] px-5 md:px-6 bg-card shadow-sm overflow-hidden">
                  <AccordionTrigger className="hover:no-underline text-[11px] md:text-sm font-black uppercase tracking-tight text-left py-5 md:py-6">
