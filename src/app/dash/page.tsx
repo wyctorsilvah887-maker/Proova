@@ -149,37 +149,26 @@ export default function DashPage() {
   const [companyNameEdit, setCompanyNameEdit] = useState('');
   const [companySlugEdit, setCompanySlugEdit] = useState('');
 
-  // Estados para novas avaliações via API (Mock/Apify)
-  const [apiSuggestions, setApiSuggestions] = useState<any[]>([]);
-  const [isLoadingApi, setIsLoadingApi] = useState(false);
+  // Avaliações do Google Maps (preenchidas pelo servidor: Apify hoje, API oficial depois)
   const [isRegenerating, setIsRegenerating] = useState<string | null>(null);
+  const [localReplies, setLocalReplies] = useState<Record<string, string>>({});
+  const [isRefreshingReviews, setIsRefreshingReviews] = useState(false);
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
   const { permission, requestPermission, isSupported: pushSupported } = useNotifications(user?.uid);
 
-  // Consumir rota de IA para alimentar o painel
-  useEffect(() => {
-    const fetchApiReviews = async () => {
-      setIsLoadingApi(true);
-      try {
-        const res = await fetch('/api/reviews/generate', { method: 'POST' });
-        const data = await res.json();
-        if (data.success && data.suggestions) {
-          setApiSuggestions(data.suggestions);
-        }
-      } catch (err) {
-        console.error("Erro ao buscar sugestões da API:", err);
-      } finally {
-        setIsLoadingApi(false);
-      }
-    };
-
-    if (user) {
-      fetchApiReviews();
-    }
-  }, [user]);
+  const googleReviewsQuery = useMemo(
+    () => (db && user ? query(collection(db, 'users', user.uid, 'googleReviews'), orderBy('fetchedAt', 'desc'), limit(30)) : null),
+    [db, user]
+  );
+  const { data: googleReviews, loading: isLoadingApi } = useCollection(googleReviewsQuery);
+  // Só as que ainda precisam de atenção do dono
+  const apiSuggestions = useMemo(
+    () => (googleReviews || []).filter((r: any) => r.status === 'pending' || r.status === 'copied'),
+    [googleReviews]
+  );
 
   // Deep Linking Logic
   useEffect(() => {
@@ -249,7 +238,7 @@ export default function DashPage() {
 
   const aiRepliesCount = useMemo(() => {
     const firestoreCount = (approvedTestimonials || []).filter((t: any) => !!t.aiReply).length;
-    const apiCount = apiSuggestions.length;
+    const apiCount = apiSuggestions.filter((r: any) => !!r.aiReply).length;
     return firestoreCount + apiCount;
   }, [approvedTestimonials, apiSuggestions]);
 
@@ -285,6 +274,49 @@ export default function DashPage() {
   const copyToClipboard = (text: string, description: string) => {
     navigator.clipboard.writeText(text);
     shadcnToast({ title: "Copiado!", description: `${description} copiado.` });
+  };
+
+  const setReviewStatus = async (id: string, status: 'copied' | 'dismissed' | 'replied') => {
+    if (!db || !user) return;
+    try {
+      await updateDoc(doc(db, 'users', user.uid, 'googleReviews', id), {
+        status,
+        ...(status === 'copied' ? { copiedAt: serverTimestamp() } : {}),
+      });
+    } catch {
+      shadcnToast({ variant: "destructive", title: "Não foi possível atualizar", description: "Tente novamente em instantes." });
+    }
+  };
+
+  const copyReviewReply = (id: string, reply: string) => {
+    copyToClipboard(reply, "Resposta");
+    const current = (googleReviews || []).find((r: any) => r.id === id) as any;
+    if (current?.status === 'pending') setReviewStatus(id, 'copied');
+  };
+
+  const handleRefreshReviews = async () => {
+    if (!user || isRefreshingReviews) return;
+    setIsRefreshingReviews(true);
+    try {
+      const idToken = await user.getIdToken();
+      const res = await fetch('/api/reviews/refresh', { method: 'POST', headers: { Authorization: `Bearer ${idToken}` } });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        shadcnToast({ title: "Buscando avaliações…", description: "Em cerca de 1 minuto as novas avaliações aparecem aqui." });
+      } else if (res.status === 429) {
+        shadcnToast({ title: "Aguarde um pouco", description: `Nova busca disponível em ${Math.ceil((data.retryInSeconds || 900) / 60)} min.` });
+      } else if (data.error === 'no_place') {
+        shadcnToast({ variant: "destructive", title: "Conecte seu Google Maps", description: "Selecione sua empresa em Google Maps primeiro." });
+      } else if (res.status === 403) {
+        shadcnToast({ variant: "destructive", title: "Recurso Gold", description: "A busca automática é exclusiva dos planos Gold, Enterprise e teste." });
+      } else {
+        throw new Error('fail');
+      }
+    } catch {
+      shadcnToast({ variant: "destructive", title: "Erro na busca", description: "Não foi possível iniciar agora." });
+    } finally {
+      setIsRefreshingReviews(false);
+    }
   };
 
   const handleSearchPlaces = async () => {
@@ -357,7 +389,7 @@ export default function DashPage() {
       });
 
       if (isApi) {
-        setApiSuggestions(prev => prev.map(s => s.reviewId === id ? { ...s, aiSuggestedReply: result.reply } : s));
+        setLocalReplies(prev => ({ ...prev, [id]: result.reply }));
       } else {
         if (!db || !user) return;
         const tRef = doc(db, 'users', user.uid, 'testimonials', id);
@@ -761,7 +793,14 @@ export default function DashPage() {
                    <Sparkles className="w-5 h-5 text-primary" />
                    <h2 className="text-sm md:text-lg font-black uppercase tracking-tight">Avaliações Recentes & IA</h2>
                 </div>
-                <Link href="/private" className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">Ver Todas</Link>
+                <div className="flex items-center gap-4">
+                  {isPremiumUser && userData?.googlePlaceId && (
+                    <button onClick={handleRefreshReviews} disabled={isRefreshingReviews} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-primary hover:underline disabled:opacity-50">
+                      <RefreshCw className={cn("w-3 h-3", isRefreshingReviews && "animate-spin")} /> Atualizar agora
+                    </button>
+                  )}
+                  <Link href="/private" className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">Ver Todas</Link>
+                </div>
               </div>
 
               <div className="space-y-4">
@@ -779,32 +818,35 @@ export default function DashPage() {
                   </Card>
                 )}
 
-                {/* Renderizar Sugestões da API (Mock/Apify) */}
-                {apiSuggestions.map((s: any) => (
-                  <Card key={s.reviewId} className="border-none shadow-lg rounded-[2rem] overflow-hidden bg-background group hover:shadow-xl transition-all border-l-4 border-l-primary/30">
+                {/* Avaliações do Google Maps com rascunho de resposta da IA */}
+                {apiSuggestions.map((r: any) => {
+                  const reply: string = localReplies[r.id] ?? r.aiReply ?? '';
+                  return (
+                  <Card key={r.id} className="border-none shadow-lg rounded-[2rem] overflow-hidden bg-background group hover:shadow-xl transition-all border-l-4 border-l-primary/30">
                      <CardContent className="p-6 md:p-8 space-y-6">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                            <div className="flex items-center gap-3">
                               <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-xs uppercase shadow-inner">
-                                 {s.reviewerName?.substring(0, 2)}
+                                 {r.authorName?.substring(0, 2)}
                               </div>
                               <div>
-                                 <p className="font-black text-xs uppercase tracking-tight leading-none">{s.reviewerName}</p>
+                                 <p className="font-black text-xs uppercase tracking-tight leading-none">{r.authorName}</p>
                                  <div className="flex items-center gap-2 mt-1">
                                     <div className="flex">
-                                       {[1,2,3,4,5].map(star => <Star key={star} className={cn("w-3.5 h-3.5", star <= s.stars ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20")} />)}
+                                       {[1,2,3,4,5].map(star => <Star key={star} className={cn("w-3.5 h-3.5", star <= r.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20")} />)}
                                     </div>
                                     <Badge variant="secondary" className="text-[7px] font-black uppercase h-4 px-1.5 border-none bg-primary/10 text-primary">GOOGLE MAPS</Badge>
+                                    {r.status === 'copied' && <Badge variant="outline" className="text-[7px] font-black uppercase h-4 px-1.5">Copiada</Badge>}
                                  </div>
                               </div>
                            </div>
                            <span className="text-[8px] font-bold text-muted-foreground uppercase flex items-center gap-1">
-                              <Clock className="w-2.5 h-2.5" /> Recentemente
+                              <Clock className="w-2.5 h-2.5" /> {r.publishedAt ? new Date(r.publishedAt).toLocaleDateString('pt-BR') : 'Recentemente'}
                            </span>
                         </div>
 
                         <p className="text-sm font-medium leading-relaxed italic opacity-80 pl-4 border-l-2 border-primary/10">
-                           "{s.originalText}"
+                           {r.text ? `"${r.text}"` : 'Avaliação apenas com estrelas, sem comentário.'}
                         </p>
 
                         <div className="mt-4 p-5 rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5 space-y-3 relative group/reply">
@@ -814,30 +856,47 @@ export default function DashPage() {
                               </div>
                               <span className="text-[9px] font-black uppercase tracking-widest text-primary">Resposta Sugerida pela IA</span>
                            </div>
-                           <p className="text-xs md:text-sm font-bold leading-relaxed text-foreground/90">
-                              {s.aiSuggestedReply}
-                            </p>
-                            <div className="absolute top-4 right-4 flex gap-2">
-                               <button 
-                                onClick={() => handleRegenerateResponse(s.reviewId, s.reviewerName, s.originalText, s.stars, true)}
-                                disabled={isRegenerating === s.reviewId}
+                           <p className="text-xs md:text-sm font-bold leading-relaxed text-foreground/90 pr-20">
+                              {reply || 'A IA não conseguiu gerar este rascunho. Use o botão de regerar.'}
+                           </p>
+                           <div className="absolute top-4 right-4 flex gap-2">
+                              <button
+                                onClick={() => handleRegenerateResponse(r.id, r.authorName, r.text || '', r.rating, true)}
+                                disabled={isRegenerating === r.id}
                                 className="p-2 rounded-xl bg-background border shadow-sm hover:bg-muted transition-all active:scale-95 disabled:opacity-50"
                                 title="Regerar Resposta"
-                               >
-                                  <RefreshCw className={cn("w-3.5 h-3.5 text-primary", isRegenerating === s.reviewId && "animate-spin")} />
-                               </button>
-                               <button 
-                                onClick={() => copyToClipboard(s.aiSuggestedReply, "Resposta IA")} 
-                                className="p-2 rounded-xl bg-background border shadow-sm hover:bg-muted transition-all active:scale-95"
-                                title="Copiar Resposta"
-                               >
+                              >
+                                <RefreshCw className={cn("w-3.5 h-3.5 text-primary", isRegenerating === r.id && "animate-spin")} />
+                              </button>
+                              {reply && (
+                                <button
+                                  onClick={() => copyReviewReply(r.id, reply)}
+                                  className="p-2 rounded-xl bg-background border shadow-sm hover:bg-muted transition-all active:scale-95"
+                                  title="Copiar Resposta"
+                                >
                                   <Copy className="w-3.5 h-3.5 text-primary" />
-                               </button>
-                            </div>
+                                </button>
+                              )}
+                           </div>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                           {r.reviewUrl && (
+                             <Button asChild variant="outline" size="sm" className="rounded-xl text-[10px] font-black uppercase tracking-widest gap-1.5">
+                               <a href={r.reviewUrl} target="_blank" rel="noopener noreferrer"><ExternalLink className="w-3 h-3" /> Abrir no Google</a>
+                             </Button>
+                           )}
+                           <Button size="sm" onClick={() => setReviewStatus(r.id, 'replied')} className="rounded-xl text-[10px] font-black uppercase tracking-widest gap-1.5">
+                             <CheckCircle2 className="w-3 h-3" /> Marcar como respondida
+                           </Button>
+                           <Button size="sm" variant="ghost" onClick={() => setReviewStatus(r.id, 'dismissed')} className="rounded-xl text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                             Descartar
+                           </Button>
                         </div>
                      </CardContent>
                   </Card>
-                ))}
+                  );
+                })}
 
                 {/* Renderizar Depoimentos do Firestore */}
                 {approvedTestimonials.slice(0, 5).map((t: any) => (
