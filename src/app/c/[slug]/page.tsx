@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { initializeFirebase } from '@/firebase';
 import { collection, query, where, getDocs, limit } from 'firebase/firestore';
 import CollectionClient from './CollectionClient';
+import { SITE_URL } from '@/lib/site';
 
 /**
  * Server Component para gerar metadados dinâmicos (Open Graph) para WhatsApp/Redes Sociais.
@@ -25,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const data = snap.docs[0].data();
   const companyName = data.companyName || 'Empresa Parceira';
-  const logoUrl = data.logoUrl || 'https://useproova.online/Logotipo%20PROOVA%20white%20mode%201.png';
+  const logoUrl = data.logoUrl || `${SITE_URL}/logo-proovaai-whitemode.png`;
 
   return {
     title: `Avalie ${companyName} no Proova`,

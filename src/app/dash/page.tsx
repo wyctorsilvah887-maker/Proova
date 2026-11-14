@@ -692,7 +692,7 @@ export default function DashPage() {
                        <Input value={companyNameEdit} onChange={(e) => setCompanyNameEdit(e.target.value)} className="h-12 rounded-xl" />
                     </div>
                     <div className="space-y-2">
-                       <Label className="text-[10px] font-black uppercase opacity-60">Slug da URL (useproova.online/c/...)</Label>
+                       <Label className="text-[10px] font-black uppercase opacity-60">Slug da URL (useproovaai.com.br/c/...)</Label>
                        <Input value={companySlugEdit} onChange={(e) => setCompanySlugEdit(e.target.value.toLowerCase().replace(/\s+/g, '-'))} className="h-12 rounded-xl font-mono text-xs" />
                     </div>
                     <Button className="w-full h-14 rounded-xl font-bold" onClick={handleUpdateBusinessInfo}>Salvar Nova Identidade</Button>
