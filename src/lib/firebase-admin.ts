@@ -1,5 +1,6 @@
 import { getApps, initializeApp, cert, type App } from 'firebase-admin/app';
 import { getFirestore, type Firestore } from 'firebase-admin/firestore';
+import { getAuth, type Auth } from 'firebase-admin/auth';
 
 /**
  * Lê a chave da conta de serviço da variável FIREBASE_SERVICE_ACCOUNT
@@ -22,4 +23,9 @@ function adminApp(): App {
 /** Firestore com privilégio de servidor (ignora as regras). Só usar em rotas de API/server actions. */
 export function adminDb(): Firestore {
   return getFirestore(adminApp());
+}
+
+/** Verificação de login (ID token) feita no servidor. */
+export function adminAuth(): Auth {
+  return getAuth(adminApp());
 }
