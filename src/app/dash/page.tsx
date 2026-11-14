@@ -575,13 +575,13 @@ export default function DashPage() {
         </SheetContent>
       </Sheet>
 
-      <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pt-24 md:pt-32 pb-12">
+      <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pt-20 md:pt-32 pb-12">
         
         {activeHash ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">
-            <header className="flex items-center justify-between">
-              <div className="space-y-1">
-                <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter uppercase">
+            <header className="flex items-center justify-between gap-4">
+              <div className="space-y-1 min-w-0 flex-1">
+                <h1 className="text-2xl sm:text-3xl md:text-5xl break-words font-black font-headline tracking-tighter uppercase">
                   {activeHash === 'link-coleta' && 'Link de Coleta'}
                   {activeHash === 'bio' && 'Link in Bio'}
                   {activeHash === 'qr' && 'Cartaz de Balcão'}
@@ -604,7 +604,7 @@ export default function DashPage() {
             </header>
 
             <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-background">
-              <div className="p-8 md:p-12">
+              <div className={cn(activeHash === 'qr' ? 'p-3' : 'p-5', 'sm:p-8 md:p-12')}>
                 {activeHash === 'link-coleta' && (
                   <div className="max-w-md mx-auto space-y-8">
                     <div className="flex flex-col items-center gap-6 text-center">
@@ -668,7 +668,7 @@ export default function DashPage() {
                         <Label className="text-[10px] font-black uppercase opacity-60">Vincular Empresa no Google (G-Boost)</Label>
                         <div className="relative">
                            <Input placeholder="Pesquise o nome da clínica..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSearchPlaces()} className="h-14 pl-12 rounded-2xl bg-muted/20 border-transparent" />
-                           <Search className="absolute left-4 top-4.5 w-5 h-5 text-muted-foreground/40" />
+                           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground/40" />
                            <Button size="sm" variant="ghost" onClick={handleSearchPlaces} disabled={isSearchingPlaces} className="absolute right-2 top-2 h-10 rounded-xl text-primary">
                              {isSearchingPlaces ? <Loader2 className="animate-spin" /> : <Navigation className="w-5 h-5" />}
                            </Button>
@@ -676,8 +676,8 @@ export default function DashPage() {
                         <div className="space-y-2">
                            {searchResults.map((p) => (
                              <div key={p.place_id} onClick={() => handleSelectPlace(p)} className="p-4 rounded-xl bg-muted/10 border-2 border-transparent hover:border-primary/20 cursor-pointer transition-all flex items-center justify-between group">
-                                <div><p className="font-bold text-sm uppercase">{p.name}</p><p className="text-[10px] text-muted-foreground">{p.address}</p></div>
-                                <ChevronRight className="w-4 h-4 opacity-20 group-hover:opacity-100" />
+                                <div className="min-w-0"><p className="font-bold text-sm uppercase break-words">{p.name}</p><p className="text-[10px] text-muted-foreground break-words">{p.address}</p></div>
+                                <ChevronRight className="w-4 h-4 shrink-0 opacity-20 group-hover:opacity-100" />
                              </div>
                            ))}
                         </div>
@@ -705,7 +705,7 @@ export default function DashPage() {
           <div className="space-y-10 animate-in fade-in duration-700">
             {(!isSetupComplete && !userData?.isSetupProcessDone) && (
               <section className="space-y-4">
-                 <div className="flex items-center justify-between">
+                 <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <Rocket className="w-5 h-5 text-primary" />
                       <h2 className="text-sm font-black uppercase tracking-widest">Missões de Sucesso Proova</h2>
@@ -715,7 +715,7 @@ export default function DashPage() {
                     </Badge>
                  </div>
                  <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden bg-background">
-                    <div className="p-6 md:p-8 space-y-6">
+                    <div className="p-4 sm:p-6 md:p-8 space-y-6">
                       <Progress value={progressPercentage} className="h-2.5 bg-muted" />
                       <div className="grid gap-3 sm:grid-cols-3">
                         {setupSteps.map((step, idx) => (
@@ -734,7 +734,7 @@ export default function DashPage() {
 
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="space-y-1">
-                <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter uppercase">Painel de Controle</h1>
+                <h1 className="text-2xl sm:text-3xl md:text-5xl font-black font-headline tracking-tighter uppercase">Painel de Controle</h1>
                 <p className="text-xs md:text-base text-muted-foreground font-medium">Gestão de autoridade e prova social digital</p>
               </div>
               <div className="w-full sm:w-48">
@@ -758,7 +758,7 @@ export default function DashPage() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16" />
                 <div className="flex items-center justify-between mb-4 relative z-10">
                   <div className="p-2 rounded-xl bg-primary/10 text-primary"><Star className="w-4 h-4 fill-primary" /></div>
-                  <Badge variant="outline" className="hidden xs:flex text-[7px] md:text-[9px] font-black uppercase border-primary/30 text-primary">{filteredMetrics.label}</Badge>
+                  <Badge variant="outline" className="hidden min-[400px]:flex text-[7px] md:text-[9px] font-black uppercase border-primary/30 text-primary">{filteredMetrics.label}</Badge>
                 </div>
                 <div className="flex items-baseline gap-2 relative z-10">
                   <span className="text-3xl md:text-6xl font-black tracking-tighter">{filteredMetrics.count}</span>
@@ -774,7 +774,7 @@ export default function DashPage() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16" />
                 <div className="flex items-center justify-between mb-4 relative z-10">
                   <div className="p-2 rounded-xl bg-primary/10 text-primary"><Bot className="w-4 h-4" /></div>
-                  <Badge variant="secondary" className="hidden xs:flex text-[7px] md:text-[9px] font-black uppercase bg-primary text-white border-none">100% IA</Badge>
+                  <Badge variant="secondary" className="hidden min-[400px]:flex text-[7px] md:text-[9px] font-black uppercase bg-primary text-white border-none">100% IA</Badge>
                 </div>
                 <div className="flex items-baseline gap-2 relative z-10">
                   <span className="text-3xl md:text-6xl font-black tracking-tighter text-primary">{aiRepliesCount}</span>
@@ -788,12 +788,12 @@ export default function DashPage() {
 
             {/* Seção Principal: Avaliações Recentes & IA (O Coração do Produto) */}
             <section className="space-y-6 pt-6">
-              <div className="flex items-center justify-between px-2">
+              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-2">
                 <div className="flex items-center gap-2">
                    <Sparkles className="w-5 h-5 text-primary" />
                    <h2 className="text-sm md:text-lg font-black uppercase tracking-tight">Avaliações Recentes & IA</h2>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                   {isPremiumUser && userData?.googlePlaceId && (
                     <button onClick={handleRefreshReviews} disabled={isRefreshingReviews} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-primary hover:underline disabled:opacity-50">
                       <RefreshCw className={cn("w-3 h-3", isRefreshingReviews && "animate-spin")} /> Atualizar agora
@@ -812,7 +812,7 @@ export default function DashPage() {
                 )}
 
                 {!isLoadingApi && apiSuggestions.length === 0 && approvedTestimonials.length === 0 && (
-                  <Card className="p-12 text-center border-2 border-dashed rounded-[2rem] opacity-30 bg-muted/20">
+                  <Card className="p-8 sm:p-12 text-center border-2 border-dashed rounded-[2rem] opacity-30 bg-muted/20">
                      <MessageSquare className="w-12 h-12 mx-auto mb-4" />
                      <p className="text-xs font-bold uppercase tracking-widest">Aguardando as primeiras avaliações...</p>
                   </Card>
@@ -823,14 +823,14 @@ export default function DashPage() {
                   const reply: string = localReplies[r.id] ?? r.aiReply ?? '';
                   return (
                   <Card key={r.id} className="border-none shadow-lg rounded-[2rem] overflow-hidden bg-background group hover:shadow-xl transition-all border-l-4 border-l-primary/30">
-                     <CardContent className="p-6 md:p-8 space-y-6">
+                     <CardContent className="p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                            <div className="flex items-center gap-3">
                               <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-xs uppercase shadow-inner">
                                  {r.authorName?.substring(0, 2)}
                               </div>
-                              <div>
-                                 <p className="font-black text-xs uppercase tracking-tight leading-none">{r.authorName}</p>
+                              <div className="min-w-0">
+                                 <p className="font-black text-xs uppercase tracking-tight leading-none truncate">{r.authorName}</p>
                                  <div className="flex items-center gap-2 mt-1">
                                     <div className="flex">
                                        {[1,2,3,4,5].map(star => <Star key={star} className={cn("w-3.5 h-3.5", star <= r.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20")} />)}
@@ -845,21 +845,19 @@ export default function DashPage() {
                            </span>
                         </div>
 
-                        <p className="text-sm font-medium leading-relaxed italic opacity-80 pl-4 border-l-2 border-primary/10">
+                        <p className="text-sm font-medium leading-relaxed italic opacity-80 pl-3 sm:pl-4 border-l-2 border-primary/10 break-words">
                            {r.text ? `"${r.text}"` : 'Avaliação apenas com estrelas, sem comentário.'}
                         </p>
 
-                        <div className="mt-4 p-5 rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5 space-y-3 relative group/reply">
-                           <div className="flex items-center gap-2">
+                        <div className="mt-4 p-4 sm:p-5 rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5 space-y-3">
+                           <div className="flex items-start justify-between gap-3">
+                           <div className="flex items-center gap-2 min-w-0">
                               <div className="p-1.5 rounded-lg bg-primary text-white">
                                  <Sparkles className="w-3 h-3" />
                               </div>
                               <span className="text-[9px] font-black uppercase tracking-widest text-primary">Resposta Sugerida pela IA</span>
                            </div>
-                           <p className="text-xs md:text-sm font-bold leading-relaxed text-foreground/90 pr-20">
-                              {reply || 'A IA não conseguiu gerar este rascunho. Use o botão de regerar.'}
-                           </p>
-                           <div className="absolute top-4 right-4 flex gap-2">
+                           <div className="flex gap-2 shrink-0">
                               <button
                                 onClick={() => handleRegenerateResponse(r.id, r.authorName, r.text || '', r.rating, true)}
                                 disabled={isRegenerating === r.id}
@@ -878,6 +876,10 @@ export default function DashPage() {
                                 </button>
                               )}
                            </div>
+                           </div>
+                           <p className="text-xs md:text-sm font-bold leading-relaxed text-foreground/90">
+                              {reply || 'A IA não conseguiu gerar este rascunho. Use o botão de regerar.'}
+                           </p>
                         </div>
 
                         <div className="flex flex-wrap gap-2">
@@ -901,14 +903,14 @@ export default function DashPage() {
                 {/* Renderizar Depoimentos do Firestore */}
                 {approvedTestimonials.slice(0, 5).map((t: any) => (
                   <Card key={t.id} className="border-none shadow-lg rounded-[2rem] overflow-hidden bg-background group hover:shadow-xl transition-all">
-                     <CardContent className="p-6 md:p-8 space-y-6">
+                     <CardContent className="p-4 sm:p-6 md:p-8 space-y-5 sm:space-y-6">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                            <div className="flex items-center gap-3">
                               <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-black text-xs uppercase shadow-inner">
                                  {t.userName?.substring(0, 2)}
                               </div>
-                              <div>
-                                 <p className="font-black text-xs uppercase tracking-tight leading-none">{t.userName}</p>
+                              <div className="min-w-0">
+                                 <p className="font-black text-xs uppercase tracking-tight leading-none truncate">{t.userName}</p>
                                  <div className="flex items-center gap-2 mt-1">
                                     <div className="flex">
                                        {[1,2,3,4,5].map(s => <Star key={s} className={cn("w-3 h-3", s <= t.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/20")} />)}
@@ -923,22 +925,20 @@ export default function DashPage() {
                            <Badge variant="outline" className="w-fit text-[7px] font-black uppercase tracking-widest border-primary/20 text-primary">Original Proova</Badge>
                         </div>
 
-                        <p className="text-sm font-medium leading-relaxed italic opacity-80 pl-4 border-l-2 border-primary/10">
+                        <p className="text-sm font-medium leading-relaxed italic opacity-80 pl-3 sm:pl-4 border-l-2 border-primary/10 break-words">
                            "{t.text}"
                         </p>
 
                         {t.aiReply && (
-                          <div className="mt-4 p-5 rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5 space-y-3 relative group/reply">
-                             <div className="flex items-center gap-2">
+                          <div className="mt-4 p-4 sm:p-5 rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5 space-y-3">
+                             <div className="flex items-start justify-between gap-3">
+                           <div className="flex items-center gap-2 min-w-0">
                                 <div className="p-1.5 rounded-lg bg-primary text-white">
                                    <Sparkles className="w-3 h-3" />
                                 </div>
                                 <span className="text-[9px] font-black uppercase tracking-widest text-primary">Resposta Gerada pela IA</span>
                              </div>
-                             <p className="text-xs md:text-sm font-bold leading-relaxed text-foreground/90">
-                                {t.aiReply}
-                              </p>
-                              <div className="absolute top-4 right-4 flex gap-2">
+                           <div className="flex gap-2 shrink-0">
                                  <button 
                                   onClick={() => handleRegenerateResponse(t.id, t.userName, t.text, t.rating)}
                                   disabled={isRegenerating === t.id}
@@ -949,6 +949,10 @@ export default function DashPage() {
                                  </button>
                                  <button onClick={() => copyToClipboard(t.aiReply, "Resposta IA")} className="p-2 rounded-xl bg-background border shadow-sm hover:bg-muted transition-all active:scale-95"><Copy className="w-3.5 h-3.5 text-primary" /></button>
                               </div>
+                           </div>
+                             <p className="text-xs md:text-sm font-bold leading-relaxed text-foreground/90">
+                                {t.aiReply}
+                              </p>
                           </div>
                         )}
                      </CardContent>
