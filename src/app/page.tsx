@@ -497,7 +497,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
   const plans = [
     {
       id: 'gold',
-      name: "Plano Gold",
+      name: "Proova AI Premium",
       price: "R$ 147",
       period: "/mês",
       description: "Aceleração de Vendas",
@@ -514,14 +514,14 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
     },
     {
       id: 'pro',
-      name: "Plano PRO",
+      name: "Proova AI PRO",
       price: "R$ 270",
       period: "/mês",
       description: "Domínio de Mercado",
       icon: Zap,
       highlight: false,
       benefits: [
-        "Tudo do Plano Gold + Exclusivos",
+        "Tudo do Proova AI Premium + Exclusivos",
         "Coleta de Vídeo Reviews 4K",
         "Suporte VIP Dedicado com Consultor",
         "Métricas de ROI Avançadas",

@@ -154,7 +154,7 @@ export default function SettingsPage() {
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
     if (status === 'enterprise') return 'PRO';
-    if (status === 'gold') return 'GOLD';
+    if (status === 'gold') return 'PREMIUM';
     if (status === 'trial') return 'TRIAL';
     if (status === 'expired') return 'EXPIRADO';
     return 'PLANO BASE';
@@ -251,7 +251,7 @@ export default function SettingsPage() {
       
       if (isSlugChanging) {
         if (!isPremiumUser) {
-          throw new Error("A alteração de link personalizado está disponível apenas nos planos Gold e Enterprise.");
+          throw new Error("A alteração de link personalizado está disponível apenas nos planos Proova AI Premium e PRO.");
         }
         const slugRef = doc(db, 'slugs', newSlug);
         const slugCheck = await getDoc(slugRef);

@@ -105,7 +105,7 @@ export default function WidgetsPage() {
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
     if (status === 'enterprise') return 'PRO';
-    if (status === 'gold') return 'GOLD';
+    if (status === 'gold') return 'PREMIUM';
     if (status === 'trial') return 'TRIAL';
     return 'PLANO BASE';
   }, [userData]);

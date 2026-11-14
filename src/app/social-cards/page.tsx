@@ -146,7 +146,7 @@ export default function SocialCardsPage() {
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
     if (status === 'enterprise') return 'PRO';
-    if (status === 'gold') return 'GOLD';
+    if (status === 'gold') return 'PREMIUM';
     if (status === 'trial') return 'TRIAL';
     if (status === 'expired') return 'EXPIRADO';
     return 'PLANO BASE';
@@ -209,7 +209,7 @@ export default function SocialCardsPage() {
       shadcnToast({
         variant: "destructive",
         title: "Recurso Premium",
-        description: "Templates VIP estão disponíveis apenas nos planos Gold e Enterprise."
+        description: "Templates VIP estão disponíveis apenas nos planos Proova AI Premium e PRO."
       });
       router.push('/pricing');
       return;

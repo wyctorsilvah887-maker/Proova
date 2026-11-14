@@ -27,7 +27,7 @@ export async function sendWeeklyPerformanceReport(userId: string) {
     const status = userData.membershipStatus || 'base';
     const isPremium = status === 'gold' || status === 'enterprise' || status === 'trial';
     if (!isPremium) {
-      return { success: false, error: "Relatórios avançados disponíveis apenas nos planos Gold e Enterprise." };
+      return { success: false, error: "Relatórios avançados disponíveis apenas nos planos Proova AI Premium e PRO." };
     }
 
     const now = new Date();

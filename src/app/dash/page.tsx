@@ -245,7 +245,7 @@ export default function DashPage() {
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
     if (status === 'enterprise') return 'PRO';
-    if (status === 'gold') return 'GOLD';
+    if (status === 'gold') return 'PREMIUM';
     if (status === 'trial') return 'TRIAL';
     return 'PLANO BASE';
   }, [userData]);
@@ -308,7 +308,7 @@ export default function DashPage() {
       } else if (data.error === 'no_place') {
         shadcnToast({ variant: "destructive", title: "Conecte seu Google Maps", description: "Selecione sua empresa em Google Maps primeiro." });
       } else if (res.status === 403) {
-        shadcnToast({ variant: "destructive", title: "Recurso Gold", description: "A busca automática é exclusiva dos planos Gold, Enterprise e teste." });
+        shadcnToast({ variant: "destructive", title: "Recurso Premium", description: "A busca automática é exclusiva dos planos Proova AI Premium, PRO e teste." });
       } else {
         throw new Error('fail');
       }
