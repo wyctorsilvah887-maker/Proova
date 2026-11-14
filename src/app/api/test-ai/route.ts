@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import mockData from '@/mocks/mock-reviews.json';
-import { generateReviewResponse } from '@/lib/gemini';
+import { generateReply } from '@/ai/reply';
 
 /**
- * Rota de teste para validar a geração de respostas via IA Gemini 3.0.
+ * Rota de teste para validar a geração de respostas via IA.
+ * Em caso de falha, devolve a mensagem real do erro (útil para diagnosticar modelo/chave).
  */
 export async function GET() {
   try {
@@ -18,12 +19,12 @@ export async function GET() {
     const results = [];
 
     for (const review of pendingReviews.slice(0, 3)) {
-      const aiResponse = await generateReviewResponse({
+      const aiResponse = await generateReply({
         authorName: review.name,
         rating: review.stars,
-        reviewText: review.text,
-        businessName: place.title,
-        categoryName: place.categoryName || 'Negócio Local'
+        text: review.text,
+        companyName: place.title,
+        businessType: place.categoryName || 'Negócio Local'
       });
       
       results.push({
