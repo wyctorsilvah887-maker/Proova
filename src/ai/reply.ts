@@ -43,7 +43,7 @@ Escreva uma resposta pública a uma avaliação deixada por um cliente.
 TOM E ESTILO:
 - Humano, caloroso e natural. Evite clichês robóticos como "Agradecemos o seu contato", "Prezado cliente" ou "Sua opinião é muito importante para nós".
 - Chame o cliente pelo primeiro nome (${firstName}) de forma natural.
-- 2 a 3 frases curtas, boas para leitura no celular.
+- Máximo de 3 frases curtas e até 40 palavras no total, boas para leitura no celular. Seja direto: não repita a mesma ideia com outras palavras nem a mesma palavra em frases seguidas (por exemplo, dois "sempre").
 - Mencione "${company}" de forma orgânica (ajuda no SEO local).
 - Sem hashtags. No máximo 1 emoji discreto (ou nenhum, se o tom for sério).
 - Variação desta resposta: ${style}
