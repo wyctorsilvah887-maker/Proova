@@ -111,7 +111,7 @@ export default function PricingPage() {
       highlight: true,
       cta: status === 'gold' ? "Plano Ativo" : "Garantir meu acesso",
       disabled: status === 'gold',
-      checkoutUrl: "https://pay.cakto.com.br/gold-proova",
+      checkoutUrl: "https://pay.cakto.com.br/8c7bbit_1215637",
       benefits: [
         "Página Pública VIP de Autoridade",
         "Automação de Respostas via IA (Gemini)",
@@ -132,7 +132,7 @@ export default function PricingPage() {
       highlight: false,
       cta: (status === 'pro' || status === 'enterprise') ? "Plano Ativo" : "Garantir meu acesso",
       disabled: status === 'pro' || status === 'enterprise',
-      checkoutUrl: "https://pay.cakto.com.br/enterprise-proova",
+      checkoutUrl: "https://pay.cakto.com.br/yhtkwz4_1215645",
       benefits: [
         "Tudo do Proova AI Premium + Exclusivos",
         "Coleta de Vídeo Reviews 4K",
