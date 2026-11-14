@@ -5,12 +5,12 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { ArrowLeft, Mail, User, Building2, Lock, Loader2, Eye, EyeOff, CheckCircle2, ShieldCheck, Briefcase, ChevronRight, Fingerprint } from "lucide-react";
+import { ArrowLeft, Mail, User, Building2, Lock, Loader2, Eye, EyeOff, CheckCircle2, XCircle, ShieldCheck, Briefcase, ChevronRight, Fingerprint } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
-import { doc, setDoc, serverTimestamp, getDoc, writeBatch } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, getDoc, writeBatch, type Firestore } from "firebase/firestore";
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useFirestore, useAuth, useUser } from "@/firebase";
 import { toast } from "@/hooks/use-toast";
@@ -18,6 +18,18 @@ import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 import { LoadingScreen } from "@/components/loading-screen";
+import { slugifyCompany, findAvailableVariation } from "@/lib/slug";
+
+type SlugStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid' | 'error';
+
+// O nome comercial vira o "slug" registrado na coleção "slugs"; se o documento existe, o nome está em uso.
+async function isSlugTaken(db: Firestore, slug: string): Promise<boolean> {
+  return (await getDoc(doc(db, 'slugs', slug))).exists();
+}
+
+function suggestCompanyName(db: Firestore, company: string): Promise<string | null> {
+  return findAvailableVariation(company, (slug: string) => isSlugTaken(db, slug));
+}
 
 export default function SignupPage() {
   const db = useFirestore();
@@ -35,6 +47,9 @@ export default function SignupPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [slugStatus, setSlugStatus] = useState<SlugStatus>('idle');
+  const [slugSuggestion, setSlugSuggestion] = useState<string | null>(null);
+  const [isCheckingName, setIsCheckingName] = useState(false);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -42,7 +57,56 @@ export default function SignupPage() {
     }
   }, [user, authLoading, router]);
 
-  const handleNextStep = () => {
+  // Verifica o nome comercial enquanto o cliente digita (com uma pequena pausa),
+  // para ele descobrir no Passo 2 e não só no final do cadastro.
+  useEffect(() => {
+    if (step !== 1) return;
+
+    const trimmed = company.trim();
+    if (!trimmed) {
+      setSlugStatus('idle');
+      setSlugSuggestion(null);
+      return;
+    }
+
+    const slug = slugifyCompany(trimmed);
+    if (!slug) {
+      setSlugStatus('invalid');
+      setSlugSuggestion(null);
+      return;
+    }
+
+    if (!db) return;
+
+    let cancelled = false;
+    setSlugStatus('checking');
+    setSlugSuggestion(null);
+
+    const timer = setTimeout(async () => {
+      try {
+        const taken = await isSlugTaken(db, slug);
+        if (cancelled) return;
+        if (!taken) {
+          setSlugStatus('available');
+          return;
+        }
+        setSlugStatus('taken');
+        const suggestion = await suggestCompanyName(db, trimmed);
+        if (!cancelled) setSlugSuggestion(suggestion);
+      } catch (err) {
+        // Sem rede ou erro do banco: não bloqueia. A verificação final do cadastro continua protegendo.
+        console.error('Erro ao verificar o nome da empresa:', err);
+        if (!cancelled) setSlugStatus('error');
+      }
+    }, 500);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [company, db, step]);
+
+  const handleNextStep = async () => {
     if (step === 0) {
       if (!businessType) {
         toast({ variant: "destructive", title: "Seleção Obrigatória", description: "Selecione o tipo do seu negócio." });
@@ -54,6 +118,33 @@ export default function SignupPage() {
         toast({ variant: "destructive", title: "Campos Obrigatórios", description: "Informe seu nome e o nome comercial da empresa." });
         return;
       }
+
+      const slug = slugifyCompany(company);
+      if (!slug) {
+        setSlugStatus('invalid');
+        toast({ variant: "destructive", title: "Nome Inválido", description: "Use letras ou números no nome da empresa." });
+        return;
+      }
+
+      // Confirmação final no clique: garante o resultado mesmo se a verificação ao digitar ainda estiver em andamento.
+      if (db) {
+        setIsCheckingName(true);
+        try {
+          if (await isSlugTaken(db, slug)) {
+            setSlugStatus('taken');
+            setSlugSuggestion(await suggestCompanyName(db, company));
+            toast({ variant: "destructive", title: "Nome já em uso", description: "Escolha outro nome comercial para continuar." });
+            return;
+          }
+          setSlugStatus('available');
+        } catch (err) {
+          // Se a checagem falhar (ex.: sem rede), segue em frente: o cadastro ainda verifica no final.
+          console.error('Erro ao verificar o nome da empresa:', err);
+        } finally {
+          setIsCheckingName(false);
+        }
+      }
+
       setStep(2);
     }
   };
@@ -114,11 +205,7 @@ export default function SignupPage() {
     setIsSubmitting(true);
     
     try {
-      const slug = company.trim().toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-');
+      const slug = slugifyCompany(company);
 
       if (!slug || slug === "") {
         throw new Error("O nome da empresa é inválido para gerar um link. Tente usar letras e números comuns.");
@@ -127,7 +214,13 @@ export default function SignupPage() {
       const slugRef = doc(db, 'slugs', slug);
       const slugCheck = await getDoc(slugRef);
       if (slugCheck.exists()) {
-        throw new Error("Este nome de empresa já está em uso. Tente uma pequena variação.");
+        // Outra pessoa pode ter ficado com o nome depois do Passo 2. Volta para lá sem perder o que foi preenchido.
+        setSlugStatus('taken');
+        setSlugSuggestion(await suggestCompanyName(db, company));
+        setStep(1);
+        setIsSubmitting(false);
+        toast({ variant: "destructive", title: "Nome já em uso", description: "Esse nome acabou de ser usado. Escolha outro; seus dados foram mantidos." });
+        return;
       }
 
       const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
@@ -286,21 +379,64 @@ export default function SignupPage() {
                         placeholder="Nome Comercial"
                         value={company}
                         onChange={(e) => setCompany(e.target.value)}
-                        className="h-11 pl-11 bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm rounded-xl"
+                        className={cn(
+                          "h-11 pl-11 bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm rounded-xl",
+                          (slugStatus === 'taken' || slugStatus === 'invalid') && "ring-1 ring-destructive/50"
+                        )}
                         required
                       />
                     </div>
+                    {company.trim() && slugStatus !== 'idle' && slugStatus !== 'error' && (
+                      <div className="ml-1 text-[11px] font-bold" aria-live="polite">
+                        {slugStatus === 'checking' && (
+                          <p className="flex items-center gap-1.5 text-muted-foreground">
+                            <Loader2 className="h-3 w-3 animate-spin" /> Verificando disponibilidade...
+                          </p>
+                        )}
+                        {slugStatus === 'available' && (
+                          <p className="flex items-center gap-1.5 text-emerald-600">
+                            <CheckCircle2 className="h-3.5 w-3.5" /> Nome disponível
+                          </p>
+                        )}
+                        {slugStatus === 'invalid' && (
+                          <p className="flex items-center gap-1.5 text-destructive">
+                            <XCircle className="h-3.5 w-3.5" /> Use letras ou números no nome da empresa.
+                          </p>
+                        )}
+                        {slugStatus === 'taken' && (
+                          <div className="space-y-1.5">
+                            <p className="flex items-center gap-1.5 text-destructive">
+                              <XCircle className="h-3.5 w-3.5" /> Este nome já está em uso. Escolha outro.
+                            </p>
+                            {slugSuggestion && (
+                              <button
+                                type="button"
+                                onClick={() => setCompany(slugSuggestion)}
+                                className="text-primary underline underline-offset-4"
+                              >
+                                Usar "{slugSuggestion}"
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <Button 
+                  <Button
                     onClick={handleNextStep}
+                    disabled={isCheckingName || slugStatus === 'taken' || slugStatus === 'invalid'}
                     className="w-full h-14 text-base font-black shadow-xl hover:scale-[1.02] active:scale-95 transition-all rounded-2xl gap-3 bg-primary hover:bg-primary/90 text-white"
                   >
-                    Próximo Passo <ChevronRight className="w-5 h-5" />
+                    {isCheckingName ? (
+                      <><Loader2 className="animate-spin h-5 w-5" /> Verificando...</>
+                    ) : (
+                      <>Próximo Passo <ChevronRight className="w-5 h-5" /></>
+                    )}
                   </Button>
-                  <button 
+                  <button
                     type="button"
                     onClick={() => setStep(0)}
                     className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors py-2 flex items-center justify-center gap-1.5"
