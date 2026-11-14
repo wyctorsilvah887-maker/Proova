@@ -20,8 +20,8 @@ O Proova AI é uma plataforma de inteligência estratégica desenhada para clín
 
 ## Links Relevantes
 
-- [Home](https://useproova.online/)
-- [Planos e Preços](https://useproova.online/pricing)
-- [Manual de Estratégia](https://useproova.online/manual)
-- [Política de Privacidade](https://useproova.online/privacy)
-- [Termos de Uso](https://useproova.online/terms)
+- [Home](https://www.useproovaai.com.br/)
+- [Planos e Preços](https://www.useproovaai.com.br/pricing)
+- [Manual de Estratégia](https://www.useproovaai.com.br/manual)
+- [Política de Privacidade](https://www.useproovaai.com.br/privacy)
+- [Termos de Uso](https://www.useproovaai.com.br/terms)

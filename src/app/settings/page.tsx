@@ -532,7 +532,7 @@ export default function SettingsPage() {
                                !isPremiumUser && "opacity-60 grayscale cursor-not-allowed bg-muted/40"
                              )}>
                                 <span className="text-[9px] md:text-[10px] font-black opacity-40 uppercase tracking-tighter shrink-0">
-                                   <span className="hidden xs:inline">useproova.online</span>/pp/
+                                   <span className="hidden xs:inline">useproovaai.com.br</span>/pp/
                                 </span>
                                 <input 
                                   disabled={!isPremiumUser}
@@ -544,7 +544,7 @@ export default function SettingsPage() {
                              </div>
                              <div className="p-4 rounded-2xl bg-muted/30 border border-muted-foreground/10 space-y-1.5 overflow-hidden">
                                 <p className="text-[9px] font-black uppercase opacity-40">Visualização do Link:</p>
-                                <p className="text-[10px] md:text-[11px] font-bold text-primary truncate">https://useproova.online/pp/{companySlug || 'seu-link'}</p>
+                                <p className="text-[10px] md:text-[11px] font-bold text-primary truncate">https://www.useproovaai.com.br/pp/{companySlug || 'seu-link'}</p>
                              </div>
                           </div>
                        </div>

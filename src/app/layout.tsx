@@ -5,13 +5,14 @@ import "./globals.css";
 import { FirebaseClientProvider } from "@/firebase/client-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
+import { SITE_URL } from '@/lib/site';
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Proova AI — Automação de Avaliações no Google Meu Negócio com IA",
   description: "Responda avaliações do Google automaticamente com Inteligência Artificial, aumente sua nota no Maps e atraia mais clientes locais.",
-  metadataBase: new URL('https://useproova.online'),
+  metadataBase: new URL(SITE_URL),
   manifest: "/manifest.json",
   icons: {
     icon: [
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Proova AI — Automação de Avaliações no Google Meu Negócio com IA",
     description: "Responda avaliações do Google automaticamente com Inteligência Artificial, aumente sua nota no Maps e atraia mais clientes locais.",
-    url: 'https://useproova.online',
+    url: SITE_URL,
     siteName: 'Proova AI',
     images: [
       {
