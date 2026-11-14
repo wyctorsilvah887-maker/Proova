@@ -85,12 +85,16 @@ service cloud.firestore {
         && request.resource.data.membershipStatus == 'base';
 
       // Atualização:
-      // 1) o dono edita o próprio perfil, mas NUNCA o campo isAdmin;
+      // 1) o dono edita o próprio perfil, mas NUNCA os campos controlados pelo servidor
+      //    (admin, plano, período de teste e controle da busca de avaliações);
       // 2) visitantes sem login só podem somar +1 nos contadores acima.
+      //    O plano é ativado só pelo webhook da Cakto (firebase-admin).
       allow update: if
         (request.auth != null
           && request.auth.uid == userId
-          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin']))
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+               'isAdmin', 'membershipStatus', 'trialUsed', 'trialStartedAt', 'planUpdatedAt',
+               'caktoSubscriptionId', 'lastReviewSyncAt', 'lastReviewRunId']))
         || isCounterBump();
 
       allow delete: if request.auth != null && request.auth.uid == userId;
@@ -141,7 +145,7 @@ service cloud.firestore {
 
     // Regras para Logs de Pagamento
     match /payment_events/{eventId} {
-      allow create: if true;
+      allow create: if false; // gravado só pelo servidor (webhook)
       allow read: if request.auth != null && 
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
     }

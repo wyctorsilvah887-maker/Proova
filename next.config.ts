@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
+  // Página antiga removida: o plano agora é ativado pelo webhook da Cakto, no servidor.
+  async redirects() {
+    return [{ source: '/payment-success', destination: '/dash', permanent: false }];
+  },
   images: {
     remotePatterns: [
       {
