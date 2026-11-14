@@ -1,4 +1,5 @@
-import { ai, AI_MODEL } from '@/ai/genkit';
+import { ai, AI_MODEL, AI_FALLBACK_MODEL } from '@/ai/genkit';
+import { runWithFallback } from '@/ai/resilience';
 import { z } from 'genkit';
 
 /**
@@ -70,18 +71,20 @@ export async function generateReply(input: ReplyInput): Promise<string> {
     ? `Cliente: ${firstName} | Nota: ${input.rating}/5 | Comentário: "${text}"`
     : `Cliente: ${firstName} | Nota: ${input.rating}/5 | Comentário: [sem texto, apenas estrelas]`;
 
+  const system = buildSystemPrompt(input, firstName);
+
   try {
-    const response = await ai.generate({
-      model: AI_MODEL,
-      system: buildSystemPrompt(input, firstName),
-      prompt,
-    });
+    // Modelo principal (com 1 nova tentativa) e, se o Google seguir sobrecarregado,
+    // modelo de reserva. Erros de configuração (chave, modelo) não passam pela reserva.
+    const response = await runWithFallback([AI_MODEL, AI_FALLBACK_MODEL], (model) =>
+      ai.generate({ model, system, prompt })
+    );
 
     const reply = response.text?.trim().replace(/^["“]+|["”]+$/g, '').trim();
     if (!reply) throw new Error('A IA retornou uma resposta vazia.');
     return reply;
   } catch (error) {
-    console.error(`[IA] Falha ao gerar resposta (modelo ${AI_MODEL}):`, error);
+    console.error(`[IA] Falha ao gerar resposta (modelos: ${AI_MODEL}, ${AI_FALLBACK_MODEL}):`, error);
     throw error;
   }
 }
