@@ -47,18 +47,52 @@ service cloud.firestore {
     }
 
     // Regras para Estatísticas de Conversão
+    // (Nenhum código do app usa esta coleção hoje. Leitura pública continua; escrita só admin,
+    // pela Regra Mestra no fim do arquivo.)
     match /platform_stats/{statsId} {
-      allow read, write: if true; 
+      allow read: if true;
     }
 
     // Regras para a coleção de usuários e subcoleções
     match /users/{userId} {
-      allow get, list: if true;
-      allow create: if true;
-      
-      allow update: if (request.auth != null && request.auth.uid == userId) || 
-        (request.resource.data.diff(resource.data).affectedKeys().hasAny(['testimonialsCount', 'googleRedirectCount', 'membershipStatus', 'trialUsed', 'trialStartedAt', 'ppVisitCount', 'whatsappClickCount']));
-      
+      // Contadores que o servidor do Proova atualiza SEM login (páginas públicas e envio de
+      // depoimentos). Só podem mudar de 1 em 1.
+      function counterOk(key) {
+        let changed = request.resource.data.diff(resource.data).affectedKeys();
+        return !changed.hasAny([key])
+          || request.resource.data[key] == resource.data.get(key, 0) + 1;
+      }
+
+      function isCounterBump() {
+        return request.resource.data.diff(resource.data).affectedKeys()
+            .hasOnly(['testimonialsCount', 'googleRedirectCount', 'ppVisitCount', 'whatsappClickCount'])
+          && counterOk('testimonialsCount')
+          && counterOk('googleRedirectCount')
+          && counterOk('ppVisitCount')
+          && counterOk('whatsappClickCount');
+      }
+
+      // Leitura de um usuário pelo ID continua pública (páginas públicas e widgets).
+      // Listagem só com limit(1): impede varrer todos os usuários de uma vez.
+      // Administradores listam tudo pela Regra Mestra no fim do arquivo.
+      allow get: if true;
+      allow list: if request.query.limit <= 1;
+
+      // Criação: só o próprio usuário logado, e nunca como admin nem com plano pago.
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.isAdmin == false
+        && request.resource.data.membershipStatus == 'base';
+
+      // Atualização:
+      // 1) o dono edita o próprio perfil, mas NUNCA o campo isAdmin;
+      // 2) visitantes sem login só podem somar +1 nos contadores acima.
+      allow update: if
+        (request.auth != null
+          && request.auth.uid == userId
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin']))
+        || isCounterBump();
+
       allow delete: if request.auth != null && request.auth.uid == userId;
       
       // Suporte Técnico (Chat)
