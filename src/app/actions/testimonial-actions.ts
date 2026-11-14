@@ -79,17 +79,21 @@ export async function submitTestimonialAction(data: {
     const status = userData.membershipStatus || 'base';
     const isPremium = status === 'gold' || status === 'enterprise' || status === 'trial';
 
-    // Piloto Automático: Gerar resposta via Gemini 3.0
+    // Piloto Automático: gera resposta por IA. Se a IA falhar, o depoimento é salvo sem resposta.
     let aiReply = null;
     if (isPremium) {
-      const { reply } = await generateReplyAction({
-        authorName: data.userName,
-        testimonialText: data.text || (data.videoUrl ? '[Depoimento em Vídeo]' : ''),
-        rating: data.rating,
-        companyName: userData.companyName,
-        businessType: userData.businessType
-      });
-      aiReply = reply;
+      try {
+        const { reply } = await generateReplyAction({
+          authorName: data.userName,
+          testimonialText: data.text || (data.videoUrl ? '[Depoimento em Vídeo]' : ''),
+          rating: data.rating,
+          companyName: userData.companyName,
+          businessType: userData.businessType
+        });
+        aiReply = reply;
+      } catch (error) {
+        console.error('Falha ao gerar resposta automática por IA:', error);
+      }
     }
 
     const initialStatus = 'approved';

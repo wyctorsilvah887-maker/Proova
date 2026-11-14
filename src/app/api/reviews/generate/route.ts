@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { generateReviewResponse } from '@/lib/gemini';
+import { generateReply } from '@/ai/reply';
 import mockData from '@/mocks/mock-reviews.json';
 
 /**
@@ -31,12 +31,12 @@ export async function POST() {
 
     const results = await Promise.all(
       pendingReviews.map(async (review: any) => {
-        const reply = await generateReviewResponse({
+        const reply = await generateReply({
           authorName: review.name,
           rating: review.stars,
-          reviewText: review.text,
-          businessName: companyName,
-          categoryName: categoryName
+          text: review.text,
+          companyName,
+          businessType: categoryName
         });
 
         return {

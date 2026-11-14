@@ -50,13 +50,12 @@ Sua missão é ajudar o usuário de nome {{userName}} (Plano: {{membershipStatus
 
 /**
  * Função de ação que processa a dúvida do usuário.
- * Atualizado para utilizar o modelo gemini-3.0 para respostas mais precisas.
+ * O modelo é definido em um único lugar: src/ai/genkit.ts.
  */
 export async function supportAiAction(input: SupportAiInput): Promise<SupportAiOutput> {
   try {
-    const { output } = await supportPrompt(input, {
-      model: 'googleai/gemini-3.0',
-    });
+    // O modelo vem do padrão definido em '@/ai/genkit'.
+    const { output } = await supportPrompt(input);
 
     if (!output) {
       throw new Error('A IA não gerou uma resposta válida.');
