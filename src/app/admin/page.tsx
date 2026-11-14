@@ -261,9 +261,64 @@ export default function AdminPage() {
             </TabsContent>
 
             <TabsContent value="payments" className="pt-6">
-               <Card className="rounded-[2rem] border-none shadow-xl overflow-hidden p-6 text-center opacity-40">
-                  <CreditCard className="w-12 h-12 mx-auto mb-4" />
-                  <p className="text-xs font-bold uppercase tracking-widest">Histórico de Transações do Cakto aparecerá aqui</p>
+               <Card className="rounded-[2rem] border-none shadow-xl overflow-hidden">
+                  {eventsLoading ? (
+                    <div className="p-10 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+                  ) : !paymentEvents || paymentEvents.length === 0 ? (
+                    <div className="p-6 text-center opacity-40">
+                      <CreditCard className="w-12 h-12 mx-auto mb-4" />
+                      <p className="text-xs font-bold uppercase tracking-widest">Nenhuma transação recebida ainda</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader className="bg-muted/30">
+                          <TableRow>
+                            <TableHead className="text-[9px] font-black uppercase">Data</TableHead>
+                            <TableHead className="text-[9px] font-black uppercase">Cliente</TableHead>
+                            <TableHead className="text-[9px] font-black uppercase">Produto / Evento</TableHead>
+                            <TableHead className="text-[9px] font-black uppercase">Resultado</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {paymentEvents.map((ev: any) => {
+                            const outcomes: Record<string, { label: string; className: string }> = {
+                              activated: { label: 'Plano ativado', className: 'bg-green-500/10 text-green-600' },
+                              deactivated: { label: 'Plano removido', className: 'bg-orange-500/10 text-orange-600' },
+                              unmatched: { label: 'Cliente não encontrado', className: 'bg-destructive/10 text-destructive' },
+                              ignored: { label: 'Sem ação', className: 'bg-muted text-muted-foreground' },
+                            };
+                            const out = outcomes[ev.outcome];
+                            const date = ev.createdAt?.toDate?.();
+                            return (
+                              <TableRow key={ev.id} className="hover:bg-muted/10">
+                                <TableCell className="text-[10px] font-bold whitespace-nowrap">
+                                  {date ? date.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—'}
+                                </TableCell>
+                                <TableCell className="text-[10px] font-medium break-all">{ev.customerEmail}</TableCell>
+                                <TableCell>
+                                  <div className="flex flex-col">
+                                    <span className="font-bold text-xs">{ev.productName}</span>
+                                    <span className="text-[10px] text-muted-foreground">{ev.eventType}</span>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  {out ? (
+                                    <div className="flex flex-col gap-1 items-start">
+                                      <Badge variant="secondary" className={cn('text-[8px] font-black uppercase border-none', out.className)}>{out.label}</Badge>
+                                      {ev.reason && <span className="text-[9px] text-muted-foreground">{ev.reason}</span>}
+                                    </div>
+                                  ) : (
+                                    <span className="text-[10px] text-muted-foreground">{ev.status || '—'}</span>
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
                </Card>
             </TabsContent>
 
