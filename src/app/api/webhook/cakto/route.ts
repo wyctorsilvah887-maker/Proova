@@ -15,7 +15,14 @@ export async function POST(request: Request) {
   try { payload = await request.json(); }
   catch { return NextResponse.json({ error: 'invalid json' }, { status: 400 }); }
 
-  if (!safeEqual(payload?.secret, process.env.CAKTO_WEBHOOK_SECRET)) {
+  const expected = process.env.CAKTO_WEBHOOK_SECRET?.trim();
+  const received = typeof payload?.secret === 'string' ? payload.secret.trim() : undefined;
+  if (!safeEqual(received, expected)) {
+    // Motivo no log (nunca o valor dos segredos), para achar rápido o que está errado.
+    const motivo = !expected ? 'CAKTO_WEBHOOK_SECRET não existe neste deploy'
+      : !received ? 'a Cakto não enviou o campo "secret"'
+      : `segredo diferente (Vercel tem ${expected.length} caracteres, a Cakto enviou ${received.length})`;
+    console.error('[cakto] 401:', motivo);
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
 
