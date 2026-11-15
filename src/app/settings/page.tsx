@@ -77,6 +77,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { LoadingScreen } from '@/components/loading-screen';
 import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
 import { usePageTour } from '@/hooks/use-page-tour';
+import { saveGooglePlace } from '@/lib/google-place-client';
 import { 
   Select, 
   SelectContent, 
@@ -280,16 +281,54 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSelectPlace = (place: any) => {
-    const reviewLink = `https://search.google.com/local/writereview?placeid=${place.place_id}`;
-    setGooglePlaceId(place.place_id);
-    setGoogleMapsUrl(reviewLink);
-    setSearchResults([]);
-    setSearchQuery('');
-    toast({ 
-      title: "Empresa Localizada", 
-      description: "Agora clique em 'Salvar Alterações' no topo da página para confirmar o vínculo." 
-    });
+  const [manualLink, setManualLink] = useState('');
+  const [isSavingLink, setIsSavingLink] = useState(false);
+
+  // Salva na hora (sem depender do botão "Salvar Alterações" lá no topo).
+  const handleSelectPlace = async (place: any) => {
+    if (!user) return;
+    if (place?.isMock) {
+      toast({ variant: "destructive", title: "Busca do Google indisponível", description: "Use a opção de colar o link da sua empresa logo abaixo." });
+      return;
+    }
+    try {
+      const r = await saveGooglePlace(user, { placeId: place.place_id });
+      setGooglePlaceId(r.googlePlaceId || '');
+      setGoogleMapsUrl(r.googleMapsUrl || '');
+      setSearchResults([]);
+      setSearchQuery('');
+      toast({ title: "Empresa vinculada!", description: "O link do Google já foi salvo na sua conta." });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Erro ao salvar", description: err?.message });
+    }
+  };
+
+  const handleSaveManualLink = async () => {
+    if (!user || !manualLink.trim() || isSavingLink) return;
+    setIsSavingLink(true);
+    try {
+      const r = await saveGooglePlace(user, { url: manualLink.trim() });
+      setGooglePlaceId(r.googlePlaceId || '');
+      setGoogleMapsUrl(r.googleMapsUrl || '');
+      setManualLink('');
+      toast({ title: "Link salvo!", description: "O botão de avaliação no Google já usa este link." });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Não foi possível salvar o link", description: err?.message });
+    } finally {
+      setIsSavingLink(false);
+    }
+  };
+
+  const handleUnlinkPlace = async () => {
+    if (!user) return;
+    try {
+      await saveGooglePlace(user, { clear: true });
+      setGooglePlaceId('');
+      setGoogleMapsUrl('');
+      toast({ title: "Empresa desvinculada" });
+    } catch (err: any) {
+      toast({ variant: "destructive", title: "Erro ao desvincular", description: err?.message });
+    }
   };
 
   const handleConnectGoogle = async () => {
@@ -742,18 +781,18 @@ export default function SettingsPage() {
                     )}
 
                     <div className="space-y-6 pt-4">
-                      {googlePlaceId ? (
+                      {(googlePlaceId || googleMapsUrl) ? (
                         <div className="p-5 rounded-2xl bg-green-500/5 border border-green-500/20 flex items-center justify-between group animate-in zoom-in duration-300">
                            <div className="flex items-center gap-4">
                               <div className="p-3 rounded-xl bg-green-500/10 text-green-600"><MapPin className="w-6 h-6" /></div>
                               <div>
                                  <p className="text-[10px] font-black uppercase text-green-600 tracking-widest leading-none mb-1">Empresa Vinculada</p>
                                  <p className="text-sm font-black uppercase tracking-tight">{userData?.companyName}</p>
-                                 <p className="text-[10px] text-muted-foreground font-mono opacity-60 truncate max-w-[200px]">{googlePlaceId}</p>
+                                 <p className="text-[10px] text-muted-foreground font-mono opacity-60 truncate max-w-[200px]">{googlePlaceId || googleMapsUrl}</p>
                               </div>
                            </div>
                            <div className="flex gap-2">
-                             <Button variant="ghost" onClick={() => { setGooglePlaceId(''); setGoogleMapsUrl(''); }} className="text-destructive hover:bg-destructive/10 text-[9px] font-black uppercase tracking-widest h-8 px-3 rounded-lg">Desvincular</Button>
+                             <Button variant="ghost" onClick={handleUnlinkPlace} className="text-destructive hover:bg-destructive/10 text-[9px] font-black uppercase tracking-widest h-8 px-3 rounded-lg">Desvincular</Button>
                            </div>
                         </div>
                       ) : (
@@ -803,6 +842,26 @@ export default function SettingsPage() {
                                    <p className="text-[10px] font-black uppercase text-muted-foreground tracking-[0.2em]">Consultando Google Satélite...</p>
                                 </div>
                               )}
+                           </div>
+
+                           <div className="space-y-3 rounded-2xl border border-dashed border-primary/20 bg-primary/5 p-4">
+                             <p className="text-xs font-black uppercase tracking-tight">Não encontrou sua empresa?</p>
+                             <p className="text-[11px] text-muted-foreground font-medium leading-relaxed">
+                               Se o estabelecimento é novo e ainda não aparece na busca, cole aqui o link de avaliação do seu perfil no Google
+                               (no Google Meu Negócio, use "Pedir avaliações" e copie o link).
+                             </p>
+                             <div className="flex flex-col sm:flex-row gap-2">
+                               <Input
+                                 placeholder="https://g.page/r/... ou https://maps.app.goo.gl/..."
+                                 value={manualLink}
+                                 onChange={(e) => setManualLink(e.target.value)}
+                                 onKeyDown={(e) => e.key === 'Enter' && handleSaveManualLink()}
+                                 className="h-12 rounded-xl bg-background text-sm font-medium"
+                               />
+                               <Button onClick={handleSaveManualLink} disabled={isSavingLink || !manualLink.trim()} className="h-12 rounded-xl font-black uppercase tracking-widest text-[10px] shrink-0">
+                                 {isSavingLink ? <Loader2 className="animate-spin w-4 h-4" /> : 'Salvar link'}
+                               </Button>
+                             </div>
                            </div>
                         </div>
                       )}

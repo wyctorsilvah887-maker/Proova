@@ -112,6 +112,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebase';
 import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
+import { saveGooglePlace } from '@/lib/google-place-client';
 import { doc, collection, query, updateDoc, orderBy, limit, where, getDocs, Timestamp, serverTimestamp, arrayUnion } from 'firebase/firestore';
 import Link from 'next/link';
 import { signOut } from 'firebase/auth';
@@ -370,14 +371,45 @@ export default function DashPage() {
     } catch (err) { shadcnToast({ variant: "destructive", title: "Erro na busca" }); } finally { setIsSearchingPlaces(false); }
   };
 
+  const [manualLink, setManualLink] = useState('');
+  const [isSavingLink, setIsSavingLink] = useState(false);
+
   const handleSelectPlace = async (place: any) => {
-    if (!db || !user) return;
-    const reviewLink = `https://search.google.com/local/writereview?placeid=${place.place_id}`;
+    if (!user) return;
+    if (place?.isMock) {
+      shadcnToast({ variant: "destructive", title: "Busca do Google indisponível", description: "Use a opção de colar o link da sua empresa logo abaixo." });
+      return;
+    }
     try {
-      await updateDoc(doc(db, 'users', user.uid), { googlePlaceId: place.place_id, googleMapsUrl: reviewLink, ...(city.trim() && state.trim().length === 2 ? { city: city.trim(), state: state.trim() } : {}) });
-      shadcnToast({ title: "G-Boost Ativado!" });
+      await saveGooglePlace(user, {
+        placeId: place.place_id,
+        ...(city.trim() && state.trim().length === 2 ? { city: city.trim(), state: state.trim() } : {}),
+      });
+      shadcnToast({ title: "G-Boost Ativado!", description: "Empresa vinculada com sucesso." });
+      setSearchResults([]);
       clearHash();
-    } catch (err) { shadcnToast({ variant: "destructive", title: "Erro ao salvar" }); }
+    } catch (err: any) {
+      console.error('[google-place]', err);
+      shadcnToast({ variant: "destructive", title: "Erro ao salvar", description: err?.message });
+    }
+  };
+
+  const handleSaveManualLink = async () => {
+    if (!user || !manualLink.trim() || isSavingLink) return;
+    setIsSavingLink(true);
+    try {
+      await saveGooglePlace(user, {
+        url: manualLink.trim(),
+        ...(city.trim() && state.trim().length === 2 ? { city: city.trim(), state: state.trim() } : {}),
+      });
+      shadcnToast({ title: "Link salvo!", description: "O botão de avaliação no Google já usa este link." });
+      setManualLink('');
+      clearHash();
+    } catch (err: any) {
+      shadcnToast({ variant: "destructive", title: "Não foi possível salvar o link", description: err?.message });
+    } finally {
+      setIsSavingLink(false);
+    }
   };
 
   const handleUpdateLocation = async () => {
@@ -616,6 +648,26 @@ export default function DashPage() {
                                 <ChevronRight className="w-4 h-4 shrink-0 opacity-20 group-hover:opacity-100" />
                              </div>
                            ))}
+                        </div>
+
+                        <div className="space-y-3 rounded-2xl border border-dashed border-primary/20 bg-primary/5 p-4">
+                          <p className="text-xs font-black uppercase tracking-tight">Não encontrou sua empresa?</p>
+                          <p className="text-[11px] text-muted-foreground font-medium leading-relaxed">
+                            Se o estabelecimento é novo e ainda não aparece na busca, cole aqui o link de avaliação do seu perfil no Google
+                            (no Google Meu Negócio, use "Pedir avaliações" e copie o link).
+                          </p>
+                          <div className="flex flex-col sm:flex-row gap-2">
+                            <Input
+                              placeholder="https://g.page/r/... ou https://maps.app.goo.gl/..."
+                              value={manualLink}
+                              onChange={(e) => setManualLink(e.target.value)}
+                              onKeyDown={(e) => e.key === 'Enter' && handleSaveManualLink()}
+                              className="h-12 rounded-xl bg-background text-sm font-medium"
+                            />
+                            <Button onClick={handleSaveManualLink} disabled={isSavingLink || !manualLink.trim()} className="h-12 rounded-xl font-black uppercase tracking-widest text-[10px] shrink-0">
+                              {isSavingLink ? <Loader2 className="animate-spin w-4 h-4" /> : 'Salvar link'}
+                            </Button>
+                          </div>
                         </div>
                      </div>
                   </div>
