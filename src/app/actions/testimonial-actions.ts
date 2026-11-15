@@ -3,7 +3,7 @@
 import { headers } from 'next/headers';
 import { initializeFirebase } from '@/firebase';
 import { collection, query, getDocs, addDoc, serverTimestamp, doc, updateDoc, increment, getDoc, limit, where } from 'firebase/firestore';
-import { Resend } from 'resend';
+import { sendFeedbackAlert } from '@/lib/feedback-alert';
 import { generateReplyAction } from '@/ai/flows/generate-reply-flow';
 
 /**
@@ -35,23 +35,6 @@ async function checkRateLimit(actionName: string) {
     action: actionName,
     createdAt: serverTimestamp()
   });
-}
-
-/**
- * Envia um alerta de feedback crítico.
- */
-async function sendCriticalFeedbackAlert(ownerEmail: string, feedbackData: any, companyName: string) {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey || !ownerEmail) return;
-  try {
-    const resend = new Resend(apiKey);
-    await resend.emails.send({
-      from: 'Proova Alerts <proova@proova.wsstudioscompany.com.br>',
-      to: [ownerEmail],
-      subject: `⚠️ Feedback Crítico Recebido - ${companyName}`,
-      html: `<p>Olá, você recebeu um feedback de ${feedbackData.rating} estrelas.</p><p>"${feedbackData.text}"</p>`,
-    });
-  } catch (err) { console.error(err); }
 }
 
 /**
@@ -88,7 +71,8 @@ export async function submitTestimonialAction(data: {
           testimonialText: data.text?.trim() || (data.videoUrl ? '[Depoimento em Vídeo]' : '[Avaliação apenas com nota]'),
           rating: data.rating,
           companyName: userData.companyName,
-          businessType: userData.businessType
+          businessType: userData.businessType,
+          contactWhatsapp: userData.contactWhatsapp || undefined,
         });
         aiReply = reply;
       } catch (error) {
@@ -100,6 +84,8 @@ export async function submitTestimonialAction(data: {
     const hasContent = !!(data.text?.trim() || data.videoUrl || data.photoUrl);
     const initialStatus = hasContent ? 'approved' : 'pending';
 
+    // Nota baixa: a resposta da IA vira rascunho (não aparece na página pública até o dono aprovar).
+    const isLowRating = data.rating <= 3;
     const testimonialData = {
       userName: data.userName?.trim() || 'Cliente',
       userEmail: data.userEmail.trim().toLowerCase(),
@@ -108,7 +94,8 @@ export async function submitTestimonialAction(data: {
       videoUrl: data.videoUrl || null,
       photoUrl: data.photoUrl || null,
       status: initialStatus,
-      aiReply: aiReply,
+      aiReply: isLowRating ? null : aiReply,
+      aiReplyDraft: isLowRating ? aiReply : null,
       createdAt: serverTimestamp(),
     };
 
@@ -116,16 +103,24 @@ export async function submitTestimonialAction(data: {
     const feedbacksRef = collection(firestore, 'users', data.targetUserId, collectionName);
 
     await updateDoc(userRef, { testimonialsCount: increment(1) });
-    await addDoc(feedbacksRef, testimonialData);
+    const created = await addDoc(feedbacksRef, testimonialData);
 
     // Alertas por e-mail (Premium)
     if (isPremium) {
       if (data.destination === 'private' || data.rating <= 3) {
-        await sendCriticalFeedbackAlert(userData.email, testimonialData, userData.companyName);
+        await sendFeedbackAlert({
+          ownerEmail: userData.email,
+          companyName: userData.companyName,
+          clientName: testimonialData.userName,
+          rating: data.rating,
+          text: testimonialData.text,
+          clientEmail: testimonialData.userEmail,
+          kind: 'new',
+        });
       }
     }
     
-    return { success: true };
+    return { success: true, id: created.id, collection: collectionName };
   } catch (error: any) {
     return { success: false, error: error.message };
   }

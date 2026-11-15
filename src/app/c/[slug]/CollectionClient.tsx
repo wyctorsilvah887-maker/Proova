@@ -10,7 +10,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { 
   Star, CheckCircle2, Loader2, Send, Video, 
   Globe, Camera, ImageIcon, Trash2, Building2, Type, 
-  MapPin, X, ArrowRight
+  MapPin, X, ArrowRight, MessageCircle
 } from 'lucide-react';
 import { useFirestore, useStorage } from '@/firebase';
 import { collection, query, where, getDocs, limit, doc } from 'firebase/firestore';
@@ -20,6 +20,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { cn } from '@/lib/utils';
 import { submitTestimonialAction } from '@/app/actions/testimonial-actions';
 import { LoadingScreen } from '@/components/loading-screen';
+import { whatsappLink } from '@/lib/whatsapp';
 import Link from 'next/link';
 import {
   Dialog,
@@ -46,6 +47,10 @@ export default function CollectionClient({ slug }: { slug: string }) {
   const [isLoadingCompany, setIsLoadingCompany] = useState(true);
   const [googleMapsUrl, setGoogleMapsUrl] = useState<string | null>(null);
   const [companyNameDisplay, setCompanyNameDisplay] = useState('');
+  const [contactWhatsapp, setContactWhatsapp] = useState<string | null>(null);
+  const [created, setCreated] = useState<{ id: string; collection: string } | null>(null);
+  const [followContact, setFollowContact] = useState('');
+  const [followState, setFollowState] = useState<'idle' | 'sending' | 'sent'>('idle');
   const [membershipStatus, setMembershipStatus] = useState<string | null>(null);
   const [activeMode, setActiveMode] = useState<CollectionMode>(null);
   const [mediaConsent, setMediaConsent] = useState(false);
@@ -78,6 +83,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
           setTargetUserId(snap1.docs[0].id);
           setCompanyNameDisplay(data.companyName);
           setGoogleMapsUrl(data.googleMapsUrl || null);
+          setContactWhatsapp(data.contactWhatsapp || null);
           setMembershipStatus(data.membershipStatus || 'lead');
         }
       } catch (err) {
@@ -125,6 +131,24 @@ export default function CollectionClient({ slug }: { slug: string }) {
       } catch {}
     }
     if (googleMapsUrl) window.open(googleMapsUrl, '_blank', 'noopener');
+  };
+
+  const handleSendContact = async () => {
+    if (!created || !targetUserId || !followContact.trim() || followState !== 'idle') return;
+    setFollowState('sending');
+    try {
+      const res = await fetch('/api/feedback-contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetUserId, testimonialId: created.id, collection: created.collection, contact: followContact.trim() }),
+      });
+      if (res.ok) { setFollowState('sent'); return; }
+      const data = await res.json().catch(() => ({}));
+      toast({ variant: "destructive", title: data?.error === 'invalid_contact' ? "Contato inválido" : "Não foi possível enviar", description: data?.error === 'invalid_contact' ? "Informe um e-mail ou um WhatsApp com DDD." : "Tente novamente em instantes." });
+    } catch {
+      toast({ variant: "destructive", title: "Não foi possível enviar", description: "Verifique sua conexão." });
+    }
+    setFollowState('idle');
   };
 
   const handleFinalSubmit = async () => {
@@ -178,6 +202,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
     });
 
     if (result.success) {
+      if ((result as any).id) setCreated({ id: (result as any).id, collection: (result as any).collection });
       setSubmitted(true);
       setIsSubmitting(false);
     } else {
@@ -205,6 +230,41 @@ export default function CollectionClient({ slug }: { slug: string }) {
               <h2 className="text-3xl font-black font-headline tracking-tighter">Muito Obrigado!</h2>
               <p className="text-muted-foreground text-sm font-medium">Sua opinião sobre <b>{companyNameDisplay}</b> foi enviada com sucesso.</p>
             </div>
+            {rating > 0 && rating <= 3 && (contactWhatsapp || created) && (
+              <div className="pt-8 border-t space-y-4 text-left animate-in fade-in slide-in-from-bottom-4 duration-700">
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary text-center">Quer resolver isso direto com a clínica?</p>
+                {contactWhatsapp && (
+                  <Button
+                    onClick={() => window.open(whatsappLink(contactWhatsapp, `Olá! Acabei de enviar uma avaliação sobre ${companyNameDisplay} e gostaria de conversar.`), '_blank', 'noopener')}
+                    className="w-full h-14 rounded-2xl gap-3 text-sm font-bold bg-[#25D366] hover:bg-[#1fb857] text-white"
+                  >
+                    <MessageCircle className="w-5 h-5" /> Falar com a clínica no WhatsApp
+                  </Button>
+                )}
+                {created && (followState === 'sent' ? (
+                  <p className="text-center text-xs font-bold text-green-600">Contato enviado. A clínica vai retornar assim que possível.</p>
+                ) : (
+                  <div className="space-y-2">
+                    <Label className="text-[9px] font-black uppercase tracking-widest ml-1 opacity-60">
+                      {contactWhatsapp ? 'Ou prefere que a clínica entre em contato? (opcional)' : 'Quer que a clínica entre em contato? (opcional)'}
+                    </Label>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Seu WhatsApp ou e-mail"
+                        value={followContact}
+                        onChange={(e) => setFollowContact(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleSendContact()}
+                        className="h-12 rounded-xl bg-muted/20 border-transparent font-bold"
+                      />
+                      <Button onClick={handleSendContact} disabled={!followContact.trim() || followState === 'sending'} className="h-12 rounded-xl font-black uppercase tracking-widest text-[10px] shrink-0">
+                        {followState === 'sending' ? <Loader2 className="animate-spin w-4 h-4" /> : 'Enviar'}
+                      </Button>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground font-medium ml-1 leading-snug">Usado apenas para a clínica retornar sobre este atendimento.</p>
+                  </div>
+                ))}
+              </div>
+            )}
             {googleMapsUrl && (
               <div className="pt-8 border-t space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <p className="text-[10px] font-black uppercase tracking-widest text-primary">Quer compartilhar sua experiência também no Google? (opcional)</p>
@@ -213,7 +273,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
                 </Button>
               </div>
             )}
-            <Button variant="ghost" onClick={() => { setSubmitted(false); setRecordedVideoUrl(null); setRecordedPhotoUrl(null); setActiveMode(null); setRating(0); setUserName(''); setText(''); setUserEmail(''); }} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary">Enviar outro depoimento</Button>
+            <Button variant="ghost" onClick={() => { setSubmitted(false); setRecordedVideoUrl(null); setRecordedPhotoUrl(null); setActiveMode(null); setRating(0); setUserName(''); setText(''); setUserEmail(''); setCreated(null); setFollowContact(''); setFollowState('idle'); setMediaConsent(false); }} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground hover:text-primary">Enviar outro depoimento</Button>
           </CardContent>
         </Card>
         

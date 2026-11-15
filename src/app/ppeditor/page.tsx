@@ -783,6 +783,10 @@ export default function PPEditorPage() {
         }
         batch.update(doc(db, 'users', user.uid), { companySlug: newSlug });
       }
+      const waDigits = (whatsappNumber || '').replace(/\D/g, '');
+      if (whatsappEnabled && waDigits.length >= 10 && waDigits.length <= 13) {
+        batch.update(doc(db, 'users', user.uid), { contactWhatsapp: waDigits.length <= 11 ? `55${waDigits}` : waDigits });
+      }
       const targetSlug = isSlugChanging ? newSlug : (oldSlug || 'minha-pagina');
       const targetPPRef = doc(db, 'users', user.uid, 'pp', targetSlug);
       batch.set(targetPPRef, {

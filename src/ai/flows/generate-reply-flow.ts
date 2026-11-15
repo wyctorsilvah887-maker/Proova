@@ -13,6 +13,7 @@ export type GenerateReplyInput = {
   rating: number;
   companyName: string;
   businessType?: string;
+  contactWhatsapp?: string;
 };
 
 export type GenerateReplyOutput = {
@@ -26,6 +27,7 @@ export async function generateReplyAction(input: GenerateReplyInput): Promise<Ge
     text: input.testimonialText,
     companyName: input.companyName,
     businessType: input.businessType,
+    contactWhatsapp: input.contactWhatsapp,
   });
   return { reply };
 }
