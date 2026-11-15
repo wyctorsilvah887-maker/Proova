@@ -113,6 +113,10 @@ export default function TermsPage() {
             <CardContent className="p-6 md:p-8 pt-0">
               <p className="text-sm md:text-base leading-relaxed text-muted-foreground font-medium">
                 O Proova AI utiliza modelos avançados de inteligência artificial para sugerir e automatizar respostas às avaliações recebidas, com base no tom de voz e nas diretrizes configuradas pelo próprio usuário. Embora nossa IA seja treinada para manter padrões éticos e profissionais, a <strong>responsabilidade editorial e jurídica final</strong> pelo conteúdo publicado no perfil público da empresa pertence integralmente ao titular da conta, que dispõe de ferramentas de moderação, edição e aprovação manual no painel. As respostas sugeridas são rascunhos: o usuário deve revisá-las antes de publicá-las.
+                <br /><br />
+                <strong>A partir de quando a IA atua.</strong> A IA responde apenas a feedbacks recebidos <strong>enquanto o plano Proova AI Premium ou PRO estiver ativo</strong>. Depoimentos recebidos pelo link de coleta antes da contratação (ou em período sem plano ativo) <strong>não recebem resposta automática</strong>; o usuário pode, se desejar, pedir uma sugestão manualmente no painel. Nas avaliações do Google, a primeira sincronização lê as avaliações públicas dos <strong>últimos 30 dias</strong> (o que pode incluir avaliações anteriores à contratação) e, depois, apenas as mais recentes, sugerindo resposta somente para as que ainda não foram respondidas pelo titular. Avaliações mais antigas não são lidas nem respondidas.
+                <br /><br />
+                <strong>O que é publicado.</strong> Respostas a avaliações do Google nunca são publicadas pelo Proova AI: são sugestões que o usuário copia e publica por conta própria. Em depoimentos de 4 e 5 estrelas recebidos pelo link de coleta, a resposta gerada pode ser exibida automaticamente na página pública do Proova do usuário; em depoimentos de 1 a 3 estrelas a resposta fica como rascunho até a aprovação do usuário.
               </p>
             </CardContent>
           </Card>
