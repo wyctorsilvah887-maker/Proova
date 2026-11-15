@@ -109,6 +109,23 @@ export default function CollectionClient({ slug }: { slug: string }) {
     }
   };
 
+  const googleClickSent = useRef(false);
+  const handleGoogleRedirect = () => {
+    // Conta no máximo 1 encaminhamento por envio; falha de rede não impede a abertura do Google.
+    if (!googleClickSent.current && targetUserId) {
+      googleClickSent.current = true;
+      try {
+        fetch('/api/google-click', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ targetUserId }),
+          keepalive: true,
+        }).catch(() => {});
+      } catch {}
+    }
+    if (googleMapsUrl) window.open(googleMapsUrl, '_blank', 'noopener');
+  };
+
   const handleFinalSubmit = async () => {
     if (honeypot || Date.now() - loadTime < 2000) return;
     
@@ -191,7 +208,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
             {googleMapsUrl && rating >= 4 && (
               <div className="pt-8 border-t space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
                 <p className="text-[10px] font-black uppercase tracking-widest text-primary">Sua voz vale muito!</p>
-                <Button onClick={() => window.open(googleMapsUrl, '_blank')} className="w-full h-14 rounded-2xl gap-3 text-sm font-bold bg-[#4285F4] hover:bg-[#357ae8] shadow-lg transition-all active:scale-95">
+                <Button onClick={handleGoogleRedirect} className="w-full h-14 rounded-2xl gap-3 text-sm font-bold bg-[#4285F4] hover:bg-[#357ae8] shadow-lg transition-all active:scale-95">
                   <MapPin className="w-5 h-5" /> Avaliar também no Google
                 </Button>
               </div>
@@ -203,13 +220,13 @@ export default function CollectionClient({ slug }: { slug: string }) {
         <footer className="mt-12 text-center space-y-4">
            <div className="opacity-40">
               <div className="relative w-[180px] h-[60px] mx-auto mb-2">
-                 <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain dark:hidden" priority unoptimized />
-                 <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain hidden dark:block" priority unoptimized />
+                 <Image src="/logo-proovaai-whitemode.png" alt="Proova AI" fill sizes="180px" className="object-contain dark:hidden" />
+                 <Image src="/logo-proovaai-darkmode.png" alt="Proova AI" fill sizes="180px" className="object-contain hidden dark:block" />
               </div>
               <p className="text-[9px] font-black uppercase tracking-[0.3em]">© 2026 Proova Technology</p>
            </div>
-           <Link href="/dash" className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.2em] text-primary hover:underline transition-all">
-              Conheça o Proova <ArrowRight className="w-2.5 h-2.5" />
+           <Link href="/" className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.2em] text-primary hover:underline transition-all">
+              Conheça o Proova AI <ArrowRight className="w-2.5 h-2.5" />
            </Link>
         </footer>
       </div>
@@ -230,7 +247,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
       
       <input type="file" ref={cameraPhotoInputRef} accept="image/*" capture="environment" className="sr-only" onChange={handlePhotoSelect} />
       <input type="file" ref={galleryPhotoInputRef} accept="image/*" className="sr-only" onChange={handlePhotoSelect} />
-      <input type="file" ref={videoInputRef} accept="video/*" capture="environment" className="sr-only" onChange={handleVideoSelect} />
+      <input type="file" ref={videoInputRef} accept="video/*" capture="user" className="sr-only" onChange={handleVideoSelect} />
 
       <div className="w-full max-w-xl flex-1 flex flex-col justify-start py-10 md:py-20 space-y-8">
         <header className="text-center space-y-4 animate-in fade-in slide-in-from-top-4 duration-700">
@@ -259,13 +276,13 @@ export default function CollectionClient({ slug }: { slug: string }) {
             ))}
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className={cn("grid gap-3", isEnterprise ? "grid-cols-3" : "grid-cols-2")}>
             {[
               { id: 'text', label: 'Texto', icon: Type, onClick: () => setActiveMode('text') },
               { id: 'photo', label: 'Foto', icon: Camera, premium: false, onClick: () => setIsPhotoChoiceOpen(true) },
               { id: 'video', label: 'Vídeo', icon: Video, premium: true, onClick: () => videoInputRef.current?.click() },
-            ].map((opt) => {
-              const isLocked = opt.premium && !isEnterprise;
+            ].filter((opt) => !(opt.premium && !isEnterprise)).map((opt) => {
+              const isLocked = false;
               return (
                 <button
                   key={opt.id}
@@ -353,8 +370,8 @@ export default function CollectionClient({ slug }: { slug: string }) {
         <footer className="text-center space-y-6 pt-10 animate-in fade-in duration-1000 delay-500 pb-10">
            <div className="flex flex-col items-center gap-4">
               <div className="relative w-[180px] h-[60px] opacity-30 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-500">
-                <Image src="/logo-proova-white-mode.gif" alt="Logo Footer" fill className="object-contain dark:hidden" priority unoptimized />
-                <Image src="/logo-proova-dark-mode.gif" alt="Logo Footer" fill className="object-contain hidden dark:block" priority unoptimized />
+                <Image src="/logo-proovaai-whitemode.png" alt="Proova AI" fill sizes="180px" className="object-contain dark:hidden" />
+                <Image src="/logo-proovaai-darkmode.png" alt="Proova AI" fill sizes="180px" className="object-contain hidden dark:block" />
               </div>
               <div className="flex flex-col items-center gap-3">
                 <div className="flex items-center gap-4 text-[9px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-50">
@@ -362,8 +379,8 @@ export default function CollectionClient({ slug }: { slug: string }) {
                   <div className="h-1 w-1 rounded-full bg-muted-foreground" />
                   <span>Proova Technology</span>
                 </div>
-                <Link href="/dash" className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.2em] text-primary hover:underline transition-all">
-                   Conheça o Proova <ArrowRight className="w-2.5 h-2.5" />
+                <Link href="/" className="inline-flex items-center gap-1.5 text-[8px] font-black uppercase tracking-[0.2em] text-primary hover:underline transition-all">
+                   Conheça o Proova AI <ArrowRight className="w-2.5 h-2.5" />
                 </Link>
               </div>
            </div>
