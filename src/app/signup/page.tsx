@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 import { LoadingScreen } from "@/components/loading-screen";
+import { canAttempt, formatWait, recordAttempt, SIGNUP_LIMIT } from '@/lib/client-rate-limit';
 import { slugifyCompany, findAvailableVariation } from "@/lib/slug";
 
 type SlugStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid' | 'error';
@@ -223,6 +224,14 @@ export default function SignupPage() {
         return;
       }
 
+      const gate = canAttempt(SIGNUP_LIMIT);
+      if (!gate.allowed) {
+        setIsSubmitting(false);
+        toast({ variant: "destructive", title: "Muitas tentativas", description: `Por segurança, aguarde ${formatWait(gate.retryInMs)} para tentar criar a conta novamente.` });
+        return;
+      }
+      recordAttempt(SIGNUP_LIMIT);
+
       const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
       const newUser = userCredential.user;
       
@@ -252,7 +261,13 @@ export default function SignupPage() {
       toast({ title: "Conta Criada!", description: "Bem-vindo à nova era da prova social." });
       router.push('/dash');
     } catch (error: any) {
-      toast({ variant: "destructive", title: "Erro no Cadastro", description: error.message || "Não foi possível criar sua conta agora." });
+      const friendly: Record<string, string> = {
+        'auth/email-already-in-use': "Este e-mail já possui uma conta. Faça login ou redefina a senha.",
+        'auth/weak-password': "Escolha uma senha mais forte (mínimo de 6 caracteres).",
+        'auth/invalid-email': "Informe um e-mail válido.",
+        'auth/too-many-requests': "Muitas tentativas. Aguarde alguns minutos e tente novamente.",
+      };
+      toast({ variant: "destructive", title: "Erro no Cadastro", description: friendly[error?.code] || error.message || "Não foi possível criar sua conta agora." });
       setIsSubmitting(false);
     }
   };
