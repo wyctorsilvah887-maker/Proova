@@ -78,6 +78,7 @@ import { LoadingScreen } from '@/components/loading-screen';
 import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
 import { usePageTour } from '@/hooks/use-page-tour';
 import { saveGooglePlace } from '@/lib/google-place-client';
+import { normalizeBrWhatsapp, formatBrWhatsapp } from '@/lib/whatsapp';
 import { 
   Select, 
   SelectContent, 
@@ -124,6 +125,7 @@ export default function SettingsPage() {
   const [companySlug, setCompanySlug] = useState('');
   const [businessType, setBusinessType] = useState('');
   const [city, setCity] = useState('');
+  const [contactWhatsapp, setContactWhatsapp] = useState('');
   const [state, setState] = useState('');
   const [googlePlaceId, setGooglePlaceId] = useState('');
   const [googleMapsUrl, setGoogleMapsUrl] = useState('');
@@ -145,6 +147,7 @@ export default function SettingsPage() {
       setCompanySlug(userData.companySlug || '');
       setBusinessType(userData.businessType || '');
       setCity(userData.city || '');
+      setContactWhatsapp(userData.contactWhatsapp ? formatBrWhatsapp(userData.contactWhatsapp) : '');
       setState(userData.state || '');
       setGooglePlaceId(userData.googlePlaceId || '');
       setGoogleMapsUrl(userData.googleMapsUrl || '');
@@ -409,12 +412,16 @@ export default function SettingsPage() {
         if (oldSlug) batch.delete(doc(db, 'slugs', oldSlug));
       }
 
+      const waNormalized = contactWhatsapp.trim() ? normalizeBrWhatsapp(contactWhatsapp) : null;
+      if (contactWhatsapp.trim() && !waNormalized) throw new Error('WhatsApp inválido. Informe com DDD, por exemplo (85) 99999-9999.');
+
       const userUpdate = {
         name: name.trim(),
         companyName: companyName.trim(),
         companySlug: newSlug || oldSlug,
         businessType,
         city: city.trim(),
+        contactWhatsapp: waNormalized || '',
         state: state.trim().toUpperCase(),
         googlePlaceId: googlePlaceId.trim(),
         googleMapsUrl: googleMapsUrl.trim(),
@@ -688,6 +695,12 @@ export default function SettingsPage() {
                                 <Label className="text-[10px] font-black uppercase ml-1 opacity-60">Estado (UF)</Label>
                                 <Input value={state} maxLength={2} onChange={(e) => setState(e.target.value.toUpperCase())} className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-black text-xs uppercase text-center" placeholder="SP" />
                              </div>
+                          </div>
+
+                          <div className="space-y-3">
+                             <Label className="text-[10px] font-black uppercase ml-1 opacity-60">WhatsApp de contato da clínica</Label>
+                             <Input value={contactWhatsapp} inputMode="tel" placeholder="(85) 99999-9999" onChange={(e) => setContactWhatsapp(e.target.value)} className="h-12 rounded-xl bg-muted/20 border-transparent font-bold" />
+                             <p className="text-[10px] text-muted-foreground font-medium ml-1">Clientes insatisfeitos usam este número para falar direto com você. Também é citado na resposta sugerida pela IA.</p>
                           </div>
                           
                           <Alert variant="destructive" className="bg-destructive/5 border-destructive/20 rounded-2xl animate-in fade-in zoom-in duration-500 w-full overflow-hidden">

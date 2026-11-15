@@ -113,7 +113,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebase';
 import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
 import { saveGooglePlace } from '@/lib/google-place-client';
-import { doc, collection, query, updateDoc, orderBy, limit, where, getDocs, Timestamp, serverTimestamp, arrayUnion } from 'firebase/firestore';
+import { normalizeBrWhatsapp, whatsappLink } from '@/lib/whatsapp';
+import { doc, collection, query, updateDoc, orderBy, limit, where, getDocs, Timestamp, serverTimestamp, arrayUnion, deleteField } from 'firebase/firestore';
 import Link from 'next/link';
 import { signOut } from 'firebase/auth';
 import { toast as shadcnToast } from '@/hooks/use-toast';
@@ -412,6 +413,40 @@ export default function DashPage() {
     }
   };
 
+  const [waInput, setWaInput] = useState('');
+  const [isSavingWa, setIsSavingWa] = useState(false);
+  const handleSaveWhatsapp = async () => {
+    if (!db || !user || isSavingWa) return;
+    const n = normalizeBrWhatsapp(waInput);
+    if (!n) {
+      shadcnToast({ variant: "destructive", title: "WhatsApp inválido", description: "Informe com DDD, por exemplo (85) 99999-9999." });
+      return;
+    }
+    setIsSavingWa(true);
+    try {
+      await updateDoc(doc(db, 'users', user.uid), { contactWhatsapp: n });
+      setWaInput('');
+      shadcnToast({ title: "WhatsApp salvo!", description: "Clientes insatisfeitos já poderão falar com a clínica por ele." });
+    } catch (err: any) {
+      shadcnToast({ variant: "destructive", title: "Erro ao salvar", description: err?.message });
+    } finally {
+      setIsSavingWa(false);
+    }
+  };
+
+  const approveDraft = async (id: string, draft: string) => {
+    if (!db || !user) return;
+    try {
+      await updateDoc(doc(db, 'users', user.uid, 'testimonials', id), { aiReply: draft, aiReplyDraft: deleteField() });
+      shadcnToast({ title: "Resposta publicada", description: "Ela já aparece na sua página pública." });
+    } catch { shadcnToast({ variant: "destructive", title: "Erro ao publicar" }); }
+  };
+  const discardDraft = async (id: string) => {
+    if (!db || !user) return;
+    try { await updateDoc(doc(db, 'users', user.uid, 'testimonials', id), { aiReplyDraft: deleteField() }); }
+    catch { shadcnToast({ variant: "destructive", title: "Erro ao descartar" }); }
+  };
+
   const handleUpdateLocation = async () => {
     if (!db || !user || !city || !state) return;
     try {
@@ -459,7 +494,8 @@ export default function DashPage() {
         testimonialText: text,
         rating: stars,
         companyName: userData.companyName,
-        businessType: userData.businessType
+        businessType: userData.businessType,
+        contactWhatsapp: userData.contactWhatsapp || undefined,
       });
 
       if (isApi) {
@@ -467,7 +503,10 @@ export default function DashPage() {
       } else {
         if (!db || !user) return;
         const tRef = doc(db, 'users', user.uid, 'testimonials', id);
-        await updateDoc(tRef, { aiReply: result.reply });
+        // Nota baixa ainda sem resposta publicada: a nova versão continua sendo rascunho.
+        const current: any = (approvedTestimonials || []).find((x: any) => x.id === id);
+        const stayDraft = stars <= 3 && !current?.aiReply;
+        await updateDoc(tRef, stayDraft ? { aiReplyDraft: result.reply } : { aiReply: result.reply });
       }
 
       shadcnToast({ title: "Resposta Atualizada ✨", description: "O Gemini gerou uma nova sugestão estratégica." });
@@ -705,6 +744,30 @@ export default function DashPage() {
               </div>
             )}
 
+            {!!userData && !userData.contactWhatsapp && (
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 rounded-2xl border border-green-500/20 bg-green-500/5 px-4 py-3">
+                <div className="flex items-start gap-3 min-w-0">
+                  <MessageCircle className="w-4 h-4 text-green-600 shrink-0 mt-0.5" />
+                  <p className="text-xs font-bold leading-relaxed">
+                    Cadastre o <span className="text-green-600">WhatsApp da clínica</span>: clientes insatisfeitos poderão falar direto com você, em vez de ir para a avaliação pública.
+                  </p>
+                </div>
+                <div className="flex gap-2 w-full lg:w-auto shrink-0">
+                  <Input
+                    placeholder="(85) 99999-9999"
+                    inputMode="tel"
+                    value={waInput}
+                    onChange={(e) => setWaInput(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSaveWhatsapp()}
+                    className="h-10 rounded-xl bg-background text-sm font-bold w-full lg:w-48"
+                  />
+                  <Button size="sm" onClick={handleSaveWhatsapp} disabled={isSavingWa || !waInput.trim()} className="h-10 rounded-xl font-black text-[10px] uppercase tracking-widest bg-green-600 hover:bg-green-700 text-white">
+                    {isSavingWa ? <Loader2 className="animate-spin w-4 h-4" /> : 'Salvar'}
+                  </Button>
+                </div>
+              </div>
+            )}
+
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div className="space-y-1">
                 <h1 className="text-2xl sm:text-3xl md:text-5xl font-black font-headline tracking-tighter uppercase">Painel de Controle</h1>
@@ -901,6 +964,44 @@ export default function DashPage() {
                         <p className="text-sm font-medium leading-relaxed italic opacity-80 pl-3 sm:pl-4 border-l-2 border-primary/10 break-words">
                            "{t.text}"
                         </p>
+
+                        {(t.contactInfo || t.userEmail) && (
+                          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] font-bold">
+                            {t.contactInfo && (
+                              <span className="flex items-center gap-1.5 text-primary">
+                                <MessageCircle className="w-3.5 h-3.5" /> Pediu retorno:{' '}
+                                {String(t.contactInfo).startsWith('+')
+                                  ? <a href={whatsappLink(String(t.contactInfo))} target="_blank" rel="noopener noreferrer" className="underline">{t.contactInfo}</a>
+                                  : <a href={`mailto:${t.contactInfo}`} className="underline">{t.contactInfo}</a>}
+                              </span>
+                            )}
+                            {t.userEmail && <span className="text-muted-foreground">E-mail informado: {t.userEmail}</span>}
+                          </div>
+                        )}
+
+                        {!t.aiReply && t.aiReplyDraft && (
+                          <div className="mt-4 p-4 sm:p-5 rounded-2xl border-2 border-dashed border-amber-500/40 bg-amber-500/5 space-y-3">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <span className="text-[9px] font-black uppercase tracking-widest text-amber-600">Rascunho de resposta — ainda não publicado</span>
+                                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">Nota baixa: revise antes de aparecer na sua página pública.</p>
+                              </div>
+                              <button
+                                onClick={() => handleRegenerateResponse(t.id, t.userName, t.text, t.rating)}
+                                disabled={isRegenerating === t.id}
+                                className="p-2 rounded-xl bg-background border shadow-sm hover:bg-muted transition-all active:scale-95 disabled:opacity-50 shrink-0"
+                                title="Gerar outra versão"
+                              >
+                                <RefreshCw className={cn("w-3.5 h-3.5 text-primary", isRegenerating === t.id && "animate-spin")} />
+                              </button>
+                            </div>
+                            <p className="text-xs md:text-sm font-bold leading-relaxed text-foreground/90">{t.aiReplyDraft}</p>
+                            <div className="flex flex-wrap gap-2">
+                              <Button size="sm" onClick={() => approveDraft(t.id, t.aiReplyDraft)} className="rounded-xl font-black text-[10px] uppercase tracking-widest">Aprovar e publicar</Button>
+                              <Button size="sm" variant="ghost" onClick={() => discardDraft(t.id)} className="rounded-xl font-black text-[10px] uppercase tracking-widest text-muted-foreground">Descartar</Button>
+                            </div>
+                          </div>
+                        )}
 
                         {t.aiReply && (
                           <div className="mt-4 p-4 sm:p-5 rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5 space-y-3">

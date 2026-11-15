@@ -58,7 +58,7 @@ export async function ingestDataset(uid: string, datasetId: string): Promise<{ s
       try {
         aiReply = await generateReply({
           authorName: r.authorName, rating: r.rating, text: r.text,
-          companyName: user.companyName || '', businessType: user.businessType,
+          companyName: user.companyName || '', businessType: user.businessType, contactWhatsapp: user.contactWhatsapp || undefined,
         });
       } catch (e) {
         console.error('[reviews] IA falhou, salvando sem rascunho:', (e as Error).message);
