@@ -48,23 +48,11 @@ import {
   SheetTitle as SheetTitleUI, 
   SheetDescription as SheetDescriptionUI 
 } from "@/components/ui/sheet";
-import { 
-  Collapsible, 
-  CollapsibleContent, 
-  CollapsibleTrigger 
-} from "@/components/ui/collapsible";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  type CarouselApi,
-} from "@/components/ui/carousel";
 import { Badge } from "@/components/ui/badge";
 import { useUser } from "@/firebase";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 import { LoadingScreen } from "@/components/loading-screen";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 // --- SUB-COMPONENTS ---
 
@@ -196,17 +184,6 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
 const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
   return (
     <section className="relative w-full pb-12 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh] pt-8 md:pt-16">
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="absolute top-[15%] left-[8%] animate-float opacity-20 text-primary">
-          <BrainCircuit className="w-16 h-16 md:w-24 md:h-24" />
-        </div>
-        <div className="absolute top-[20%] right-[12%] animate-float-delayed opacity-20 text-primary">
-          <HeartPulse className="w-12 h-12 md:w-20 md:h-20" />
-        </div>
-        <div className="absolute bottom-[20%] left-[15%] animate-float-delayed opacity-20 text-primary">
-          <Shield className="w-20 h-20 md:w-32 md:h-32" />
-        </div>
-      </div>
       
       <div className="container relative z-10 px-4 mx-auto">
         <div className="max-w-4xl mx-auto text-center space-y-6">
@@ -219,11 +196,11 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
             </div>
             
             <h1 className={cn(
-              "text-3xl font-black tracking-tighter sm:text-5xl md:text-7xl font-headline leading-[1] transition-all duration-1000",
+              "text-3xl font-extrabold tracking-tight sm:text-4xl md:text-6xl font-headline leading-[1.1] transition-all duration-1000",
               isVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
             )}>
               Respostas prontas para suas avaliações no <br className="hidden sm:block" />
-              <span className="inline-block relative bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">
+              <span className="text-primary">
                 Google Meu Negócio
               </span> com IA
             </h1>
@@ -262,8 +239,8 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
           "space-y-4 transition-all duration-1000",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         )}>
-          <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
-            Gestão Unificada de <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-1">Autoridade Digital.</span>
+          <h2 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight leading-tight">
+            Gestão Unificada de <span className="text-primary">Autoridade Digital.</span>
           </h2>
           <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">O Proova lê as avaliações do Google da sua empresa, prepara a resposta com IA e reúne todos os seus depoimentos em um só painel, para você escalar seu ranking orgânico com dados reais.</p>
         </header>
@@ -311,19 +288,19 @@ AgitationSection.displayName = "AgitationSection";
 
 const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   return (
-    <section id="metodologia" ref={ref} className="w-full py-24 md:py-32 bg-background border-y overflow-hidden min-h-[500px]">
+    <section id="metodologia" ref={ref} className="w-full py-20 md:py-24 bg-background border-y overflow-hidden">
       <div className="container px-4 mx-auto">
         <header className={cn(
-          "text-center space-y-4 mb-24 transition-all duration-1000",
+          "text-center space-y-4 mb-14 transition-all duration-1000",
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         )}>
-          <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
-            Como o Proova <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">Automatiza sua Reputação.</span>
+          <h2 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight">
+            Como o Proova <span className="text-primary">Automatiza sua Reputação.</span>
           </h2>
         </header>
         
         <div className="max-w-4xl mx-auto relative px-4 md:px-0">
-          <div className="space-y-20 md:space-y-32">
+          <div className="space-y-12 md:space-y-16">
             {[
               { number: '01', title: '01. Conecte sua ficha do Google', desc: 'Informe sua empresa pelo Google Maps e o Proova passa a ler as avaliações públicas da sua ficha, sem precisar da senha da sua conta.' },
               { number: '02', title: '02. IA Generativa (Gemini)', desc: 'O Proova utiliza modelos avançados de IA para preparar respostas com empatia, mantendo o tom de voz da sua marca.' },
@@ -339,10 +316,10 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                   </div>
                 </div>
                 <article className="space-y-3 md:space-y-4 pt-1 md:pt-2 flex-1">
-                  <h3 className="text-xl md:text-4xl font-black font-headline tracking-tight">
+                  <h3 className="text-lg md:text-2xl font-bold font-headline tracking-tight">
                     {step.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm md:text-xl leading-relaxed font-medium max-w-2xl">
+                  <p className="text-muted-foreground text-sm md:text-base leading-relaxed font-medium max-w-2xl">
                     {step.desc}
                   </p>
                 </article>
@@ -357,133 +334,30 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 PillarsSection.displayName = "PillarsSection";
 
 const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
-  const [apiMobile, setApiMobile] = useState<CarouselApi>();
-  const [apiPc, setApiPc] = useState<CarouselApi>();
-
-  useEffect(() => {
-    if (!apiMobile) return;
-    const interval = setInterval(() => apiMobile.scrollNext(), 4000);
-    return () => clearInterval(interval);
-  }, [apiMobile]);
-
-  useEffect(() => {
-    if (!apiPc) return;
-    const interval = setInterval(() => apiPc.scrollNext(), 4500);
-    return () => clearInterval(interval);
-  }, [apiPc]);
-
-  const mobileSlides = useMemo(() => [
-    {
-      light: PlaceHolderImages.find(img => img.id === 'app-mobile-light')?.imageUrl || "/paginappmobile-whitemode.webp",
-      dark: PlaceHolderImages.find(img => img.id === 'app-mobile-dark')?.imageUrl || "/paginappmobile-darkmod.webp"
-    },
-    {
-      light: PlaceHolderImages.find(img => img.id === 'app-mobile-light-2')?.imageUrl || "/paginappmobile-whitemode2.webp",
-      dark: PlaceHolderImages.find(img => img.id === 'app-mobile-dark-2')?.imageUrl || "/paginappmobile-darkmod2.webp"
-    }
-  ], []);
-
-  const pcSlides = useMemo(() => [
-    {
-      light: PlaceHolderImages.find(img => img.id === 'app-pc-light')?.imageUrl || "/paginapppc-whitemode.webp",
-      dark: PlaceHolderImages.find(img => img.id === 'app-pc-dark')?.imageUrl || "/paginapppc-darkmode.webp"
-    },
-    {
-      light: PlaceHolderImages.find(img => img.id === 'app-pc-light-2')?.imageUrl || "/paginapppc-whitemode2.webp",
-      dark: PlaceHolderImages.find(img => img.id === 'app-pc-dark-2')?.imageUrl || "/paginapppc-darkmode2.webp"
-    }
-  ], []);
-
+  const items = [
+    { icon: Bot, title: 'IA Pilot', desc: 'Respostas inteligentes geradas para cada avaliação, economizando o tempo da sua equipe.' },
+    { icon: LayoutGrid, title: 'Bio Link Studio', desc: 'Personalize cores, layouts e seções para que sua página de depoimentos reflita a identidade da sua clínica.' },
+    { icon: Star, title: 'Página Pública de Autoridade', desc: 'Um link único e profissional que reúne seus melhores depoimentos e facilita o contato de novos pacientes.' },
+  ];
   return (
-    <section id="setores" ref={ref} className="w-full py-24 md:py-32 overflow-hidden bg-muted/20 min-h-[500px]">
-      <div className="container px-4 mx-auto">
-        <div className="grid lg:grid-cols-2 gap-16 md:gap-24 items-center">
-          <div className={cn("space-y-8 transition-all duration-1000", isVisible ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-10")}>
-            <header className="space-y-4">
-              <h2 className="text-3xl md:text-5xl font-black font-headline leading-tight tracking-tight">
-                Sua <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-3">Página de Autoridade</span> para o Link da Bio.
-              </h2>
-              <p className="text-sm md:text-lg text-muted-foreground font-medium">
-                Nossa tecnologia permite que você centralize seus melhores depoimentos e facilite o contato de novos pacientes através de um link único e profissional.
-              </p>
-            </header>
-
-            <div className="space-y-6">
-              {[
-                { icon: Bot, title: 'IA Pilot', desc: 'Respostas inteligentes geradas automaticamente para economizar tempo da sua equipe.' },
-                { icon: LayoutGrid, title: 'Bio Link Studio', desc: 'Personalize cores, layouts e seções para que sua página de depoimentos reflita a identidade da sua clínica.' }
-              ].map((item, idx) => (
-                <article key={idx} className="flex gap-6 group">
-                  <item.icon className="w-7 h-7 text-primary shrink-0 group-hover:scale-110 transition-transform duration-500" />
-                  <div className="space-y-1">
-                    <p className="font-black text-xl font-headline">{item.title}</p>
-                    <p className="text-muted-foreground text-sm md:text-base leading-relaxed">{item.desc}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-
-          <aside className={cn(
-            "relative transition-all duration-1000 delay-500 flex flex-col items-center", 
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          )}>
-            <div className="absolute -inset-6 bg-primary/20 rounded-[3rem] blur-3xl opacity-20 animate-pulse" />
-            
-            {/* Mobile View: Carousel */}
-            <div className="relative w-full max-w-[280px] mx-auto lg:hidden">
-              <Carousel setApi={setApiMobile} opts={{ loop: true }} className="w-full">
-                <CarouselContent>
-                  {mobileSlides.map((slide, index) => (
-                    <CarouselItem key={index}>
-                      <div className="relative w-full aspect-[9/19] rounded-[2.5rem] overflow-hidden shadow-2xl ring-1 ring-primary/10 bg-background">
-                        <Image 
-                          src={slide.light} 
-                          alt={`Demonstração Mobile ${index + 1} Light`} 
-                          fill 
-                          className="object-cover object-top dark:hidden"
-                          priority={index === 0}
-                        />
-                        <Image 
-                          src={slide.dark} 
-                          alt={`Demonstração Mobile ${index + 1} Dark`} 
-                          fill 
-                          className="object-cover object-top hidden dark:block"
-                          priority={index === 0}
-                        />
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-              </Carousel>
-            </div>
-
-            {/* Desktop View: Carousel */}
-            <div className="hidden lg:block relative w-full max-w-3xl">
-              <Carousel setApi={setApiPc} opts={{ loop: true }} className="w-full">
-                <CarouselContent>
-                  {pcSlides.map((slide, index) => (
-                    <CarouselItem key={index}>
-                      <div className="relative w-full aspect-[16/10] rounded-[2.5rem] overflow-hidden shadow-2xl ring-1 ring-primary/10 border-8 border-muted/20 bg-background">
-                        <Image 
-                          src={slide.light} 
-                          alt={`Preview Desktop ${index + 1} Light`} 
-                          fill 
-                          className="object-cover dark:hidden"
-                        />
-                        <Image 
-                          src={slide.dark} 
-                          alt={`Preview Desktop ${index + 1} Dark`} 
-                          fill 
-                          className="object-cover hidden dark:block"
-                        />
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-              </Carousel>
-            </div>
-          </aside>
+    <section id="setores" ref={ref} className="w-full py-20 md:py-24 bg-muted/20 border-b">
+      <div className="container px-4 mx-auto max-w-5xl">
+        <header className={cn("text-center space-y-3 mb-12 transition-all duration-700", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6")}>
+          <h2 className="text-3xl md:text-4xl font-extrabold font-headline leading-tight tracking-tight">
+            Sua <span className="text-primary">Página de Autoridade</span> para o Link da Bio.
+          </h2>
+          <p className="max-w-2xl mx-auto text-sm md:text-base text-muted-foreground font-medium">
+            Centralize seus melhores depoimentos e facilite o contato de novos pacientes através de um link único e profissional.
+          </p>
+        </header>
+        <div className="grid gap-4 md:grid-cols-3">
+          {items.map((item, idx) => (
+            <article key={idx} className={cn("rounded-2xl border bg-card p-6 space-y-3 transition-all duration-700", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6")} style={{ transitionDelay: `${idx * 120}ms` }}>
+              <div className="inline-flex p-2.5 rounded-xl bg-primary/10 text-primary"><item.icon className="w-5 h-5" /></div>
+              <h3 className="font-bold text-base font-headline">{item.title}</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
+            </article>
+          ))}
         </div>
       </div>
     </section>
@@ -492,109 +366,79 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
 VersatilitySection.displayName = "VersatilitySection";
 
 const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
-  const [expandedPlan, setExpandedPlan] = useState<string | null>(null);
-
   const plans = [
     {
-      id: 'gold',
+      id: 'premium',
       name: "Proova AI Premium",
       price: "R$ 147",
       period: "/mês",
-      description: "Aceleração de Vendas",
-      icon: Bot,
+      description: "Para clínicas e profissionais que querem responder todas as avaliações com agilidade.",
       highlight: true,
       benefits: [
+        "Respostas prontas via IA para cada avaliação",
+        "Busca automática das avaliações do Google",
         "Página Pública VIP",
-        "Automação de Respostas via IA",
-        "G-Boost (Estratégia de SEO Local)",
-        "Social Cards Studio (Post/Story)",
-        "Relatórios de Performance Automáticos",
-        "Inbox Privado (Shield)"
-      ]
+        "G-Boost (estratégia de SEO local)",
+        "Social Cards Studio (post e story)",
+        "Relatórios de performance automáticos",
+        "Inbox privado (Shield)",
+      ],
     },
     {
       id: 'pro',
       name: "Proova AI PRO",
       price: "R$ 270",
       period: "/mês",
-      description: "Domínio de Mercado",
-      icon: Zap,
+      description: "Para quem quer o máximo de personalização e acompanhamento.",
       highlight: false,
       benefits: [
-        "Tudo do Proova AI Premium + Exclusivos",
-        "Coleta de Vídeo Reviews 4K",
-        "Suporte VIP Dedicado com Consultor",
-        "Métricas de ROI Avançadas",
-        "Design de Página Ultra Customizado",
-        "Consultoria de Reputação Mensal",
-        "Uplink para Domínio Próprio (sob consulta)"
-      ]
-    }
+        "Tudo do Proova AI Premium",
+        "Coleta de vídeo reviews 4K",
+        "Suporte VIP dedicado com consultor",
+        "Métricas de ROI avançadas",
+        "Design de página ultra customizado",
+        "Consultoria de reputação mensal",
+        "Domínio próprio (sob consulta)",
+      ],
+    },
   ];
 
   return (
-    <section id="planos" ref={ref} className="w-full py-24 md:py-32 bg-background overflow-hidden min-h-[500px] border-t">
+    <section id="planos" ref={ref} className="w-full py-20 md:py-24 bg-background border-b">
       <div className="container px-4 mx-auto max-w-4xl">
-        <header className={cn("text-center space-y-4 mb-16 transition-all duration-1000", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10")}>
-          <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter">
-            Níveis de <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">Automação Estratégica.</span>
-          </h2>
+        <header className={cn("text-center space-y-3 mb-12 transition-all duration-700", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6")}>
+          <h2 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight">Planos e <span className="text-primary">preços</span></h2>
+          <p className="text-sm md:text-base text-muted-foreground font-medium">Garantia de 7 dias com reembolso integral. Cancele quando quiser.</p>
         </header>
-
-        <div className="space-y-4">
-          {plans.map((plan) => {
-            const isExpanded = expandedPlan === plan.id;
-            return (
-              <Collapsible key={plan.id} open={isExpanded} onOpenChange={() => setExpandedPlan(isExpanded ? null : plan.id)} className="w-full">
-                <Card className={cn("relative overflow-hidden border-none shadow-xl transition-all duration-300 rounded-3xl", plan.highlight ? "bg-primary text-white" : "bg-card text-card-foreground hover:bg-muted/30 border")}>
-                  <CollapsibleTrigger asChild>
-                    <div className="p-6 cursor-pointer select-none">
-                      <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-                        <div className="flex items-center gap-5 flex-1 w-full sm:w-auto">
-                          <div className={cn("p-3 rounded-2xl shrink-0 transition-transform duration-500", plan.highlight ? "bg-white/10" : "bg-primary/10")}>
-                            <plan.icon className={cn("w-6 h-6", plan.highlight ? "text-white" : "text-primary")} />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-xl font-black uppercase tracking-tight">{plan.name}</h3>
-                            <p className={cn("text-[10px] font-bold uppercase tracking-widest opacity-70", plan.highlight ? "text-white" : "text-primary")}>{plan.description}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center justify-between sm:justify-end gap-8 w-full sm:w-auto">
-                          <div className="text-right">
-                            <p className="text-xl font-black leading-none">{plan.price}</p>
-                            <p className="text-[10px] font-bold uppercase opacity-60">{plan.period}</p>
-                          </div>
-                          <div className={cn("p-2 rounded-full transition-transform duration-300", isExpanded && "rotate-180", plan.highlight ? "bg-white/10" : "bg-muted")}>
-                            <ChevronDown className="w-4 h-4" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className={cn("px-6 pb-6 pt-2 space-y-6", plan.highlight ? "border-t border-white/10" : "border-t border-border")}>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-4">
-                        {plan.benefits.map((benefit, idx) => (
-                          <div key={idx} className="flex items-start gap-3">
-                            <div className={cn("mt-1 p-0.5 rounded-full shrink-0", plan.highlight ? "bg-white/20" : "bg-primary/10")}>
-                              <Check className="w-3 h-3" />
-                            </div>
-                            <span className="text-xs font-bold leading-relaxed">{benefit}</span>
-                          </div>
-                        ))}
-                      </div>
-                      <Link href="/signup" className="w-full">
-                        <Button className={cn("w-full h-14 rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-tight sm:tracking-normal shadow-2xl transition-all active:scale-95 gap-2", plan.highlight ? "bg-white text-primary hover:bg-zinc-100" : "bg-primary text-white hover:bg-primary/90")}>
-                          Garantir meu acesso <ArrowRight className="w-4 h-4" />
-                        </Button>
-                      </Link>
-                    </div>
-                  </CollapsibleContent>
-                </Card>
-              </Collapsible>
-            );
-          })}
+        <div className="grid gap-6 md:grid-cols-2 items-stretch">
+          {plans.map((plan) => (
+            <div key={plan.id} className={cn("relative flex flex-col rounded-2xl border p-6 md:p-8", plan.highlight ? "border-primary shadow-lg bg-card" : "bg-card")}>
+              {plan.highlight && (
+                <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary-foreground">Mais escolhido</span>
+              )}
+              <h3 className="text-lg font-bold font-headline">{plan.name}</h3>
+              <p className="mt-1 text-xs text-muted-foreground font-medium min-h-[2.5rem]">{plan.description}</p>
+              <p className="mt-4 flex items-baseline gap-1">
+                <span className="text-4xl font-extrabold tracking-tight">{plan.price}</span>
+                <span className="text-sm text-muted-foreground font-medium">{plan.period}</span>
+              </p>
+              <ul className="mt-6 space-y-3 flex-1">
+                {plan.benefits.map((benefit) => (
+                  <li key={benefit} className="flex items-start gap-3 text-sm font-medium">
+                    <Check className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
+                    <span>{benefit}</span>
+                  </li>
+                ))}
+              </ul>
+              <Link href="/signup" className="mt-8 block">
+                <Button className="w-full h-12 rounded-xl text-xs font-bold uppercase tracking-wide gap-2" variant={plan.highlight ? "default" : "outline"}>
+                  Garantir meu acesso <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+            </div>
+          ))}
         </div>
+        <p className="mt-6 text-center text-xs text-muted-foreground font-medium">Crie sua conta gratuitamente e contrate o plano em seguida, com o mesmo e-mail.</p>
       </div>
     </section>
   );
@@ -611,19 +455,19 @@ const FAQ_ITEMS = [
 ];
 
 const FaqSection = () => (
-  <section id="perguntas" className="w-full py-20 md:py-28 bg-background border-t">
-    <div className="container max-w-3xl mx-auto px-4 space-y-10">
-      <header className="text-center space-y-3">
-        <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">Perguntas <span className="text-primary italic">frequentes.</span></h2>
+  <section id="perguntas" className="w-full py-16 md:py-20 bg-muted/20">
+    <div className="container max-w-2xl mx-auto px-4 space-y-8">
+      <header className="text-center">
+        <h2 className="text-2xl md:text-3xl font-extrabold font-headline tracking-tight">Perguntas <span className="text-primary">frequentes</span></h2>
       </header>
-      <div className="space-y-3">
+      <div className="space-y-2">
         {FAQ_ITEMS.map((item) => (
-          <details key={item.q} className="group rounded-2xl border bg-card px-5 py-4 shadow-sm open:shadow-md transition-shadow">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm md:text-base font-black">
+          <details key={item.q} className="group rounded-xl border bg-card px-4 py-3">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-xs md:text-sm font-bold">
               {item.q}
-              <ChevronDown className="w-4 h-4 shrink-0 transition-transform group-open:rotate-180" />
+              <ChevronDown className="w-3.5 h-3.5 shrink-0 transition-transform group-open:rotate-180" />
             </summary>
-            <p className="pt-3 text-sm md:text-base text-muted-foreground font-medium leading-relaxed">{item.a}</p>
+            <p className="pt-2 text-xs md:text-sm text-muted-foreground font-medium leading-relaxed">{item.a}</p>
           </details>
         ))}
       </div>
@@ -763,22 +607,22 @@ export default function Home() {
         <AgitationSection ref={agitationRef} isVisible={isAgitationVisible} />
         <PillarsSection ref={pillarsRef} isVisible={isPillarsVisible} />
         <VersatilitySection ref={versatilityRef} isVisible={isVersatilityVisible} />
+        <PricingSection ref={pricingRef} isVisible={isPricingVisible} />
         <FaqSection />
         
-        <section className="relative w-full py-24 md:py-36 bg-black text-white overflow-hidden">
-          <Image src="https://picsum.photos/seed/ctabg88/1920/1080" alt="Chamada para Ação Final" fill className="object-cover opacity-20 grayscale brightness-50" />
+        <section className="relative w-full py-20 md:py-28 bg-zinc-950 text-white overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-primary/10" />
           <div className="container relative z-10 px-4 mx-auto text-center space-y-10">
             <header className="space-y-4">
-              <h2 className="text-4xl md:text-7xl font-black font-headline tracking-tighter leading-[1]">
+              <h2 className="text-3xl md:text-5xl font-extrabold font-headline tracking-tight leading-tight">
                 Gestão de Reputação com <span className="text-primary italic">IA ao seu lado.</span>
               </h2>
-              <p className="max-w-lg mx-auto text-base md:text-2xl font-medium text-white/80">
+              <p className="max-w-lg mx-auto text-sm md:text-lg font-medium text-white/80">
                 Assuma a liderança regional através da prova social estratégica e IA.
               </p>
             </header>
             <Link href="/signup" className="w-full sm:w-auto">
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto h-16 md:h-20 px-12 rounded-2xl text-sm md:text-xl font-black shadow-2xl hover:scale-105 transition-all bg-white text-black hover:bg-white/90">
+              <Button size="lg" variant="secondary" className="w-full sm:w-auto h-14 md:h-16 px-10 rounded-xl text-sm md:text-base font-bold shadow-2xl hover:scale-105 transition-all bg-white text-black hover:bg-white/90">
                 CRIAR MINHA CONTA AGORA
               </Button>
             </Link>
