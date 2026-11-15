@@ -167,11 +167,11 @@ export default function DashPage() {
   const showTour = !tourClosed && !activeHash && (tourForced || (userData as any)?.onboardingDone === false);
   const tourSteps: TourStep[] = useMemo(() => [
     { title: 'Bem-vindo ao Proova! 👋', text: 'Em menos de 1 minuto você vai conhecer o painel e saber por onde começar. Dá pra pular quando quiser.' },
-    { target: 'menu', title: 'Menu de navegação', text: 'Aqui ficam o seu link de coleta, o Link in Bio, o cartaz de balcão, a identidade da marca e as configurações.' },
-    { target: 'missions', title: 'Missões de sucesso', text: 'Comece por aqui: pequenas tarefas que deixam sua conta pronta para coletar e exibir depoimentos.' },
+    { target: 'menu', title: 'Menu de navegação', text: 'Aqui ficam a localização, o Google Maps, o link de coleta, o Link in Bio, o cartaz de balcão, a identidade da marca e as configurações da conta.' },
+    { target: 'setup', title: 'Complete sua configuração', text: 'Informe a localização e o link do Google Maps para a coleta e o redirecionamento de avaliações funcionarem. Este aviso some quando terminar.' },
     { target: 'metrics', title: 'Seus números', text: 'Acompanhe os elogios coletados e a sua nota. Use o filtro de período para ver a evolução.' },
     { target: 'reviews', title: 'Avaliações & IA', text: 'Os depoimentos e avaliações chegam aqui. Gere uma resposta com IA, copie e responda em segundos.' },
-    { title: 'Tudo pronto! 🚀', text: 'Compartilhe seu link de coleta com os clientes e veja a prova social crescer. Você pode rever este tour com ?tour=1 no endereço do painel.' },
+    { title: 'Tudo pronto! 🚀', text: 'Depois de configurar, compartilhe seu link de coleta com os clientes e veja a prova social crescer. Para rever este tour, abra o painel com ?tour=1 no endereço.' },
   ], []);
   const finishTour = () => {
     setTourClosed(true);
@@ -291,6 +291,13 @@ export default function DashPage() {
   const completedStepsCount = setupSteps.filter(s => s.completed).length;
   const progressPercentage = (completedStepsCount / setupSteps.length) * 100;
   const isSetupComplete = completedStepsCount === setupSteps.length;
+  // Aviso discreto: só localização e Google Maps (a "coleta ativa" não é pendência de configuração).
+  const pendingSetup = useMemo(() => {
+    if (userDataLoading || !userData) return null;
+    const missing = setupSteps.filter((st) => st.id !== 'collect' && !st.completed);
+    if (missing.length === 0) return null;
+    return { labels: missing.map((m) => m.label).join(' e '), action: missing[0].action };
+  }, [setupSteps, userData, userDataLoading]);
 
   const copyToClipboard = (text: string, description: string) => {
     navigator.clipboard.writeText(text);
@@ -726,33 +733,18 @@ export default function DashPage() {
           </div>
         ) : (
           <div className="space-y-10 animate-in fade-in duration-700">
-            {(!isSetupComplete && !userData?.isSetupProcessDone) && (
-              <section className="space-y-4" data-tour="missions">
-                 <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <Rocket className="w-5 h-5 text-primary" />
-                      <h2 className="text-sm font-black uppercase tracking-widest">Missões de Sucesso Proova</h2>
-                    </div>
-                    <Badge variant="secondary" className="bg-primary/10 text-primary border-none font-black text-[10px]">
-                      {completedStepsCount} / {setupSteps.length} COMPLETAS
-                    </Badge>
-                 </div>
-                 <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden bg-background">
-                    <div className="p-4 sm:p-6 md:p-8 space-y-6">
-                      <Progress value={progressPercentage} className="h-2.5 bg-muted" />
-                      <div className="grid gap-3 sm:grid-cols-3">
-                        {setupSteps.map((step, idx) => (
-                          <div key={step.id} onClick={() => step.unlocked && step.action()} className={cn("p-4 rounded-2xl border-2 transition-all cursor-pointer group", step.completed ? "bg-primary/5 border-primary/20" : (step.unlocked ? "border-dashed hover:border-primary/50" : "opacity-40 cursor-not-allowed"))}>
-                            <div className="flex items-center gap-3">
-                              <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", step.completed ? "bg-primary text-white" : "bg-muted")}>{step.completed ? <Check className="w-4 h-4" /> : <span className="text-xs font-black">{idx + 1}</span>}</div>
-                              <p className="text-[11px] font-black uppercase tracking-tight truncate">{step.label}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                 </Card>
-              </section>
+            {pendingSetup && (
+              <div data-tour="setup" className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3">
+                <div className="flex items-start gap-3 min-w-0">
+                  <Rocket className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <p className="text-xs font-bold leading-relaxed">
+                    Falta configurar: <span className="text-primary">{pendingSetup.labels}</span>. Leva menos de 1 minuto.
+                  </p>
+                </div>
+                <Button size="sm" onClick={pendingSetup.action} className="rounded-xl font-black text-[10px] uppercase tracking-widest shrink-0">
+                  Completar configuração
+                </Button>
+              </div>
             )}
 
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
