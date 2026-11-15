@@ -222,7 +222,7 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
               "text-3xl font-black tracking-tighter sm:text-5xl md:text-7xl font-headline leading-[1] transition-all duration-1000",
               isVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
             )}>
-              Automatize suas respostas no <br className="hidden sm:block" />
+              Respostas prontas para suas avaliações no <br className="hidden sm:block" />
               <span className="inline-block relative bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">
                 Google Meu Negócio
               </span> com IA
@@ -233,7 +233,7 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
             "max-w-2xl mx-auto text-muted-foreground text-sm md:text-xl font-medium leading-relaxed transition-all duration-1000 delay-300",
             isVisible ? "animate-in fade-in slide-in-from-right-20 opacity-100" : "opacity-0"
           )}>
-            Integração oficial com Google Business Profile, Automação de Respostas via Gemini e Gestão Estratégica de Prova Social para Profissionais da Saúde.
+            Veja as avaliações da sua empresa no Google, receba a resposta pronta da IA (Gemini) e gerencie sua prova social em um só painel. Feito para profissionais da saúde.
           </p>
           
           <div className={cn(
@@ -242,7 +242,7 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
           )}>
             <Link href="/signup" className="w-full sm:w-auto">
               <Button className="w-full sm:w-auto h-14 px-8 rounded-2xl text-[10px] font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
-                AUTOMATIZAR MINHAS AVALIAÇÕES <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+                COMEÇAR AGORA <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
               </Button>
             </Link>
           </div>
@@ -265,27 +265,27 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
           <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">
             Gestão Unificada de <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-1">Autoridade Digital.</span>
           </h2>
-          <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">O Proova se conecta diretamente ao Perfil da sua Empresa no Google para monitorar, responder e escalar seu ranking orgânico através de dados reais.</p>
+          <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">O Proova lê as avaliações do Google da sua empresa, prepara a resposta com IA e reúne todos os seus depoimentos em um só painel, para você escalar seu ranking orgânico com dados reais.</p>
         </header>
 
         <div className="grid gap-12 lg:grid-cols-3">
           {[
             { 
               icon: MapPin, 
-              title: "Monitoramento GBP", 
-              desc: "Receba alertas instantâneos de novas avaliações no Google Maps e gerencie toda a sua reputação em um único painel centralizado.", 
+              title: "Inbox Unificado", 
+              desc: "Receba alertas instantâneos de cada novo depoimento enviado pelo seu link de coleta Proova e modere tudo em um único inbox unificado.", 
               color: "text-primary"
             },
             { 
               icon: Bot, 
-              title: "Respostas Automáticas", 
-              desc: "Nossa IA (Gemini) analisa o sentimento do depoimento e gera respostas profissionais e éticas em segundos, mantendo seu perfil ativo.", 
+              title: "Respostas Prontas com IA", 
+              desc: "Nossa IA (Gemini) analisa o sentimento da avaliação e gera respostas profissionais e éticas em segundos, prontas para você revisar, copiar e publicar.", 
               color: "text-primary" 
             },
             { 
               icon: Zap, 
               title: "Estratégia G-Boost", 
-              desc: "Aumente drasticamente seu volume de avaliações 5 estrelas no Google através do nosso fluxo de redirecionamento inteligente.", 
+              desc: "Aumente seu volume de avaliações 5 estrelas no Google através do nosso fluxo de redirecionamento inteligente.", 
               color: "text-primary" 
             }
           ].map((item, idx) => (
@@ -325,8 +325,8 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
         <div className="max-w-4xl mx-auto relative px-4 md:px-0">
           <div className="space-y-20 md:space-y-32">
             {[
-              { number: '01', title: '01. Conexão com Google', desc: 'Integração via API oficial para ler e gerir o perfil da sua clínica no Google Business Profile de forma segura.' },
-              { number: '02', title: '02. IA Generativa (Gemini)', desc: 'O Proova utiliza modelos avançados de IA para responder pacientes com empatia, mantendo o tom de voz da sua marca.' },
+              { number: '01', title: '01. Conecte sua ficha do Google', desc: 'Informe sua empresa pelo Google Maps e o Proova passa a ler as avaliações públicas da sua ficha, sem precisar da senha da sua conta.' },
+              { number: '02', title: '02. IA Generativa (Gemini)', desc: 'O Proova utiliza modelos avançados de IA para preparar respostas com empatia, mantendo o tom de voz da sua marca.' },
               { number: '03', title: '03. Link in Bio de Autoridade', desc: 'Transforme sua biografia do Instagram em um hub de conversão com uma vitrine dinâmica de depoimentos e botão de contato direto.' }
             ].map((step, idx) => (
               <div key={idx} className={cn(
@@ -601,6 +601,36 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 });
 PricingSection.displayName = "PricingSection";
 
+const FAQ_ITEMS = [
+  { q: "Preciso dar a senha da minha conta do Google?", a: "Não. Você informa sua empresa pelo Google Maps e o Proova lê as avaliações públicas da sua ficha." },
+  { q: "O Proova publica as respostas por mim?", a: "Hoje a IA prepara a resposta e você copia e publica em segundos, com controle total do que vai ao ar. A publicação automática chegará com a integração oficial do Google." },
+  { q: "Como funcionam os alertas?", a: "Cada novo depoimento enviado pelo seu link de coleta Proova chega ao seu inbox unificado com alerta instantâneo, para você moderar antes de publicar." },
+  { q: "Com que frequência as avaliações do Google são atualizadas?", a: "Automaticamente uma vez por dia e, quando você quiser, na hora pelo botão \"Atualizar agora\" (planos pagos)." },
+  { q: "Posso cancelar quando quiser?", a: "Sim, sem multa. O cancelamento pode ser feito pelo e-mail contato@useproovaai.com.br." },
+  { q: "E se eu não gostar?", a: "Você tem 7 dias de garantia: peça o reembolso integral direto no painel, em Configurações." },
+];
+
+const FaqSection = () => (
+  <section id="perguntas" className="w-full py-20 md:py-28 bg-background border-t">
+    <div className="container max-w-3xl mx-auto px-4 space-y-10">
+      <header className="text-center space-y-3">
+        <h2 className="text-3xl md:text-5xl font-black font-headline tracking-tighter leading-tight">Perguntas <span className="text-primary italic">frequentes.</span></h2>
+      </header>
+      <div className="space-y-3">
+        {FAQ_ITEMS.map((item) => (
+          <details key={item.q} className="group rounded-2xl border bg-card px-5 py-4 shadow-sm open:shadow-md transition-shadow">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm md:text-base font-black">
+              {item.q}
+              <ChevronDown className="w-4 h-4 shrink-0 transition-transform group-open:rotate-180" />
+            </summary>
+            <p className="pt-3 text-sm md:text-base text-muted-foreground font-medium leading-relaxed">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
 const Footer = () => {
   return (
     <footer className="py-20 border-t bg-background">
@@ -733,6 +763,7 @@ export default function Home() {
         <AgitationSection ref={agitationRef} isVisible={isAgitationVisible} />
         <PillarsSection ref={pillarsRef} isVisible={isPillarsVisible} />
         <VersatilitySection ref={versatilityRef} isVisible={isVersatilityVisible} />
+        <FaqSection />
         
         <section className="relative w-full py-24 md:py-36 bg-black text-white overflow-hidden">
           <Image src="https://picsum.photos/seed/ctabg88/1920/1080" alt="Chamada para Ação Final" fill className="object-cover opacity-20 grayscale brightness-50" />
@@ -740,7 +771,7 @@ export default function Home() {
           <div className="container relative z-10 px-4 mx-auto text-center space-y-10">
             <header className="space-y-4">
               <h2 className="text-4xl md:text-7xl font-black font-headline tracking-tighter leading-[1]">
-                Gestão de Reputação em <span className="text-primary italic">Piloto Automático.</span>
+                Gestão de Reputação com <span className="text-primary italic">IA ao seu lado.</span>
               </h2>
               <p className="max-w-lg mx-auto text-base md:text-2xl font-medium text-white/80">
                 Assuma a liderança regional através da prova social estratégica e IA.
@@ -751,6 +782,7 @@ export default function Home() {
                 CRIAR MINHA CONTA AGORA
               </Button>
             </Link>
+            <p className="text-xs md:text-sm font-bold text-white/70">Garantia de 7 dias com reembolso integral • Cancele quando quiser</p>
           </div>
         </section>
       </main>
