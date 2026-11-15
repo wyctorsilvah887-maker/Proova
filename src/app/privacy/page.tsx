@@ -51,7 +51,7 @@ export default function PrivacyPage() {
               <ShieldCheck className="w-3.5 h-3.5" /> Segurança de Dados
            </div>
            <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter uppercase leading-tight">Política de Privacidade</h1>
-           <p className="text-muted-foreground font-medium text-sm md:text-lg">Entenda como o Proova AI protege sua integridade digital e gerencia suas informações.</p>
+           <p className="text-muted-foreground font-medium text-sm md:text-lg">Entenda como o Proova AI protege sua integridade digital e gerencia suas informações. Última atualização: 15 de novembro de 2026.</p>
         </section>
 
         <div className="grid gap-12">
@@ -61,7 +61,7 @@ export default function PrivacyPage() {
               <div className="p-2 rounded-xl bg-primary/10 text-primary shadow-inner">
                 <Globe className="w-5 h-5" />
               </div>
-              <h2 className="text-xl font-black uppercase tracking-tight">Uso de Dados das APIs do Google</h2>
+              <h2 className="text-xl font-black uppercase tracking-tight">Uso de Dados do Google e Serviços de Terceiros</h2>
             </div>
             <div className="bg-primary/5 border-2 border-dashed border-primary/20 rounded-[2rem] p-8 md:p-10 space-y-6 animate-in zoom-in duration-500">
               <p className="text-sm md:text-base leading-relaxed font-bold text-foreground/90">
@@ -71,7 +71,9 @@ export default function PrivacyPage() {
                 <p className="text-xs md:text-sm text-muted-foreground font-medium leading-relaxed italic">
                   Declaramos expressamente que a <strong>única finalidade</strong> do processamento e uso dessas informações é a gestão estratégica de reputação e autoridade da própria clínica usuária. Os dados acessados destinam-se exclusivamente a permitir que a clínica monitore e responda às suas próprias avaliações no Google Business Profile, nunca sendo utilizados para fins publicitários, prospecção de terceiros ou comercialização de bases de dados.
                   <br /><br />
-                  Informamos adicionalmente que, para viabilizar a geração de respostas automatizadas, o texto da avaliação é processado via APIs seguras de inteligência artificial sob regime de estrita confidencialidade técnica e sem qualquer retenção de dados para treinamento de modelos públicos de terceiros.
+                  <strong>Leitura de avaliações públicas:</strong> enquanto a integração oficial com o Google Business Profile não está disponível para a sua conta, o Proova AI lê as avaliações públicas da ficha do Google Maps informada por você (via Place ID) por meio de um provedor de coleta terceirizado (Apify). Esses dados (nome do avaliador, nota, texto e data) são os mesmos já visíveis publicamente e são usados apenas para exibi-los no seu painel.
+                  <br /><br />
+                  Para gerar as respostas sugeridas, o texto da avaliação é enviado a um provedor de inteligência artificial (Google Gemini) somente para produzir o rascunho da resposta. O Proova AI não utiliza esses dados para treinar modelos próprios.
                 </p>
               </div>
             </div>
@@ -123,7 +125,37 @@ export default function PrivacyPage() {
                   "Dados de Registro: Nome, e-mail corporativo e senha criptografada.",
                   "Dados do Perfil Comercial: Nome da empresa, setor de atuação e Place ID do Google Maps.",
                   "Conteúdo Gerado: Depoimentos e imagens enviados por seus clientes finais.",
+                  "Avaliações do Google: nome do avaliador, nota, texto e data das avaliações públicas da sua empresa, e as respostas sugeridas pela IA.",
+                  "Dados de Cobrança: e-mail da compra, plano contratado, identificadores de assinatura e eventos de pagamento. O pagamento é processado pela Cakto; o Proova AI não armazena dados de cartão.",
+                  "Pedidos de Reembolso e Verificação: motivo informado em pedidos de reembolso e códigos temporários de verificação (válidos por 10 minutos).",
                   "Logs Técnicos: Endereço IP e cookies para manutenção da sessão e segurança."
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm md:text-base font-medium">
+                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+             </ul>
+          </section>
+
+          <section className="space-y-4">
+             <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-muted text-muted-foreground shadow-inner">
+                  <Globe className="w-5 h-5" />
+                </div>
+                <h2 className="text-xl font-black uppercase tracking-tight">Serviços de Terceiros (Operadores)</h2>
+             </div>
+             <p className="text-sm md:text-base text-muted-foreground leading-relaxed font-medium">
+               Para prestar o serviço, compartilhamos apenas os dados necessários com os seguintes operadores, que podem estar localizados fora do Brasil:
+             </p>
+             <ul className="space-y-3 list-none pl-1">
+                {[
+                  "Google Firebase: autenticação e banco de dados.",
+                  "Vercel: hospedagem da plataforma.",
+                  "Google Gemini: geração das respostas sugeridas às avaliações.",
+                  "Apify: leitura das avaliações públicas da ficha do Google Maps.",
+                  "Cakto: processamento de pagamentos, assinaturas e reembolsos.",
+                  "Resend: envio de e-mails da plataforma (por exemplo, códigos de verificação e alertas)."
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm md:text-base font-medium">
                     <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
@@ -141,7 +173,7 @@ export default function PrivacyPage() {
                 <h2 className="text-xl font-black uppercase tracking-tight">Segurança e Retenção</h2>
              </div>
              <p className="text-sm md:text-base text-muted-foreground leading-relaxed font-medium">
-                Seus dados são armazenados em infraestrutura de nuvem com criptografia de ponta. Mantemos as informações apenas pelo período necessário para cumprir com as finalidades descritas nesta política ou conforme exigido por lei. Depoimentos excluídos pelo usuário são removidos permanentemente de nossos servidores ativos em até 30 dias.
+                Seus dados são armazenados em infraestrutura de nuvem com criptografia de ponta. Mantemos as informações apenas pelo período necessário para cumprir com as finalidades descritas nesta política ou conforme exigido por lei. Depoimentos excluídos pelo usuário são removidos permanentemente de nossos servidores ativos em até 30 dias. Você pode solicitar acesso, correção, portabilidade ou exclusão dos seus dados a qualquer momento pelo e-mail <strong>contato@useproovaai.com.br</strong>.
              </p>
           </section>
 

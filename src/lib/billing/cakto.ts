@@ -3,7 +3,7 @@
  * Quem grava no banco é a rota /api/webhook/cakto.
  */
 
-export type Plan = 'gold' | 'enterprise' | 'trial';
+export type Plan = 'gold' | 'enterprise';
 
 type Json = Record<string, any>;
 
@@ -19,7 +19,7 @@ function purchaseKeys(data: Json): string[] {
 
 /**
  * Descobre qual plano foi comprado.
- * 1) Pelos IDs configurados nas variáveis CAKTO_PREMIUM_IDS / CAKTO_PRO_IDS / CAKTO_TRIAL_IDS
+ * 1) Pelos IDs configurados nas variáveis CAKTO_PREMIUM_IDS / CAKTO_PRO_IDS
  *    (IDs de produto, de oferta ou o final do link de checkout, ex.: "premium-proova").
  * 2) Se não houver ID configurado, pelo nome do produto/oferta.
  */
@@ -28,14 +28,12 @@ export function resolvePlan(data: Json, env: Record<string, string | undefined> 
   const lists: Array<[Plan, string[]]> = [
     ['enterprise', ids(env.CAKTO_PRO_IDS || env.CAKTO_ENTERPRISE_IDS)],
     ['gold', ids(env.CAKTO_PREMIUM_IDS || env.CAKTO_GOLD_IDS)],
-    ['trial', ids(env.CAKTO_TRIAL_IDS)],
   ];
   for (const [plan, list] of lists) if (keys.some((k) => list.includes(k))) return plan;
 
   const name = `${data.product?.name || ''} ${data.offer?.name || ''}`.toLowerCase();
   if (/\benterprise\b|\bpro\b/.test(name)) return 'enterprise';
   if (/\bpremium\b|\bgold\b/.test(name)) return 'gold';
-  if (/\btrial\b|\bteste\b/.test(name)) return 'trial';
   return null;
 }
 

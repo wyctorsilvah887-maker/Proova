@@ -62,7 +62,7 @@ export default function TermsPage() {
               <Scale className="w-3.5 h-3.5" /> Acordo de Serviço
            </div>
            <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter uppercase leading-tight">Termos de Uso</h1>
-           <p className="text-muted-foreground font-medium text-sm md:text-lg">Regras e diretrizes para o uso da plataforma Proova AI. Última atualização: Novembro de 2026.</p>
+           <p className="text-muted-foreground font-medium text-sm md:text-lg">Regras e diretrizes para o uso da plataforma Proova AI. Última atualização: 15 de novembro de 2026.</p>
         </section>
 
         <div className="grid gap-6">
@@ -90,12 +90,12 @@ export default function TermsPage() {
                 <div className="p-2 rounded-xl bg-primary/10 text-primary shadow-inner">
                   <Globe className="w-5 h-5" />
                 </div>
-                <CardTitle className="text-lg font-black uppercase tracking-tight">2. Integração com Google Business Profile</CardTitle>
+                <CardTitle className="text-lg font-black uppercase tracking-tight">2. Integração com o Google e Leitura de Avaliações</CardTitle>
               </div>
             </CardHeader>
             <CardContent className="p-6 md:p-8 pt-0">
               <p className="text-sm md:text-base leading-relaxed text-muted-foreground font-medium">
-                Para operar os recursos de leitura e resposta de avaliações, o usuário concede autorização explícita via protocolo oficial OAuth do Google. O usuário compromete-se a utilizar a plataforma em estrita conformidade com as Políticas de Conteúdo e Diretrizes do Google Business Profile, abstendo-se de publicar respostas com conteúdo ofensivo, spam, desinformação ou violação de privacidade de pacientes.
+                Para exibir as avaliações da empresa no painel, o Proova AI lê as avaliações <strong>públicas</strong> da ficha do Google Maps indicada pelo usuário (identificada pelo Place ID), por meio de um provedor de coleta terceirizado. Nessa modalidade o Proova AI <strong>não publica respostas</strong> no Google em nome do usuário: ele recebe a resposta sugerida e a publica por conta própria. Quando disponível, a integração oficial com o Google Business Profile exigirá autorização explícita do usuário via protocolo OAuth do Google, e qualquer publicação automática ocorrerá somente conforme essa autorização e as configurações escolhidas pelo usuário. O usuário compromete-se a utilizar a plataforma em estrita conformidade com as Políticas de Conteúdo e Diretrizes do Google Business Profile, abstendo-se de publicar respostas com conteúdo ofensivo, spam, desinformação ou violação de privacidade de pacientes.
               </p>
             </CardContent>
           </Card>
@@ -112,7 +112,7 @@ export default function TermsPage() {
             </CardHeader>
             <CardContent className="p-6 md:p-8 pt-0">
               <p className="text-sm md:text-base leading-relaxed text-muted-foreground font-medium">
-                O Proova AI utiliza modelos avançados de inteligência artificial para sugerir e automatizar respostas às avaliações recebidas, com base no tom de voz e nas diretrizes configuradas pelo próprio usuário. Embora nossa IA seja treinada para manter padrões éticos e profissionais, a <strong>responsabilidade editorial e jurídica final</strong> pelo conteúdo publicado no perfil público da empresa pertence integralmente ao titular da conta, que dispõe de ferramentas de moderação, edição e aprovação manual no painel.
+                O Proova AI utiliza modelos avançados de inteligência artificial para sugerir e automatizar respostas às avaliações recebidas, com base no tom de voz e nas diretrizes configuradas pelo próprio usuário. Embora nossa IA seja treinada para manter padrões éticos e profissionais, a <strong>responsabilidade editorial e jurídica final</strong> pelo conteúdo publicado no perfil público da empresa pertence integralmente ao titular da conta, que dispõe de ferramentas de moderação, edição e aprovação manual no painel. As respostas sugeridas são rascunhos: o usuário deve revisá-las antes de publicá-las.
               </p>
             </CardContent>
           </Card>
@@ -146,7 +146,7 @@ export default function TermsPage() {
             </CardHeader>
             <CardContent className="p-6 md:p-8 pt-0">
               <p className="text-sm md:text-base leading-relaxed text-muted-foreground font-medium">
-                O acesso aos recursos do Proova AI é regido pelo plano de assinatura contratado (Mensal ou Trimestral) e eventuais taxas de implementação informadas no ato da adesão. O cancelamento pode ser solicitado a qualquer momento antes da renovação do ciclo seguinte pelo painel do usuário ou pelo e-mail <strong>contato@useproovaai.com.br</strong>, sem multa rescisória para planos mensais.
+                O acesso aos recursos do Proova AI é regido pelo plano de assinatura contratado (<strong>Proova AI Premium</strong> ou <strong>Proova AI PRO</strong>), cobrado de forma recorrente conforme o ciclo e o valor exibidos no checkout, além de eventuais taxas informadas no ato da adesão. Os pagamentos são processados pela plataforma <strong>Cakto</strong>; o Proova AI não armazena dados de cartão. O cancelamento pode ser solicitado a qualquer momento pelo e-mail <strong>contato@useproovaai.com.br</strong> ou pela plataforma de pagamento, sem multa rescisória, e o acesso aos recursos do plano pago é encerrado quando o cancelamento é processado. <strong>Garantia de 7 dias:</strong> o contratante pode solicitar o reembolso integral em até 7 dias corridos após a contratação, em Configurações → Garantia de 7 dias no painel ou pelo e-mail acima; confirmado o reembolso, a conta retorna ao plano gratuito.
               </p>
             </CardContent>
           </Card>
@@ -164,6 +164,23 @@ export default function TermsPage() {
             <CardContent className="p-6 md:p-8 pt-0">
               <p className="text-sm md:text-base leading-relaxed text-muted-foreground font-medium">
                 Empregamos infraestrutura em nuvem de alta disponibilidade para garantir o funcionamento contínuo do agente de IA. Contudo, o Proova AI não se responsabiliza por instabilidades temporárias, alterações de regras ou suspensões aplicadas diretamente pelas APIs de terceiros (como o Google) ou por configurações inadequadas inseridas pelo próprio usuário.
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* 7. VINCULAÇÃO DA COMPRA */}
+          <Card className="rounded-[2rem] border-none shadow-sm overflow-hidden bg-background group hover:shadow-md transition-shadow">
+            <CardHeader className="p-6 md:p-8 pb-3">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-primary/10 text-primary shadow-inner">
+                  <CreditCard className="w-5 h-5" />
+                </div>
+                <CardTitle className="text-lg font-black uppercase tracking-tight">7. Ativação do Plano e E-mail da Compra</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent className="p-6 md:p-8 pt-0">
+              <p className="text-sm md:text-base leading-relaxed text-muted-foreground font-medium">
+                O plano é ativado automaticamente na conta cujo e-mail coincide com o e-mail informado na compra. Se a compra for feita com outro e-mail, o contratante pode vincular o plano à sua conta em Configurações, confirmando um código de 6 dígitos enviado ao e-mail da compra. O contratante é responsável por manter acesso a esse e-mail e por não compartilhar o código.
               </p>
             </CardContent>
           </Card>

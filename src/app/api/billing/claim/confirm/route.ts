@@ -41,7 +41,6 @@ export async function POST(req: Request) {
       planUpdatedAt: FieldValue.serverTimestamp(),
       billingEmail: claim.email, // renovações/cancelamentos futuros desse e-mail chegam nesta conta
     };
-    if (plan === 'trial') { update.trialUsed = true; update.trialStartedAt = FieldValue.serverTimestamp(); }
     tx.update(userRef, update);
     open.docs.forEach((d) => tx.update(d.ref, { status: 'claimed', claimedBy: uid, claimedAt: FieldValue.serverTimestamp() }));
     tx.delete(claimRef);
