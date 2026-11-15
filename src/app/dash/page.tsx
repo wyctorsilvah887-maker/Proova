@@ -110,6 +110,7 @@ import { Progress } from '@/components/ui/progress';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebase';
+import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
 import { doc, collection, query, updateDoc, orderBy, limit, where, getDocs, Timestamp, serverTimestamp, arrayUnion } from 'firebase/firestore';
 import Link from 'next/link';
 import { signOut } from 'firebase/auth';
@@ -156,6 +157,26 @@ export default function DashPage() {
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
+
+  // Tour de boas-vindas: só para contas novas (onboardingDone === false) ou ao abrir /dash?tour=1.
+  const [tourForced, setTourForced] = useState(false);
+  const [tourClosed, setTourClosed] = useState(false);
+  useEffect(() => {
+    try { setTourForced(new URLSearchParams(window.location.search).get('tour') === '1'); } catch {}
+  }, []);
+  const showTour = !tourClosed && !activeHash && (tourForced || (userData as any)?.onboardingDone === false);
+  const tourSteps: TourStep[] = useMemo(() => [
+    { title: 'Bem-vindo ao Proova! 👋', text: 'Em menos de 1 minuto você vai conhecer o painel e saber por onde começar. Dá pra pular quando quiser.' },
+    { target: 'menu', title: 'Menu de navegação', text: 'Aqui ficam a localização, o Google Maps, o link de coleta, o Link in Bio, o cartaz de balcão, a identidade da marca e as configurações da conta.' },
+    { target: 'setup', title: 'Complete sua configuração', text: 'Informe a localização e o link do Google Maps para a coleta e o redirecionamento de avaliações funcionarem. Este aviso some quando terminar.' },
+    { target: 'metrics', title: 'Seus números', text: 'Acompanhe os elogios coletados e a sua nota. Use o filtro de período para ver a evolução.' },
+    { target: 'reviews', title: 'Avaliações & IA', text: 'Os depoimentos e avaliações chegam aqui. Gere uma resposta com IA, copie e responda em segundos.' },
+    { title: 'Tudo pronto! 🚀', text: 'Depois de configurar, compartilhe seu link de coleta com os clientes e veja a prova social crescer. Para rever este tour, abra o painel com ?tour=1 no endereço.' },
+  ], []);
+  const finishTour = () => {
+    setTourClosed(true);
+    if (user && db) updateDoc(doc(db, 'users', user.uid), { onboardingDone: true }).catch(() => {});
+  };
 
   const { permission, requestPermission, isSupported: pushSupported } = useNotifications(user?.uid);
 
@@ -270,6 +291,13 @@ export default function DashPage() {
   const completedStepsCount = setupSteps.filter(s => s.completed).length;
   const progressPercentage = (completedStepsCount / setupSteps.length) * 100;
   const isSetupComplete = completedStepsCount === setupSteps.length;
+  // Aviso discreto: só localização e Google Maps (a "coleta ativa" não é pendência de configuração).
+  const pendingSetup = useMemo(() => {
+    if (userDataLoading || !userData) return null;
+    const missing = setupSteps.filter((st) => st.id !== 'collect' && !st.completed);
+    if (missing.length === 0) return null;
+    return { labels: missing.map((m) => m.label).join(' e '), action: missing[0].action };
+  }, [setupSteps, userData, userDataLoading]);
 
   const copyToClipboard = (text: string, description: string) => {
     navigator.clipboard.writeText(text);
@@ -418,6 +446,7 @@ export default function DashPage() {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
+      {showTour && <OnboardingTour steps={tourSteps} onFinish={finishTour} />}
       {currentAnnouncement && !isAnnouncementDismissed && !activeHash && (
         <div className={cn(
           "w-full py-3 flex items-center relative overflow-hidden transition-all duration-500 z-[130] border-b border-white/10",
@@ -438,6 +467,7 @@ export default function DashPage() {
       <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[120] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2">
           <button 
+            data-tour="menu"
             ref={toggleButtonRef}
             type="button"
             onPointerDown={(e) => {
@@ -703,33 +733,18 @@ export default function DashPage() {
           </div>
         ) : (
           <div className="space-y-10 animate-in fade-in duration-700">
-            {(!isSetupComplete && !userData?.isSetupProcessDone) && (
-              <section className="space-y-4">
-                 <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <Rocket className="w-5 h-5 text-primary" />
-                      <h2 className="text-sm font-black uppercase tracking-widest">Missões de Sucesso Proova</h2>
-                    </div>
-                    <Badge variant="secondary" className="bg-primary/10 text-primary border-none font-black text-[10px]">
-                      {completedStepsCount} / {setupSteps.length} COMPLETAS
-                    </Badge>
-                 </div>
-                 <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden bg-background">
-                    <div className="p-4 sm:p-6 md:p-8 space-y-6">
-                      <Progress value={progressPercentage} className="h-2.5 bg-muted" />
-                      <div className="grid gap-3 sm:grid-cols-3">
-                        {setupSteps.map((step, idx) => (
-                          <div key={step.id} onClick={() => step.unlocked && step.action()} className={cn("p-4 rounded-2xl border-2 transition-all cursor-pointer group", step.completed ? "bg-primary/5 border-primary/20" : (step.unlocked ? "border-dashed hover:border-primary/50" : "opacity-40 cursor-not-allowed"))}>
-                            <div className="flex items-center gap-3">
-                              <div className={cn("w-8 h-8 rounded-full flex items-center justify-center shrink-0", step.completed ? "bg-primary text-white" : "bg-muted")}>{step.completed ? <Check className="w-4 h-4" /> : <span className="text-xs font-black">{idx + 1}</span>}</div>
-                              <p className="text-[11px] font-black uppercase tracking-tight truncate">{step.label}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                 </Card>
-              </section>
+            {pendingSetup && (
+              <div data-tour="setup" className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3">
+                <div className="flex items-start gap-3 min-w-0">
+                  <Rocket className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                  <p className="text-xs font-bold leading-relaxed">
+                    Falta configurar: <span className="text-primary">{pendingSetup.labels}</span>. Leva menos de 1 minuto.
+                  </p>
+                </div>
+                <Button size="sm" onClick={pendingSetup.action} className="rounded-xl font-black text-[10px] uppercase tracking-widest shrink-0">
+                  Completar configuração
+                </Button>
+              </div>
             )}
 
             <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -752,7 +767,7 @@ export default function DashPage() {
             </header>
 
             {/* Topo Compacto: Métricas Lado a Lado */}
-            <div className="grid grid-cols-2 gap-3 md:gap-6">
+            <div className="grid grid-cols-2 gap-3 md:gap-6" data-tour="metrics">
               {/* Card 1: Elogios Coletados */}
               <Card className="border-none shadow-xl rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-8 transition-all group relative overflow-hidden bg-background">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16" />
@@ -787,7 +802,7 @@ export default function DashPage() {
             </div>
 
             {/* Seção Principal: Avaliações Recentes & IA (O Coração do Produto) */}
-            <section className="space-y-6 pt-6">
+            <section className="space-y-6 pt-6" data-tour="reviews">
               <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-2">
                 <div className="flex items-center gap-2">
                    <Sparkles className="w-5 h-5 text-primary" />

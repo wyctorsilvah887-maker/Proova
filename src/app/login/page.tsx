@@ -94,6 +94,7 @@ export default function LoginPage() {
           companySlug: `empresa-${Math.random().toString(36).substring(2, 7)}`,
           businessType: 'clinica_estetica',
           isAdmin: false,
+          onboardingDone: false,
           membershipStatus: 'base',
           createdAt: serverTimestamp(),
           googleConnected: true,
