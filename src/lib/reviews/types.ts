@@ -26,5 +26,5 @@ export interface ReviewSource {
   name: StoredReview['source'];
 }
 
-/** Planos que recebem a busca automática. */
+/** Planos que recebem a busca automática ('trial' só por compatibilidade com contas antigas; não é mais vendido). */
 export const AUTO_FETCH_PLANS = ['gold', 'enterprise', 'trial'] as const;

@@ -99,10 +99,6 @@ export async function POST(request: Request) {
           planUpdatedAt: FieldValue.serverTimestamp(),
         };
         if (data.subscription?.id) update.caktoSubscriptionId = data.subscription.id;
-        if (decision.plan === 'trial') {
-          update.trialUsed = true;
-          update.trialStartedAt = FieldValue.serverTimestamp();
-        }
         await userRef.update(update);
         outcome = 'activated';
         reason = decision.plan;

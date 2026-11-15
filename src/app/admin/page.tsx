@@ -437,7 +437,6 @@ export default function AdminPage() {
                         <SelectItem value="base">Base (Grátis)</SelectItem>
                         <SelectItem value="gold">Proova AI Premium</SelectItem>
                         <SelectItem value="enterprise">Proova AI PRO</SelectItem>
-                        <SelectItem value="trial">Trial</SelectItem>
                         <SelectItem value="expired">Expirado</SelectItem>
                      </SelectContent>
                   </Select>
