@@ -173,6 +173,19 @@ export default function DashPage() {
     { target: 'reviews', title: 'Avaliações & IA', text: 'Os depoimentos e avaliações chegam aqui. Gere uma resposta com IA, copie e responda em segundos.' },
     { title: 'Tudo pronto! 🚀', text: 'Depois de configurar, compartilhe seu link de coleta com os clientes e veja a prova social crescer. Para rever este tour, abra o painel com ?tour=1 no endereço.' },
   ], []);
+  // Mini-tour da tela de localização: só na primeira vez (cidade ainda não definida).
+  const [locationTourClosed, setLocationTourClosed] = useState(false);
+  const showLocationTour = !locationTourClosed && (activeHash === 'localizacao' || activeHash === 'google-maps')
+    && !!userData && !(userData as any).city && !(userData as any).locationTourDone;
+  const locationTourSteps: TourStep[] = useMemo(() => [
+    { target: 'loc-fields', title: '1. Cidade e UF', text: 'Informe a cidade e o estado do seu negócio. Isso melhora a busca da sua empresa no Google.' },
+    { target: 'loc-search', title: '2. Encontre sua empresa', text: 'Pesquise o nome da clínica e toque no resultado correto. É esse vínculo que permite coletar e redirecionar avaliações para o seu perfil do Google.' },
+    { target: 'loc-save', title: '3. Salve a localização', text: 'Com tudo conferido, salve. Você pode editar essas informações quando quiser.' },
+  ], []);
+  const finishLocationTour = () => {
+    setLocationTourClosed(true);
+    if (user && db) updateDoc(doc(db, 'users', user.uid), { locationTourDone: true }).catch(() => {});
+  };
   const finishTour = () => {
     setTourClosed(true);
     if (user && db) updateDoc(doc(db, 'users', user.uid), { onboardingDone: true }).catch(() => {});
@@ -360,7 +373,7 @@ export default function DashPage() {
     if (!db || !user) return;
     const reviewLink = `https://search.google.com/local/writereview?placeid=${place.place_id}`;
     try {
-      await updateDoc(doc(db, 'users', user.uid), { googlePlaceId: place.place_id, googleMapsUrl: reviewLink });
+      await updateDoc(doc(db, 'users', user.uid), { googlePlaceId: place.place_id, googleMapsUrl: reviewLink, ...(city.trim() && state.trim().length === 2 ? { city: city.trim(), state: state.trim() } : {}) });
       shadcnToast({ title: "G-Boost Ativado!" });
       clearHash();
     } catch (err) { shadcnToast({ variant: "destructive", title: "Erro ao salvar" }); }
@@ -447,6 +460,7 @@ export default function DashPage() {
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
       {showTour && <OnboardingTour steps={tourSteps} onFinish={finishTour} />}
+      {showLocationTour && <OnboardingTour steps={locationTourSteps} onFinish={finishLocationTour} />}
       {currentAnnouncement && !isAnnouncementDismissed && !activeHash && (
         <div className={cn(
           "w-full py-3 flex items-center relative overflow-hidden transition-all duration-500 z-[130] border-b border-white/10",
@@ -682,7 +696,7 @@ export default function DashPage() {
 
                 {(activeHash === 'google-maps' || activeHash === 'localizacao') && (
                   <div className="max-w-2xl mx-auto space-y-8">
-                     <div className="grid sm:grid-cols-2 gap-4">
+                     <div data-tour="loc-fields" className="grid sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                            <Label className="text-[10px] font-black uppercase opacity-60">Cidade Atual</Label>
                            <Input value={city} onChange={(e) => setCity(e.target.value)} className="h-12 rounded-xl" />
@@ -692,9 +706,9 @@ export default function DashPage() {
                            <Input value={state} maxLength={2} onChange={(e) => setState(e.target.value.toUpperCase())} className="h-12 rounded-xl text-center font-black" />
                         </div>
                      </div>
-                     <Button className="w-full h-14 rounded-xl font-bold" onClick={handleUpdateLocation}>Atualizar Localização</Button>
+                     <Button data-tour="loc-save" className="w-full h-14 rounded-xl font-bold" onClick={handleUpdateLocation}>Atualizar Localização</Button>
                      
-                     <div className="pt-8 border-t space-y-6">
+                     <div data-tour="loc-search" className="pt-8 border-t space-y-6">
                         <Label className="text-[10px] font-black uppercase opacity-60">Vincular Empresa no Google (G-Boost)</Label>
                         <div className="relative">
                            <Input placeholder="Pesquise o nome da clínica..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSearchPlaces()} className="h-14 pl-12 rounded-2xl bg-muted/20 border-transparent" />
