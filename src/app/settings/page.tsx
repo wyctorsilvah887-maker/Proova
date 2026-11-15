@@ -1,5 +1,6 @@
 'use client';
 
+import { AppSideMenu } from '@/components/app-menu';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -74,6 +75,8 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LoadingScreen } from '@/components/loading-screen';
+import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
+import { usePageTour } from '@/hooks/use-page-tour';
 import { 
   Select, 
   SelectContent, 
@@ -103,6 +106,16 @@ export default function SettingsPage() {
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
+  const [settingsTab, setSettingsTab] = useState('perfil');
+  const tour = usePageTour(userDocRef, userData, 'settingsTourDone');
+  const tourSteps: TourStep[] = useMemo(() => [
+    { title: 'Conheça as Configurações ⚙️', text: 'Aqui você ajusta seus dados, a identidade da clínica e a conexão com o Google. Vamos passar pelas 3 áreas em 1 minuto.' },
+    { target: 's-tabs', title: 'Três áreas', text: 'Perfil (seus dados e plano), Negócio (identidade e links) e Google (conexão com o Maps). Troque de área tocando nas abas.', onEnter: () => setSettingsTab('perfil') },
+    { target: 's-plan', title: 'Seu plano', text: 'Veja o plano ativo e faça upgrade quando quiser. Se pagou com outro e-mail ou precisa da garantia de 7 dias, as opções aparecem logo abaixo.', onEnter: () => setSettingsTab('perfil') },
+    { target: 's-business', title: 'Identidade comercial', text: 'Nome da empresa, link da página pública, setor, cidade e UF. Atenção: ao mudar o link (slug), os links e QR Codes já divulgados podem deixar de funcionar.', onEnter: () => setSettingsTab('negocio') },
+    { target: 's-google', title: 'Conexão com o Google', text: 'Vincule o perfil da clínica no Google Maps. É isso que leva os pacientes satisfeitos a avaliar você no Google e alimenta a busca automática de avaliações.', onEnter: () => setSettingsTab('google') },
+    { target: 's-save', title: 'Salve suas alterações', text: 'Depois de editar, use este botão para guardar. Você pode rever este tour quando quiser em "Como funciona".' },
+  ], []);
 
   // Estados dos Campos
   const [name, setName] = useState('');
@@ -398,6 +411,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
+      {tour.open && <OnboardingTour steps={tourSteps} onFinish={tour.finish} />}
       <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[120] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2 flex-1">
           <button 
@@ -428,104 +442,7 @@ export default function SettingsPage() {
         </div>
       </header>
 
-      <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen} modal={false}>
-        <SheetContent 
-          side="left" 
-          className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden z-[110]"
-          onPointerDownOutside={(e) => {
-            if (toggleButtonRef.current?.contains(e.target as Node)) {
-              e.preventDefault();
-            }
-          }}
-        >
-          <SheetHeader className="sr-only">
-            <SheetTitle>Menu de Navegação</SheetTitle>
-            <SheetDescription>Acesse as funcionalidades e configurações da sua conta Proova.</SheetDescription>
-          </SheetHeader>
-          
-          <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col pt-20">
-            <div className="p-6 border-b bg-muted/10 shrink-0">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
-                  <User className="w-6 h-6 text-primary" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-black uppercase tracking-tight truncate">{userData?.companyName}</p>
-                  <span className="text-[8px] font-black uppercase tracking-widest text-primary">{membershipLabel}</span>
-                </div>
-              </div>
-            </div>
-
-            <ScrollArea className="flex-1">
-              <div className="px-4 py-6 space-y-8">
-                <div>
-                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Navegação Principal</p>
-                  <button 
-                    onClick={() => { router.push('/dash'); setIsMenuOpen(false); }}
-                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
-                  >
-                    <LayoutGridIcon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
-                    <span>Dashboard</span>
-                  </button>
-                </div>
-
-                <div>
-                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas Proova</p>
-                  {[
-                    { label: 'Social Cards', href: '/social-cards', icon: ImageIcon },
-                    { label: 'Moderação Inbox', href: '/private', icon: Inbox },
-                    { label: 'Métricas & ROI', href: '/metrics', icon: BarChart3 },
-                  ].map((item: any, idx) => (
-                    <button 
-                      key={idx}
-                      onClick={() => {
-                        router.push(item.href);
-                        setIsMenuOpen(false);
-                      }}
-                      className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
-                    >
-                      <div className="flex items-center gap-4">
-                        <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
-                        <span>{item.label}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-
-                <div>
-                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Suporte & Conta</p>
-                  {[
-                    { label: 'Suporte VIP', href: '/support', icon: Headphones },
-                    { label: 'Configurações', href: '/settings', icon: Settings },
-                  ].map((item: any, idx) => (
-                    <button 
-                      key={idx}
-                      onClick={() => {
-                        router.push(item.href);
-                        setIsMenuOpen(false);
-                      }}
-                      className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
-                    >
-                      <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
-                      <span>{item.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </ScrollArea>
-
-            <div className="p-4 border-t shrink-0">
-               <Button 
-                 variant="ghost" 
-                 className="w-full h-12 rounded-xl text-destructive hover:bg-destructive/10 font-black uppercase tracking-widest text-[9px] gap-2"
-                 onClick={() => signOut(auth)}
-               >
-                  <LogOut className="w-4 h-4" /> Sair da Conta
-               </Button>
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
+      <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} />
 
       <main className="flex-1 p-4 md:p-8 space-y-6 md:space-y-8 max-w-5xl mx-auto w-full pt-24 md:pt-32 pb-20">
         <header className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -537,14 +454,15 @@ export default function SettingsPage() {
               Configurações
             </h1>
             <p className="text-xs md:text-sm text-muted-foreground font-medium">Gerencie sua identidade comercial e integrações estratégicas.</p>
+            <button type="button" onClick={tour.start} className="mt-1 text-[10px] font-black uppercase tracking-widest text-primary hover:underline">Como funciona</button>
           </div>
-          <Button onClick={handleSaveSettings} disabled={isSaving} className="w-full md:w-auto h-14 px-10 rounded-2xl font-black uppercase tracking-widest gap-2 shadow-xl bg-primary hover:bg-primary/90 text-white transition-all active:scale-95">
+          <Button data-tour="s-save" onClick={handleSaveSettings} disabled={isSaving} className="w-full md:w-auto h-14 px-10 rounded-2xl font-black uppercase tracking-widest gap-2 shadow-xl bg-primary hover:bg-primary/90 text-white transition-all active:scale-95">
              {isSaving ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="w-4 h-4" />} Salvar Alterações
           </Button>
         </header>
 
-        <Tabs defaultValue="perfil" className="w-full">
-           <TabsList className="bg-background border rounded-2xl h-auto p-1.5 gap-1 mb-8 shadow-sm flex flex-wrap md:flex-row md:h-16">
+        <Tabs value={settingsTab} onValueChange={setSettingsTab} className="w-full">
+           <TabsList data-tour="s-tabs" className="bg-background border rounded-2xl h-auto p-1.5 gap-1 mb-8 shadow-sm flex flex-wrap md:flex-row md:h-16">
               <TabsTrigger value="perfil" className="flex-1 min-w-[90px] rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest gap-2 py-3 data-[state=active]:bg-primary/5 data-[state=active]:text-primary transition-all">
                  <User className="w-3.5 h-3.5 md:w-4 md:h-4" /> Perfil
               </TabsTrigger>
@@ -583,7 +501,7 @@ export default function SettingsPage() {
                  </CardContent>
               </Card>
 
-              <Card className="rounded-[2.5rem] border-none shadow-xl overflow-hidden bg-primary/5 ring-1 ring-primary/10">
+              <Card data-tour="s-plan" className="rounded-[2.5rem] border-none shadow-xl overflow-hidden bg-primary/5 ring-1 ring-primary/10">
                  <CardContent className="p-6 md:p-8 flex flex-col sm:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-4 text-center sm:text-left flex-col sm:flex-row">
                        <div className="p-4 rounded-3xl bg-primary text-white shadow-lg shadow-primary/20 shrink-0">
@@ -657,7 +575,7 @@ export default function SettingsPage() {
            </TabsContent>
 
            <TabsContent value="negocio" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 outline-none">
-              <Card className="rounded-[2rem] border-none shadow-xl overflow-hidden bg-background">
+              <Card data-tour="s-business" className="rounded-[2rem] border-none shadow-xl overflow-hidden bg-background">
                  <CardHeader className="p-6 md:p-8 pb-4">
                     <CardTitle className="text-base md:text-lg font-black uppercase tracking-tight flex items-center gap-2"><Building2 className="w-5 h-5 text-primary" /> Identidade Comercial</CardTitle>
                     <CardDescription className="text-xs font-medium">Como sua empresa é vista na web e seus links oficiais.</CardDescription>
@@ -749,7 +667,7 @@ export default function SettingsPage() {
            </TabsContent>
 
            <TabsContent value="google" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 outline-none">
-              <Card className="rounded-[2rem] border-none shadow-xl overflow-hidden bg-background">
+              <Card data-tour="s-google" className="rounded-[2rem] border-none shadow-xl overflow-hidden bg-background">
                  <CardHeader className="p-6 md:p-8 pb-4">
                     <CardTitle className="text-base md:text-lg font-black uppercase tracking-tight flex items-center gap-2"><Globe className="w-5 h-5 text-primary" /> Automação G-Boost</CardTitle>
                     <CardDescription className="text-xs font-medium">Conecte seu perfil do Google Maps para impulsionar seu SEO Local.</CardDescription>

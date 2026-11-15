@@ -1,5 +1,6 @@
 'use client';
 
+import { AppSideMenu } from '@/components/app-menu';
 import { useMemo, useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -24,7 +25,8 @@ import {
   LayoutGrid as LayoutGridIcon,
   ImageIcon,
   BarChart3 as BarChart3Icon,
-  Menu
+  Menu,
+  CircleHelp
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -65,6 +67,22 @@ import { toast } from '@/hooks/use-toast';
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LoadingScreen } from '@/components/loading-screen';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
+import { usePageTour } from '@/hooks/use-page-tour';
+
+function HelpTip({ text }: { text: string }) {
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <button type="button" aria-label="O que significa?" className="text-muted-foreground/50 hover:text-primary transition-colors">
+          <CircleHelp className="w-3.5 h-3.5" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent side="top" className="w-64 rounded-2xl p-4 text-xs font-medium leading-relaxed">{text}</PopoverContent>
+    </Popover>
+  );
+}
 
 export default function MetricsPage() {
   const { user, loading: authLoading } = useUser();
@@ -80,6 +98,15 @@ export default function MetricsPage() {
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
+  const tour = usePageTour(userDocRef, userData, 'metricsTourDone');
+  const tourSteps: TourStep[] = useMemo(() => [
+    { title: 'Entenda seus resultados 📊', text: 'Esta página mostra o impacto da sua prova social. Em 1 minuto você vai saber o que cada número quer dizer. Toque no ícone ? de qualquer card para rever a explicação.' },
+    { target: 'm-period', title: 'Período', text: 'Escolha 7 dias, 30 dias ou todo o período. O filtro vale para depoimentos, nota média e o gráfico de coleta.' },
+    { target: 'm-gboost', title: 'Performance G-Boost', text: 'Mostra quantos depoimentos você coletou, a nota média e quantos pacientes foram encaminhados para avaliar você no Google. Os cliques são acumulados desde o início.' },
+    { target: 'm-bio', title: 'Performance Link in Bio', text: 'Acompanha sua página pública: visitas, cliques no WhatsApp e a taxa de visitantes que viraram contato.' },
+    { target: 'm-charts', title: 'Gráficos', text: 'À esquerda, quantos depoimentos chegaram por dia. À direita, a distribuição das notas: quanto mais 5 estrelas, melhor a percepção da sua clínica.' },
+    { target: 'm-report', title: 'Relatório por e-mail', text: 'Receba o resumo completo de performance na sua caixa de entrada (planos Premium e PRO).' },
+  ], []);
 
   const isPremiumUser = useMemo(() => {
     const status = userData?.membershipStatus;
@@ -129,6 +156,7 @@ export default function MetricsPage() {
   const stats = useMemo(() => {
     if (!rawTestimonials) return { 
       total: 0, 
+      allTime: 0,
       avgRating: "0.0", 
       chartData: [], 
       pieData: []
@@ -185,6 +213,7 @@ export default function MetricsPage() {
 
     return {
       total: filtered.length,
+      allTime: approved.length,
       avgRating: avg,
       chartData,
       pieData
@@ -220,6 +249,7 @@ export default function MetricsPage() {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
+      {tour.open && <OnboardingTour steps={tourSteps} onFinish={tour.finish} />}
       <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[120] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2 flex-1">
           <button 
@@ -250,105 +280,7 @@ export default function MetricsPage() {
         </div>
       </header>
 
-      <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen} modal={false}>
-        <SheetContent 
-          side="left" 
-          className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden z-[110]"
-          onPointerDownOutside={(e) => {
-            if (toggleButtonRef.current?.contains(e.target as Node)) {
-              e.preventDefault();
-            }
-          }}
-        >
-          <SheetHeader className="sr-only">
-            <SheetTitle>Menu de Navegação</SheetTitle>
-            <SheetDescription>Acesse as funcionalidades e configurações da sua conta Proova.</SheetDescription>
-          </SheetHeader>
-          
-          <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col pt-20">
-            <div className="p-6 border-b bg-muted/10 shrink-0">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
-                  <User className="w-6 h-6 text-primary" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-black uppercase tracking-tight truncate">{userData?.companyName}</p>
-                  <span className="text-[8px] font-black uppercase tracking-widest text-primary">{membershipLabel}</span>
-                </div>
-              </div>
-            </div>
-
-            <ScrollArea className="flex-1">
-              <div className="px-4 py-6 space-y-8">
-                <div>
-                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Navegação Principal</p>
-                  <button 
-                    onClick={() => { router.push('/dash'); setIsMenuOpen(false); }}
-                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
-                  >
-                    <LayoutGridIcon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
-                    <span>Dashboard</span>
-                  </button>
-                </div>
-
-                <div>
-                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas Proova</p>
-                  {[
-                    { label: 'Social Cards', href: '/social-cards', icon: ImageIcon },
-                    { label: 'Moderação Inbox', href: '/private', icon: Inbox, badge: pendingTestimonialsCount },
-                    { label: 'Métricas & ROI', href: '/metrics', icon: BarChart3Icon },
-                  ].map((item: any, idx) => (
-                    <button 
-                      key={idx}
-                      onClick={() => {
-                        router.push(item.href);
-                        setIsMenuOpen(false);
-                      }}
-                      className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
-                    >
-                      <div className="flex items-center gap-4">
-                        <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
-                        <span>{item.label}</span>
-                      </div>
-                      {item.badge > 0 && <Badge className="bg-destructive text-white h-4 px-1.5 text-[8px]">{item.badge}</Badge>}
-                    </button>
-                  ))}
-                </div>
-
-                <div>
-                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Suporte & Conta</p>
-                  {[
-                    { label: 'Suporte VIP', href: '/support', icon: Headphones },
-                    { label: 'Configurações', href: '/settings', icon: Settings },
-                  ].map((item: any, idx) => (
-                    <button 
-                      key={idx}
-                      onClick={() => {
-                        router.push(item.href);
-                        setIsMenuOpen(false);
-                      }}
-                      className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
-                    >
-                      <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
-                      <span>{item.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </ScrollArea>
-
-            <div className="p-4 border-t shrink-0">
-               <Button 
-                 variant="ghost" 
-                 className="w-full h-12 rounded-xl text-destructive hover:bg-destructive/10 font-black uppercase tracking-widest text-[9px] gap-2"
-                 onClick={() => signOut(auth)}
-               >
-                  <LogOut className="w-4 h-4" /> Sair da Conta
-               </Button>
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
+      <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} pendingCount={pendingTestimonialsCount} />
 
       <main className="flex-1 p-4 md:p-8 space-y-12 max-w-7xl mx-auto w-full pt-24 md:pt-32 pb-12">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -358,14 +290,15 @@ export default function MetricsPage() {
                 <div className="p-2 rounded-xl bg-primary/10 text-primary">
                   <BarChart3 className="w-6 h-6" />
                 </div>
-                Proova Analytics
+                Proova AI Analytics
               </h1>
               <p className="text-xs md:text-sm text-muted-foreground font-medium">Análise de impacto e conversão da sua autoridade digital.</p>
+              <button type="button" onClick={tour.start} className="mt-1 text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-1.5"><CircleHelp className="w-3.5 h-3.5" /> Como ler esta página</button>
             </div>
           </div>
 
           <div className="flex flex-col items-end gap-3 w-full sm:w-auto">
-            <div className="w-full sm:w-48">
+            <div data-tour="m-period" className="w-full sm:w-48">
               <Select value={period} onValueChange={(val: any) => setPeriod(val)}>
                 <SelectTrigger className="h-11 rounded-xl bg-background border-primary/20 text-[11px] font-bold uppercase tracking-wider focus:ring-0 focus:ring-offset-0 focus-visible:ring-0">
                   <SelectValue placeholder="Período" />
@@ -378,6 +311,7 @@ export default function MetricsPage() {
               </Select>
             </div>
             <button 
+              data-tour="m-report"
               onClick={handleSendWeeklyReport} 
               disabled={isSendingReport} 
               className={cn(
@@ -392,7 +326,7 @@ export default function MetricsPage() {
           </div>
         </header>
 
-        <section className="space-y-6">
+        <section data-tour="m-gboost" className="space-y-6">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-primary" />
             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Performance G-Boost</h2>
@@ -400,7 +334,7 @@ export default function MetricsPage() {
           <div className="grid gap-4 md:gap-6 grid-cols-2 lg:grid-cols-4">
             <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Volume Total</p>
+                <div className="flex items-center gap-1.5"><p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Volume Total</p><HelpTip text="Quantos depoimentos de pacientes foram aprovados no período escolhido." /></div>
                 <BarChart3 className="w-4 h-4 text-primary" />
               </CardHeader>
               <CardContent className="px-4 md:px-6 pb-4">
@@ -411,7 +345,7 @@ export default function MetricsPage() {
 
             <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Média Geral</p>
+                <div className="flex items-center gap-1.5"><p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Média Geral</p><HelpTip text="Nota média (de 1 a 5 estrelas) dos depoimentos aprovados no período escolhido." /></div>
                 <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
               </CardHeader>
               <CardContent className="px-4 md:px-6 pb-4">
@@ -422,7 +356,7 @@ export default function MetricsPage() {
 
             <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Cliques no Maps</p>
+                <div className="flex items-center gap-1.5"><p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Cliques no Maps</p><HelpTip text="Quantos pacientes foram encaminhados ao seu perfil do Google para deixar uma avaliação pública. Contagem acumulada desde o início." /></div>
                 <MousePointer2 className="w-4 h-4 text-primary" />
               </CardHeader>
               <CardContent className="px-4 md:px-6 pb-4">
@@ -433,20 +367,20 @@ export default function MetricsPage() {
 
             <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem] bg-primary/5 border border-primary/10">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-                <p className="text-[10px] font-black uppercase tracking-widest text-primary">Conversão G-Boost Estimada</p>
+                <div className="flex items-center gap-1.5"><p className="text-[10px] font-black uppercase tracking-widest text-primary">Conversão G-Boost Estimada</p><HelpTip text="Proporção entre os pacientes encaminhados ao Google e os depoimentos coletados (acumulado). Quanto maior, mais pacientes estão indo avaliar você no Google." /></div>
                 <TrendingUp className="w-4 h-4 text-primary" />
               </CardHeader>
               <CardContent className="px-4 md:px-6 pb-4">
                 <div className="text-2xl font-black text-primary">
-                  {userData?.googleRedirectCount && stats.total && stats.total > 0 ? ((userData.googleRedirectCount / stats.total) * 100).toFixed(0) : 0}%
+                  {stats.allTime > 0 ? Math.min(100, Math.round(((userData?.googleRedirectCount || 0) / stats.allTime) * 100)) : 0}%
                 </div>
-                <p className="text-[9px] text-primary/60 uppercase font-bold">Elogios vs Cliques</p>
+                <p className="text-[9px] text-primary/60 uppercase font-bold">Cliques no Google ÷ depoimentos (acumulado)</p>
               </CardContent>
             </Card>
           </div>
         </section>
 
-        <section className="space-y-6">
+        <section data-tour="m-bio" className="space-y-6">
           <div className="flex items-center gap-2">
             <Globe className="w-4 h-4 text-primary" />
             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Performance Link in Bio</h2>
@@ -454,7 +388,7 @@ export default function MetricsPage() {
           <div className="grid gap-4 md:gap-6 grid-cols-2 lg:grid-cols-4">
             <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Visitas Link in Bio</p>
+                <div className="flex items-center gap-1.5"><p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Visitas Link in Bio</p><HelpTip text="Quantas vezes a sua página pública (Link in Bio) foi aberta. Contagem acumulada." /></div>
                 <Globe className="w-4 h-4 text-primary" />
               </CardHeader>
               <CardContent className="px-4 md:px-6 pb-4">
@@ -465,7 +399,7 @@ export default function MetricsPage() {
 
             <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Cliques WhatsApp</p>
+                <div className="flex items-center gap-1.5"><p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Cliques WhatsApp</p><HelpTip text="Quantas pessoas tocaram no botão de WhatsApp da sua página pública. Contagem acumulada." /></div>
                 <MessageCircle className="w-4 h-4 text-green-500" />
               </CardHeader>
               <CardContent className="px-4 md:px-6 pb-4">
@@ -476,7 +410,7 @@ export default function MetricsPage() {
 
             <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem] bg-green-500/5 border border-green-500/10 col-span-2">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-                <p className="text-[10px] font-black uppercase tracking-widest text-green-600">Conversão Link in Bio</p>
+                <div className="flex items-center gap-1.5"><p className="text-[10px] font-black uppercase tracking-widest text-green-600">Conversão Link in Bio</p><HelpTip text="Entre os visitantes da sua página pública, a porcentagem que clicou para falar com você no WhatsApp." /></div>
                 <TrendingUp className="w-4 h-4 text-green-600" />
               </CardHeader>
               <CardContent className="px-4 md:px-6 pb-4">
@@ -490,10 +424,10 @@ export default function MetricsPage() {
           </div>
         </section>
 
-        <section className="grid gap-6 md:grid-cols-2">
+        <section data-tour="m-charts" className="grid gap-6 md:grid-cols-2">
           <Card className="border-none shadow-xl rounded-[2rem] overflow-hidden">
              <CardHeader className="p-6 pb-0">
-                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Volume de Coleta (30 dias)</CardTitle>
+                <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Volume de Coleta ({period === 'all' ? 'últimos 30 dias' : `${period} dias`})</CardTitle>
              </CardHeader>
              <CardContent className="p-6 h-[300px]">
                 <ChartContainer config={chartConfig} className="h-full w-full">
@@ -512,7 +446,10 @@ export default function MetricsPage() {
              <CardHeader className="p-6 pb-0">
                 <CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Qualidade do Feedback</CardTitle>
              </CardHeader>
-             <CardContent className="p-6 h-[300px] flex items-center justify-center">
+             <CardContent className="p-6 h-[300px] flex items-center justify-center relative">
+                {stats.pieData.length === 0 ? (
+                  <p className="text-xs font-bold text-muted-foreground text-center">Ainda não há depoimentos neste período.</p>
+                ) : (
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -531,10 +468,13 @@ export default function MetricsPage() {
                     <ChartTooltip />
                   </PieChart>
                 </ResponsiveContainer>
-                <div className="absolute flex flex-col items-center">
+                )}
+                {stats.pieData.length > 0 && (
+                <div className="absolute flex flex-col items-center pointer-events-none">
                    <p className="text-2xl font-black">{stats.avgRating}</p>
                    <p className="text-[8px] font-bold uppercase opacity-40">Score</p>
                 </div>
+                )}
              </CardContent>
           </Card>
         </section>
