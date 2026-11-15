@@ -166,7 +166,7 @@ export default function DashPage() {
   }, []);
   const showTour = !tourClosed && !activeHash && (tourForced || (userData as any)?.onboardingDone === false);
   const tourSteps: TourStep[] = useMemo(() => [
-    { title: 'Bem-vindo ao Proova! 👋', text: 'Em menos de 1 minuto você vai conhecer o painel e saber por onde começar. Dá pra pular quando quiser.' },
+    { title: 'Bem-vindo ao Proova AI! 👋', text: 'Em menos de 1 minuto você vai conhecer o painel e saber por onde começar. Dá pra pular quando quiser.' },
     { target: 'menu', title: 'Menu de navegação', text: 'Aqui ficam a localização, o Google Maps, o link de coleta, o Link in Bio, o cartaz de balcão, a identidade da marca e as configurações da conta.' },
     { target: 'setup', title: 'Complete sua configuração', text: 'Informe a localização e o link do Google Maps para a coleta e o redirecionamento de avaliações funcionarem. Este aviso some quando terminar.' },
     { target: 'metrics', title: 'Seus números', text: 'Acompanhe os elogios coletados e a sua nota. Use o filtro de período para ver a evolução.' },
