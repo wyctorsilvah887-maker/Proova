@@ -200,7 +200,7 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
               isVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
             )}>
               Respostas prontas para suas avaliações no <br className="hidden sm:block" />
-              <span className="text-primary">
+              <span className="inline-block relative bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">
                 Google Meu Negócio
               </span> com IA
             </h1>
@@ -240,7 +240,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         )}>
           <h2 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight leading-tight">
-            Gestão Unificada de <span className="text-primary">Autoridade Digital.</span>
+            Gestão Unificada de <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-1">Autoridade Digital.</span>
           </h2>
           <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">O Proova lê as avaliações do Google da sua empresa, prepara a resposta com IA e reúne todos os seus depoimentos em um só painel, para você escalar seu ranking orgânico com dados reais.</p>
         </header>
@@ -295,7 +295,7 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         )}>
           <h2 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight">
-            Como o Proova <span className="text-primary">Automatiza sua Reputação.</span>
+            Como o Proova <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">Automatiza sua Reputação.</span>
           </h2>
         </header>
         
@@ -344,7 +344,7 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
       <div className="container px-4 mx-auto max-w-5xl">
         <header className={cn("text-center space-y-3 mb-12 transition-all duration-700", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6")}>
           <h2 className="text-3xl md:text-4xl font-extrabold font-headline leading-tight tracking-tight">
-            Sua <span className="text-primary">Página de Autoridade</span> para o Link da Bio.
+            Sua <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">Página de Autoridade</span> para o Link da Bio.
           </h2>
           <p className="max-w-2xl mx-auto text-sm md:text-base text-muted-foreground font-medium">
             Centralize seus melhores depoimentos e facilite o contato de novos pacientes através de um link único e profissional.
@@ -407,7 +407,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
     <section id="planos" ref={ref} className="w-full py-20 md:py-24 bg-background border-b">
       <div className="container px-4 mx-auto max-w-4xl">
         <header className={cn("text-center space-y-3 mb-12 transition-all duration-700", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6")}>
-          <h2 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight">Planos e <span className="text-primary">preços</span></h2>
+          <h2 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight">Planos e <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">preços</span></h2>
           <p className="text-sm md:text-base text-muted-foreground font-medium">Garantia de 7 dias com reembolso integral. Cancele quando quiser.</p>
         </header>
         <div className="grid gap-6 md:grid-cols-2 items-stretch">
@@ -458,7 +458,7 @@ const FaqSection = () => (
   <section id="perguntas" className="w-full py-16 md:py-20 bg-muted/20">
     <div className="container max-w-2xl mx-auto px-4 space-y-8">
       <header className="text-center">
-        <h2 className="text-2xl md:text-3xl font-extrabold font-headline tracking-tight">Perguntas <span className="text-primary">frequentes</span></h2>
+        <h2 className="text-2xl md:text-3xl font-extrabold font-headline tracking-tight">Perguntas <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-1">frequentes</span></h2>
       </header>
       <div className="space-y-2">
         {FAQ_ITEMS.map((item) => (
