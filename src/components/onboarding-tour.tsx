@@ -11,6 +11,8 @@ export type TourStep = {
   target?: string;
   title: string;
   text: string;
+  /** Chamado ao entrar no passo (ex.: trocar de aba para o alvo aparecer). */
+  onEnter?: () => void;
 };
 
 type Rect = { top: number; left: number; width: number; height: number };
@@ -36,7 +38,7 @@ export function OnboardingTour({
   useEffect(() => {
     setMounted(true);
     setAvailable(
-      steps.filter((s) => !s.target || document.querySelector(`[data-tour="${s.target}"]`))
+      steps.filter((s) => !s.target || s.onEnter || document.querySelector(`[data-tour="${s.target}"]`))
     );
   }, [steps]);
 
@@ -52,16 +54,20 @@ export function OnboardingTour({
     setRect({ top: r.top, left: r.left, width: r.width, height: r.height });
   }, [step]);
 
-  // Rola até o alvo e mede.
+  // Rola até o alvo e mede (com novas tentativas quando o passo troca de aba/conteúdo).
   useLayoutEffect(() => {
     if (!mounted || !step) return;
-    if (step.target) {
+    step.onEnter?.();
+    const scrollToTarget = () => {
+      if (!step.target) return;
       const el = document.querySelector(`[data-tour="${step.target}"]`) as HTMLElement | null;
       el?.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    }
+    };
+    scrollToTarget();
     measure();
-    const t = window.setTimeout(measure, 350); // após a rolagem suave
-    return () => window.clearTimeout(t);
+    const t1 = window.setTimeout(() => { scrollToTarget(); measure(); }, step.onEnter ? 120 : 0);
+    const t2 = window.setTimeout(measure, 450); // após a rolagem suave
+    return () => { window.clearTimeout(t1); window.clearTimeout(t2); };
   }, [mounted, step, measure]);
 
   useEffect(() => {

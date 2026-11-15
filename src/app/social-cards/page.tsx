@@ -1,5 +1,6 @@
 'use client';
 
+import { AppSideMenu } from '@/components/app-menu';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -253,105 +254,7 @@ export default function SocialCardsPage() {
         </div>
       </header>
 
-      <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen} modal={false}>
-        <SheetContent 
-          side="left" 
-          className="w-full max-w-[300px] border-none shadow-2xl bg-background p-0 flex flex-col h-[100dvh] overflow-hidden z-[110]"
-          onPointerDownOutside={(e) => {
-            if (toggleButtonRef.current?.contains(e.target as Node)) {
-              e.preventDefault();
-            }
-          }}
-        >
-          <SheetHeader className="sr-only">
-            <SheetTitle>Menu de Navegação</SheetTitle>
-            <SheetDescription>Acesse as funcionalidades e configurações da sua conta Proova.</SheetDescription>
-          </SheetHeader>
-          
-          <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col pt-20">
-            <div className="p-6 border-b bg-muted/10 shrink-0">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
-                  <User className="w-6 h-6 text-primary" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-black uppercase tracking-tight truncate">{userData?.companyName}</p>
-                  <span className="text-[8px] font-black uppercase tracking-widest text-primary">{membershipLabel}</span>
-                </div>
-              </div>
-            </div>
-
-            <ScrollArea className="flex-1">
-              <div className="px-4 py-6 space-y-8">
-                <div>
-                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Navegação Principal</p>
-                  <button 
-                    onClick={() => { router.push('/dash'); setIsMenuOpen(false); }}
-                    className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
-                  >
-                    <LayoutGridIcon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
-                    <span>Dashboard</span>
-                  </button>
-                </div>
-
-                <div>
-                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Ferramentas Proova</p>
-                  {[
-                    { label: 'Social Cards', href: '/social-cards', icon: ImageIcon },
-                    { label: 'Moderação Inbox', href: '/private', icon: Inbox, badge: allApprovedTestimonials.filter(t => t.status === 'pending').length },
-                    { label: 'Métricas & ROI', href: '/metrics', icon: BarChart3 },
-                  ].map((item: any, idx) => (
-                    <button 
-                      key={idx}
-                      onClick={() => {
-                        router.push(item.href);
-                        setIsMenuOpen(false);
-                      }}
-                      className="w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
-                    >
-                      <div className="flex items-center gap-4">
-                        <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
-                        <span>{item.label}</span>
-                      </div>
-                      {item.badge > 0 && <Badge className="bg-destructive text-white h-4 px-1.5 text-[8px]">{item.badge}</Badge>}
-                    </button>
-                  ))}
-                </div>
-
-                <div>
-                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">Suporte & Conta</p>
-                  {[
-                    { label: 'Suporte VIP', href: '/support', icon: Headphones },
-                    { label: 'Configurações', href: '/settings', icon: Settings },
-                  ].map((item: any, idx) => (
-                    <button 
-                      key={idx}
-                      onClick={() => {
-                        router.push(item.href);
-                        setIsMenuOpen(false);
-                      }}
-                      className="w-full flex items-center gap-4 p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0"
-                    >
-                      <item.icon className="w-4 h-4 text-primary opacity-60 group-hover:opacity-100" />
-                      <span>{item.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </ScrollArea>
-
-            <div className="p-4 border-t shrink-0">
-               <Button 
-                 variant="ghost" 
-                 className="w-full h-12 rounded-xl text-destructive hover:bg-destructive/10 font-black uppercase tracking-widest text-[9px] gap-2"
-                 onClick={() => signOut(auth)}
-               >
-                  <LogOut className="w-4 h-4" /> Sair da Conta
-               </Button>
-            </div>
-          </div>
-        </SheetContent>
-      </Sheet>
+      <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} pendingCount={allApprovedTestimonials.filter(t => t.status === 'pending').length} />
 
       <main className="flex-1 overflow-y-auto p-4 md:p-8 pt-24 md:pt-32 pb-20">
         <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-700">
