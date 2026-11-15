@@ -1,10 +1,37 @@
 import { NextResponse } from 'next/server';
-import { FieldValue } from 'firebase-admin/firestore';
+import { FieldValue, type Firestore } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase-admin';
 import { safeEqual } from '@/lib/safe-equal';
-import { customerOf, decide } from '@/lib/billing/cakto';
+import { customerOf, decide, resolvePlan } from '@/lib/billing/cakto';
 
 export const maxDuration = 30;
+
+/**
+ * Compra sem conta correspondente: guarda como "pendente" para o cliente resgatar depois
+ * (por código enviado ao e-mail da compra). Reembolso/cancelamento fecha a compra pendente.
+ */
+async function recordPendingPlan(db: Firestore, event: string, data: any, email: string): Promise<string | null> {
+  const plan = resolvePlan(data);
+  if (!plan) return null;
+  const decision = decide(event, data, undefined);
+  const col = db.collection('pending_plans');
+
+  if (decision.action === 'activate') {
+    const id = String(data.id || data.refId || '').replace(/\//g, '_');
+    const ref = id ? col.doc(id) : col.doc();
+    await ref.create({
+      email, plan, productName: data.product?.name || null, orderId: data.id || null,
+      status: 'open', createdAt: FieldValue.serverTimestamp(),
+    }).catch((e: any) => { if (e?.code !== 6) throw e; }); // 6 = já existe (reenvio da Cakto)
+    return 'pending_claim';
+  }
+  if (['refund', 'chargeback', 'subscription_canceled'].includes(event)) {
+    const open = await col.where('email', '==', email).where('plan', '==', plan).where('status', '==', 'open').get();
+    await Promise.all(open.docs.map((d) => d.ref.update({ status: 'canceled', canceledAt: FieldValue.serverTimestamp() })));
+  }
+  return null;
+}
+
 
 /**
  * Webhook da Cakto. É AQUI que o plano é ativado ou removido, no servidor.
@@ -47,9 +74,20 @@ export async function POST(request: Request) {
       }
     }
 
+    if (!userRef && email && !reason) {
+      // E-mail de cobrança vinculado por um resgate anterior.
+      const q = await db.collection('users').where('billingEmail', '==', email.toLowerCase()).limit(2).get();
+      if (q.size === 1) userRef = q.docs[0].ref;
+      else if (q.size > 1) reason = 'email_duplicado';
+    }
+
     if (!userRef) {
       outcome = 'unmatched';
       reason = reason || 'usuario_nao_encontrado';
+      if (reason === 'usuario_nao_encontrado' && email) {
+        const pendingOutcome = await recordPendingPlan(db, event, data, email.toLowerCase());
+        if (pendingOutcome) outcome = pendingOutcome;
+      }
     } else {
       matchedUid = userRef.id;
       const current = (await userRef.get()).data()?.membershipStatus as string | undefined;

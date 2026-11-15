@@ -141,6 +141,60 @@ export default function SettingsPage() {
     return userData?.businessType === 'agencia';
   }, [userData]);
 
+  // Resgate de plano (comprou com outro e-mail)
+  const [claimEmail, setClaimEmail] = useState('');
+  const [claimCode, setClaimCode] = useState('');
+  const [claimStep, setClaimStep] = useState<'email' | 'code'>('email');
+  const [isClaiming, setIsClaiming] = useState(false);
+
+  const claimFetch = async (path: string, body: object) => {
+    const idToken = await user!.getIdToken();
+    const res = await fetch(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+      body: JSON.stringify(body),
+    });
+    return { res, data: await res.json().catch(() => ({})) };
+  };
+
+  const handleClaimSend = async () => {
+    if (!user || isClaiming) return;
+    setIsClaiming(true);
+    try {
+      const { res, data } = await claimFetch('/api/billing/claim/request', { email: claimEmail });
+      if (res.ok) {
+        setClaimStep('code');
+        toast({ title: "Verifique seu e-mail", description: "Se existir uma compra com esse e-mail, enviamos um código de 6 dígitos (vale 10 minutos)." });
+      } else if (res.status === 429) {
+        toast({ variant: "destructive", title: "Aguarde um pouco", description: `Tente de novo em ${Math.ceil((data.retryInSeconds || 60) / 60)} min.` });
+      } else {
+        toast({ variant: "destructive", title: "E-mail inválido", description: "Confira o e-mail usado na compra." });
+      }
+    } catch {
+      toast({ variant: "destructive", title: "Erro", description: "Não foi possível enviar agora." });
+    } finally { setIsClaiming(false); }
+  };
+
+  const handleClaimConfirm = async () => {
+    if (!user || isClaiming) return;
+    setIsClaiming(true);
+    try {
+      const { res, data } = await claimFetch('/api/billing/claim/confirm', { code: claimCode });
+      if (res.ok) {
+        toast({ title: "Plano ativado!", description: "Sua conta foi atualizada." });
+        setClaimStep('email'); setClaimCode(''); setClaimEmail('');
+      } else {
+        const msg: Record<string, string> = {
+          codigo_invalido: "Código incorreto.", codigo_expirado: "Código expirado. Peça um novo.",
+          tentativas: "Muitas tentativas. Peça um novo código.", sem_compra: "Nenhuma compra encontrada para esse e-mail.",
+        };
+        toast({ variant: "destructive", title: "Não foi possível ativar", description: msg[data.error] || "Tente novamente." });
+      }
+    } catch {
+      toast({ variant: "destructive", title: "Erro", description: "Tente novamente." });
+    } finally { setIsClaiming(false); }
+  };
+
   // Garantia de 7 dias / pedido de reembolso
   const [refundOpen, setRefundOpen] = useState(false);
   const [refundReason, setRefundReason] = useState('');
@@ -543,6 +597,35 @@ export default function SettingsPage() {
                     <Button variant="outline" onClick={() => router.push('/pricing')} className="w-full sm:w-auto h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[9px] border-primary/20 text-primary hover:bg-primary hover:text-white transition-all shadow-sm">Ver Planos e Upgrade</Button>
                  </CardContent>
               </Card>
+
+              {userData?.membershipStatus !== 'gold' && userData?.membershipStatus !== 'enterprise' && (
+                <Card className="rounded-[2rem] border-none shadow-xl overflow-hidden bg-background">
+                   <CardHeader className="p-6 md:p-8 pb-4">
+                      <CardTitle className="text-base md:text-lg font-black uppercase tracking-tight flex items-center gap-2"><Mail className="w-5 h-5 text-primary" /> Pagou com outro e-mail?</CardTitle>
+                      <CardDescription className="text-xs font-medium">Informe o e-mail usado na compra. Enviaremos um código para ele e, ao confirmar, o plano é ativado nesta conta.</CardDescription>
+                   </CardHeader>
+                   <CardContent className="p-6 md:p-8 pt-0 space-y-3">
+                      {claimStep === 'email' ? (
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          <Input type="email" value={claimEmail} onChange={(e) => setClaimEmail(e.target.value)} placeholder="e-mail da compra" className="h-12 rounded-xl bg-muted/20 border-transparent font-bold text-sm" />
+                          <Button onClick={handleClaimSend} disabled={isClaiming || !claimEmail.includes('@')} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[9px] gap-2">
+                            {isClaiming && <Loader2 className="animate-spin w-4 h-4" />} Enviar código
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className="flex flex-col sm:flex-row gap-3">
+                            <Input inputMode="numeric" maxLength={6} value={claimCode} onChange={(e) => setClaimCode(e.target.value.replace(/\D/g, ''))} placeholder="código de 6 dígitos" className="h-12 rounded-xl bg-muted/20 border-transparent font-black text-lg tracking-widest text-center" />
+                            <Button onClick={handleClaimConfirm} disabled={isClaiming || claimCode.length !== 6} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[9px] gap-2">
+                              {isClaiming && <Loader2 className="animate-spin w-4 h-4" />} Ativar plano
+                            </Button>
+                          </div>
+                          <button onClick={() => { setClaimStep('email'); setClaimCode(''); }} className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">Usar outro e-mail / reenviar</button>
+                        </div>
+                      )}
+                   </CardContent>
+                </Card>
+              )}
 
               {(userData?.membershipStatus === 'gold' || userData?.membershipStatus === 'enterprise') && (
                 <Card className="rounded-[2rem] border-none shadow-xl overflow-hidden bg-background">
