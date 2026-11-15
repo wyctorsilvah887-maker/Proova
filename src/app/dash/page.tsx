@@ -110,6 +110,7 @@ import { Progress } from '@/components/ui/progress';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebase';
+import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
 import { doc, collection, query, updateDoc, orderBy, limit, where, getDocs, Timestamp, serverTimestamp, arrayUnion } from 'firebase/firestore';
 import Link from 'next/link';
 import { signOut } from 'firebase/auth';
@@ -156,6 +157,26 @@ export default function DashPage() {
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
+
+  // Tour de boas-vindas: só para contas novas (onboardingDone === false) ou ao abrir /dash?tour=1.
+  const [tourForced, setTourForced] = useState(false);
+  const [tourClosed, setTourClosed] = useState(false);
+  useEffect(() => {
+    try { setTourForced(new URLSearchParams(window.location.search).get('tour') === '1'); } catch {}
+  }, []);
+  const showTour = !tourClosed && !activeHash && (tourForced || (userData as any)?.onboardingDone === false);
+  const tourSteps: TourStep[] = useMemo(() => [
+    { title: 'Bem-vindo ao Proova! 👋', text: 'Em menos de 1 minuto você vai conhecer o painel e saber por onde começar. Dá pra pular quando quiser.' },
+    { target: 'menu', title: 'Menu de navegação', text: 'Aqui ficam o seu link de coleta, o Link in Bio, o cartaz de balcão, a identidade da marca e as configurações.' },
+    { target: 'missions', title: 'Missões de sucesso', text: 'Comece por aqui: pequenas tarefas que deixam sua conta pronta para coletar e exibir depoimentos.' },
+    { target: 'metrics', title: 'Seus números', text: 'Acompanhe os elogios coletados e a sua nota. Use o filtro de período para ver a evolução.' },
+    { target: 'reviews', title: 'Avaliações & IA', text: 'Os depoimentos e avaliações chegam aqui. Gere uma resposta com IA, copie e responda em segundos.' },
+    { title: 'Tudo pronto! 🚀', text: 'Compartilhe seu link de coleta com os clientes e veja a prova social crescer. Você pode rever este tour com ?tour=1 no endereço do painel.' },
+  ], []);
+  const finishTour = () => {
+    setTourClosed(true);
+    if (user && db) updateDoc(doc(db, 'users', user.uid), { onboardingDone: true }).catch(() => {});
+  };
 
   const { permission, requestPermission, isSupported: pushSupported } = useNotifications(user?.uid);
 
@@ -418,6 +439,7 @@ export default function DashPage() {
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">
+      {showTour && <OnboardingTour steps={tourSteps} onFinish={finishTour} />}
       {currentAnnouncement && !isAnnouncementDismissed && !activeHash && (
         <div className={cn(
           "w-full py-3 flex items-center relative overflow-hidden transition-all duration-500 z-[130] border-b border-white/10",
@@ -438,6 +460,7 @@ export default function DashPage() {
       <header className="bg-background border-b h-16 md:h-20 flex items-center px-2 md:px-4 fixed top-0 w-full z-[120] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center gap-2">
           <button 
+            data-tour="menu"
             ref={toggleButtonRef}
             type="button"
             onPointerDown={(e) => {
@@ -704,7 +727,7 @@ export default function DashPage() {
         ) : (
           <div className="space-y-10 animate-in fade-in duration-700">
             {(!isSetupComplete && !userData?.isSetupProcessDone) && (
-              <section className="space-y-4">
+              <section className="space-y-4" data-tour="missions">
                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
                       <Rocket className="w-5 h-5 text-primary" />
@@ -752,7 +775,7 @@ export default function DashPage() {
             </header>
 
             {/* Topo Compacto: Métricas Lado a Lado */}
-            <div className="grid grid-cols-2 gap-3 md:gap-6">
+            <div className="grid grid-cols-2 gap-3 md:gap-6" data-tour="metrics">
               {/* Card 1: Elogios Coletados */}
               <Card className="border-none shadow-xl rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-8 transition-all group relative overflow-hidden bg-background">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16" />
@@ -787,7 +810,7 @@ export default function DashPage() {
             </div>
 
             {/* Seção Principal: Avaliações Recentes & IA (O Coração do Produto) */}
-            <section className="space-y-6 pt-6">
+            <section className="space-y-6 pt-6" data-tour="reviews">
               <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-2">
                 <div className="flex items-center gap-2">
                    <Sparkles className="w-5 h-5 text-primary" />

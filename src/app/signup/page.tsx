@@ -32,6 +32,18 @@ function suggestCompanyName(db: Firestore, company: string): Promise<string | nu
   return findAvailableVariation(company, (slug: string) => isSlugTaken(db, slug));
 }
 
+function passwordStrength(pw: string): { score: number; label: string } {
+  let score = 0;
+  if (pw.length >= 6) score++;
+  if (pw.length >= 10) score++;
+  if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+  if (/\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)) score++;
+  return { score, label: ['Muito fraca', 'Fraca', 'Razoável', 'Boa', 'Forte'][score] };
+}
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const STEP_LABELS = ['Negócio', 'Identificação', 'Acesso'];
+
 export default function SignupPage() {
   const db = useFirestore();
   const auth = useAuth();
@@ -51,6 +63,9 @@ export default function SignupPage() {
   const [slugStatus, setSlugStatus] = useState<SlugStatus>('idle');
   const [slugSuggestion, setSlugSuggestion] = useState<string | null>(null);
   const [isCheckingName, setIsCheckingName] = useState(false);
+  const [emailTouched, setEmailTouched] = useState(false);
+  const emailValid = EMAIL_RE.test(email.trim());
+  const strength = passwordStrength(password);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -174,6 +189,7 @@ export default function SignupPage() {
           email: result.user.email,
           businessType: 'clinica_estetica',
           isAdmin: false,
+          onboardingDone: false,
           membershipStatus: 'base',
           isSetupProcessDone: false,
           testimonialsCount: 0,
@@ -245,6 +261,7 @@ export default function SignupPage() {
         email: email.trim().toLowerCase(),
         businessType: businessType,
         isAdmin: false,
+          onboardingDone: false,
         membershipStatus: 'base',
         isSetupProcessDone: false,
         testimonialsCount: 0,
@@ -300,6 +317,27 @@ export default function SignupPage() {
             {step === 1 && "Agora, como devemos chamar você e sua empresa?"}
             {step === 2 && "Por fim, defina seus dados de acesso."}
           </p>
+        </div>
+
+        <div className="mb-5 flex items-center justify-center gap-2" aria-label={`Passo ${step + 1} de 3`}>
+          {STEP_LABELS.map((l, i) => (
+            <div key={l} className="flex items-center gap-2">
+              <button
+                type="button"
+                disabled={i >= step}
+                onClick={() => setStep(i)}
+                className={cn(
+                  "flex items-center gap-1.5 rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest transition-all",
+                  i === step ? "bg-primary text-primary-foreground shadow-md scale-105" :
+                  i < step ? "bg-primary/15 text-primary hover:bg-primary/25 cursor-pointer" : "bg-muted text-muted-foreground"
+                )}
+              >
+                {i < step ? <CheckCircle2 className="h-3 w-3" /> : <span>{i + 1}</span>}
+                <span className="hidden sm:inline">{l}</span>
+              </button>
+              {i < 2 && <span className={cn("h-0.5 w-6 rounded-full transition-colors", i < step ? "bg-primary" : "bg-muted")} />}
+            </div>
+          ))}
         </div>
 
         <Card className="border-none shadow-2xl overflow-hidden bg-card rounded-[2rem] ring-1 ring-border/50">
@@ -381,6 +419,7 @@ export default function SignupPage() {
                         placeholder="Nome e Sobrenome"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
+                        autoFocus
                         className="h-11 pl-11 bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm rounded-xl"
                         required
                       />
@@ -394,6 +433,7 @@ export default function SignupPage() {
                         placeholder="Nome Comercial"
                         value={company}
                         onChange={(e) => setCompany(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleNextStep(); } }}
                         className={cn(
                           "h-11 pl-11 bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm rounded-xl",
                           (slugStatus === 'taken' || slugStatus === 'invalid') && "ring-1 ring-destructive/50"
@@ -474,10 +514,20 @@ export default function SignupPage() {
                         placeholder="seu@melhoremail.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="h-11 pl-11 bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm rounded-xl"
+                        onBlur={() => setEmailTouched(true)}
+                        autoComplete="email"
+                        className={cn(
+                          "h-11 pl-11 bg-muted/20 border-transparent focus:ring-primary/20 font-bold text-sm rounded-xl",
+                          emailTouched && email && !emailValid && "ring-1 ring-destructive/50"
+                        )}
                         required
                       />
                     </div>
+                    {emailTouched && email && !emailValid && (
+                      <p className="ml-1 flex items-center gap-1.5 text-[11px] font-bold text-destructive" aria-live="polite">
+                        <XCircle className="h-3.5 w-3.5" /> Digite um e-mail válido.
+                      </p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -500,6 +550,24 @@ export default function SignupPage() {
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                       </button>
                     </div>
+                    {password && (
+                      <div className="ml-1 space-y-1" aria-live="polite">
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4].map((n) => (
+                            <span
+                              key={n}
+                              className={cn(
+                                "h-1.5 flex-1 rounded-full transition-colors",
+                                strength.score >= n
+                                  ? strength.score <= 1 ? "bg-destructive" : strength.score <= 2 ? "bg-amber-500" : "bg-emerald-500"
+                                  : "bg-muted"
+                              )}
+                            />
+                          ))}
+                        </div>
+                        <p className="text-[10px] font-bold text-muted-foreground">Força da senha: {strength.label}</p>
+                      </div>
+                    )}
                   </div>
                 </div>
 
