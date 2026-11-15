@@ -92,7 +92,7 @@ service cloud.firestore {
         (request.auth != null
           && request.auth.uid == userId
           && !request.resource.data.diff(resource.data).affectedKeys().hasAny([
-               'isAdmin', 'membershipStatus', 'trialUsed', 'trialStartedAt', 'planUpdatedAt',
+               'isAdmin', 'membershipStatus', 'trialUsed', 'trialStartedAt', 'planUpdatedAt', 'planActivatedAt',
                'caktoSubscriptionId', 'billingEmail', 'email', 'lastReviewSyncAt', 'lastReviewRunId']))
         || isCounterBump();
 

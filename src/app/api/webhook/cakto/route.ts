@@ -98,6 +98,8 @@ export async function POST(request: Request) {
           membershipStatus: decision.plan,
           planUpdatedAt: FieldValue.serverTimestamp(),
         };
+        // Início do plano atual (base da garantia de 7 dias). Renovação do mesmo plano não reinicia.
+        if (current !== decision.plan) update.planActivatedAt = FieldValue.serverTimestamp();
         if (data.subscription?.id) update.caktoSubscriptionId = data.subscription.id;
         await userRef.update(update);
         outcome = 'activated';

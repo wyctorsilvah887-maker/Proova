@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { mailFrom } from '@/lib/mail';
 import { SITE_URL } from '@/lib/site';
 
 export function escapeHtml(s: string) {
@@ -37,7 +38,7 @@ export async function sendFeedbackAlert(opts: {
     }
     lines.push(`<p><a href="${SITE_URL}/dash" style="background:#f97316;color:#fff;padding:10px 18px;border-radius:10px;text-decoration:none;font-weight:bold">Abrir painel e responder</a></p>`);
     await resend.emails.send({
-      from: 'Proova Alerts <proova@proova.wsstudioscompany.com.br>',
+      from: mailFrom('Proova AI Alertas'),
       to: [opts.ownerEmail],
       subject: opts.kind === 'new'
         ? `⚠️ Feedback crítico recebido - ${opts.companyName}`

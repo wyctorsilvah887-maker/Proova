@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   if (wait > 0) return NextResponse.json({ error: 'cooldown', retryInSeconds: Math.ceil(wait / 1000) }, { status: 429 });
 
   try {
-    await startSyncForUser(uid, user.googlePlaceId, !user.lastReviewSyncAt);
+    await startSyncForUser(uid, user.googlePlaceId, !user.reviewsBackfilled);
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error('[reviews refresh]', (e as Error).message);
