@@ -447,6 +447,7 @@ PricingSection.displayName = "PricingSection";
 
 const FAQ_ITEMS = [
   { q: "Preciso dar a senha da minha conta do Google?", a: "Não. Você informa sua empresa pelo Google Maps e o Proova lê as avaliações públicas da sua ficha." },
+  { q: "A IA responde avaliações antigas?", a: "A IA atua nos feedbacks recebidos depois que o seu plano é ativado. Nos depoimentos coletados antes disso ela não responde sozinha (você pode pedir uma sugestão no painel). Nas avaliações do Google, a primeira busca traz os últimos 30 dias e, depois, só as mais recentes." },
   { q: "O Proova publica as respostas por mim?", a: "Hoje a IA prepara a resposta e você copia e publica em segundos, com controle total do que vai ao ar. A publicação automática chegará com a integração oficial do Google." },
   { q: "Como funcionam os alertas?", a: "Cada novo depoimento enviado pelo seu link de coleta Proova chega ao seu inbox unificado com alerta instantâneo, para você moderar antes de publicar." },
   { q: "Com que frequência as avaliações do Google são atualizadas?", a: "Automaticamente uma vez por dia e, quando você quiser, na hora pelo botão \"Atualizar agora\" (planos pagos)." },
