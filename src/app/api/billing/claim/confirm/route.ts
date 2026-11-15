@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   const claimRef = db.doc(`claim_codes/${uid}`);
   const userRef = db.doc(`users/${uid}`);
 
-  type Result = { status: number; body: Record<string, unknown> };
+  type Result = { status: number; body: Record<string, unknown>; orders?: string[] };
   const result: Result = await db.runTransaction(async (tx): Promise<Result> => {
     const claim = (await tx.get(claimRef)).data();
     if (!claim?.codeHash || !claim.email || (claim.expiresAt?.toMillis?.() ?? 0) < Date.now()) {
@@ -45,8 +45,23 @@ export async function POST(req: Request) {
     tx.update(userRef, update);
     open.docs.forEach((d) => tx.update(d.ref, { status: 'claimed', claimedBy: uid, claimedAt: FieldValue.serverTimestamp() }));
     tx.delete(claimRef);
-    return { status: 200, body: { ok: true, plan } };
+    const orders = open.docs.map((d) => String(d.data().orderId || d.id));
+    return { status: 200, body: { ok: true, plan }, orders };
   });
+
+  // Atualiza o histórico de pagamentos (admin): "Aguardando resgate" passa a "Resgatado".
+  if (result.status === 200 && result.orders) {
+    try {
+      for (const orderId of result.orders) {
+        const events = await db.collection('payment_events').where('payload.data.id', '==', orderId).get();
+        await Promise.all(events.docs
+          .filter((d) => d.data().outcome === 'pending_claim')
+          .map((d) => d.ref.update({ outcome: 'claimed', reason: 'resgatado', externalId: uid })));
+      }
+    } catch (e) {
+      console.error('[claim] não atualizou o histórico:', (e as Error).message);
+    }
+  }
 
   return NextResponse.json(result.body, { status: result.status });
 }
