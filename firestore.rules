@@ -143,6 +143,12 @@ service cloud.firestore {
       }
     }
 
+    // Pedidos de reembolso: criados só pelo servidor (/api/refund); o cliente lê os próprios.
+    match /refund_requests/{requestId} {
+      allow read: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create, update, delete: if false;
+    }
+
     // Regras para Logs de Pagamento
     match /payment_events/{eventId} {
       allow create: if false; // gravado só pelo servidor (webhook)

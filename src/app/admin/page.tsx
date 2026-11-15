@@ -92,6 +92,18 @@ export default function AdminPage() {
 
   const { data: paymentEvents, loading: eventsLoading } = useCollection(paymentEventsQuery);
 
+  const refundsQuery = useMemo(() => {
+    if (!db || !user || !isAdminVerified) return null;
+    return query(collection(db, 'refund_requests'), orderBy('createdAt', 'desc'), limit(50));
+  }, [db, user, isAdminVerified]);
+  const { data: refundRequests } = useCollection(refundsQuery);
+  const pendingRefunds = (refundRequests || []).filter((r: any) => r.status === 'pending').length;
+
+  const resolveRefund = async (id: string) => {
+    if (!db) return;
+    await updateDoc(doc(db, 'refund_requests', id), { status: 'resolved', resolvedAt: serverTimestamp() });
+  };
+
   const ticketsQuery = useMemo(() => {
     if (!db || !isAdminVerified) return null;
     return collection(db, 'support_tickets');
@@ -219,6 +231,7 @@ export default function AdminPage() {
             <TabsList className="bg-background border rounded-xl h-12 p-1 gap-1">
               <TabsTrigger value="leads" className="rounded-lg text-[10px] font-black uppercase tracking-widest">Usuários</TabsTrigger>
               <TabsTrigger value="payments" className="rounded-lg text-[10px] font-black uppercase tracking-widest">Pagamentos</TabsTrigger>
+              <TabsTrigger value="refunds" className="rounded-lg text-[10px] font-black uppercase tracking-widest">Reembolsos{pendingRefunds > 0 && <span className="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[9px] text-white">{pendingRefunds}</span>}</TabsTrigger>
               <TabsTrigger value="actions" className="rounded-lg text-[10px] font-black uppercase tracking-widest">Ações</TabsTrigger>
             </TabsList>
             
@@ -315,6 +328,52 @@ export default function AdminPage() {
                               </TableRow>
                             );
                           })}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+               </Card>
+            </TabsContent>
+
+            <TabsContent value="refunds" className="pt-6">
+               <Card className="rounded-[2rem] border-none shadow-xl overflow-hidden">
+                  {!refundRequests || refundRequests.length === 0 ? (
+                    <div className="p-6 text-center opacity-40"><p className="text-xs font-bold uppercase tracking-widest">Nenhum pedido de reembolso</p></div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader className="bg-muted/30">
+                          <TableRow>
+                            <TableHead className="text-[9px] font-black uppercase">Data</TableHead>
+                            <TableHead className="text-[9px] font-black uppercase">Cliente</TableHead>
+                            <TableHead className="text-[9px] font-black uppercase">Motivo</TableHead>
+                            <TableHead className="text-[9px] font-black uppercase">Situação</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {refundRequests.map((r: any) => (
+                            <TableRow key={r.id}>
+                              <TableCell className="text-[10px] font-bold whitespace-nowrap">{r.createdAt?.toDate?.().toLocaleDateString('pt-BR') || '—'}</TableCell>
+                              <TableCell>
+                                <div className="flex flex-col">
+                                  <span className="font-bold text-xs">{r.companyName || '—'}</span>
+                                  <span className="text-[10px] text-muted-foreground break-all">{r.email}</span>
+                                  <span className="text-[9px] text-muted-foreground uppercase">{r.plan === 'enterprise' ? 'PRO' : 'PREMIUM'}{r.windowUnknown ? ' • conferir prazo' : ''}</span>
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-[10px] max-w-[220px] break-words">{r.reason || '—'}</TableCell>
+                              <TableCell>
+                                {r.status === 'pending' ? (
+                                  <div className="flex flex-col gap-1 items-start">
+                                    <Badge variant="secondary" className="text-[8px] font-black uppercase border-none bg-orange-500/10 text-orange-600">Pendente</Badge>
+                                    <Button size="sm" variant="outline" onClick={() => resolveRefund(r.id)} className="h-7 rounded-lg text-[9px] font-black uppercase">Marcar resolvido</Button>
+                                  </div>
+                                ) : (
+                                  <Badge variant="secondary" className="text-[8px] font-black uppercase border-none">{r.status === 'refunded' ? 'Reembolsado' : 'Resolvido'}</Badge>
+                                )}
+                              </TableCell>
+                            </TableRow>
+                          ))}
                         </TableBody>
                       </Table>
                     </div>
