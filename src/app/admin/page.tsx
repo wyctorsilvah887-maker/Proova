@@ -299,6 +299,7 @@ export default function AdminPage() {
                               activated: { label: 'Plano ativado', className: 'bg-green-500/10 text-green-600' },
                               deactivated: { label: 'Plano removido', className: 'bg-orange-500/10 text-orange-600' },
                               unmatched: { label: 'Cliente não encontrado', className: 'bg-destructive/10 text-destructive' },
+                              pending_claim: { label: 'Aguardando resgate', className: 'bg-blue-500/10 text-blue-600' },
                               ignored: { label: 'Sem ação', className: 'bg-muted text-muted-foreground' },
                             };
                             const out = outcomes[ev.outcome];
