@@ -1,5 +1,6 @@
 'use client';
 
+import { sanitizeHtml, safeUrl } from '@/lib/safe-html';
 import { useState, useMemo, useEffect, use } from 'react';
 import { useFirestore, useUser } from '@/firebase';
 import { 
@@ -299,8 +300,8 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
                   </div>
                 )}
                 <div className="space-y-4">
-                  <h1 className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.05] max-w-5xl mx-auto" dangerouslySetInnerHTML={{ __html: heroTitle }} />
-                  {heroSubtitle && <div className="text-muted-foreground text-lg sm:text-2xl max-w-3xl mx-auto font-medium leading-relaxed italic opacity-80" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />}
+                  <h1 className="text-4xl sm:text-7xl font-black tracking-tighter text-foreground leading-[1.05] max-w-5xl mx-auto" dangerouslySetInnerHTML={{ __html: sanitizeHtml(heroTitle) }} />
+                  {heroSubtitle && <div className="text-muted-foreground text-lg sm:text-2xl max-w-3xl mx-auto font-medium leading-relaxed italic opacity-80" dangerouslySetInnerHTML={{ __html: sanitizeHtml(heroSubtitle) }} />}
                 </div>
               </div>
             </header>
@@ -313,7 +314,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
                     <p className="text-base sm:text-xl leading-relaxed opacity-90 font-medium">{section.content}</p>
                     {section.buttonText && (
                       <div className="pt-8">
-                        <a href={section.buttonUrl || '#'} className="inline-block" target="_blank" rel="noopener noreferrer">
+                        <a href={safeUrl(section.buttonUrl)} className="inline-block" target="_blank" rel="noopener noreferrer">
                           <Button size="lg" className={cn("h-16 px-10 rounded-2xl text-lg font-black gap-2 shadow-2xl transition-all hover:scale-105 active:scale-95", section.variant === 'accent' ? "bg-white text-black hover:bg-white/90" : "")} style={{ backgroundColor: section.variant !== 'accent' ? themeColor : undefined }}>
                             {section.buttonText} <ArrowRight className="w-5 h-5" />
                           </Button>
@@ -371,7 +372,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
 
             <footer className="mt-auto px-6 py-20 text-center space-y-12 border-t bg-muted/5">
               {externalSiteUrl && (
-                <a href={externalSiteUrl.startsWith('http') ? externalSiteUrl : `https://${externalSiteUrl}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 px-12 py-6 rounded-full text-white text-[14px] font-black shadow-2xl hover:scale-105 active:scale-95 transition-all" style={{ backgroundColor: themeColor }}>
+                <a href={safeUrl(externalSiteUrl)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 px-12 py-6 rounded-full text-white text-[14px] font-black shadow-2xl hover:scale-105 active:scale-95 transition-all" style={{ backgroundColor: themeColor }}>
                   Visitar Site Oficial <Globe className="w-5 h-5" />
                 </a>
               )}

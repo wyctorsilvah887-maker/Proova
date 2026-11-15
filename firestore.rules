@@ -41,10 +41,9 @@ service cloud.firestore {
         (resource == null || resource.data.userId == request.auth.uid);
     }
 
-    // Regras para Rate Limiting
-    match /rate_limits/{limitId} {
-      allow create, list: if true;
-    }
+    // Rate limiting: gravado só pelo servidor (firebase-admin, ver src/lib/rate-limit.ts).
+    // Sem acesso público: antes a listagem aberta expunha os IPs de quem enviou depoimentos.
+    // (Regra Mestra no fim do arquivo: só admin.)
 
     // Regras para Estatísticas de Conversão
     // (Nenhum código do app usa esta coleção hoje. Leitura pública continua; escrita só admin,
