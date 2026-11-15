@@ -1,5 +1,6 @@
 'use client';
 
+import { sanitizeHtml } from '@/lib/safe-html';
 import { AppSideMenu } from '@/components/app-menu';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -1039,8 +1040,8 @@ export default function PPEditorPage() {
                              )
                           )}
                           <div className="space-y-4">
-                              <div className="text-2xl font-black leading-[1.1] tracking-tighter" dangerouslySetInnerHTML={{ __html: heroTitle || 'Seu Título' }} />
-                              <div className="text-[11px] text-muted-foreground font-medium italic opacity-80 leading-relaxed px-2" dangerouslySetInnerHTML={{ __html: heroSubtitle }} />
+                              <div className="text-2xl font-black leading-[1.1] tracking-tighter" dangerouslySetInnerHTML={{ __html: sanitizeHtml(heroTitle || 'Seu Título') }} />
+                              <div className="text-[11px] text-muted-foreground font-medium italic opacity-80 leading-relaxed px-2" dangerouslySetInnerHTML={{ __html: sanitizeHtml(heroSubtitle) }} />
                           </div>
                         </header>
 

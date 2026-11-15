@@ -1,39 +1,9 @@
 
 'use server';
 
-import { headers } from 'next/headers';
 import { initializeFirebase } from '@/firebase';
+import { checkRateLimit } from '@/lib/rate-limit';
 import { collection, query, getDocs, addDoc, serverTimestamp, limit, where } from 'firebase/firestore';
-
-/**
- * Verifica o limite de requisições sem exigir índices compostos.
- */
-async function checkRateLimit(actionName: string) {
-  const { firestore } = initializeFirebase();
-  const headerList = await headers();
-  const ip = (headerList.get('x-forwarded-for') ?? '127.0.0.1').split(',')[0].trim();
-  
-  const oneMinuteAgo = new Date(Date.now() - 60000);
-  const rateLimitRef = collection(firestore, 'rate_limits');
-  
-  const snap = await getDocs(query(rateLimitRef, where('ip', '==', ip), limit(50)));
-  
-  const recentRequests = snap.docs.filter(doc => {
-    const data = doc.data();
-    const createdAt = data.createdAt?.toDate?.() || new Date(0);
-    return data.action === actionName && createdAt > oneMinuteAgo;
-  });
-  
-  if (recentRequests.length >= 15) {
-    throw new Error('Limite de requisições excedido. Tente novamente em um minuto.');
-  }
-
-  await addDoc(rateLimitRef, {
-    ip,
-    action: actionName,
-    createdAt: serverTimestamp()
-  });
-}
 
 /**
  * Consulta detalhes técnicos de um local no Google Maps para o Consultor Proova.

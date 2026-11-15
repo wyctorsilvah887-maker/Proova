@@ -1,41 +1,10 @@
 'use server';
 
-import { headers } from 'next/headers';
 import { initializeFirebase } from '@/firebase';
+import { checkRateLimit } from '@/lib/rate-limit';
 import { collection, query, getDocs, addDoc, serverTimestamp, doc, updateDoc, increment, getDoc, limit, where } from 'firebase/firestore';
 import { sendFeedbackAlert } from '@/lib/feedback-alert';
 import { generateReplyAction } from '@/ai/flows/generate-reply-flow';
-
-/**
- * Verifica o limite de requisições.
- */
-async function checkRateLimit(actionName: string) {
-  const { firestore } = initializeFirebase();
-  const headerList = await headers();
-  const ip = (headerList.get('x-forwarded-for') ?? '127.0.0.1').split(',')[0].trim();
-  
-  const oneMinuteAgo = new Date(Date.now() - 60000);
-  const rateLimitRef = collection(firestore, 'rate_limits');
-  
-  const q = query(rateLimitRef, where('ip', '==', ip), limit(50));
-  const snap = await getDocs(q);
-  
-  const recentRequests = snap.docs.filter(doc => {
-    const data = doc.data();
-    const createdAt = data.createdAt?.toDate?.() || new Date(0);
-    return data.action === actionName && createdAt > oneMinuteAgo;
-  });
-  
-  if (recentRequests.length >= 15) {
-    throw new Error('Limite de envios excedido. Tente novamente em instantes.');
-  }
-
-  await addDoc(rateLimitRef, {
-    ip,
-    action: actionName,
-    createdAt: serverTimestamp()
-  });
-}
 
 /**
  * Salva um depoimento com resposta automática via IA.
@@ -51,7 +20,7 @@ export async function submitTestimonialAction(data: {
   photoUrl?: string;
 }) {
   try {
-    await checkRateLimit('submit_testimonial');
+    await checkRateLimit('submit_testimonial', 15, 'Limite de envios excedido. Tente novamente em instantes.');
     const { firestore } = initializeFirebase();
     
     const userRef = doc(firestore, 'users', data.targetUserId);
