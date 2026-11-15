@@ -47,6 +47,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -65,7 +66,7 @@ import {
   AlertTitle 
 } from "@/components/ui/alert";
 import { useUser, useFirestore, useDoc, useAuth } from '@/firebase';
-import { doc, updateDoc, serverTimestamp, getDoc, writeBatch } from 'firebase/firestore';
+import { doc, updateDoc, serverTimestamp, getDoc, writeBatch, collection, query, where, limit, getDocs } from 'firebase/firestore';
 import { signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { toast } from '@/hooks/use-toast';
 import { useTheme } from 'next-themes';
@@ -139,6 +140,45 @@ export default function SettingsPage() {
   const isAgency = useMemo(() => {
     return userData?.businessType === 'agencia';
   }, [userData]);
+
+  // Garantia de 7 dias / pedido de reembolso
+  const [refundOpen, setRefundOpen] = useState(false);
+  const [refundReason, setRefundReason] = useState('');
+  const [isRequestingRefund, setIsRequestingRefund] = useState(false);
+  const [refundPending, setRefundPending] = useState(false);
+
+  useEffect(() => {
+    if (!db || !user) return;
+    getDocs(query(collection(db, 'refund_requests'), where('uid', '==', user.uid), where('status', '==', 'pending'), limit(1)))
+      .then((snap) => setRefundPending(!snap.empty))
+      .catch(() => {});
+  }, [db, user]);
+
+  const handleRequestRefund = async () => {
+    if (!user || isRequestingRefund) return;
+    setIsRequestingRefund(true);
+    try {
+      const idToken = await user.getIdToken();
+      const res = await fetch('/api/refund', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({ reason: refundReason }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok || data.error === 'ja_solicitado') {
+        setRefundPending(true); setRefundOpen(false); setRefundReason('');
+        toast({ title: "Pedido enviado", description: "Recebemos sua solicitação e vamos responder por e-mail em breve." });
+      } else if (data.error === 'prazo_expirado') {
+        toast({ variant: "destructive", title: "Prazo encerrado", description: "A garantia é de 7 dias após a contratação." });
+      } else {
+        throw new Error('fail');
+      }
+    } catch {
+      toast({ variant: "destructive", title: "Não foi possível enviar", description: "Tente novamente ou fale com o suporte." });
+    } finally {
+      setIsRequestingRefund(false);
+    }
+  };
 
   const isPremiumUser = useMemo(() => {
     const status = userData?.membershipStatus;
@@ -503,6 +543,34 @@ export default function SettingsPage() {
                     <Button variant="outline" onClick={() => router.push('/pricing')} className="w-full sm:w-auto h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[9px] border-primary/20 text-primary hover:bg-primary hover:text-white transition-all shadow-sm">Ver Planos e Upgrade</Button>
                  </CardContent>
               </Card>
+
+              {(userData?.membershipStatus === 'gold' || userData?.membershipStatus === 'enterprise') && (
+                <Card className="rounded-[2rem] border-none shadow-xl overflow-hidden bg-background">
+                   <CardHeader className="p-6 md:p-8 pb-4">
+                      <CardTitle className="text-base md:text-lg font-black uppercase tracking-tight flex items-center gap-2"><Shield className="w-5 h-5 text-primary" /> Garantia de 7 dias</CardTitle>
+                      <CardDescription className="text-xs font-medium">Não gostou? Você pode pedir o reembolso em até 7 dias após a contratação.</CardDescription>
+                   </CardHeader>
+                   <CardContent className="p-6 md:p-8 pt-0 space-y-4">
+                      {refundPending ? (
+                        <p className="text-xs font-bold text-primary">Seu pedido de reembolso está em análise. Você receberá a resposta por e-mail.</p>
+                      ) : !refundOpen ? (
+                        <Button variant="outline" onClick={() => setRefundOpen(true)} className="w-full sm:w-auto h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[9px]">Solicitar reembolso</Button>
+                      ) : (
+                        <div className="space-y-3">
+                          <Label className="text-[10px] font-black uppercase ml-1 opacity-60">Conte o motivo (opcional)</Label>
+                          <Textarea value={refundReason} onChange={(e) => setRefundReason(e.target.value)} maxLength={500} rows={3} placeholder="Sua opinião nos ajuda a melhorar." className="rounded-xl bg-muted/20 border-transparent text-sm" />
+                          <div className="flex flex-wrap gap-2">
+                            <Button onClick={handleRequestRefund} disabled={isRequestingRefund} className="h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[9px] gap-2">
+                              {isRequestingRefund && <Loader2 className="animate-spin w-4 h-4" />} Confirmar pedido
+                            </Button>
+                            <Button variant="ghost" onClick={() => setRefundOpen(false)} className="h-12 px-6 rounded-xl font-black uppercase tracking-widest text-[9px]">Cancelar</Button>
+                          </div>
+                          <p className="text-[9px] text-muted-foreground italic ml-1">Ao confirmar, o reembolso será processado e o acesso ao plano pago será encerrado.</p>
+                        </div>
+                      )}
+                   </CardContent>
+                </Card>
+              )}
            </TabsContent>
 
            <TabsContent value="negocio" className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 outline-none">
