@@ -85,7 +85,7 @@ export async function submitTestimonialAction(data: {
       try {
         const { reply } = await generateReplyAction({
           authorName: data.userName,
-          testimonialText: data.text || (data.videoUrl ? '[Depoimento em Vídeo]' : ''),
+          testimonialText: data.text?.trim() || (data.videoUrl ? '[Depoimento em Vídeo]' : '[Avaliação apenas com nota]'),
           rating: data.rating,
           companyName: userData.companyName,
           businessType: userData.businessType
@@ -96,10 +96,12 @@ export async function submitTestimonialAction(data: {
       }
     }
 
-    const initialStatus = 'approved';
+    // Avaliação só com nota (sem texto/mídia) não vai direto para a página pública: fica na moderação.
+    const hasContent = !!(data.text?.trim() || data.videoUrl || data.photoUrl);
+    const initialStatus = hasContent ? 'approved' : 'pending';
 
     const testimonialData = {
-      userName: data.userName.trim(),
+      userName: data.userName?.trim() || 'Cliente',
       userEmail: data.userEmail.trim().toLowerCase(),
       rating: data.rating,
       text: data.text.trim(),
