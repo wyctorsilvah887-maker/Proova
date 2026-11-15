@@ -48,6 +48,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
   const [companyNameDisplay, setCompanyNameDisplay] = useState('');
   const [membershipStatus, setMembershipStatus] = useState<string | null>(null);
   const [activeMode, setActiveMode] = useState<CollectionMode>(null);
+  const [mediaConsent, setMediaConsent] = useState(false);
   
   const [recordedVideoUrl, setRecordedVideoUrl] = useState<string | null>(null);
   const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
@@ -138,8 +139,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
       return; 
     }
     
-    if (!userName.trim()) { toast({ variant: "destructive", title: "Nome Obrigatório" }); return; }
-    if (!text.trim()) { toast({ variant: "destructive", title: "Relato Obrigatório" }); return; }
+    if ((videoBlob || photoBlob) && !mediaConsent) { toast({ variant: "destructive", title: "Autorização necessária", description: "Confirme a autorização de uso da foto/vídeo." }); return; }
     
     if (!targetUserId) return;
     setIsSubmitting(true);
@@ -169,7 +169,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
     const result = await submitTestimonialAction({
       targetUserId, 
       destination: 'public',
-      userName, 
+      userName: userName.trim() || 'Cliente', 
       userEmail: userEmail.trim(), 
       rating, 
       text: text.trim(), 
@@ -205,9 +205,9 @@ export default function CollectionClient({ slug }: { slug: string }) {
               <h2 className="text-3xl font-black font-headline tracking-tighter">Muito Obrigado!</h2>
               <p className="text-muted-foreground text-sm font-medium">Sua opinião sobre <b>{companyNameDisplay}</b> foi enviada com sucesso.</p>
             </div>
-            {googleMapsUrl && rating >= 4 && (
+            {googleMapsUrl && (
               <div className="pt-8 border-t space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <p className="text-[10px] font-black uppercase tracking-widest text-primary">Sua voz vale muito!</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary">Quer compartilhar sua experiência também no Google? (opcional)</p>
                 <Button onClick={handleGoogleRedirect} className="w-full h-14 rounded-2xl gap-3 text-sm font-bold bg-[#4285F4] hover:bg-[#357ae8] shadow-lg transition-all active:scale-95">
                   <MapPin className="w-5 h-5" /> Avaliar também no Google
                 </Button>
@@ -235,9 +235,9 @@ export default function CollectionClient({ slug }: { slug: string }) {
 
   const isEnterprise = membershipStatus === 'enterprise' || membershipStatus === 'trial';
   const hasMedia = !!recordedPhotoUrl || !!recordedVideoUrl;
-  const shouldShowForm = activeMode === 'text' || hasMedia;
+  const shouldShowForm = rating > 0 || activeMode === 'text' || hasMedia;
   
-  const isFormValid = userName.trim() !== '' && text.trim() !== '';
+  const isFormValid = rating > 0 && (!hasMedia || mediaConsent);
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col items-center p-4 font-body text-foreground overflow-x-hidden">
@@ -266,7 +266,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
               <button 
                 key={star} 
                 type="button" 
-                onClick={() => setRating(star)} 
+                onClick={() => { setRating(star); if (!activeMode) setActiveMode('text'); }} 
                 onMouseEnter={() => setHoverRating(star)} 
                 onMouseLeave={() => setHoverRating(0)} 
                 className="p-1 transition-all active:scale-150 transform hover:scale-110"
@@ -335,19 +335,48 @@ export default function CollectionClient({ slug }: { slug: string }) {
 
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] font-black uppercase tracking-widest ml-1 opacity-60">Seu nome</Label>
-                    <Input placeholder="Seu nome aqui" value={userName} onChange={(e) => setUserName(e.target.value)} required className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold" />
+                    <Label className="text-[9px] font-black uppercase tracking-widest ml-1 opacity-60">Seu primeiro nome (opcional)</Label>
+                    <Input placeholder="Como podemos te chamar?" autoComplete="given-name" value={userName} onChange={(e) => setUserName(e.target.value)} className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold" />
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-[9px] font-black uppercase tracking-widest ml-1 opacity-60">E-mail (Opcional)</Label>
-                    <Input type="email" placeholder="Receba promos e ofertas especiais por email" value={userEmail} onChange={(e) => setUserEmail(e.target.value)} className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold" />
+                    <Label className="text-[9px] font-black uppercase tracking-widest ml-1 opacity-60">E-mail (opcional)</Label>
+                    <Input type="email" placeholder="seu@email.com" autoComplete="email" value={userEmail} onChange={(e) => setUserEmail(e.target.value)} className="h-12 rounded-xl bg-muted/20 border-transparent focus:ring-primary/20 font-bold" />
+                    <p className="text-[10px] text-muted-foreground font-medium ml-1 leading-snug">Se informar, a clínica poderá entrar em contato com você. Você pode pedir a remoção a qualquer momento.</p>
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <Label className="text-[9px] font-black uppercase tracking-widest ml-1 opacity-60">Sua Experiência</Label>
+                  <Label className="text-[9px] font-black uppercase tracking-widest ml-1 opacity-60">Sua Experiência (opcional)</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      ['Atendimento', 'Gostei muito do atendimento. '],
+                      ['Pontualidade', 'Fui atendido(a) no horário. '],
+                      ['Resultado', 'Fiquei satisfeito(a) com o resultado. '],
+                      ['Ambiente', 'O ambiente é muito agradável. '],
+                    ].map(([label, phrase]) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => setText((t) => (t.includes(phrase.trim()) ? t : t + phrase))}
+                        className="rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/10 transition-colors"
+                      >
+                        + {label}
+                      </button>
+                    ))}
+                  </div>
                   <Textarea placeholder="O que você mais gostou no atendimento de hoje?" className="min-h-[120px] rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 font-medium text-sm leading-relaxed p-4" value={text} onChange={(e) => setText(e.target.value)} />
                 </div>
+
+                {hasMedia && (
+                  <label className="flex items-start gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-3 cursor-pointer">
+                    <input type="checkbox" checked={mediaConsent} onChange={(e) => setMediaConsent(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[hsl(var(--primary))]" />
+                    <span className="text-[11px] font-medium leading-snug">Autorizo o uso da minha {recordedVideoUrl ? 'imagem e voz (vídeo)' : 'imagem (foto)'} na divulgação de {companyNameDisplay}.</span>
+                  </label>
+                )}
+
+                <p className="text-[10px] text-muted-foreground font-medium text-center leading-snug">
+                  Ao enviar, você autoriza {companyNameDisplay} a exibir seu depoimento em seus canais. Veja a <Link href="/privacy" target="_blank" className="underline hover:text-primary">Política de Privacidade</Link>.
+                </p>
 
                 <Button 
                   type="button" 
