@@ -116,8 +116,9 @@ import { useTheme } from 'next-themes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LoadingScreen } from '@/components/loading-screen';
 import { StudioPanel } from '@/components/studio-panel';
-import { PPStudioBlocks, PPMapBlock } from '@/components/pp-blocks';
-import { type StudioData, defaultStudio, normalizeStudio } from '@/lib/studio';
+import { type StudioData, defaultStudio, normalizeStudio, applyStudioCaps } from '@/lib/studio';
+import { PPBlock } from '@/components/pp-blocks';
+import { ppCaps, ppPlanOf } from '@/lib/pp-plans';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 type LayoutType = 'grid' | 'mural' | 'carousel' | 'popup';
@@ -231,6 +232,12 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
   );
 };
 
+const PlanChip = ({ plan = 'Premium' }: { plan?: string }) => (
+  <Link href="/pricing" className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[8px] font-black uppercase tracking-widest text-primary hover:bg-primary/20">
+    <Lock className="w-2.5 h-2.5" /> {plan}
+  </Link>
+);
+
 const PublicPageSettings = ({ 
   themeColor, setThemeColor,
   secondaryColor, setSecondaryColor,
@@ -246,7 +253,7 @@ const PublicPageSettings = ({
   externalSiteUrl, setExternalSiteUrl,
   externalSiteButtonText, setExternalSiteButtonText,
   customSections, setCustomSections,
-  studio, setStudio, googlePlaceId,
+  studio, setStudio, googlePlaceId, caps,
   autoPublishEnabled, setAutoPublishEnabled,
   autoPublishMinRating, setAutoPublishMinRating,
   autoPublishMinChars, setAutoPublishMinChars,
@@ -478,6 +485,7 @@ const PublicPageSettings = ({
                           <Button 
                             size="sm" 
                             variant="outline" 
+                            disabled={customSections.length >= caps.customSections}
                             onClick={() => setCustomSections([...customSections, { id: Date.now().toString(), title: 'Nova Seção', subtitle: '', content: 'Conteúdo da seção...', buttonText: '', buttonUrl: '', variant: 'light' }])}
                             className="h-8 rounded-lg text-[9px] font-black uppercase gap-1.5 border-primary/20 text-primary hover:bg-primary/5"
                           >
@@ -567,7 +575,7 @@ const PublicPageSettings = ({
              </TabsContent>
 
              <TabsContent value="blocos" className="mt-0 space-y-8 outline-none">
-               <StudioPanel studio={studio} setStudio={setStudio} googlePlaceId={googlePlaceId} />
+               <StudioPanel studio={studio} setStudio={setStudio} googlePlaceId={googlePlaceId} caps={caps} />
              </TabsContent>
 
              <TabsContent value="design" className="mt-0 space-y-8 outline-none">
@@ -582,12 +590,15 @@ const PublicPageSettings = ({
                      ].map(l => (
                        <button 
                          key={l.id} 
-                         onClick={() => setLayout(l.id as LayoutType)}
+                         onClick={() => caps.layouts.includes(l.id) && setLayout(l.id as LayoutType)}
+                         disabled={!caps.layouts.includes(l.id)}
                          className={cn(
-                           "flex flex-col items-center justify-center p-5 rounded-[1.5rem] border-2 transition-all gap-2 text-center shadow-sm",
+                           "flex flex-col items-center justify-center p-5 rounded-[1.5rem] border-2 transition-all gap-2 text-center shadow-sm relative",
+                           !caps.layouts.includes(l.id) && "opacity-50 cursor-not-allowed",
                            layout === l.id ? "bg-primary/5 border-primary shadow-inner" : "bg-muted/20 border-transparent hover:border-primary/20"
                          )}
                        >
+                         {!caps.layouts.includes(l.id) && <span className="absolute top-2 right-2"><PlanChip /></span>}
                          <l.icon className={cn("w-6 h-6", layout === l.id ? "text-primary" : "text-muted-foreground")} />
                          <div className="space-y-0.5">
                             <p className="text-xs font-black uppercase tracking-tight">{l.label}</p>
@@ -601,11 +612,11 @@ const PublicPageSettings = ({
                 <section className="space-y-4">
                   <div className="flex items-center justify-between p-5 rounded-[1.5rem] bg-muted/20 border border-muted">
                     <div className="space-y-1">
-                      <p className="text-xs font-black uppercase tracking-tight">Cor Secundária (Efeitos)</p>
+                      <p className="text-xs font-black uppercase tracking-tight flex items-center gap-2">Cor Secundária (Efeitos) {!caps.secondaryColor && <PlanChip />}</p>
                       <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-tight">Ativa brilhos e bordas VIP</p>
                     </div>
                     <div className="relative">
-                       <input type="color" value={secondaryColor || '#ffffff'} onChange={(e) => setSecondaryColor(e.target.value)} className="w-8 h-8 rounded-full border-2 border-transparent cursor-pointer shadow-md" />
+                       <input type="color" disabled={!caps.secondaryColor} value={secondaryColor || '#ffffff'} onChange={(e) => setSecondaryColor(e.target.value)} className="w-8 h-8 rounded-full border-2 border-transparent cursor-pointer shadow-md" />
                     </div>
                   </div>
                   {secondaryColor && <button onClick={() => setSecondaryColor('')} className="text-[9px] font-black uppercase text-destructive hover:underline ml-1 transition-all">Desativar Efeitos</button>}
@@ -617,9 +628,9 @@ const PublicPageSettings = ({
                    <div className="flex items-center justify-between p-5 rounded-[1.5rem] bg-green-500/5 border border-green-500/20 shadow-sm">
                       <div className="flex items-center gap-3">
                          <div className="p-2.5 rounded-xl bg-green-500/10 text-green-600"><MessageCircle className="w-5 h-5" /></div>
-                         <p className="text-xs font-black uppercase tracking-tight">Botão WhatsApp</p>
+                         <p className="text-xs font-black uppercase tracking-tight flex items-center gap-2">Botão WhatsApp {!caps.whatsappButton && <PlanChip />}</p>
                       </div>
-                      <Switch checked={whatsappEnabled} onCheckedChange={setWhatsappEnabled} />
+                      <Switch checked={whatsappEnabled && caps.whatsappButton} disabled={!caps.whatsappButton} onCheckedChange={setWhatsappEnabled} />
                    </div>
                    {whatsappEnabled && (
                      <div className="space-y-4 p-5 rounded-[2rem] border-2 border-dashed border-green-500/30 bg-green-500/5 animate-in fade-in slide-in-from-top-3">
@@ -632,10 +643,10 @@ const PublicPageSettings = ({
                 </section>
 
                 <section className="space-y-4">
-                   <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Site Oficial (Botão Rodapé)</Label>
+                   <Label className="text-[10px] font-black uppercase tracking-widest opacity-60 flex items-center gap-2">Site Oficial (Botão Rodapé) {!caps.externalSite && <PlanChip />}</Label>
                    <div className="space-y-4">
-                      <Input value={externalSiteButtonText} onChange={(e) => setExternalSiteButtonText(e.target.value)} placeholder="Texto do botão" className="h-11 rounded-xl" />
-                      <Input value={externalSiteUrl} onChange={(e) => setExternalSiteUrl(e.target.value)} placeholder="https://www.seusite.com.br" className="h-11 rounded-xl" />
+                      <Input disabled={!caps.externalSite} value={externalSiteButtonText} onChange={(e) => setExternalSiteButtonText(e.target.value)} placeholder="Texto do botão" className="h-11 rounded-xl" />
+                      <Input disabled={!caps.externalSite} value={externalSiteUrl} onChange={(e) => setExternalSiteUrl(e.target.value)} placeholder="https://www.seusite.com.br" className="h-11 rounded-xl" />
                    </div>
                 </section>
 
@@ -644,8 +655,8 @@ const PublicPageSettings = ({
                    <div className="space-y-4">
                       <Input value={footerText} onChange={(e) => setFooterText(e.target.value)} placeholder="Copyright" className="h-11 rounded-xl" />
                       <div className="flex items-center justify-between p-5 rounded-[1.5rem] bg-muted/10 border border-muted">
-                        <p className="text-[10px] font-black uppercase tracking-tight">Exibir Powered by Proova</p>
-                        <Switch checked={showLogo} onCheckedChange={setShowLogo} />
+                        <p className="text-[10px] font-black uppercase tracking-tight flex items-center gap-2">Exibir Powered by Proova {!caps.removeBranding && <PlanChip plan="PRO" />}</p>
+                        <Switch checked={showLogo || !caps.removeBranding} disabled={!caps.removeBranding} onCheckedChange={setShowLogo} />
                       </div>
                    </div>
                 </section>
@@ -681,7 +692,8 @@ export default function PPEditorPage() {
 
   const isEnterprise = userData?.membershipStatus === 'enterprise';
   const isGoldPlan = isEnterprise || userData?.membershipStatus === 'gold' || userData?.membershipStatus === 'trial';
-  const SELECTION_LIMIT = isEnterprise ? Infinity : (isGoldPlan ? 50 : 5);
+  const caps = useMemo(() => ppCaps(ppPlanOf(userData?.membershipStatus)), [userData?.membershipStatus]);
+  const SELECTION_LIMIT = caps.selectionLimit;
 
   const testimonialsQuery = useMemo(() => {
     if (!db || !user) return null;
@@ -706,6 +718,7 @@ export default function PPEditorPage() {
   const [externalSiteButtonText, setExternalSiteButtonText] = useState('');
   const [customSections, setCustomSections] = useState<CustomSection[]>([]);
   const [studio, setStudio] = useState<StudioData>(defaultStudio());
+  const previewStudio = useMemo(() => applyStudioCaps(studio, caps), [studio, caps]);
   const [autoPublishEnabled, setAutoPublishEnabled] = useState(false);
   const [autoPublishMinRating, setAutoPublishMinRating] = useState(5);
   const [autoPublishMinChars, setAutoPublishMinChars] = useState(0);
@@ -970,7 +983,7 @@ export default function PPEditorPage() {
             externalSiteUrl={externalSiteUrl} setExternalSiteUrl={setExternalSiteUrl}
             externalSiteButtonText={externalSiteButtonText} setExternalSiteButtonText={setExternalSiteButtonText}
             customSections={customSections} setCustomSections={setCustomSections} 
-            studio={studio} setStudio={setStudio} googlePlaceId={userData?.googlePlaceId}
+            studio={studio} setStudio={setStudio} googlePlaceId={userData?.googlePlaceId} caps={caps}
             autoPublishEnabled={autoPublishEnabled} setAutoPublishEnabled={setAutoPublishEnabled}
             autoPublishMinRating={autoPublishMinRating} setAutoPublishMinRating={setAutoPublishMinRating}
             autoPublishMinChars={autoPublishMinChars} setAutoPublishMinChars={setAutoPublishMinChars}
@@ -1012,7 +1025,7 @@ export default function PPEditorPage() {
                             externalSiteUrl={externalSiteUrl} setExternalSiteUrl={setExternalSiteUrl}
                             externalSiteButtonText={externalSiteButtonText} setExternalSiteButtonText={setExternalSiteButtonText}
                             customSections={customSections} setCustomSections={setCustomSections} 
-            studio={studio} setStudio={setStudio} googlePlaceId={userData?.googlePlaceId}
+            studio={studio} setStudio={setStudio} googlePlaceId={userData?.googlePlaceId} caps={caps}
                             autoPublishEnabled={autoPublishEnabled} setAutoPublishEnabled={setAutoPublishEnabled}
                             autoPublishMinRating={autoPublishMinRating} setAutoPublishMinRating={setAutoPublishMinRating}
                             autoPublishMinChars={autoPublishMinChars} setAutoPublishMinChars={setAutoPublishMinChars}
@@ -1102,7 +1115,8 @@ export default function PPEditorPage() {
                           </DropdownMenu>
                         </div>
 
-                        <main className="p-8 space-y-8 flex-1">
+                        <div className="flex flex-col flex-1">
+                        <main style={{ order: previewStudio.order.indexOf('testimonials') }} className="p-8 space-y-8">
                           <div className={cn("grid gap-6", "grid-cols-1")}>
                               {visibleTestimonialsPreview.map((t, idx) => (
                                 <div 
@@ -1130,8 +1144,12 @@ export default function PPEditorPage() {
                               ))}
                           </div>
                         </main>
-                        <PPStudioBlocks studio={studio} themeColor={themeColor} compact />
-                        <PPMapBlock studio={studio} themeColor={themeColor} compact />
+                        {previewStudio.order.filter(id => id !== 'testimonials').map(id => (
+                          <div key={id} style={{ order: previewStudio.order.indexOf(id) }}>
+                            <PPBlock id={id} studio={previewStudio} themeColor={themeColor} compact />
+                          </div>
+                        ))}
+                        </div>
                     </div>
                   </div>
               </div>

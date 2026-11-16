@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Trash2, MapPin, Loader2, Wand2, Info } from 'lucide-react';
+import Link from 'next/link';
+import { Plus, Trash2, MapPin, Loader2, Wand2, Info, ArrowUp, ArrowDown, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,33 +11,42 @@ import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
 import { getPlaceAddress } from '@/app/actions/maps-actions';
 import {
-  type StudioData, type SocialKey, DAY_LABELS, SOCIAL_KEYS, FAQ_LIMIT,
+  type StudioData, type SocialKey, type BlockId, DAY_LABELS, SOCIAL_KEYS, BLOCK_LABELS, normalizeOrder,
 } from '@/lib/studio';
+import type { PPCaps } from '@/lib/pp-plans';
 
 interface Props {
   studio: StudioData;
   setStudio: (s: StudioData) => void;
   googlePlaceId?: string;
+  caps: PPCaps;
 }
 
 const SOCIAL_LABEL: Record<SocialKey, string> = {
   instagram: 'Instagram (@usuario)', facebook: 'Facebook', tiktok: 'TikTok (@usuario)', youtube: 'YouTube (@canal)', linkedin: 'LinkedIn',
 };
 
-function BlockHeader({ title, hint, checked, onChange }: { title: string; hint?: string; checked: boolean; onChange: (v: boolean) => void }) {
+function BlockHeader({ title, hint, checked, onChange, locked }: { title: string; hint?: string; checked: boolean; onChange: (v: boolean) => void; locked?: boolean }) {
   return (
-    <div className="flex items-center justify-between gap-3 p-4 rounded-2xl bg-muted/10 border">
+    <div className={`flex items-center justify-between gap-3 p-4 rounded-2xl bg-muted/10 border ${locked ? 'opacity-70' : ''}`}>
       <div className="min-w-0">
-        <p className="text-xs font-black uppercase tracking-tight">{title}</p>
+        <p className="text-xs font-black uppercase tracking-tight flex items-center gap-2">
+          {title}
+          {locked && (
+            <Link href="/pricing" className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[8px] font-black tracking-widest text-primary hover:bg-primary/20">
+              <Lock className="w-2.5 h-2.5" /> Premium
+            </Link>
+          )}
+        </p>
         {hint && <p className="text-[10px] text-muted-foreground font-medium leading-snug">{hint}</p>}
       </div>
-      <Switch checked={checked} onCheckedChange={onChange} />
+      <Switch checked={checked && !locked} disabled={locked} onCheckedChange={onChange} />
     </div>
   );
 }
 
 /** Aba "Blocos" do editor: Sobre, Horários, Perguntas frequentes, Redes sociais e Mapa. */
-export function StudioPanel({ studio, setStudio, googlePlaceId }: Props) {
+export function StudioPanel({ studio, setStudio, googlePlaceId, caps }: Props) {
   const [loadingAddr, setLoadingAddr] = useState(false);
   const set = <K extends keyof StudioData>(key: K, patch: Partial<StudioData[K]>) =>
     setStudio({ ...studio, [key]: { ...studio[key], ...patch } });
@@ -53,6 +63,15 @@ export function StudioPanel({ studio, setStudio, googlePlaceId }: Props) {
     } finally { setLoadingAddr(false); }
   };
 
+  const order = normalizeOrder(studio.order);
+  const move = (i: number, dir: -1 | 1) => {
+    const next = [...order] as BlockId[];
+    const j = i + dir;
+    if (j < 0 || j >= next.length) return;
+    [next[i], next[j]] = [next[j], next[i]];
+    setStudio({ ...studio, order: next });
+  };
+
   const updateDay = (i: number, patch: Partial<StudioData['hours']['days'][number]>) =>
     set('hours', { days: studio.hours.days.map((d, idx) => (idx === i ? { ...d, ...patch } : d)) });
 
@@ -64,6 +83,26 @@ export function StudioPanel({ studio, setStudio, googlePlaceId }: Props) {
           Evite promessas de resultado, fotos de antes e depois e preços promocionais: a publicidade de serviços de saúde tem regras dos conselhos profissionais.
         </p>
       </div>
+
+      <section className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Ordem da página</Label>
+          {!caps.reorder && (
+            <Link href="/pricing" className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[8px] font-black uppercase tracking-widest text-primary"><Lock className="w-2.5 h-2.5" /> Premium</Link>
+          )}
+        </div>
+        <div className="space-y-1.5">
+          {order.map((id, i) => (
+            <div key={id} className="flex items-center gap-2 rounded-xl border bg-muted/10 px-3 py-2">
+              <span className="w-5 text-[10px] font-black opacity-40">{i + 1}</span>
+              <span className="flex-1 text-xs font-black uppercase tracking-tight">{BLOCK_LABELS[id]}</span>
+              <Button variant="ghost" size="icon" className="h-7 w-7" disabled={!caps.reorder || i === 0} onClick={() => move(i, -1)} aria-label="Subir"><ArrowUp className="w-3.5 h-3.5" /></Button>
+              <Button variant="ghost" size="icon" className="h-7 w-7" disabled={!caps.reorder || i === order.length - 1} onClick={() => move(i, 1)} aria-label="Descer"><ArrowDown className="w-3.5 h-3.5" /></Button>
+            </div>
+          ))}
+        </div>
+        <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">Blocos desligados não aparecem na página, mesmo na ordem.</p>
+      </section>
 
       <section className="space-y-3">
         <BlockHeader title="Sobre" hint="Apresente a clínica ou o profissional." checked={studio.about.enabled} onChange={(v) => set('about', { enabled: v })} />
@@ -101,8 +140,8 @@ export function StudioPanel({ studio, setStudio, googlePlaceId }: Props) {
       </section>
 
       <section className="space-y-3">
-        <BlockHeader title="Perguntas frequentes" hint={`Até ${FAQ_LIMIT} perguntas.`} checked={studio.faq.enabled} onChange={(v) => set('faq', { enabled: v })} />
-        {studio.faq.enabled && (
+        <BlockHeader locked={!caps.blocks.faq} title="Perguntas frequentes" hint={`Até ${caps.faqLimit || 5} perguntas.`} checked={studio.faq.enabled} onChange={(v) => set('faq', { enabled: v })} />
+        {studio.faq.enabled && caps.blocks.faq && (
           <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
             {studio.faq.items.map((it, i) => (
               <div key={it.id} className="space-y-2 rounded-2xl border p-3">
@@ -113,7 +152,7 @@ export function StudioPanel({ studio, setStudio, googlePlaceId }: Props) {
                 <Textarea value={it.a} maxLength={600} rows={3} onChange={(e) => set('faq', { items: studio.faq.items.map((x, idx) => idx === i ? { ...x, a: e.target.value } : x) })} placeholder="Resposta" className="rounded-xl text-xs" />
               </div>
             ))}
-            {studio.faq.items.length < FAQ_LIMIT && (
+            {studio.faq.items.length < caps.faqLimit && (
               <Button variant="outline" className="w-full h-11 rounded-xl text-[10px] font-black uppercase tracking-widest gap-2 border-dashed"
                 onClick={() => set('faq', { items: [...studio.faq.items, { id: `f${Date.now()}`, q: '', a: '' }] })}>
                 <Plus className="w-4 h-4" /> Adicionar pergunta
@@ -124,8 +163,8 @@ export function StudioPanel({ studio, setStudio, googlePlaceId }: Props) {
       </section>
 
       <section className="space-y-3">
-        <BlockHeader title="Redes sociais" hint="Aceita @usuario ou o link completo." checked={studio.socials.enabled} onChange={(v) => set('socials', { enabled: v })} />
-        {studio.socials.enabled && (
+        <BlockHeader locked={!caps.blocks.socials} title="Redes sociais" hint="Aceita @usuario ou o link completo." checked={studio.socials.enabled} onChange={(v) => set('socials', { enabled: v })} />
+        {studio.socials.enabled && caps.blocks.socials && (
           <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
             {SOCIAL_KEYS.map((k) => (
               <div key={k} className="space-y-1">
@@ -138,8 +177,8 @@ export function StudioPanel({ studio, setStudio, googlePlaceId }: Props) {
       </section>
 
       <section className="space-y-3">
-        <BlockHeader title="Mapa" hint="Mostra a localização no fim da página, sem interação, com botão Como chegar." checked={studio.map.enabled} onChange={(v) => set('map', { enabled: v })} />
-        {studio.map.enabled && (
+        <BlockHeader locked={!caps.blocks.map} title="Mapa" hint="Mostra a localização no fim da página, sem interação, com botão Como chegar." checked={studio.map.enabled} onChange={(v) => set('map', { enabled: v })} />
+        {studio.map.enabled && caps.blocks.map && (
           <div className="space-y-3 animate-in fade-in slide-in-from-top-2">
             <div className="space-y-1">
               <Label className="text-[9px] font-black uppercase ml-1 opacity-60">Endereço completo</Label>

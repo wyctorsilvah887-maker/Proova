@@ -29,8 +29,14 @@ function Title({ children, themeColor, compact }: { children: React.ReactNode; t
   );
 }
 
-/** Blocos extras da página pública: Sobre, Horários, Perguntas frequentes e Redes sociais. */
-export function PPStudioBlocks({ studio, themeColor, compact }: Props) {
+/** Renderiza UM bloco extra pelo id (a ordem é decidida por quem chama). 'testimonials' não é tratado aqui. */
+export function PPBlock({ id, ...props }: Props & { id: string }) {
+  if (id === 'map') return <PPMapBlock {...props} />;
+  if (id === 'about' || id === 'hours' || id === 'faq' || id === 'socials') return <PPStudioBlocks {...props} only={id} />;
+  return null;
+}
+
+function PPStudioBlocks({ studio, themeColor, compact, only }: Props & { only: 'about' | 'hours' | 'faq' | 'socials' }) {
   const rows = studio.hours.enabled ? hoursRows(studio.hours.days) : [];
   const faq = studio.faq.items.filter(i => i.q.trim() && i.a.trim());
   const socials = SOCIAL_KEYS
@@ -41,14 +47,14 @@ export function PPStudioBlocks({ studio, themeColor, compact }: Props) {
 
   return (
     <>
-      {studio.about.enabled && studio.about.text.trim() && (
+      {only === 'about' && studio.about.enabled && studio.about.text.trim() && (
         <section className={cn(wrap, 'text-center')}>
           <Title themeColor={themeColor} compact={compact}>{studio.about.title || 'Sobre nós'}</Title>
           <p className={cn(body, 'leading-relaxed font-medium opacity-80 whitespace-pre-line')}>{studio.about.text}</p>
         </section>
       )}
 
-      {rows.length > 0 && (
+      {only === 'hours' && rows.length > 0 && (
         <section className={wrap}>
           <Title themeColor={themeColor} compact={compact}>Horários de atendimento</Title>
           <div className="rounded-3xl border bg-card p-5 sm:p-7 space-y-3">
@@ -63,7 +69,7 @@ export function PPStudioBlocks({ studio, themeColor, compact }: Props) {
         </section>
       )}
 
-      {studio.faq.enabled && faq.length > 0 && (
+      {only === 'faq' && studio.faq.enabled && faq.length > 0 && (
         <section className={wrap}>
           <Title themeColor={themeColor} compact={compact}>Perguntas frequentes</Title>
           <div className="space-y-3">
@@ -80,7 +86,7 @@ export function PPStudioBlocks({ studio, themeColor, compact }: Props) {
         </section>
       )}
 
-      {socials.length > 0 && (
+      {only === 'socials' && socials.length > 0 && (
         <section className={cn(wrap, 'text-center')}>
           <Title themeColor={themeColor} compact={compact}>Siga nas redes</Title>
           <div className="flex flex-wrap items-center justify-center gap-3">
@@ -101,7 +107,7 @@ export function PPStudioBlocks({ studio, themeColor, compact }: Props) {
 }
 
 /** Mapa do Google sem interação (só visual) + botão "Como chegar". Vai no fim da página. */
-export function PPMapBlock({ studio, themeColor, compact }: Props) {
+function PPMapBlock({ studio, themeColor, compact }: Props) {
   const address = studio.map.address.trim();
   if (!studio.map.enabled || !address) return null;
   return (
