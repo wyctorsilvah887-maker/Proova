@@ -4,7 +4,8 @@ import { initializeFirebase } from '@/firebase';
 import { checkRateLimit } from '@/lib/rate-limit';
 import { collection, query, getDocs, addDoc, serverTimestamp, doc, updateDoc, increment, getDoc, limit, where } from 'firebase/firestore';
 import { sendFeedbackAlert } from '@/lib/feedback-alert';
-import { generateReplyAction } from '@/ai/flows/generate-reply-flow';
+import { generateReply } from '@/ai/reply';
+import { reserveAiReplies, releaseAiReplies } from '@/lib/ai-quota';
 
 /**
  * Salva um depoimento com resposta automática via IA.
@@ -34,18 +35,23 @@ export async function submitTestimonialAction(data: {
     // Piloto Automático: gera resposta por IA. Se a IA falhar, o depoimento é salvo sem resposta.
     let aiReply = null;
     if (isPremium) {
+      let reserved = false;
       try {
-        const { reply } = await generateReplyAction({
-          authorName: data.userName,
-          testimonialText: data.text?.trim() || (data.videoUrl ? '[Depoimento em Vídeo]' : '[Avaliação apenas com nota]'),
-          rating: data.rating,
-          companyName: userData.companyName,
-          businessType: userData.businessType,
-          contactWhatsapp: userData.contactWhatsapp || undefined,
-        });
-        aiReply = reply;
+        // Cota mensal: se estourar, o depoimento é salvo normalmente, só sem resposta automática.
+        reserved = (await reserveAiReplies(data.targetUserId, status, 1)).ok;
+        if (reserved) {
+          aiReply = await generateReply({
+            authorName: data.userName,
+            text: data.text?.trim() || (data.videoUrl ? '[Depoimento em Vídeo]' : '[Avaliação apenas com nota]'),
+            rating: data.rating,
+            companyName: userData.companyName,
+            businessType: userData.businessType,
+            contactWhatsapp: userData.contactWhatsapp || undefined,
+          });
+        }
       } catch (error) {
         console.error('Falha ao gerar resposta automática por IA:', error);
+        if (reserved) await releaseAiReplies(data.targetUserId, 1);
       }
     }
 
