@@ -73,7 +73,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { getConsultantResponse, getMainMenu } from '@/lib/consultant-rules';
+import { getConsultantResponse, getMainMenu, matchConsultantKey } from '@/lib/consultant-rules';
+import { ppPlanOf } from '@/lib/pp-plans';
 import { toast } from '@/hooks/use-toast';
 import { LoadingScreen } from '@/components/loading-screen';
 import { Badge } from '@/components/ui/badge';
@@ -193,7 +194,7 @@ export default function SupportPage() {
   };
 
   const handleCreateSupportTicket = async () => {
-    if (!user || !db || !userData) return;
+    if (!user || !db || !userData || activeTicket) return; // já existe ticket aberto: não duplica
     setIsCreatingTicket(true);
     try {
       const ticketRef = await addDoc(collection(db, 'support_tickets'), {
@@ -206,8 +207,8 @@ export default function SupportPage() {
         isUserTyping: false,
         isSupportTyping: false
       });
-      const plan = (userData.membershipStatus || 'base').toLowerCase();
-      let planMessage = plan === 'enterprise' ? "Você está na **fila prioritária**." : (plan === 'gold' ? "Você está na **fila de espera** para o suporte." : "Aguarde até **2 horas** em horário comercial para obter sua resposta.");
+      const plan = ppPlanOf(userData.membershipStatus);
+      const planMessage = plan === 'pro' ? "Você está na **fila prioritária**." : (plan === 'premium' ? "Você está na **fila de espera** para o suporte." : "Aguarde até **2 horas** em horário comercial para obter sua resposta.");
       const finalBotMsg = `Seu ticket foi criado com sucesso! 🎟️\nProtocolo: **${ticketRef.id}**\n\n${planMessage}`;
       await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
         text: finalBotMsg,
@@ -263,21 +264,35 @@ export default function SupportPage() {
         setIsSending(false);
         return;
       }
+      // "sim" só confirma o encerramento se a última resposta do consultor foi o pedido de confirmação.
+      const lastBot = [...localMessages].reverse().find((m: any) => m.sender === 'support');
+      const wantsClose = /^sim$/i.test(userMsg) && String(lastBot?.text || '').includes('Confirmação de Encerramento');
+      if (wantsClose) {
+        setIsSending(false);
+        await handleFinalCleanup();
+        return;
+      }
       setIsAiThinking(true);
       setTimeout(async () => {
-        const botResponse = getConsultantResponse(userMsg, userData?.name?.split(' ')[0] || 'Parceiro');
-        await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
-          text: botResponse,
-          sender: 'support',
-          createdAt: serverTimestamp()
-        });
-        const normalizedInput = userMsg.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-        if (userMsg === '6' || normalizedInput.includes('humano')) {
-          await handleCreateSupportTicket();
+        try {
+          const key = matchConsultantKey(userMsg);
+          const firstName = userData?.name?.split(' ')[0] || 'Parceiro';
+          const botResponse = key === '6' && activeTicket
+            ? `Você já tem um atendimento aberto (protocolo **${activeTicket.id}**). Escreva sua dúvida aqui que o consultor responde. 🎧\n\n*Digite **0** para voltar ao menu principal.*`
+            : getConsultantResponse(userMsg, firstName);
+          await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
+            text: botResponse,
+            sender: 'support',
+            createdAt: serverTimestamp()
+          });
+          if (key === '6') await handleCreateSupportTicket();
+        } catch (e) {
+          console.error(e);
+        } finally {
+          setIsAiThinking(false);
+          setIsSending(false);
         }
-        setIsAiThinking(false);
-        setIsSending(false);
-      }, 1000);
+      }, 800);
     } catch (err) {
       console.error(err);
       setIsSending(false);
@@ -343,7 +358,7 @@ export default function SupportPage() {
                     <Bot className="w-6 h-6" />
                   </div>
                   <div className="space-y-0.5">
-                    <h3 className="text-sm font-black uppercase tracking-tight">Consultor Proova V1.0</h3>
+                    <h3 className="text-sm font-black uppercase tracking-tight">Consultor Proova AI</h3>
                     <div className="flex items-center gap-1.5">
                       <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
                       <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Árvore de Decisão Ativa</span>
@@ -372,7 +387,7 @@ export default function SupportPage() {
                 </div>
               ) : (
                 localMessages.map((msg: any, idx: number) => (
-                  <div key={idx} className={cn("flex animate-in fade-in slide-in-from-bottom-4 duration-500", msg.sender === 'user' ? "justify-end" : "justify-start")}>
+                  <div key={msg.id || idx} className={cn("flex animate-in fade-in slide-in-from-bottom-4 duration-500", msg.sender === 'user' ? "justify-end" : "justify-start")}>
                     <div className={cn("flex gap-2 md:gap-3 max-w-[85%] sm:max-w-[75%]", msg.sender === 'user' ? "flex-row-reverse" : "flex-row")}>
                       <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center shrink-0 mt-1 shadow-md", msg.sender === 'user' ? "bg-primary text-white" : "bg-muted text-muted-foreground")}>
                         {msg.sender === 'user' ? <User className="w-4 h-4" /> : (isHumanSupportPresent ? <Headphones className="w-4 h-4" /> : <Bot className="w-4 h-4" />)}
@@ -443,6 +458,7 @@ export default function SupportPage() {
                    setMessage(e.target.value);
                    handleTyping();
                  }}
+                 maxLength={500}
                  placeholder="Digite o número da opção (ex: 1)..."
                  className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs md:text-sm font-medium pr-14 shadow-inner"
                  disabled={isSending || isEndingChat}
@@ -475,7 +491,7 @@ export default function SupportPage() {
       </main>
 
       <footer className="py-4 text-center opacity-30 shrink-0">
-        <p className="text-[8px] font-black uppercase tracking-[0.4em]">POWERED BY PROOVA DECISION TREE V1.0</p>
+        <p className="text-[8px] font-black uppercase tracking-[0.4em]">POWERED BY PROOVA AI</p>
       </footer>
 
       <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
