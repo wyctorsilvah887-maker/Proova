@@ -119,6 +119,7 @@ import Link from 'next/link';
 import { signOut } from 'firebase/auth';
 import { toast as shadcnToast } from '@/hooks/use-toast';
 import { QRCodeSVG } from 'qrcode.react';
+import { LinkShareBox } from '@/components/link-share-box';
 import { useTheme } from 'next-themes';
 import { jsPDF } from 'jspdf';
 import { toPng } from 'html-to-image';
@@ -483,6 +484,18 @@ export default function DashPage() {
     } catch (err) { shadcnToast({ variant: "destructive", title: "Erro na geração" }); } finally { setIsGeneratingPdf(false); }
   };
 
+  const handleDownloadPng = async () => {
+    try {
+      const qrElement = document.getElementById('qr-container-print');
+      if (!qrElement) throw new Error();
+      const dataUrl = await toPng(qrElement, { pixelRatio: 4, backgroundColor: '#ffffff' });
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = `qrcode-${userData?.companySlug}.png`;
+      a.click();
+    } catch { shadcnToast({ variant: "destructive", title: "Erro ao baixar imagem" }); }
+  };
+
   // Lógica para regerar resposta por IA
   const handleRegenerateResponse = async (id: string, name: string, text: string, stars: number, isApi: boolean = false) => {
     if (isRegenerating || !userData) return;
@@ -614,13 +627,12 @@ export default function DashPage() {
               <div className={cn(activeHash === 'qr' ? 'p-3' : 'p-5', 'sm:p-8 md:p-12')}>
                 {activeHash === 'link-coleta' && (
                   <div className="max-w-md mx-auto space-y-8">
-                    <div className="flex flex-col items-center gap-6 text-center">
+                    <div className="flex flex-col items-center gap-4 text-center">
                        <div className="p-5 rounded-3xl bg-primary/10 text-primary"><Link2 className="w-10 h-10" /></div>
                        <p className="text-sm font-medium text-muted-foreground">Envie este link aos seus clientes após o atendimento para capturar elogios instantâneos.</p>
                     </div>
-                    <Button className="w-full h-16 rounded-2xl text-lg font-black gap-3 shadow-xl bg-primary hover:bg-primary/90" onClick={() => copyToClipboard(collectionLink, "Link de coleta")}>
-                       <Copy className="w-5 h-5" /> Copiar Link de Coleta
-                    </Button>
+                    <LinkShareBox url={collectionLink} label="Link de coleta" shareMessage="Conta pra gente como foi seu atendimento, leva menos de 1 minuto:" onCopy={copyToClipboard} />
+                    <p className="text-center text-[11px] font-medium text-muted-foreground leading-relaxed">Dica: envie pelo WhatsApp logo após a consulta, quando a experiência ainda está fresca.</p>
                   </div>
                 )}
 
@@ -630,15 +642,10 @@ export default function DashPage() {
                        <div className="p-5 rounded-3xl bg-primary/10 text-primary"><Globe className="w-10 h-10" /></div>
                        <p className="text-sm font-medium text-muted-foreground">Sua vitrine oficial de depoimentos. Ideal para o link da bio do Instagram.</p>
                     </div>
-                    <div className="grid gap-3">
-                       <Button className="h-14 rounded-xl font-black uppercase tracking-widest gap-3" onClick={() => router.push(`/pp/${userData.companySlug}`)}>
-                          <Eye className="w-5 h-5" /> Visualizar Página
-                       </Button>
-                       <Button variant="outline" className="h-14 rounded-xl font-black uppercase tracking-widest gap-3 border-primary/20 text-primary" onClick={() => router.push('/ppeditor')}>
-                          <Settings className="w-5 h-5" /> Configurar Temas
-                       </Button>
-                       <Button variant="ghost" className="text-[10px] font-black uppercase text-primary" onClick={() => copyToClipboard(publicPageLink, "Link da bio")}>Copiar URL da Página</Button>
-                    </div>
+                    <LinkShareBox url={publicPageLink} label="Link da bio" shareMessage="Veja os depoimentos de quem já passou por aqui:" onCopy={copyToClipboard} />
+                    <Button variant="outline" className="w-full h-14 rounded-xl font-black uppercase tracking-widest gap-3 border-primary/20 text-primary" onClick={() => router.push('/ppeditor')}>
+                       <Settings className="w-5 h-5" /> Configurar Temas
+                    </Button>
                   </div>
                 )}
 
@@ -651,9 +658,16 @@ export default function DashPage() {
                         <p className="text-[10px] font-bold text-muted-foreground uppercase">{userData?.companyName}</p>
                       </div>
                     </div>
-                    <Button className="w-full h-14 md:h-16 max-w-sm rounded-2xl text-xs md:text-lg font-black gap-3 shadow-xl" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
-                      {isGeneratingPdf ? <Loader2 className="animate-spin" /> : <Download className="w-5 h-5 md:w-6 md:h-6" />} Baixar PDF para Impressão
-                    </Button>
+                    <div className="w-full max-w-sm space-y-3">
+                      <Button className="w-full h-14 md:h-16 rounded-2xl text-xs md:text-lg font-black gap-3 shadow-xl" onClick={handleDownloadPdf} disabled={isGeneratingPdf}>
+                        {isGeneratingPdf ? <Loader2 className="animate-spin" /> : <Download className="w-5 h-5 md:w-6 md:h-6" />} Baixar PDF para Impressão
+                      </Button>
+                      <Button variant="outline" className="w-full h-12 rounded-xl border-primary/20 text-primary font-black text-[10px] uppercase tracking-widest gap-2" onClick={handleDownloadPng}>
+                        <ImageIcon className="w-4 h-4" /> Baixar imagem (PNG)
+                      </Button>
+                      <LinkShareBox url={collectionLink} label="Link de coleta" shareMessage="Conta pra gente como foi seu atendimento:" onCopy={copyToClipboard} />
+                      <p className="text-center text-[11px] font-medium text-muted-foreground leading-relaxed">Imprima e deixe no balcão ou na recepção. O cliente aponta a câmera do celular e avalia em segundos.</p>
+                    </div>
                   </div>
                 )}
 
