@@ -43,7 +43,6 @@ import {
   Link2,
   Bell,
   ExternalLink,
-  Zap,
   ChevronLeft,
   ChevronRight,
   ListChecks,
@@ -267,13 +266,9 @@ const PublicPageSettings = ({
   externalSiteButtonText, setExternalSiteButtonText,
   customSections, setCustomSections,
   studio, setStudio, googlePlaceId, caps,
-  autoPublishEnabled, setAutoPublishEnabled,
-  autoPublishMinRating, setAutoPublishMinRating,
-  autoPublishMinChars, setAutoPublishMinChars,
   onFileSelect,
   isUploading,
   isGoldPlan,
-  isEnterprise,
   isAgency,
   logoInputRef,
   currentSlug, setSlugEdit,
@@ -325,7 +320,6 @@ const PublicPageSettings = ({
                 { id: 'geral', label: 'Visual', icon: Palette },
                 { id: 'selecao', label: 'Seleção', icon: ListChecks, badge: selectedIds.length },
                 { id: 'conteudo', label: 'Conteúdo', icon: Type, locked: !isGoldPlan },
-                { id: 'automacao', label: 'Automação', icon: Zap, locked: !isEnterprise },
                 { id: 'blocos', label: 'Blocos', icon: Layout },
                 { id: 'design', label: 'Layout', icon: LayoutGridIcon },
                 { id: 'social', label: 'Contato', icon: MessageCircle },
@@ -767,9 +761,6 @@ export default function PPEditorPage() {
   const previewStudio = useMemo(() => applyStudioCaps(studio, caps), [studio, caps]);
   const googleRating = useGoogleRating(previewStudio.showRating ? user?.uid : null);
   const proovaRating = useMemo(() => (previewStudio.showRating ? proovaAverage(approvedTestimonials as any[]) : null), [previewStudio.showRating, approvedTestimonials]);
-  const [autoPublishEnabled, setAutoPublishEnabled] = useState(false);
-  const [autoPublishMinRating, setAutoPublishMinRating] = useState(5);
-  const [autoPublishMinChars, setAutoPublishMinChars] = useState(0);
   const [slugEdit, setSlugEdit] = useState('');
 
   const [isSaving, setIsSaving] = useState(false);
@@ -813,9 +804,6 @@ export default function PPEditorPage() {
       setExternalSiteButtonText(ppData.externalSiteButtonText || '');
       setCustomSections(ppData.customSections || []);
       setStudio(normalizeStudio(ppData.studio));
-      setAutoPublishEnabled(ppData.autoPublishEnabled || false);
-      setAutoPublishMinRating(ppData.autoPublishMinRating || 5);
-      setAutoPublishMinChars(ppData.autoPublishMinChars || 0);
     }
   }, [ppData]);
 
@@ -875,7 +863,6 @@ export default function PPEditorPage() {
         whatsappEnabled, whatsappNumber: waNormalized || '', externalSiteUrl, externalSiteButtonText,
         customSections: customSections || [],
         studio,
-        autoPublishEnabled, autoPublishMinRating, autoPublishMinChars,
         updatedAt: serverTimestamp()
       }, { merge: true });
       await batch.commit();
@@ -1039,11 +1026,8 @@ export default function PPEditorPage() {
             externalSiteButtonText={externalSiteButtonText} setExternalSiteButtonText={setExternalSiteButtonText}
             customSections={customSections} setCustomSections={setCustomSections} 
             studio={studio} setStudio={setStudio} googlePlaceId={userData?.googlePlaceId} caps={caps}
-            autoPublishEnabled={autoPublishEnabled} setAutoPublishEnabled={setAutoPublishEnabled}
-            autoPublishMinRating={autoPublishMinRating} setAutoPublishMinRating={setAutoPublishMinRating}
-            autoPublishMinChars={autoPublishMinChars} setAutoPublishMinChars={setAutoPublishMinChars}
             onFileSelect={onFileSelect}
-            isUploading={isUploading} isGoldPlan={isGoldPlan} isEnterprise={isEnterprise} isAgency={isAgency}
+            isUploading={isUploading} isGoldPlan={isGoldPlan} isAgency={isAgency}
             logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
             approvedTestimonials={approvedTestimonials}
             selectedIds={selectedIds}
@@ -1081,11 +1065,8 @@ export default function PPEditorPage() {
                             externalSiteButtonText={externalSiteButtonText} setExternalSiteButtonText={setExternalSiteButtonText}
                             customSections={customSections} setCustomSections={setCustomSections} 
             studio={studio} setStudio={setStudio} googlePlaceId={userData?.googlePlaceId} caps={caps}
-                            autoPublishEnabled={autoPublishEnabled} setAutoPublishEnabled={setAutoPublishEnabled}
-                            autoPublishMinRating={autoPublishMinRating} setAutoPublishMinRating={setAutoPublishMinRating}
-                            autoPublishMinChars={autoPublishMinChars} setAutoPublishMinChars={setAutoPublishMinChars}
                             onFileSelect={onFileSelect}
-                            isUploading={isUploading} isGoldPlan={isGoldPlan} isEnterprise={isEnterprise} isAgency={isAgency}
+                            isUploading={isUploading} isGoldPlan={isGoldPlan} isAgency={isAgency}
                             logoInputRef={logoInputRef} currentSlug={slugEdit} setSlugEdit={setSlugEdit}
                             onClose={() => setIsSheetOpen(false)}
                             approvedTestimonials={approvedTestimonials}
