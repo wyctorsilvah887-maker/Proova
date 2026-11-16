@@ -399,11 +399,11 @@ export default function DashPage() {
     if (!user || !manualLink.trim() || isSavingLink) return;
     setIsSavingLink(true);
     try {
-      await saveGooglePlace(user, {
+      const saved = await saveGooglePlace(user, {
         url: manualLink.trim(),
         ...(city.trim() && state.trim().length === 2 ? { city: city.trim(), state: state.trim() } : {}),
       });
-      shadcnToast({ title: "Link salvo!", description: "O botão de avaliação no Google já usa este link." });
+      shadcnToast({ title: "Link salvo!", description: saved.googlePlaceId ? "Empresa identificada: o botão de avaliação e a busca automática já funcionam." : "O botão de avaliação no Google já usa este link. A busca automática de avaliações precisa da empresa selecionada na busca." });
       setManualLink('');
       clearHash();
     } catch (err: any) {
