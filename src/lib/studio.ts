@@ -9,6 +9,8 @@ export type StudioData = {
   faq: { enabled: boolean; items: StudioFaqItem[] };
   socials: { enabled: boolean; instagram: string; facebook: string; tiktok: string; youtube: string; linkedin: string };
   map: { enabled: boolean; address: string; showAddress: boolean };
+  /** Mostra o selo de avaliações (média Proova AI + nota do Google) no topo. */
+  showRating: boolean;
   /** Ordem dos blocos da página (depois do topo): inclui 'testimonials'. */
   order: BlockId[];
 };
@@ -47,6 +49,7 @@ export function defaultStudio(): StudioData {
     faq: { enabled: false, items: [] },
     socials: { enabled: false, instagram: '', facebook: '', tiktok: '', youtube: '', linkedin: '' },
     map: { enabled: false, address: '', showAddress: true },
+    showRating: true,
     order: [...DEFAULT_ORDER],
   };
 }
@@ -87,6 +90,7 @@ export function normalizeStudio(raw: any): StudioData {
       linkedin: str(raw.socials?.linkedin, 200),
     },
     map: { enabled: !!raw.map?.enabled, address: str(raw.map?.address, 250), showAddress: raw.map?.showAddress !== false },
+    showRating: raw.showRating !== false,
     order: normalizeOrder(raw.order),
   };
 }
@@ -145,9 +149,10 @@ export function hasStudioContent(s: StudioData) {
 }
 
 /** Aplica os limites do plano ao que será exibido (não altera o que o dono salvou). */
-export function applyStudioCaps(s: StudioData, caps: { blocks: Record<string, boolean>; faqLimit: number; reorder: boolean }): StudioData {
+export function applyStudioCaps(s: StudioData, caps: { blocks: Record<string, boolean>; faqLimit: number; reorder: boolean; ratingSummary: boolean }): StudioData {
   return {
     ...s,
+    showRating: s.showRating && caps.ratingSummary,
     about: { ...s.about, enabled: s.about.enabled && caps.blocks.about },
     hours: { ...s.hours, enabled: s.hours.enabled && caps.blocks.hours },
     faq: { ...s.faq, enabled: s.faq.enabled && caps.blocks.faq, items: s.faq.items.slice(0, caps.faqLimit) },
@@ -155,4 +160,15 @@ export function applyStudioCaps(s: StudioData, caps: { blocks: Record<string, bo
     map: { ...s.map, enabled: s.map.enabled && caps.blocks.map },
     order: caps.reorder ? s.order : [...DEFAULT_ORDER],
   };
+}
+
+/** Mínimo de avaliações para exibir a média (evita "5,0" com uma única avaliação). */
+export const MIN_PROOVA_RATINGS = 5;
+
+/** Média geral do Proova: mesma conta da página de métricas (todas as avaliações aprovadas, todo o período). */
+export function proovaAverage(testimonials: { rating?: number }[] | null | undefined): { avg: number; count: number } | null {
+  const list = (testimonials || []).filter(t => typeof t.rating === 'number' && t.rating > 0);
+  if (list.length < MIN_PROOVA_RATINGS) return null;
+  const sum = list.reduce((acc, t) => acc + (t.rating || 0), 0);
+  return { avg: sum / list.length, count: list.length };
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock, MapPin, Navigation, Instagram, Facebook, Youtube, Linkedin, Music2, ChevronDown } from 'lucide-react';
+import { Clock, MapPin, Navigation, Instagram, Facebook, Youtube, Linkedin, Music2, ChevronDown, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   type StudioData, type SocialKey, SOCIAL_KEYS, socialUrl, hoursRows, mapEmbedUrl, directionsUrl,
@@ -87,15 +87,14 @@ function PPStudioBlocks({ studio, themeColor, compact, only }: Props & { only: '
       )}
 
       {only === 'socials' && socials.length > 0 && (
-        <section className={cn(wrap, 'text-center')}>
-          <Title themeColor={themeColor} compact={compact}>Siga nas redes</Title>
+        <section className={cn(compact ? 'px-6 py-4' : 'px-6 py-8 max-w-3xl mx-auto w-full')}>
           <div className="flex flex-wrap items-center justify-center gap-3">
             {socials.map(({ k, url }) => {
               const { label, Icon } = SOCIAL_META[k];
               return (
-                <a key={k} href={url} target="_blank" rel="noopener noreferrer" aria-label={label}
-                   className="flex items-center gap-2 rounded-full border bg-card px-4 py-2.5 text-xs font-black uppercase tracking-widest transition-transform hover:scale-105">
-                  <Icon className="w-4 h-4" style={{ color: themeColor }} /> {label}
+                <a key={k} href={url} target="_blank" rel="noopener noreferrer" aria-label={label} title={label}
+                   className={cn('flex items-center justify-center rounded-full border bg-card shadow-sm transition-transform hover:scale-110', compact ? 'h-9 w-9' : 'h-12 w-12')}>
+                  <Icon className={compact ? 'w-4 h-4' : 'w-5 h-5'} style={{ color: themeColor }} />
                 </a>
               );
             })}
@@ -136,5 +135,33 @@ function PPMapBlock({ studio, themeColor, compact }: Props) {
         </a>
       </div>
     </section>
+  );
+}
+
+const fmt = (n: number) => n.toFixed(1).replace('.', ',');
+
+/** Selo de avaliações no topo: média Proova AI (a mesma da página de métricas) e nota do Google. */
+export function RatingSummary({ proova, google, themeColor, compact }: {
+  proova: { avg: number; count: number } | null;
+  google: { rating: number; count: number } | null;
+  themeColor: string;
+  compact?: boolean;
+}) {
+  if (!proova && !google) return null;
+  const row = (label: string, value: number, count: number) => (
+    <div className={cn('flex items-center justify-between gap-4 rounded-full border bg-card font-bold shadow-sm', compact ? 'px-3 py-1.5 text-[10px]' : 'px-5 py-2.5 text-xs sm:text-sm')}>
+      <span className="opacity-70">{label}</span>
+      <span className="flex items-center gap-1.5 font-black">
+        <Star className={cn('fill-current', compact ? 'w-3 h-3' : 'w-4 h-4')} style={{ color: themeColor }} />
+        {fmt(value)}
+        <span className="font-semibold opacity-50">· {count} {count === 1 ? 'avaliação' : 'avaliações'}</span>
+      </span>
+    </div>
+  );
+  return (
+    <div className={cn('mx-auto w-full space-y-2', compact ? 'max-w-[260px]' : 'max-w-sm')}>
+      {proova && row('Avaliações Proova AI', proova.avg, proova.count)}
+      {google && row('Avaliações Google', google.rating, google.count)}
+    </div>
   );
 }

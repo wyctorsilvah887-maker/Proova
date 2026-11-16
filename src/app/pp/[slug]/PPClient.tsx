@@ -26,8 +26,10 @@ import {
 } from "@/components/ui/carousel";
 import { trackPPVisit, trackWhatsappClick } from '@/app/actions/stats-actions';
 import { LoadingScreen } from '@/components/loading-screen';
-import { PPBlock } from '@/components/pp-blocks';
-import { normalizeStudio, applyStudioCaps } from '@/lib/studio';
+import { PPBlock, RatingSummary } from '@/components/pp-blocks';
+import { useGoogleRating } from '@/hooks/use-google-rating';
+import { normalizeStudio, applyStudioCaps, proovaAverage } from '@/lib/studio';
+import { normalizeBrWhatsapp } from '@/lib/whatsapp';
 import { ppCaps, ppPlanOf } from '@/lib/pp-plans';
 
 export default function PPClient({ slug }: { slug: string }) {
@@ -42,6 +44,7 @@ export default function PPClient({ slug }: { slug: string }) {
   const [isStandalone, setIsStandalone] = useState(false);
   const [companyName, setCompanyName] = useState('');
   const [ownerStatus, setOwnerStatus] = useState('');
+  const [ownerWhatsapp, setOwnerWhatsapp] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
   const [api, setApi] = useState<CarouselApi>();
 
@@ -65,6 +68,7 @@ export default function PPClient({ slug }: { slug: string }) {
           setTargetUserId(uId);
           setCompanyName(snap1.docs[0].data().companyName);
           setOwnerStatus(snap1.docs[0].data().membershipStatus || '');
+          setOwnerWhatsapp(snap1.docs[0].data().contactWhatsapp || '');
 
           const hasVisited = sessionStorage.getItem(`pp_visited_${uId}`);
           if (!hasVisited) {
@@ -115,11 +119,14 @@ export default function PPClient({ slug }: { slug: string }) {
   const footerText = ppData?.footerText || `${new Date().getFullYear()} ${companyName || ''}`;
   const showProovaBranding = caps.removeBranding ? ppData?.showLogo !== false : true;
   const whatsappEnabled = caps.whatsappButton && (ppData?.whatsappEnabled || false);
-  const whatsappNumber = ppData?.whatsappNumber || '';
+  // O WhatsApp cadastrado na conta (configurações/dash) vale primeiro; o do editor é reserva.
+  const whatsappNumber = normalizeBrWhatsapp(ownerWhatsapp) || ppData?.whatsappNumber || '';
   const externalSiteUrl = caps.externalSite ? (ppData?.externalSiteUrl || '') : '';
   const externalSiteButtonText = ppData?.externalSiteButtonText || 'Visitar Site Oficial';
   const customSections = (ppData?.customSections || []).slice(0, caps.customSections);
   const studio = useMemo(() => applyStudioCaps(normalizeStudio(ppData?.studio), caps), [ppData, caps]);
+  const googleRating = useGoogleRating(studio.showRating ? targetUserId : null);
+  const proovaRating = useMemo(() => (studio.showRating ? proovaAverage(allTestimonials) : null), [studio.showRating, allTestimonials]);
 
   const isVideoLogo = useMemo(() => {
     if (!logoUrl) return false;
@@ -231,17 +238,6 @@ export default function PPClient({ slug }: { slug: string }) {
           </div>
         </Card>
 
-        {t.aiReply && (
-          <div className="pl-6 sm:pl-10 -mt-2 animate-in fade-in slide-in-from-top-2 duration-1000">
-            <div className="bg-muted/30 border-l-4 rounded-r-2xl p-4 space-y-2 relative" style={{ borderColor: themeColor }}>
-              <div className="flex items-center gap-2">
-                <Bot className="w-3 h-3 text-primary" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-primary">Resposta da Clínica</span>
-              </div>
-              <p className="text-xs font-medium leading-relaxed opacity-90">{t.aiReply}</p>
-            </div>
-          </div>
-        )}
       </div>
     );
   };
@@ -306,6 +302,9 @@ export default function PPClient({ slug }: { slug: string }) {
                   <div className="text-muted-foreground text-lg sm:text-2xl max-w-3xl mx-auto font-medium leading-relaxed italic opacity-80" dangerouslySetInnerHTML={{ __html: sanitizeHtml(heroSubtitle) }} />
                 )}
               </div>
+              {studio.showRating && (
+                <RatingSummary proova={proovaRating} google={googleRating} themeColor={themeColor} />
+              )}
             </header>
 
             <div className="w-full">
