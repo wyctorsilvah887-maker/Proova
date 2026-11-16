@@ -26,8 +26,9 @@ import {
 } from "@/components/ui/carousel";
 import { trackPPVisit, trackWhatsappClick } from '@/app/actions/stats-actions';
 import { LoadingScreen } from '@/components/loading-screen';
-import { PPStudioBlocks, PPMapBlock } from '@/components/pp-blocks';
-import { normalizeStudio } from '@/lib/studio';
+import { PPBlock } from '@/components/pp-blocks';
+import { normalizeStudio, applyStudioCaps } from '@/lib/studio';
+import { ppCaps, ppPlanOf } from '@/lib/pp-plans';
 
 export default function PPClient({ slug }: { slug: string }) {
   const db = useFirestore();
@@ -40,6 +41,7 @@ export default function PPClient({ slug }: { slug: string }) {
   const [muralIndex, setMuralIndex] = useState(0);
   const [isStandalone, setIsStandalone] = useState(false);
   const [companyName, setCompanyName] = useState('');
+  const [ownerStatus, setOwnerStatus] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
   const [api, setApi] = useState<CarouselApi>();
 
@@ -62,6 +64,7 @@ export default function PPClient({ slug }: { slug: string }) {
           const uId = snap1.docs[0].id;
           setTargetUserId(uId);
           setCompanyName(snap1.docs[0].data().companyName);
+          setOwnerStatus(snap1.docs[0].data().membershipStatus || '');
 
           const hasVisited = sessionStorage.getItem(`pp_visited_${uId}`);
           if (!hasVisited) {
@@ -93,27 +96,30 @@ export default function PPClient({ slug }: { slug: string }) {
     return () => { unsubPP(); unsubTestimonials(); };
   }, [db, targetUserId, slug]);
 
+  // Limites do plano ATUAL do dono (quem faz downgrade deixa de exibir o que o plano não cobre).
+  const caps = useMemo(() => ppCaps(ppPlanOf(ownerStatus)), [ownerStatus]);
+
   const filteredTestimonials = useMemo(() => {
     if (!ppData || !allTestimonials.length) return [];
     const selectedIds = ppData.selectedTestimonialIds || [];
-    return allTestimonials.filter(t => selectedIds.includes(t.id));
-  }, [ppData, allTestimonials]);
+    return allTestimonials.filter(t => selectedIds.includes(t.id)).slice(0, caps.selectionLimit);
+  }, [ppData, allTestimonials, caps]);
 
-  const layout = ppData?.layout || 'grid';
+  const layout = caps.layouts.includes(ppData?.layout) ? ppData.layout : 'grid';
   const themeColor = ppData?.themeColor || '#f97316';
-  const secondaryColor = ppData?.secondaryColor || '';
+  const secondaryColor = caps.secondaryColor ? (ppData?.secondaryColor || '') : '';
   const logoUrl = ppData?.logoUrl || '';
   const heroTitle = ppData?.heroTitle || `O que dizem sobre ${companyName || 'nós'}`;
   const heroSubtitle = ppData?.heroSubtitle || '';
   const testimonialsTitle = ppData?.testimonialsTitle || '';
   const footerText = ppData?.footerText || `${new Date().getFullYear()} ${companyName || ''}`;
-  const showProovaBranding = ppData?.showLogo !== false;
-  const whatsappEnabled = ppData?.whatsappEnabled || false;
+  const showProovaBranding = caps.removeBranding ? ppData?.showLogo !== false : true;
+  const whatsappEnabled = caps.whatsappButton && (ppData?.whatsappEnabled || false);
   const whatsappNumber = ppData?.whatsappNumber || '';
-  const externalSiteUrl = ppData?.externalSiteUrl || '';
+  const externalSiteUrl = caps.externalSite ? (ppData?.externalSiteUrl || '') : '';
   const externalSiteButtonText = ppData?.externalSiteButtonText || 'Visitar Site Oficial';
-  const customSections = ppData?.customSections || [];
-  const studio = useMemo(() => normalizeStudio(ppData?.studio), [ppData]);
+  const customSections = (ppData?.customSections || []).slice(0, caps.customSections);
+  const studio = useMemo(() => applyStudioCaps(normalizeStudio(ppData?.studio), caps), [ppData, caps]);
 
   const isVideoLogo = useMemo(() => {
     if (!logoUrl) return false;
@@ -325,7 +331,8 @@ export default function PPClient({ slug }: { slug: string }) {
               ))}
             </div>
 
-            <main className="px-6 pb-32 max-w-[1600px] mx-auto w-full pt-12 space-y-12">
+            <div className="flex flex-col w-full">
+            <main style={{ order: studio.order.indexOf('testimonials') }} className="px-6 pb-32 max-w-[1600px] mx-auto w-full pt-12 space-y-12">
               {testimonialsTitle && (
                 <div className="text-center">
                    <h2 className="text-2xl sm:text-4xl font-black font-headline uppercase tracking-tight" style={{ color: themeColor }}>{testimonialsTitle}</h2>
@@ -360,8 +367,12 @@ export default function PPClient({ slug }: { slug: string }) {
               </div>
             </main>
 
-            <PPStudioBlocks studio={studio} themeColor={themeColor} />
-            <PPMapBlock studio={studio} themeColor={themeColor} />
+            {studio.order.filter(id => id !== 'testimonials').map(id => (
+              <div key={id} style={{ order: studio.order.indexOf(id) }}>
+                <PPBlock id={id} studio={studio} themeColor={themeColor} />
+              </div>
+            ))}
+            </div>
 
             <footer className="mt-auto px-6 py-24 text-center space-y-12 border-t bg-muted/5">
               {externalSiteUrl && (

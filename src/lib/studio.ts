@@ -9,7 +9,27 @@ export type StudioData = {
   faq: { enabled: boolean; items: StudioFaqItem[] };
   socials: { enabled: boolean; instagram: string; facebook: string; tiktok: string; youtube: string; linkedin: string };
   map: { enabled: boolean; address: string; showAddress: boolean };
+  /** Ordem dos blocos da página (depois do topo): inclui 'testimonials'. */
+  order: BlockId[];
 };
+
+export const BLOCK_IDS = ['testimonials', 'about', 'hours', 'faq', 'socials', 'map'] as const;
+export type BlockId = typeof BLOCK_IDS[number];
+export const BLOCK_LABELS: Record<BlockId, string> = {
+  testimonials: 'Depoimentos', about: 'Sobre', hours: 'Horários', faq: 'Perguntas frequentes', socials: 'Redes sociais', map: 'Mapa',
+};
+export const DEFAULT_ORDER: BlockId[] = [...BLOCK_IDS];
+
+/** Garante uma ordem válida: só ids conhecidos, sem repetir, e os que faltarem entram no fim. */
+export function normalizeOrder(raw: unknown): BlockId[] {
+  const seen = new Set<BlockId>();
+  const out: BlockId[] = [];
+  for (const id of Array.isArray(raw) ? raw : []) {
+    if ((BLOCK_IDS as readonly string[]).includes(id) && !seen.has(id)) { seen.add(id); out.push(id); }
+  }
+  for (const id of DEFAULT_ORDER) if (!seen.has(id)) out.push(id);
+  return out;
+}
 
 export const DAY_LABELS = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
 export const SOCIAL_KEYS = ['instagram', 'facebook', 'tiktok', 'youtube', 'linkedin'] as const;
@@ -27,6 +47,7 @@ export function defaultStudio(): StudioData {
     faq: { enabled: false, items: [] },
     socials: { enabled: false, instagram: '', facebook: '', tiktok: '', youtube: '', linkedin: '' },
     map: { enabled: false, address: '', showAddress: true },
+    order: [...DEFAULT_ORDER],
   };
 }
 
@@ -66,6 +87,7 @@ export function normalizeStudio(raw: any): StudioData {
       linkedin: str(raw.socials?.linkedin, 200),
     },
     map: { enabled: !!raw.map?.enabled, address: str(raw.map?.address, 250), showAddress: raw.map?.showAddress !== false },
+    order: normalizeOrder(raw.order),
   };
 }
 
@@ -120,4 +142,17 @@ export function hasStudioContent(s: StudioData) {
     (s.socials.enabled && SOCIAL_KEYS.some(k => !!socialUrl(k, s.socials[k]))) ||
     (s.map.enabled && !!s.map.address.trim())
   );
+}
+
+/** Aplica os limites do plano ao que será exibido (não altera o que o dono salvou). */
+export function applyStudioCaps(s: StudioData, caps: { blocks: Record<string, boolean>; faqLimit: number; reorder: boolean }): StudioData {
+  return {
+    ...s,
+    about: { ...s.about, enabled: s.about.enabled && caps.blocks.about },
+    hours: { ...s.hours, enabled: s.hours.enabled && caps.blocks.hours },
+    faq: { ...s.faq, enabled: s.faq.enabled && caps.blocks.faq, items: s.faq.items.slice(0, caps.faqLimit) },
+    socials: { ...s.socials, enabled: s.socials.enabled && caps.blocks.socials },
+    map: { ...s.map, enabled: s.map.enabled && caps.blocks.map },
+    order: caps.reorder ? s.order : [...DEFAULT_ORDER],
+  };
 }
