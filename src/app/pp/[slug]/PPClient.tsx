@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/carousel";
 import { trackPPVisit, trackWhatsappClick } from '@/app/actions/stats-actions';
 import { LoadingScreen } from '@/components/loading-screen';
+import { PPStudioBlocks, PPMapBlock } from '@/components/pp-blocks';
+import { normalizeStudio } from '@/lib/studio';
 
 export default function PPClient({ slug }: { slug: string }) {
   const db = useFirestore();
@@ -111,6 +113,7 @@ export default function PPClient({ slug }: { slug: string }) {
   const externalSiteUrl = ppData?.externalSiteUrl || '';
   const externalSiteButtonText = ppData?.externalSiteButtonText || 'Visitar Site Oficial';
   const customSections = ppData?.customSections || [];
+  const studio = useMemo(() => normalizeStudio(ppData?.studio), [ppData]);
 
   const isVideoLogo = useMemo(() => {
     if (!logoUrl) return false;
@@ -356,6 +359,9 @@ export default function PPClient({ slug }: { slug: string }) {
                 )}
               </div>
             </main>
+
+            <PPStudioBlocks studio={studio} themeColor={themeColor} />
+            <PPMapBlock studio={studio} themeColor={themeColor} />
 
             <footer className="mt-auto px-6 py-24 text-center space-y-12 border-t bg-muted/5">
               {externalSiteUrl && (

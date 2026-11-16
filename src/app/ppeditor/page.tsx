@@ -115,6 +115,9 @@ import Cropper from 'react-easy-crop';
 import { useTheme } from 'next-themes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LoadingScreen } from '@/components/loading-screen';
+import { StudioPanel } from '@/components/studio-panel';
+import { PPStudioBlocks, PPMapBlock } from '@/components/pp-blocks';
+import { type StudioData, defaultStudio, normalizeStudio } from '@/lib/studio';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 type LayoutType = 'grid' | 'mural' | 'carousel' | 'popup';
@@ -243,6 +246,7 @@ const PublicPageSettings = ({
   externalSiteUrl, setExternalSiteUrl,
   externalSiteButtonText, setExternalSiteButtonText,
   customSections, setCustomSections,
+  studio, setStudio, googlePlaceId,
   autoPublishEnabled, setAutoPublishEnabled,
   autoPublishMinRating, setAutoPublishMinRating,
   autoPublishMinChars, setAutoPublishMinChars,
@@ -302,6 +306,7 @@ const PublicPageSettings = ({
                 { id: 'selecao', label: 'Seleção', icon: ListChecks, badge: selectedIds.length },
                 { id: 'conteudo', label: 'Conteúdo', icon: Type, locked: !isGoldPlan },
                 { id: 'automacao', label: 'Automação', icon: Zap, locked: !isEnterprise },
+                { id: 'blocos', label: 'Blocos', icon: Layout },
                 { id: 'design', label: 'Layout', icon: LayoutGridIcon },
                 { id: 'social', label: 'Contato', icon: MessageCircle },
               ].map((tab) => (
@@ -561,6 +566,10 @@ const PublicPageSettings = ({
                )}
              </TabsContent>
 
+             <TabsContent value="blocos" className="mt-0 space-y-8 outline-none">
+               <StudioPanel studio={studio} setStudio={setStudio} googlePlaceId={googlePlaceId} />
+             </TabsContent>
+
              <TabsContent value="design" className="mt-0 space-y-8 outline-none">
                 <section className="space-y-4">
                    <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Layout dos Depoimentos</Label>
@@ -696,6 +705,7 @@ export default function PPEditorPage() {
   const [externalSiteUrl, setExternalSiteUrl] = useState('');
   const [externalSiteButtonText, setExternalSiteButtonText] = useState('');
   const [customSections, setCustomSections] = useState<CustomSection[]>([]);
+  const [studio, setStudio] = useState<StudioData>(defaultStudio());
   const [autoPublishEnabled, setAutoPublishEnabled] = useState(false);
   const [autoPublishMinRating, setAutoPublishMinRating] = useState(5);
   const [autoPublishMinChars, setAutoPublishMinChars] = useState(0);
@@ -741,6 +751,7 @@ export default function PPEditorPage() {
       setExternalSiteUrl(ppData.externalSiteUrl || '');
       setExternalSiteButtonText(ppData.externalSiteButtonText || '');
       setCustomSections(ppData.customSections || []);
+      setStudio(normalizeStudio(ppData.studio));
       setAutoPublishEnabled(ppData.autoPublishEnabled || false);
       setAutoPublishMinRating(ppData.autoPublishMinRating || 5);
       setAutoPublishMinChars(ppData.autoPublishMinChars || 0);
@@ -795,6 +806,7 @@ export default function PPEditorPage() {
         themeColor, secondaryColor, layout, logoUrl, heroTitle, heroSubtitle, testimonialsTitle, footerText, showLogo,
         whatsappEnabled, whatsappNumber, externalSiteUrl, externalSiteButtonText,
         customSections: customSections || [],
+        studio,
         autoPublishEnabled, autoPublishMinRating, autoPublishMinChars,
         updatedAt: serverTimestamp()
       }, { merge: true });
@@ -958,6 +970,7 @@ export default function PPEditorPage() {
             externalSiteUrl={externalSiteUrl} setExternalSiteUrl={setExternalSiteUrl}
             externalSiteButtonText={externalSiteButtonText} setExternalSiteButtonText={setExternalSiteButtonText}
             customSections={customSections} setCustomSections={setCustomSections} 
+            studio={studio} setStudio={setStudio} googlePlaceId={userData?.googlePlaceId}
             autoPublishEnabled={autoPublishEnabled} setAutoPublishEnabled={setAutoPublishEnabled}
             autoPublishMinRating={autoPublishMinRating} setAutoPublishMinRating={setAutoPublishMinRating}
             autoPublishMinChars={autoPublishMinChars} setAutoPublishMinChars={setAutoPublishMinChars}
@@ -999,6 +1012,7 @@ export default function PPEditorPage() {
                             externalSiteUrl={externalSiteUrl} setExternalSiteUrl={setExternalSiteUrl}
                             externalSiteButtonText={externalSiteButtonText} setExternalSiteButtonText={setExternalSiteButtonText}
                             customSections={customSections} setCustomSections={setCustomSections} 
+            studio={studio} setStudio={setStudio} googlePlaceId={userData?.googlePlaceId}
                             autoPublishEnabled={autoPublishEnabled} setAutoPublishEnabled={setAutoPublishEnabled}
                             autoPublishMinRating={autoPublishMinRating} setAutoPublishMinRating={setAutoPublishMinRating}
                             autoPublishMinChars={autoPublishMinChars} setAutoPublishMinChars={setAutoPublishMinChars}
@@ -1116,6 +1130,8 @@ export default function PPEditorPage() {
                               ))}
                           </div>
                         </main>
+                        <PPStudioBlocks studio={studio} themeColor={themeColor} compact />
+                        <PPMapBlock studio={studio} themeColor={themeColor} compact />
                     </div>
                   </div>
               </div>
