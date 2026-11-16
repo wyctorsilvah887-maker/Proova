@@ -699,7 +699,7 @@ const PublicPageSettings = ({
                    <div className="space-y-4">
                       <Input value={footerText} onChange={(e) => setFooterText(e.target.value)} placeholder="Copyright" className="h-11 rounded-xl" />
                       <div className="flex items-center justify-between p-5 rounded-[1.5rem] bg-muted/10 border border-muted">
-                        <p className="text-[10px] font-black uppercase tracking-tight flex items-center gap-2">Exibir Powered by Proova {!caps.removeBranding && <PlanChip plan="PRO" />}</p>
+                        <p className="text-[10px] font-black uppercase tracking-tight flex items-center gap-2">Exibir Powered by Proova AI {!caps.removeBranding && <PlanChip plan="PRO" />}</p>
                         <Switch checked={showLogo || !caps.removeBranding} disabled={!caps.removeBranding} onCheckedChange={setShowLogo} />
                       </div>
                    </div>
