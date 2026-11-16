@@ -85,6 +85,10 @@ export function StudioPanel({ studio, setStudio, googlePlaceId, caps }: Props) {
       </div>
 
       <section className="space-y-3">
+        <BlockHeader locked={!caps.ratingSummary} title="Selo de avaliações" hint="Média Proova AI (mesma da página de métricas, a partir de 5 avaliações) e nota do Google no topo." checked={studio.showRating} onChange={(v) => setStudio({ ...studio, showRating: v })} />
+      </section>
+
+      <section className="space-y-3">
         <div className="flex items-center justify-between">
           <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Ordem da página</Label>
           {!caps.reorder && (

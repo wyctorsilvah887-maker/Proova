@@ -116,8 +116,10 @@ import { useTheme } from 'next-themes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { LoadingScreen } from '@/components/loading-screen';
 import { StudioPanel } from '@/components/studio-panel';
-import { type StudioData, defaultStudio, normalizeStudio, applyStudioCaps } from '@/lib/studio';
-import { PPBlock } from '@/components/pp-blocks';
+import { type StudioData, defaultStudio, normalizeStudio, applyStudioCaps, proovaAverage } from '@/lib/studio';
+import { PPBlock, RatingSummary } from '@/components/pp-blocks';
+import { useGoogleRating } from '@/hooks/use-google-rating';
+import { normalizeBrWhatsapp, maskBrPhone } from '@/lib/whatsapp';
 import { ppCaps, ppPlanOf } from '@/lib/pp-plans';
 import { ThemeToggle } from '@/components/theme-toggle';
 
@@ -679,8 +681,8 @@ const PublicPageSettings = ({
                    {whatsappEnabled && (
                      <div className="space-y-4 p-5 rounded-[2rem] border-2 border-dashed border-green-500/30 bg-green-500/5 animate-in fade-in slide-in-from-top-3">
                         <div className="space-y-2.5">
-                           <Label className="text-[9px] font-black uppercase ml-1 opacity-60">Seu WhatsApp (Ex: 11999998888)</Label>
-                           <Input placeholder="Apenas números..." value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} className="h-12 rounded-xl bg-background border-green-500/20 focus:ring-green-500/20 font-bold" />
+                           <Label className="text-[9px] font-black uppercase ml-1 opacity-60">Seu WhatsApp (com DDD)</Label>
+                           <Input placeholder="(85) 99999-9999" inputMode="tel" value={whatsappNumber} onChange={(e) => setWhatsappNumber(maskBrPhone(e.target.value))} className="h-12 rounded-xl bg-background border-green-500/20 focus:ring-green-500/20 font-bold" />
                         </div>
                      </div>
                    )}
@@ -763,6 +765,8 @@ export default function PPEditorPage() {
   const [customSections, setCustomSections] = useState<CustomSection[]>([]);
   const [studio, setStudio] = useState<StudioData>(defaultStudio());
   const previewStudio = useMemo(() => applyStudioCaps(studio, caps), [studio, caps]);
+  const googleRating = useGoogleRating(previewStudio.showRating ? user?.uid : null);
+  const proovaRating = useMemo(() => (previewStudio.showRating ? proovaAverage(approvedTestimonials as any[]) : null), [previewStudio.showRating, approvedTestimonials]);
   const [autoPublishEnabled, setAutoPublishEnabled] = useState(false);
   const [autoPublishMinRating, setAutoPublishMinRating] = useState(5);
   const [autoPublishMinChars, setAutoPublishMinChars] = useState(0);
@@ -815,6 +819,14 @@ export default function PPEditorPage() {
     }
   }, [ppData]);
 
+  // O WhatsApp da conta (configurações/dash) é a fonte principal: aparece aqui já preenchido.
+  useEffect(() => {
+    const cw = userData?.contactWhatsapp;
+    if (!cw) return;
+    setWhatsappNumber(maskBrPhone(String(cw)));
+    if (ppData && ppData.whatsappEnabled === undefined) setWhatsappEnabled(true);
+  }, [userData?.contactWhatsapp, ppData]);
+
   useEffect(() => {
     if (!authLoading && !user) router.replace('/login');
   }, [user, authLoading, router]);
@@ -852,16 +864,15 @@ export default function PPEditorPage() {
         }
         batch.update(doc(db, 'users', user.uid), { companySlug: newSlug });
       }
-      const waDigits = (whatsappNumber || '').replace(/\D/g, '');
-      if (whatsappEnabled && waDigits.length >= 10 && waDigits.length <= 13) {
-        batch.update(doc(db, 'users', user.uid), { contactWhatsapp: waDigits.length <= 11 ? `55${waDigits}` : waDigits });
-      }
+      const waNormalized = normalizeBrWhatsapp(whatsappNumber);
+      if (whatsappNumber.trim() && !waNormalized) throw new Error("WhatsApp inválido. Use DDD + número, ex.: (85) 99999-9999.");
+      if (waNormalized) batch.update(doc(db, 'users', user.uid), { contactWhatsapp: waNormalized });
       const targetSlug = isSlugChanging ? newSlug : (oldSlug || 'minha-pagina');
       const targetPPRef = doc(db, 'users', user.uid, 'pp', targetSlug);
       batch.set(targetPPRef, {
         selectedTestimonialIds: selectedIds,
         themeColor, secondaryColor, layout, logoUrl, heroTitle, heroSubtitle, testimonialsTitle, footerText, showLogo,
-        whatsappEnabled, whatsappNumber, externalSiteUrl, externalSiteButtonText,
+        whatsappEnabled, whatsappNumber: waNormalized || '', externalSiteUrl, externalSiteButtonText,
         customSections: customSections || [],
         studio,
         autoPublishEnabled, autoPublishMinRating, autoPublishMinChars,
@@ -1114,50 +1125,8 @@ export default function PPEditorPage() {
                               <div className="text-2xl font-black leading-[1.1] tracking-tighter" dangerouslySetInnerHTML={{ __html: sanitizeHtml(heroTitle || 'Seu Título') }} />
                               <div className="text-[11px] text-muted-foreground font-medium italic opacity-80 leading-relaxed px-2" dangerouslySetInnerHTML={{ __html: sanitizeHtml(heroSubtitle) }} />
                           </div>
+                          {previewStudio.showRating && <div className="mt-4"><RatingSummary proova={proovaRating} google={googleRating} themeColor={themeColor} compact /></div>}
                         </header>
-
-                        <div className="ml-auto flex items-center gap-2 md:gap-4 px-8">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-10 md:h-12 px-1.5 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
-                                <div className="flex flex-col items-end relative">
-                                  <span className="text-[10px] md:text-xs font-bold truncate max-w-[70px] sm:max-w-[120px] transition-colors group-hover:text-primary leading-tight">
-                                    {userData?.companyName || 'Empresa'}
-                                  </span>
-                                  <div className="flex flex-col items-end gap-0">
-                                    <span className={cn(
-                                      "text-[6px] sm:text-[8px] uppercase tracking-widest font-black leading-tight text-primary",
-                                      userData?.membershipStatus === 'enterprise' && "animate-pulse"
-                                    )}>
-                                      {membershipLabel}
-                                    </span>
-                                  </div>
-                                </div>
-                                <div className="h-7 w-7 md:h-8 md:w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20"><User className="w-3.5 h-3.5 md:w-4 md:h-4" /></div>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-56 bg-background border-border shadow-xl rounded-2xl p-2">
-                                <DropdownMenuLabel className="px-3 py-2 text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">Minha Conta</DropdownMenuLabel>
-                                <DropdownMenuSeparator className="mx-1" />
-                                <DropdownMenuItem onClick={() => router.push('/dash')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                                    <TrendingUp className="mr-2 h-4 w-4 text-primary" />
-                                    <span>Dash</span>
-                                </DropdownMenuItem>
-                                {isAgency && (
-                                    <DropdownMenuItem onClick={() => router.push('/widgets')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                                        <Layout className="mr-2 h-4 w-4 text-primary" />
-                                        <span>Meus Murais</span>
-                                    </DropdownMenuItem>
-                                )}
-                                <DropdownMenuItem onClick={() => router.push('/settings')} className="rounded-xl cursor-pointer font-bold py-2.5">
-                                    <Settings className="mr-2 h-4 w-4 text-primary" />
-                                    <span>Configurações</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator className="mx-1" />
-                                <DropdownMenuItem onClick={() => signOut(auth)} className="rounded-xl text-destructive focus:text-destructive cursor-pointer font-bold py-2.5"><LogOut className="mr-2 h-4 w-4" /><span>Sair</span></DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
 
                         <div className="flex flex-col flex-1">
                         <main style={{ order: previewStudio.order.indexOf('testimonials') }} className="p-8 space-y-8">
