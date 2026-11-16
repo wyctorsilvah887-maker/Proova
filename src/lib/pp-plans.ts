@@ -53,3 +53,6 @@ export function ppCaps(plan: PPPlan): PPCaps {
     blocks: { about: true, hours: true, socials: false, faq: false, map: false }, faqLimit: 0, reorder: false,
   };
 }
+
+/** Respostas geradas por IA por mês (custo de Gemini sob controle): curta no gratuito, generosa para quem paga. */
+export const AI_MONTHLY_LIMIT: Record<PPPlan, number> = { free: 20, premium: 300, pro: 1000 };

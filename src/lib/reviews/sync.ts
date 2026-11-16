@@ -2,6 +2,7 @@ import { FieldValue } from 'firebase-admin/firestore';
 import { timingSafeEqual } from 'node:crypto';
 import { adminDb } from '@/lib/firebase-admin';
 import { generateReply } from '@/ai/reply';
+import { reserveAiReplies, releaseAiReplies } from '@/lib/ai-quota';
 import { startApifyRun, fetchDatasetReviews } from './apify';
 import { AUTO_FETCH_PLANS } from './types';
 
@@ -55,13 +56,17 @@ export async function ingestDataset(uid: string, datasetId: string): Promise<{ s
   for (let i = 0; i < fresh.length; i += 3) {
     await Promise.all(fresh.slice(i, i + 3).map(async (r) => {
       let aiReply: string | null = null;
+      let reserved = false;
       try {
-        aiReply = await generateReply({
+        // Cota mensal de IA: estourou, a avaliação entra sem rascunho (a IA pode ser pedida depois no painel).
+        reserved = (await reserveAiReplies(uid, user.membershipStatus, 1)).ok;
+        if (reserved) aiReply = await generateReply({
           authorName: r.authorName, rating: r.rating, text: r.text,
           companyName: user.companyName || '', businessType: user.businessType, contactWhatsapp: user.contactWhatsapp || undefined,
         });
       } catch (e) {
         console.error('[reviews] IA falhou, salvando sem rascunho:', (e as Error).message);
+        if (reserved) await releaseAiReplies(uid, 1);
       }
       await col.doc(r.reviewId.replace(/\//g, '_')).create({
         ...r, status: 'pending', aiReply, source: 'apify', fetchedAt: FieldValue.serverTimestamp(),

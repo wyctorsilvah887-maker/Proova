@@ -54,7 +54,7 @@ import {
 } from "@/components/ui/accordion";
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LoadingScreen } from '@/components/loading-screen';
-import { ppCaps } from '@/lib/pp-plans';
+import { ppCaps, AI_MONTHLY_LIMIT } from '@/lib/pp-plans';
 
 const FREE = ppCaps('free');
 const PREMIUM = ppCaps('premium');
@@ -74,7 +74,8 @@ const COMPARE_ROWS: { label: string; base: string | boolean; premium: string | b
   { label: 'Seções de texto livres', base: String(FREE.customSections), premium: String(PREMIUM.customSections), pro: String(PRO.customSections) },
   { label: 'Ocultar "Powered by Proova"', base: FREE.removeBranding, premium: PREMIUM.removeBranding, pro: PRO.removeBranding },
   { label: 'Busca automática de novas avaliações do Google', base: false, premium: true, pro: true },
-  { label: 'Respostas sugeridas por IA', base: false, premium: true, pro: true },
+  { label: 'Respostas por IA (por mês)', base: String(AI_MONTHLY_LIMIT.free), premium: String(AI_MONTHLY_LIMIT.premium), pro: String(AI_MONTHLY_LIMIT.pro) },
+  { label: 'Resposta automática assim que o depoimento chega', base: false, premium: true, pro: true },
   { label: 'Aviso por e-mail de avaliação negativa', base: false, premium: true, pro: true },
   { label: 'Social Cards VIP (post e story)', base: false, premium: true, pro: true },
   { label: 'Métricas e relatório semanal', base: false, premium: true, pro: true },
@@ -142,7 +143,7 @@ export default function PricingPage() {
         "Página pública completa: 4 layouts, até 50 depoimentos, cores, WhatsApp e site",
         "Studio da página: Sobre, Horários, Perguntas, Redes sociais e Mapa",
         "Busca automática das novas avaliações do Google",
-        "Respostas sugeridas por IA (Gemini)",
+        `Respostas por IA (Gemini): até ${AI_MONTHLY_LIMIT.premium} por mês, com resposta automática`,
         "Aviso por e-mail quando chega avaliação negativa",
         "G-Boost (mais avaliações no Google Maps)",
         "Social Cards VIP (Post e Story)",
@@ -165,6 +166,7 @@ export default function PricingPage() {
       checkoutUrl: "https://pay.cakto.com.br/yhtkwz4_1215645",
       benefits: [
         "Tudo do Premium, mais:",
+        `Até ${AI_MONTHLY_LIMIT.pro} respostas por IA por mês`,
         "Depoimentos ilimitados na página pública",
         "Coleta de depoimento em vídeo",
         "Remova o \"Powered by Proova\" da sua página",

@@ -128,7 +128,7 @@ import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-ac
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useNotifications } from '@/hooks/use-notifications';
 import { LoadingScreen } from '@/components/loading-screen';
-import { generateReplyAction } from '@/ai/flows/generate-reply-flow';
+import { regenerateReplyAction } from '@/app/actions/ai-reply-actions';
 
 export default function DashPage() {
   const { user, loading: authLoading } = useUser();
@@ -502,14 +502,9 @@ export default function DashPage() {
     setIsRegenerating(id);
 
     try {
-      const result = await generateReplyAction({
-        authorName: name,
-        testimonialText: text,
-        rating: stars,
-        companyName: userData.companyName,
-        businessType: userData.businessType,
-        contactWhatsapp: userData.contactWhatsapp || undefined,
-      });
+      if (!user) return;
+      const idToken = await user.getIdToken();
+      const result = await regenerateReplyAction(idToken, { authorName: name, testimonialText: text, rating: stars });
 
       if (isApi) {
         setLocalReplies(prev => ({ ...prev, [id]: result.reply }));
@@ -522,9 +517,10 @@ export default function DashPage() {
         await updateDoc(tRef, stayDraft ? { aiReplyDraft: result.reply } : { aiReply: result.reply });
       }
 
-      shadcnToast({ title: "Resposta Atualizada ✨", description: "O Gemini gerou uma nova sugestão estratégica." });
-    } catch (err) {
-      shadcnToast({ variant: "destructive", title: "Erro na IA", description: "Não foi possível regerar a resposta agora." });
+      shadcnToast({ title: "Resposta Atualizada ✨", description: `Nova sugestão gerada. Restam ${result.remaining} de ${result.limit} respostas por IA neste mês.` });
+    } catch (err: any) {
+      const msg = String(err?.message || '');
+      shadcnToast({ variant: "destructive", title: msg.includes('respostas por IA') ? "Limite do mês atingido" : "Erro na IA", description: msg.includes('respostas por IA') ? msg : "Não foi possível regerar a resposta agora." });
     } finally {
       setIsRegenerating(null);
     }
