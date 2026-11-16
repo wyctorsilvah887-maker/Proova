@@ -134,3 +134,29 @@ export async function searchGooglePlaces(queryStr: string, city?: string, state?
     return [];
   }
 }
+
+/**
+ * Endereço formatado de um local do Google (para preencher o mapa da página pública).
+ * Retorna null se a chave não existir, o local não tiver endereço (perfil de área de serviço) ou a consulta falhar.
+ */
+export async function getPlaceAddress(placeId: string): Promise<string | null> {
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (!apiKey || typeof placeId !== 'string' || !/^[A-Za-z0-9_-]{10,200}$/.test(placeId)) return null;
+  try {
+    await checkRateLimit('google_maps_search');
+  } catch (e: any) {
+    throw new Error(e.message);
+  }
+  try {
+    const res = await fetch(`https://places.googleapis.com/v1/places/${placeId}`, {
+      headers: { 'X-Goog-Api-Key': apiKey, 'X-Goog-FieldMask': 'formattedAddress', 'Accept-Language': 'pt-BR' },
+      cache: 'no-store',
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return typeof data?.formattedAddress === 'string' ? data.formattedAddress : null;
+  } catch (err) {
+    console.error('Falha ao buscar endereço do local:', err);
+    return null;
+  }
+}
