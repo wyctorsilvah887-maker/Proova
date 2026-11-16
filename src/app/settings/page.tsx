@@ -314,7 +314,7 @@ export default function SettingsPage() {
       setGooglePlaceId(r.googlePlaceId || '');
       setGoogleMapsUrl(r.googleMapsUrl || '');
       setManualLink('');
-      toast({ title: "Link salvo!", description: "O botão de avaliação no Google já usa este link." });
+      toast({ title: "Link salvo!", description: r.googlePlaceId ? "Empresa identificada: o botão de avaliação e a busca automática já funcionam." : "O botão de avaliação no Google já usa este link. A busca automática de avaliações precisa da empresa selecionada na busca." });
     } catch (err: any) {
       toast({ variant: "destructive", title: "Não foi possível salvar o link", description: err?.message });
     } finally {

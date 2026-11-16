@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
 import { isValidPlaceId, parseGoogleLink, reviewLinkFor } from '@/lib/google-place';
+import { resolvePlaceIdFromLink } from '@/lib/google-place-resolve';
 
 /**
  * Salva (ou remove) a empresa do Google do usuário logado.
@@ -33,8 +34,15 @@ export async function POST(req: Request) {
   } else if (typeof body?.url === 'string') {
     const parsed = parseGoogleLink(body.url);
     if (!parsed) return NextResponse.json({ error: 'invalid_link' }, { status: 400 });
-    update.googleMapsUrl = parsed.url;
-    update.googlePlaceId = parsed.placeId || '';
+    // Tenta descobrir o place id pelo link (segue redirecionamentos de links curtos).
+    const resolved = parsed.placeId ? { placeId: parsed.placeId } : await resolvePlaceIdFromLink(body.url);
+    if (resolved.placeId) {
+      update.googlePlaceId = resolved.placeId;
+      update.googleMapsUrl = reviewLinkFor(resolved.placeId);
+    } else {
+      update.googleMapsUrl = parsed.url;
+      update.googlePlaceId = '';
+    }
   } else {
     return NextResponse.json({ error: 'bad_request' }, { status: 400 });
   }
