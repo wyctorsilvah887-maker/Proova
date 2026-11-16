@@ -378,7 +378,7 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
               )}
               <div className="flex flex-col items-center gap-2 opacity-30">
                 <p className="text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-1"><span>©</span> {footerText}</p>
-                {showProovaBranding && <div className="flex items-center justify-center gap-1.5 mt-2"><span className="text-[8px] font-black uppercase tracking-[0.3em]">POWERED BY PROOVA</span></div>}
+                {showProovaBranding && <div className="flex items-center justify-center gap-1.5 mt-2"><span className="text-[8px] font-black uppercase tracking-[0.3em]">POWERED BY PROOVA AI</span></div>}
               </div>
             </footer>
           </div>

@@ -127,7 +127,7 @@ export default function ForgotPasswordPage() {
                 ) : 'Enviar Link de Recuperação'}
               </Button>
               <p className="text-[8px] text-center text-muted-foreground uppercase tracking-[0.3em] font-black opacity-40">
-                🚀 Powered by Proova
+                🚀 Powered by Proova AI
               </p>
             </form>
           )}

@@ -384,7 +384,7 @@ export default function PPClient({ slug }: { slug: string }) {
                 <p className="text-[9px] font-bold uppercase tracking-widest flex items-center justify-center gap-1"><span>©</span> {footerText}</p>
                 {showProovaBranding && (
                   <div className="flex items-center justify-center gap-1.5 mt-4">
-                    <span className="text-[8px] font-black uppercase tracking-[0.3em]">POWERED BY PROOVA</span>
+                    <span className="text-[8px] font-black uppercase tracking-[0.3em]">POWERED BY PROOVA AI</span>
                   </div>
                 )}
               </div>

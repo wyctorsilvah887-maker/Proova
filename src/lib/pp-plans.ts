@@ -22,7 +22,7 @@ export type PPCaps = {
   secondaryColor: boolean;
   whatsappButton: boolean;
   externalSite: boolean;
-  removeBranding: boolean;     // pode ocultar "Powered by Proova"
+  removeBranding: boolean;     // pode ocultar "Powered by Proova AI"
   customSlug: boolean;
   customSections: number;      // seções de texto livres
   blocks: { about: boolean; hours: boolean; socials: boolean; faq: boolean; map: boolean };
