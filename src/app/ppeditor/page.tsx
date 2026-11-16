@@ -232,6 +232,17 @@ const RichTextEditor = ({ value, onChange, placeholder, className, allowColor }:
   );
 };
 
+const THEME_PRESETS: { id: string; name: string; color: string; secondary: string; layout: LayoutType }[] = [
+  { id: 'classico', name: 'Clássico', color: '#f97316', secondary: '', layout: 'grid' },
+  { id: 'clinica', name: 'Clínica Azul', color: '#3b82f6', secondary: '', layout: 'grid' },
+  { id: 'grafite', name: 'Grafite', color: '#475569', secondary: '', layout: 'grid' },
+  { id: 'saude', name: 'Saúde Verde', color: '#10b981', secondary: '#6ee7b7', layout: 'carousel' },
+  { id: 'ouro', name: 'Ouro', color: '#D4AF37', secondary: '#f5d77a', layout: 'popup' },
+  { id: 'roxo', name: 'Elegante', color: '#7c3aed', secondary: '#c4b5fd', layout: 'mural' },
+  { id: 'rose', name: 'Rosé', color: '#e11d48', secondary: '#fda4af', layout: 'grid' },
+  { id: 'turquesa', name: 'Turquesa', color: '#0d9488', secondary: '#5eead4', layout: 'mural' },
+];
+
 const PlanChip = ({ plan = 'Premium' }: { plan?: string }) => (
   <Link href="/pricing" className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-[8px] font-black uppercase tracking-widest text-primary hover:bg-primary/20">
     <Lock className="w-2.5 h-2.5" /> {plan}
@@ -374,6 +385,39 @@ const PublicPageSettings = ({
                       {logoUrl && <button onClick={() => setLogoUrl('')} className="text-[10px] font-black uppercase text-destructive hover:underline pt-1 transition-all">Remover</button>}
                     </div>
                   </div>
+                </section>
+
+                <section className="space-y-4">
+                   <Label className="text-[10px] font-black uppercase tracking-widest opacity-60">Temas prontos</Label>
+                   <div className="grid grid-cols-2 gap-2.5">
+                     {THEME_PRESETS.map(t => {
+                       const active = themeColor === t.color && (secondaryColor || '') === (caps.secondaryColor ? t.secondary : '');
+                       return (
+                         <button
+                           key={t.id}
+                           onClick={() => {
+                             setThemeColor(t.color);
+                             setSecondaryColor(caps.secondaryColor ? t.secondary : '');
+                             if (caps.layouts.includes(t.layout)) setLayout(t.layout);
+                             if (!caps.secondaryColor || !caps.layouts.includes(t.layout)) {
+                               toast({ title: `Tema ${t.name} aplicado`, description: 'Alguns detalhes (brilho e layout) são do plano Premium.' });
+                             }
+                           }}
+                           className={cn(
+                             "flex items-center gap-3 rounded-2xl border-2 p-3 text-left transition-all hover:border-primary/30",
+                             active ? "border-primary bg-primary/5" : "border-transparent bg-muted/20"
+                           )}
+                         >
+                           <span className="flex shrink-0">
+                             <span className="h-6 w-6 rounded-full border-2 border-background shadow" style={{ backgroundColor: t.color }} />
+                             <span className="-ml-2 h-6 w-6 rounded-full border-2 border-background shadow" style={{ backgroundColor: t.secondary || t.color, opacity: t.secondary ? 1 : 0.4 }} />
+                           </span>
+                           <span className="text-[10px] font-black uppercase tracking-tight leading-tight">{t.name}</span>
+                         </button>
+                       );
+                     })}
+                   </div>
+                   <p className="text-[9px] text-muted-foreground font-medium leading-relaxed">Aplica cores e layout. Seus textos não mudam, e dá para ajustar tudo depois.</p>
                 </section>
 
                 <section className="space-y-4">

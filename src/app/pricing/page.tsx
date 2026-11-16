@@ -54,6 +54,32 @@ import {
 } from "@/components/ui/accordion";
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LoadingScreen } from '@/components/loading-screen';
+import { ppCaps } from '@/lib/pp-plans';
+
+const FREE = ppCaps('free');
+const PREMIUM = ppCaps('premium');
+const PRO = ppCaps('pro');
+const num = (n: number) => (n === Infinity ? 'Ilimitados' : String(n));
+
+// Valores de página pública vêm de pp-plans.ts (mesma fonte do editor), então a tabela nunca diverge.
+const COMPARE_ROWS: { label: string; base: string | boolean; premium: string | boolean; pro: string | boolean }[] = [
+  { label: 'Link de coleta e QR Code de balcão', base: true, premium: true, pro: true },
+  { label: 'Depoimentos na página pública', base: num(FREE.selectionLimit), premium: num(PREMIUM.selectionLimit), pro: num(PRO.selectionLimit) },
+  { label: 'Layouts de depoimentos', base: String(FREE.layouts.length), premium: String(PREMIUM.layouts.length), pro: String(PRO.layouts.length) },
+  { label: 'Blocos Sobre e Horários', base: FREE.blocks.about, premium: PREMIUM.blocks.about, pro: PRO.blocks.about },
+  { label: 'Perguntas frequentes, redes sociais e mapa', base: FREE.blocks.faq, premium: PREMIUM.blocks.faq, pro: PRO.blocks.faq },
+  { label: 'Reordenar os blocos da página', base: FREE.reorder, premium: PREMIUM.reorder, pro: PRO.reorder },
+  { label: 'Botão de WhatsApp e botão do site', base: FREE.whatsappButton, premium: PREMIUM.whatsappButton, pro: PRO.whatsappButton },
+  { label: 'Cor secundária e link personalizado', base: FREE.secondaryColor, premium: PREMIUM.secondaryColor, pro: PRO.secondaryColor },
+  { label: 'Seções de texto livres', base: String(FREE.customSections), premium: String(PREMIUM.customSections), pro: String(PRO.customSections) },
+  { label: 'Ocultar "Powered by Proova"', base: FREE.removeBranding, premium: PREMIUM.removeBranding, pro: PRO.removeBranding },
+  { label: 'Busca automática de novas avaliações do Google', base: false, premium: true, pro: true },
+  { label: 'Respostas sugeridas por IA', base: false, premium: true, pro: true },
+  { label: 'Aviso por e-mail de avaliação negativa', base: false, premium: true, pro: true },
+  { label: 'Social Cards VIP (post e story)', base: false, premium: true, pro: true },
+  { label: 'Métricas e relatório semanal', base: false, premium: true, pro: true },
+  { label: 'Coleta de depoimento em vídeo', base: false, premium: false, pro: true },
+];
 
 export default function PricingPage() {
   const { user, loading: authLoading } = useUser();
@@ -113,13 +139,17 @@ export default function PricingPage() {
       disabled: status === 'gold',
       checkoutUrl: "https://pay.cakto.com.br/8c7bbit_1215637",
       benefits: [
-        "Página Pública VIP de Autoridade",
-        "Automação de Respostas via IA (Gemini)",
-        "G-Boost (Ranqueamento no Google Maps)",
-        "Social Cards Studio (Post/Story)",
-        "Relatórios de Performance Automáticos",
-        "Inbox Privado (Reputation Shield)",
-        "Suporte VIP via Chat no App"
+        "Página pública completa: 4 layouts, até 50 depoimentos, cores, WhatsApp e site",
+        "Studio da página: Sobre, Horários, Perguntas, Redes sociais e Mapa",
+        "Busca automática das novas avaliações do Google",
+        "Respostas sugeridas por IA (Gemini)",
+        "Aviso por e-mail quando chega avaliação negativa",
+        "G-Boost (mais avaliações no Google Maps)",
+        "Social Cards VIP (Post e Story)",
+        "Métricas e relatório semanal por e-mail",
+        "Link personalizado da sua página",
+        "Inbox privado (Reputation Shield)",
+        "Suporte prioritário no chat do app"
       ]
     },
     {
@@ -134,13 +164,14 @@ export default function PricingPage() {
       disabled: status === 'pro' || status === 'enterprise',
       checkoutUrl: "https://pay.cakto.com.br/yhtkwz4_1215645",
       benefits: [
-        "Tudo do Proova AI Premium + Exclusivos",
-        "Coleta de Vídeo Reviews 4K",
-        "Suporte VIP Dedicado com Consultor",
-        "Métricas de ROI Avançadas",
-        "Design de Página Ultra Customizado",
-        "Consultoria de Reputação Mensal",
-        "Uplink para Domínio Próprio (sob consulta)"
+        "Tudo do Premium, mais:",
+        "Depoimentos ilimitados na página pública",
+        "Coleta de depoimento em vídeo",
+        "Remova o \"Powered by Proova\" da sua página",
+        "Até 20 seções de texto livres",
+        "Suporte dedicado com consultor",
+        "Consultoria de reputação mensal",
+        "Domínio próprio (sob consulta)"
       ]
     }
   ];
@@ -322,6 +353,39 @@ export default function PricingPage() {
           })}
         </section>
 
+        <section className="space-y-4">
+          <div className="text-center space-y-2">
+            <h2 className="text-xl md:text-2xl font-black font-headline uppercase tracking-tight">Compare os planos</h2>
+            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">O que cada nível libera</p>
+          </div>
+          <Card className="rounded-[1.5rem] border shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-[10px] md:text-xs">
+                <thead>
+                  <tr className="border-b bg-muted/30 font-black uppercase tracking-widest">
+                    <th className="p-3 md:p-4">Recurso</th>
+                    <th className="p-3 md:p-4 text-center">Base</th>
+                    <th className="p-3 md:p-4 text-center text-primary">Premium</th>
+                    <th className="p-3 md:p-4 text-center">PRO</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {COMPARE_ROWS.map((row) => (
+                    <tr key={row.label} className="border-b last:border-0">
+                      <td className="p-3 md:p-4 font-bold leading-snug">{row.label}</td>
+                      {([row.base, row.premium, row.pro] as (string | boolean)[]).map((v, i) => (
+                        <td key={i} className="p-3 md:p-4 text-center font-black">
+                          {v === true ? <Check className="w-4 h-4 mx-auto text-green-600" /> : v === false ? <span className="opacity-25">—</span> : v}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        </section>
+
         <section className="space-y-6 md:space-y-8 pt-4 md:pt-8">
            <div className="text-center space-y-2">
               <h2 className="text-xl md:text-2xl font-black font-headline uppercase tracking-tight">Perguntas Frequentes</h2>
@@ -332,6 +396,7 @@ export default function PricingPage() {
              {[
                { q: "Posso cancelar minha assinatura quando quiser?", a: "Sim. A Proova não possui fidelidade. Você pode cancelar sua assinatura mensal diretamente no painel ou via suporte a qualquer momento, sem taxas ocultas." },
                { q: "O G-Boost realmente melhora meu posicionamento no Google?", a: "Absolutamente. O algoritmo do Google Maps prioriza perfis que recebem avaliações constantes e positivas. Ao automatizar o convite para elogios 5 estrelas, você aumenta sua visibilidade organicamente." },
+               { q: "O que acontece se eu cancelar ou trocar de plano?", a: "Nada é apagado. Seus depoimentos, a configuração da página e o Studio ficam salvos. Os recursos que o novo plano não cobre deixam de aparecer na sua página pública e voltam assim que você reativar o plano." },
                { q: "Como funciona o suporte VIP?", a: "Clientes Premium e PRO possuem fila prioritária em nosso chat de suporte e atendimento especializado por consultores estratégicos de prova social." }
              ].map((faq, idx) => (
                <AccordionItem key={idx} value={`item-${idx}`} className="border rounded-[1.5rem] px-5 md:px-6 bg-card shadow-sm overflow-hidden">
