@@ -78,7 +78,7 @@ import { LoadingScreen } from '@/components/loading-screen';
 import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
 import { usePageTour } from '@/hooks/use-page-tour';
 import { saveGooglePlace } from '@/lib/google-place-client';
-import { normalizeBrWhatsapp, formatBrWhatsapp } from '@/lib/whatsapp';
+import { normalizeBrWhatsapp, formatBrWhatsapp, maskBrPhone } from '@/lib/whatsapp';
 import { 
   Select, 
   SelectContent, 
@@ -699,7 +699,7 @@ export default function SettingsPage() {
 
                           <div className="space-y-3">
                              <Label className="text-[10px] font-black uppercase ml-1 opacity-60">WhatsApp de contato da clínica</Label>
-                             <Input value={contactWhatsapp} inputMode="tel" placeholder="(85) 99999-9999" onChange={(e) => setContactWhatsapp(e.target.value)} className="h-12 rounded-xl bg-muted/20 border-transparent font-bold" />
+                             <Input value={contactWhatsapp} inputMode="tel" placeholder="(85) 99999-9999" onChange={(e) => setContactWhatsapp(maskBrPhone(e.target.value))} className="h-12 rounded-xl bg-muted/20 border-transparent font-bold" />
                              <p className="text-[10px] text-muted-foreground font-medium ml-1">Clientes insatisfeitos usam este número para falar direto com você. Também é citado na resposta sugerida pela IA.</p>
                           </div>
                           
@@ -795,16 +795,16 @@ export default function SettingsPage() {
 
                     <div className="space-y-6 pt-4">
                       {(googlePlaceId || googleMapsUrl) ? (
-                        <div className="p-5 rounded-2xl bg-green-500/5 border border-green-500/20 flex items-center justify-between group animate-in zoom-in duration-300">
-                           <div className="flex items-center gap-4">
-                              <div className="p-3 rounded-xl bg-green-500/10 text-green-600"><MapPin className="w-6 h-6" /></div>
-                              <div>
+                        <div className="p-5 rounded-2xl bg-green-500/5 border border-green-500/20 flex items-center justify-between gap-3 group animate-in zoom-in duration-300">
+                           <div className="flex items-center gap-4 min-w-0 flex-1">
+                              <div className="p-3 rounded-xl bg-green-500/10 text-green-600 shrink-0"><MapPin className="w-6 h-6" /></div>
+                              <div className="min-w-0">
                                  <p className="text-[10px] font-black uppercase text-green-600 tracking-widest leading-none mb-1">Empresa Vinculada</p>
                                  <p className="text-sm font-black uppercase tracking-tight">{userData?.companyName}</p>
-                                 <p className="text-[10px] text-muted-foreground font-mono opacity-60 truncate max-w-[200px]">{googlePlaceId || googleMapsUrl}</p>
+                                 <p className="text-[10px] text-muted-foreground font-mono opacity-60 truncate">{googlePlaceId || googleMapsUrl}</p>
                               </div>
                            </div>
-                           <div className="flex gap-2">
+                           <div className="flex gap-2 shrink-0">
                              <Button variant="ghost" onClick={handleUnlinkPlace} className="text-destructive hover:bg-destructive/10 text-[9px] font-black uppercase tracking-widest h-8 px-3 rounded-lg">Desvincular</Button>
                            </div>
                         </div>

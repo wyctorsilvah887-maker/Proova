@@ -113,7 +113,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebase';
 import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
 import { saveGooglePlace } from '@/lib/google-place-client';
-import { normalizeBrWhatsapp, whatsappLink } from '@/lib/whatsapp';
+import { normalizeBrWhatsapp, whatsappLink, maskBrPhone } from '@/lib/whatsapp';
 import { doc, collection, query, updateDoc, orderBy, limit, where, getDocs, Timestamp, serverTimestamp, arrayUnion, deleteField } from 'firebase/firestore';
 import Link from 'next/link';
 import { signOut } from 'firebase/auth';
@@ -350,7 +350,7 @@ export default function DashPage() {
       } else if (res.status === 429) {
         shadcnToast({ title: "Aguarde um pouco", description: `Nova busca disponível em ${Math.ceil((data.retryInSeconds || 900) / 60)} min.` });
       } else if (data.error === 'no_place') {
-        shadcnToast({ variant: "destructive", title: "Conecte seu Google Maps", description: "Selecione sua empresa em Google Maps primeiro." });
+        shadcnToast({ variant: "destructive", title: "Vincule pela busca do Google", description: "A busca automática precisa da empresa selecionada na busca do Google (links manuais não permitem). Refaça o vínculo em Configurações > Google." });
       } else if (res.status === 403) {
         shadcnToast({ variant: "destructive", title: "Recurso Premium", description: "A busca automática é exclusiva dos planos Proova AI Premium e PRO." });
       } else {
@@ -757,7 +757,7 @@ export default function DashPage() {
                     placeholder="(85) 99999-9999"
                     inputMode="tel"
                     value={waInput}
-                    onChange={(e) => setWaInput(e.target.value)}
+                    onChange={(e) => setWaInput(maskBrPhone(e.target.value))}
                     onKeyDown={(e) => e.key === 'Enter' && handleSaveWhatsapp()}
                     className="h-10 rounded-xl bg-background text-sm font-bold w-full lg:w-48"
                   />
@@ -830,12 +830,11 @@ export default function DashPage() {
                    <h2 className="text-sm md:text-lg font-black uppercase tracking-tight">Avaliações Recentes & IA</h2>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-                  {isPremiumUser && userData?.googlePlaceId && (
+                  {isPremiumUser && (userData?.googlePlaceId || userData?.googleMapsUrl) && (
                     <button onClick={handleRefreshReviews} disabled={isRefreshingReviews} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-primary hover:underline disabled:opacity-50">
                       <RefreshCw className={cn("w-3 h-3", isRefreshingReviews && "animate-spin")} /> Atualizar agora
                     </button>
                   )}
-                  <Link href="/private" className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline">Ver Todas</Link>
                 </div>
               </div>
 
