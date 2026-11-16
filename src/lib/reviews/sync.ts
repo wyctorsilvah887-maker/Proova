@@ -68,5 +68,7 @@ export async function ingestDataset(uid: string, datasetId: string): Promise<{ s
       }).then(() => { saved++; }).catch((e) => { if (e?.code !== 6) throw e; }); // 6 = já existe
     }));
   }
+  // A busca dos últimos 30 dias só conta como feita depois que o resultado chegou com sucesso.
+  await db.doc(`users/${uid}`).update({ reviewsBackfilled: true }).catch(() => {});
   return { saved, skipped: all.length - saved };
 }

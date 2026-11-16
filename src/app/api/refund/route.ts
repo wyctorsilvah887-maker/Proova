@@ -17,7 +17,8 @@ export async function POST(req: Request) {
   const user = (await db.doc(`users/${uid}`).get()).data();
   if (!user) return NextResponse.json({ error: 'not_found' }, { status: 404 });
 
-  const planMs = user.planUpdatedAt?.toMillis?.() ?? null;
+  // Garantia conta a partir do início do plano; planUpdatedAt (que muda a cada renovação) é só fallback p/ contas antigas.
+  const planMs = user.planActivatedAt?.toMillis?.() ?? user.planUpdatedAt?.toMillis?.() ?? null;
   const check = checkRefundEligibility(user.membershipStatus, planMs);
   if (!check.ok) return NextResponse.json({ error: check.reason }, { status: 403 });
 

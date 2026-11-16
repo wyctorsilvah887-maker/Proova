@@ -1,6 +1,8 @@
 
 'use server';
 
+import { SITE_URL } from '@/lib/site';
+import { mailFrom } from '@/lib/mail';
 import { Resend } from 'resend';
 import { initializeFirebase } from '@/firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -26,7 +28,7 @@ export async function notifySupportPresence(targetUserId: string) {
     if (!userEmail) return { success: false };
 
     await resend.emails.send({
-      from: 'Proova Suporte <proova@proova.wsstudioscompany.com.br>',
+      from: mailFrom('Proova AI Suporte'),
       to: [userEmail],
       subject: '🎧 Um consultor humano entrou no seu chat!',
       html: `
@@ -39,7 +41,7 @@ export async function notifySupportPresence(targetUserId: string) {
             <p>Um de nossos especialistas estratégicos acaba de entrar no seu chat de suporte para te ajudar com sua solicitação.</p>
             <p>Retorne ao aplicativo agora para conversar em tempo real.</p>
             <div style="text-align: center; margin-top: 32px;">
-              <a href="https://proova.wsstudioscompany.com.br/support" style="background-color: #f97316; color: white; padding: 14px 28px; text-decoration: none; border-radius: 12px; font-weight: bold; display: inline-block;">Ir para o Chat de Suporte</a>
+              <a href="${SITE_URL}/support" style="background-color: #f97316; color: white; padding: 14px 28px; text-decoration: none; border-radius: 12px; font-weight: bold; display: inline-block;">Ir para o Chat de Suporte</a>
             </div>
           </div>
           <div style="background-color: #f9fafb; padding: 16px; text-align: center; font-size: 12px; color: #9ca3af;">

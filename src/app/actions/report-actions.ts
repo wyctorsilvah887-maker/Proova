@@ -1,5 +1,7 @@
 'use server';
 
+import { SITE_URL } from '@/lib/site';
+import { mailFrom } from '@/lib/mail';
 import { Resend } from 'resend';
 import { initializeFirebase } from '@/firebase';
 import { collection, query, getDocs, doc, getDoc, Timestamp, where, orderBy } from 'firebase/firestore';
@@ -72,7 +74,7 @@ export async function sendWeeklyPerformanceReport(userId: string) {
     const userFirstName = userData.name ? userData.name.split(' ')[0] : 'Parceiro';
     
     const { data, error } = await resend.emails.send({
-      from: 'Proova Reports <proova@proova.wsstudioscompany.com.br>',
+      from: mailFrom('Proova AI Relatórios'),
       to: [userData.email],
       subject: `📊 Sumário Executivo: ${userData.companyName}`,
       html: `
@@ -180,7 +182,7 @@ export async function sendWeeklyPerformanceReport(userId: string) {
                         </tr>
                         <tr>
                           <td align="center">
-                            <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'https://proova.wsstudioscompany.com.br'}/dash" style="background-color: #f97316; color: #ffffff; padding: 18px 40px; text-decoration: none; border-radius: 14px; font-weight: 800; font-size: 14px; display: inline-block; box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.25);">Acessar Painel Executivo</a>
+                            <a href="${SITE_URL}/dash" style="background-color: #f97316; color: #ffffff; padding: 18px 40px; text-decoration: none; border-radius: 14px; font-weight: 800; font-size: 14px; display: inline-block; box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.25);">Acessar Painel Executivo</a>
                           </td>
                         </tr>
                       </table>
@@ -193,9 +195,9 @@ export async function sendWeeklyPerformanceReport(userId: string) {
                       <p style="margin: 0; font-size: 10px; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.2em;">Powered by Proova Technology</p>
                       <p style="margin: 8px 0 0 0; font-size: 11px; color: #cbd5e1; font-weight: 500;">© 2026 WS STUDIOS COMPANY. Todos os direitos reservados.</p>
                       <div style="margin-top: 24px;">
-                        <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'https://proova.wsstudioscompany.com.br'}/privacy" style="color: #94a3b8; text-decoration: none; font-size: 10px; font-weight: 700;">Privacidade</a>
+                        <a href="${SITE_URL}/privacy" style="color: #94a3b8; text-decoration: none; font-size: 10px; font-weight: 700;">Privacidade</a>
                         <span style="color: #cbd5e1; margin: 0 8px;">•</span>
-                        <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'https://proova.wsstudioscompany.com.br'}/terms" style="color: #94a3b8; text-decoration: none; font-size: 10px; font-weight: 700;">Termos</a>
+                        <a href="${SITE_URL}/terms" style="color: #94a3b8; text-decoration: none; font-size: 10px; font-weight: 700;">Termos</a>
                       </div>
                     </td>
                   </tr>

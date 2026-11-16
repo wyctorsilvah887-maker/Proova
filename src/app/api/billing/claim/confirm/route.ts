@@ -34,11 +34,16 @@ export async function POST(req: Request) {
     if (open.empty) return { status: 404, body: { error: 'sem_compra' } };
 
     const newest = [...open.docs].sort((a, b) => (b.data().createdAt?.toMillis?.() ?? 0) - (a.data().createdAt?.toMillis?.() ?? 0))[0];
-    const plan = newest.data().plan as string;
+    const claimed = newest.data().plan as string;
+    // Nunca rebaixa: se a conta já tem um plano igual ou maior, mantém o atual.
+    const rank: Record<string, number> = { base: 0, lead: 0, gold: 1, enterprise: 2 };
+    const current = ((await tx.get(userRef)).data()?.membershipStatus as string | undefined) || 'base';
+    const plan = (rank[current] ?? 0) >= (rank[claimed] ?? 0) && current !== 'trial' ? current : claimed;
 
     const update: Record<string, unknown> = {
       membershipStatus: plan,
       planUpdatedAt: FieldValue.serverTimestamp(),
+      ...(plan !== current ? { planActivatedAt: FieldValue.serverTimestamp() } : {}),
       billingEmail: claim.email, // renovações/cancelamentos futuros desse e-mail chegam nesta conta
     };
     tx.update(userRef, update);
