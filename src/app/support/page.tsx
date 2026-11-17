@@ -4,37 +4,21 @@ import { AppSideMenu } from '@/components/app-menu';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { 
-  ArrowLeft, 
-  Send, 
-  Loader2, 
-  User, 
-  CheckCheck, 
+import {
+  Send,
+  Loader2,
+  CheckCheck,
   Bot,
-  LogOut,
-  TrendingUp,
-  Layout,
-  Inbox,
-  Gem,
-  Sun,
-  Moon,
-  Shield,
-  Zap,
-  Sparkles,
   Headphones,
-  Ticket,
   XCircle,
   AlertTriangle,
-  LayoutGrid as LayoutGridIcon,
-  BarChart3,
-  ImageIcon,
-  Settings,
-  X,
-  Menu
+  ChevronDown,
+  Clock,
+  Info,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from '@/components/ui/textarea';
 import { useUser, useFirestore, useCollection, useDoc, useAuth } from '@/firebase';
 import { 
   collection, 
@@ -73,11 +57,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { getConsultantResponse, getMainMenu, matchConsultantKey } from '@/lib/consultant-rules';
+import { getConsultantResponse, matchConsultantKey } from '@/lib/consultant-rules';
 import { ppPlanOf } from '@/lib/pp-plans';
 import { toast } from '@/hooks/use-toast';
 import { LoadingScreen } from '@/components/loading-screen';
-import { Badge } from '@/components/ui/badge';
+import { formatMessage } from '@/components/support/format-message';
+import { SupportInfoPanel, SUPPORT_TOPICS } from '@/components/support/support-info-panel';
 
 export default function SupportPage() {
   const { user, loading: authLoading } = useUser();
@@ -94,7 +79,10 @@ export default function SupportPage() {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [localMessages, setLocalMessages] = useState<any[]>([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isInfoOpen, setIsInfoOpen] = useState(false);
+  const [showJump, setShowJump] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+  const nearBottomRef = useRef(true);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -123,21 +111,6 @@ export default function SupportPage() {
   }, [db, user]);
 
   const { data: remoteMessages, loading: messagesLoading } = useCollection(messagesQuery);
-
-  const formatText = (text: string) => {
-    if (!text) return "";
-    const parts = text.split(/(\*\*.*?\*\*)/g);
-    return parts.map((part, index) => {
-      if (part.startsWith('**') && part.endsWith('**')) {
-        return (
-          <span key={index} className="text-primary font-black">
-            {part.substring(2, part.length - 2)}
-          </span>
-        );
-      }
-      return part;
-    });
-  };
 
   useEffect(() => {
     if (user) {
@@ -173,14 +146,25 @@ export default function SupportPage() {
     if (!authLoading && !user) router.replace('/login');
   }, [user, authLoading, router]);
 
+  const scrollToBottom = (smooth = true) => {
+    const el = listRef.current;
+    if (el) el.scrollTo({ top: el.scrollHeight, behavior: smooth ? 'smooth' : 'auto' });
+  };
+
+  // Acompanha a conversa só se a pessoa já estiver perto do fim; senão mostra o botão "novas mensagens".
   useEffect(() => {
-    if (scrollRef.current) {
-      const scrollContainer = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]');
-      if (scrollContainer) {
-        scrollContainer.scrollTop = scrollContainer.scrollHeight;
-      }
-    }
+    const last = localMessages[localMessages.length - 1];
+    if (nearBottomRef.current || last?.sender === 'user') { scrollToBottom(); setShowJump(false); }
+    else setShowJump(true);
   }, [localMessages, isAiThinking, isSupportTyping]);
+
+  const onListScroll = () => {
+    const el = listRef.current;
+    if (!el) return;
+    const near = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+    nearBottomRef.current = near;
+    if (near) setShowJump(false);
+  };
 
   const handleTyping = () => {
     if (!activeTicket || !db) return;
@@ -245,12 +229,11 @@ export default function SupportPage() {
     }
   };
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!message.trim() || !user || !db || isSending || isEndingChat) return;
-    const userMsg = message.trim();
+  const sendText = async (raw: string, fromInput = false) => {
+    const userMsg = raw.trim();
+    if (!userMsg || !user || !db || isSending || isEndingChat) return;
     setIsSending(true);
-    setMessage('');
+    if (fromInput) setMessage('');
     if (activeTicket) {
       updateDoc(doc(db, 'support_tickets', activeTicket.id), { isUserTyping: false });
     }
@@ -300,6 +283,11 @@ export default function SupportPage() {
     }
   };
 
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendText(message, true);
+  };
+
   const membershipLabel = useMemo(() => {
     const status = userData?.membershipStatus;
     if (status === 'enterprise') return 'PRO';
@@ -308,6 +296,58 @@ export default function SupportPage() {
     if (status === 'expired') return 'EXPIRADO';
     return 'PLANO BASE';
   }, [userData]);
+
+  const plan = ppPlanOf(userData?.membershipStatus);
+  const firstName = userData?.name?.split(' ')[0] || 'Parceiro';
+
+  const tsToDate = (t: any): Date | null => {
+    if (!t) return null;
+    if (typeof t.toDate === 'function') return t.toDate();
+    if (typeof t.seconds === 'number') return new Date(t.seconds * 1000);
+    const d = new Date(t);
+    return isNaN(d.getTime()) ? null : d;
+  };
+  const dayLabel = (d: Date) => {
+    const today = new Date();
+    const y = new Date(); y.setDate(today.getDate() - 1);
+    if (d.toDateString() === today.toDateString()) return 'Hoje';
+    if (d.toDateString() === y.toDateString()) return 'Ontem';
+    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+  };
+  const timeLabel = (t: any) => {
+    const d = tsToDate(t);
+    return d ? d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 'enviando';
+  };
+
+  const chatMode: 'human' | 'waiting' | 'bot' = isHumanSupportPresent ? 'human' : activeTicket ? 'waiting' : 'bot';
+  const statusText = chatMode === 'human' ? 'Atendente online no chat' : chatMode === 'waiting' ? 'Aguardando atendente' : 'Assistente automático · resposta imediata';
+
+  const quickChips = [
+    { key: '0', label: 'Menu' },
+    ...SUPPORT_TOPICS.map((t) => ({ key: t.key, label: t.label })),
+    ...(activeTicket ? [] : [{ key: '6', label: 'Falar com atendente' }]),
+  ];
+
+  const onTopic = (key: string) => { setIsInfoOpen(false); sendText(key); };
+  const onEnd = () => { setIsInfoOpen(false); setIsConfirmOpen(true); };
+
+  const infoPanel = (
+    <SupportInfoPanel
+      plan={plan}
+      planLabel={membershipLabel}
+      ticket={activeTicket || null}
+      isHumanPresent={isHumanSupportPresent}
+      busy={isSending || isCreatingTicket || isEndingChat}
+      onTopic={onTopic}
+      onEnd={onEnd}
+    />
+  );
+
+  const dots = (cls: string) => (
+    <span className="flex gap-1 items-center">
+      {[0, 1, 2].map((i) => <span key={i} className={cn('w-1.5 h-1.5 rounded-full animate-bounce', cls)} style={{ animationDelay: `${i * 0.15}s` }} />)}
+    </span>
+  );
 
   if (authLoading || userDataLoading || (user && !userData)) {
     return <LoadingScreen />;
@@ -347,152 +387,168 @@ export default function SupportPage() {
 
       <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} />
 
-      <main className="flex-1 flex flex-col w-full max-w-5xl mx-auto min-h-0 md:p-4 lg:p-6 pb-2 md:pb-8 relative pt-24 md:pt-32">
-        <div className="flex-1 bg-background md:border md:rounded-[2.5rem] md:shadow-2xl flex flex-col overflow-hidden relative">
-          
-          <ScrollArea ref={scrollRef} className="flex-1 px-4 py-6 md:p-10">
-            <div className="space-y-6">
-              <div className="bg-muted/10 border-2 border-muted rounded-[1.5rem] p-5 mb-8 animate-in fade-in zoom-in duration-700">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-inner">
-                    <Bot className="w-6 h-6" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <h3 className="text-sm font-black uppercase tracking-tight">Consultor Proova AI</h3>
-                    <div className="flex items-center gap-1.5">
-                      <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-                      <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Árvore de Decisão Ativa</span>
-                    </div>
-                  </div>
+      <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} />
+
+      <main className="flex-1 min-h-0 pt-16 md:pt-20">
+        <div className="h-full max-w-7xl mx-auto lg:p-6 lg:gap-6 flex">
+          <aside className="hidden lg:block w-[340px] shrink-0 overflow-y-auto">{infoPanel}</aside>
+
+          <section className="flex-1 min-w-0 flex flex-col bg-background lg:border lg:rounded-3xl lg:shadow-xl overflow-hidden">
+            {/* Cabeçalho do chat */}
+            <div className="flex items-center gap-3 px-4 py-3 border-b shrink-0">
+              <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center shrink-0', chatMode === 'human' ? 'bg-primary text-white' : 'bg-primary/10 text-primary')}>
+                {chatMode === 'bot' ? <Bot className="w-5 h-5" /> : <Headphones className="w-5 h-5" />}
+              </div>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-sm font-black uppercase tracking-tight truncate">{chatMode === 'human' ? 'Atendente Proova AI' : 'Suporte Proova AI'}</h1>
+                <div className="flex items-center gap-1.5">
+                  <span className={cn('h-1.5 w-1.5 rounded-full', chatMode === 'human' ? 'bg-green-500 animate-pulse' : chatMode === 'waiting' ? 'bg-amber-500 animate-pulse' : 'bg-primary/60')} />
+                  <span className="text-[11px] font-medium text-muted-foreground truncate">{statusText}</span>
                 </div>
               </div>
+              <Button type="button" variant="outline" size="icon" className="lg:hidden h-9 w-9 rounded-xl shrink-0" onClick={() => setIsInfoOpen(true)} aria-label="Ver ticket e tópicos">
+                <Info className="w-4 h-4" />
+              </Button>
+            </div>
 
-              {localMessages.length === 0 ? (
-                <div className="flex justify-start animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  <div className="flex gap-2 md:gap-3 max-w-[85%] sm:max-w-[75%]">
-                    <div className="h-8 w-8 rounded-lg flex items-center justify-center shrink-0 mt-1 shadow-md bg-muted text-muted-foreground">
-                      <Sparkles className="w-4 h-4" />
+            {/* Mensagens */}
+            <div className="relative flex-1 min-h-0">
+              <div ref={listRef} onScroll={onListScroll} className="h-full overflow-y-auto overscroll-contain px-3 sm:px-6 py-5 space-y-1">
+                {localMessages.length === 0 && (
+                  <div className="max-w-xl mx-auto py-4 space-y-5 animate-in fade-in duration-500">
+                    <div className="text-center space-y-2">
+                      <div className="mx-auto h-14 w-14 rounded-2xl bg-primary/10 text-primary flex items-center justify-center"><Sparkles className="w-7 h-7" /></div>
+                      <h2 className="text-lg font-black tracking-tight">Olá, {firstName}! Como podemos ajudar?</h2>
+                      <p className="text-sm text-muted-foreground font-medium">Escolha um tópico ou escreva sua dúvida. Se precisar, chamamos um atendente.</p>
                     </div>
-                    <div className="space-y-1">
-                      <div className="p-3 md:p-4 shadow-sm border bg-muted/30 rounded-2xl rounded-tl-none border-muted">
-                        <p className="text-xs md:text-sm font-medium leading-relaxed whitespace-pre-wrap">
-                          {formatText(getMainMenu(userData?.name?.split(' ')[0] || 'Parceiro'))}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-1.5 px-1">
-                        <span className="text-[8px] font-black uppercase text-muted-foreground opacity-60">Sistema</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                localMessages.map((msg: any, idx: number) => (
-                  <div key={msg.id || idx} className={cn("flex animate-in fade-in slide-in-from-bottom-4 duration-500", msg.sender === 'user' ? "justify-end" : "justify-start")}>
-                    <div className={cn("flex gap-2 md:gap-3 max-w-[85%] sm:max-w-[75%]", msg.sender === 'user' ? "flex-row-reverse" : "flex-row")}>
-                      <div className={cn("h-8 w-8 rounded-lg flex items-center justify-center shrink-0 mt-1 shadow-md", msg.sender === 'user' ? "bg-primary text-white" : "bg-muted text-muted-foreground")}>
-                        {msg.sender === 'user' ? <User className="w-4 h-4" /> : (isHumanSupportPresent ? <Headphones className="w-4 h-4" /> : <Bot className="w-4 h-4" />)}
-                      </div>
-                      <div className="space-y-1">
-                        <div className={cn(
-                          "p-3 md:p-4 shadow-sm border",
-                          msg.sender === 'user' 
-                            ? "bg-primary text-white rounded-2xl rounded-tr-none border-transparent" 
-                            : "bg-muted/30 rounded-2xl rounded-tl-none border-muted"
-                        )}>
-                          <p className="text-xs md:text-sm font-medium leading-relaxed whitespace-pre-wrap">{formatText(msg.text)}</p>
-                        </div>
-                        <div className={cn("flex items-center gap-1.5 px-1", msg.sender === 'user' ? "justify-end" : "justify-start")}>
-                          <span className="text-[8px] font-black uppercase text-muted-foreground opacity-60">
-                            {msg.createdAt?.toDate ? msg.createdAt.toDate().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '...'}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {SUPPORT_TOPICS.map((t) => (
+                        <button key={t.key} type="button" disabled={isSending} onClick={() => sendText(t.key)}
+                          className="flex items-center gap-3 text-left rounded-2xl border bg-muted/20 hover:bg-primary/5 hover:border-primary/30 transition-colors p-3 disabled:opacity-50">
+                          <span className="h-9 w-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0"><t.icon className="w-4 h-4" /></span>
+                          <span className="min-w-0">
+                            <span className="block text-sm font-black">{t.label}</span>
+                            <span className="block text-[11px] text-muted-foreground font-medium truncate">{t.hint}</span>
                           </span>
-                          {msg.sender === 'user' && <CheckCheck className="w-3 h-3 text-primary opacity-40" />}
+                        </button>
+                      ))}
+                      {!activeTicket && (
+                        <button type="button" disabled={isSending} onClick={() => sendText('6')}
+                          className="sm:col-span-2 flex items-center justify-center gap-2 rounded-2xl bg-primary text-white font-black text-sm p-3 hover:bg-primary/90 disabled:opacity-50">
+                          <Headphones className="w-4 h-4" /> Falar com atendente
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {localMessages.map((msg: any, idx: number) => {
+                  const mine = msg.sender === 'user';
+                  const d = tsToDate(msg.createdAt);
+                  const prev = localMessages[idx - 1];
+                  const pd = prev ? tsToDate(prev.createdAt) : null;
+                  const newDay = d && (!pd || pd.toDateString() !== d.toDateString());
+                  const grouped = prev && prev.sender === msg.sender && !newDay;
+                  const next = localMessages[idx + 1];
+                  const lastOfGroup = !next || next.sender !== msg.sender;
+                  return (
+                    <div key={msg.id || idx}>
+                      {newDay && d && (
+                        <div className="flex justify-center py-3">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground bg-muted/50 rounded-full px-3 py-1">{dayLabel(d)}</span>
+                        </div>
+                      )}
+                      <div className={cn('flex', mine ? 'justify-end' : 'justify-start', grouped ? 'mt-0.5' : 'mt-3')}>
+                        <div className={cn('max-w-[88%] sm:max-w-[75%] flex flex-col', mine ? 'items-end' : 'items-start')}>
+                          <div className={cn(
+                            'px-3.5 py-2.5 text-[13px] sm:text-sm leading-relaxed whitespace-pre-wrap break-words shadow-sm',
+                            mine ? 'bg-primary text-white rounded-2xl rounded-br-md' : 'bg-muted/50 border rounded-2xl rounded-bl-md'
+                          )}>
+                            {formatMessage(msg.text)}
+                          </div>
+                          {lastOfGroup && (
+                            <div className="flex items-center gap-1 px-1 mt-1 text-[10px] font-medium text-muted-foreground">
+                              {!mine && <span>{isHumanSupportPresent ? 'Atendente' : 'Assistente'} ·</span>}
+                              <span>{timeLabel(msg.createdAt)}</span>
+                              {mine && d && <CheckCheck className="w-3 h-3 text-primary/60" />}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))
-              )}
+                  );
+                })}
 
-              {isAiThinking && (
-                <div className="flex justify-start animate-in fade-in slide-in-from-left-2 duration-300">
-                  <div className="flex gap-2 md:gap-3 items-center">
-                    <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground shrink-0 mt-1 shadow-md">
-                      <Bot className="w-4 h-4" />
-                    </div>
-                    <div className="space-y-1">
-                      <div className="bg-muted/30 px-4 py-2 rounded-full flex gap-1 items-center">
-                        <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-bounce" />
-                        <div className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:0.2s]" />
-                        <div className="w-1.5 h-1.5 bg-primary/80 rounded-full animate-bounce [animation-delay:0.4s]" />
-                      </div>
-                    </div>
+                {isAiThinking && (
+                  <div className="flex justify-start mt-3 animate-in fade-in duration-300">
+                    <div className="bg-muted/50 border rounded-2xl rounded-bl-md px-4 py-3">{dots('bg-primary/60')}</div>
                   </div>
-                </div>
-              )}
+                )}
+                {isSupportTyping && (
+                  <div className="mt-3 animate-in fade-in duration-300">
+                    <div className="inline-flex bg-primary/5 border border-primary/10 rounded-2xl rounded-bl-md px-4 py-3">{dots('bg-primary/60')}</div>
+                    <p className="text-[10px] font-medium text-primary mt-1 ml-1">Atendente está digitando...</p>
+                  </div>
+                )}
+              </div>
 
-              {isSupportTyping && (
-                <div className="flex justify-start animate-in fade-in slide-in-from-left-2 duration-300">
-                  <div className="flex gap-2 md:gap-3 items-center">
-                    <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0 mt-1 shadow-md border border-primary/20">
-                      <Headphones className="w-4 h-4" />
-                    </div>
-                    <div className="space-y-1">
-                      <div className="bg-primary/5 px-4 py-2 rounded-full flex gap-1 items-center border border-primary/10">
-                        <div className="w-1.5 h-1.5 bg-primary/40 rounded-full animate-pulse" />
-                        <div className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-pulse [animation-delay:0.2s]" />
-                        <div className="w-1.5 h-1.5 bg-primary/80 rounded-full animate-pulse [animation-delay:0.4s]" />
-                      </div>
-                      <span className="text-[8px] font-black uppercase text-primary ml-1">Consultor está digitando...</span>
-                    </div>
-                  </div>
-                </div>
+              {showJump && (
+                <button type="button" onClick={() => { scrollToBottom(); setShowJump(false); }}
+                  className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-primary text-white text-xs font-black px-3.5 py-2 shadow-lg animate-in fade-in zoom-in">
+                  <ChevronDown className="w-4 h-4" /> Novas mensagens
+                </button>
               )}
             </div>
-          </ScrollArea>
 
-          <div className="p-3 md:p-6 border-t bg-background shrink-0">
-             <form onSubmit={handleSendMessage} className="flex items-center gap-2 md:gap-3 relative">
-               <Input 
-                 value={message}
-                 onChange={(e) => {
-                   setMessage(e.target.value);
-                   handleTyping();
-                 }}
-                 maxLength={500}
-                 placeholder="Digite o número da opção (ex: 1)..."
-                 className="h-12 md:h-14 rounded-xl md:rounded-2xl bg-muted/20 border-transparent focus:ring-primary/20 text-xs md:text-sm font-medium pr-14 shadow-inner"
-                 disabled={isSending || isEndingChat}
-               />
-               <Button 
-                type="submit" 
-                size="icon" 
-                className="h-10 w-10 md:h-12 md:w-12 rounded-lg md:rounded-xl shadow-xl bg-primary hover:bg-primary/90 absolute right-1 md:right-1.5"
-                disabled={!message.trim() || isSending || isEndingChat}
-               >
-                 {isSending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-               </Button>
-             </form>
-             <div className="flex items-center justify-between mt-3 px-1">
-                <div className="flex items-center gap-1.5">
-                   <div className={cn("h-1.5 w-1.5 rounded-full", isHumanSupportPresent ? "bg-green-500 animate-pulse" : "bg-muted-foreground/30")} />
-                   <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground opacity-60">
-                     Histórico local de 24h. Use o menu numerado para navegar.
-                   </span>
+            {/* Atalhos + campo de envio */}
+            <div className="border-t bg-background shrink-0 pb-[env(safe-area-inset-bottom)]">
+              {!isHumanSupportPresent && (
+                <div className="flex gap-2 overflow-x-auto px-3 sm:px-6 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                  {quickChips.map((c) => (
+                    <button key={c.key} type="button" disabled={isSending || isEndingChat} onClick={() => sendText(c.key)}
+                      className={cn('shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-bold transition-colors disabled:opacity-50',
+                        c.key === '6' ? 'bg-primary text-white border-primary' : 'bg-muted/30 hover:bg-primary/5 hover:border-primary/30')}>
+                      {c.label}
+                    </button>
+                  ))}
                 </div>
-                <button 
-                  onClick={() => setIsConfirmOpen(true)} 
-                  className="text-[8px] font-black uppercase tracking-widest text-destructive/40 hover:text-destructive transition-colors flex items-center gap-1"
-                >
-                  <XCircle className="w-2.5 h-2.5" /> Encerrar Sessão
-                </button>
-             </div>
-          </div>
+              )}
+              {activeTicket && !isHumanSupportPresent && (
+                <p className="flex items-center gap-1.5 px-3 sm:px-6 pt-2 text-[11px] font-medium text-muted-foreground">
+                  <Clock className="w-3 h-3" /> Ticket aberto. Escreva sua dúvida que o atendente responde por aqui.
+                </p>
+              )}
+              <form onSubmit={handleSendMessage} className="flex items-end gap-2 p-3 sm:px-6 sm:pb-4">
+                <Textarea
+                  value={message}
+                  rows={1}
+                  onChange={(e) => { setMessage(e.target.value); handleTyping(); }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendText(message, true); }
+                  }}
+                  maxLength={500}
+                  placeholder="Escolha um tópico ou digite sua dúvida..."
+                  className="min-h-[44px] max-h-32 resize-none rounded-2xl bg-muted/30 border-transparent text-base sm:text-sm font-medium py-3"
+                  disabled={isEndingChat}
+                />
+                <Button type="submit" size="icon" className="h-11 w-11 rounded-xl shrink-0 shadow-lg" disabled={!message.trim() || isSending || isEndingChat} aria-label="Enviar">
+                  {isSending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+                </Button>
+              </form>
+            </div>
+          </section>
         </div>
       </main>
 
-      <footer className="py-4 text-center opacity-30 shrink-0">
-        <p className="text-[8px] font-black uppercase tracking-[0.4em]">POWERED BY PROOVA AI</p>
-      </footer>
+      <Sheet open={isInfoOpen} onOpenChange={setIsInfoOpen}>
+        <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto rounded-t-3xl">
+          <SheetHeader className="text-left">
+            <SheetTitle className="font-black uppercase tracking-tight text-sm">Seu atendimento</SheetTitle>
+            <SheetDescription className="sr-only">Ticket, tópicos e encerramento do atendimento</SheetDescription>
+          </SheetHeader>
+          <div className="mt-3">{infoPanel}</div>
+        </SheetContent>
+      </Sheet>
 
       <AlertDialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>
         <AlertDialogContent className="rounded-[2rem] border-none shadow-2xl p-8">
