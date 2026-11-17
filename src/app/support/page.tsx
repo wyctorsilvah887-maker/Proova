@@ -391,9 +391,7 @@ export default function SupportPage() {
         </div>
       </header>
 
-      <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} />
-
-      <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} />
+      <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} isAdmin={userData?.isAdmin === true} />
 
       <main className="flex-1 min-h-0 pt-16 md:pt-20">
         <div className="h-full max-w-7xl mx-auto lg:p-6 lg:gap-6 flex">

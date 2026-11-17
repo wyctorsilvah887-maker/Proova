@@ -254,7 +254,7 @@ export default function SocialCardsPage() {
         </div>
       </header>
 
-      <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} pendingCount={allApprovedTestimonials.filter(t => t.status === 'pending').length} />
+      <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} isAdmin={userData?.isAdmin === true} pendingCount={allApprovedTestimonials.filter(t => t.status === 'pending').length} />
 
       <main className="flex-1 overflow-y-auto p-4 md:p-8 pt-24 md:pt-32 pb-20">
         <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-700">

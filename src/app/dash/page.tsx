@@ -589,7 +589,7 @@ export default function DashPage() {
         </div>
       </header>
 
-      <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} pendingCount={pendingTestimonialsCount} onHome={clearHash} onHash={(h) => { window.location.hash = h; }} />
+      <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} isAdmin={userData?.isAdmin === true} pendingCount={pendingTestimonialsCount} onHome={clearHash} onHash={(h) => { window.location.hash = h; }} />
 
       <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pt-20 md:pt-32 pb-12">
         
