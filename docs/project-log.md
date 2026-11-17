@@ -18,3 +18,18 @@
 - [ ] **ROI da Confiança**: Cálculo de valor gerado por prova social.
 - [ ] **Daily Pick**: Notificação diária do melhor depoimento para o Instagram.
 - [ ] Ativação da Moderação Automática com Genkit (Shield).
+
+## 🧭 Roadmap (itens combinados, ainda não executados)
+**Distribuição / canais**
+- [ ] Estruturar os canais primeiro (Instagram `@useproova.ai`, depois TikTok e YouTube): bio, destaques, pilares de conteúdo, link único, padrão visual.
+- [ ] Série em motion "Dra. Lia, formei e abri a clínica" (episódios com dores reais de clínica + enquete nos comentários que define o próximo episódio).
+- [ ] Versões do marketing para outros nichos (odontologia, médicos) e alternativa da nota do Google.
+
+**Produto / segurança**
+- [ ] Programa de incentivo (revisão jurídica antes).
+- [ ] Proteger dados públicos: doc `users` legível publicamente (e-mail, fcmToken).
+- [ ] App Check / reCAPTCHA; rate limit em `/api/google-click`.
+- [ ] Cancelamento ao fim do período; notificação de pedido de reembolso.
+- [ ] Desativar `ignoreBuildErrors`; TTL em `rate_limits.expireAt`.
+- [ ] Publicação automática no Google Business Profile.
+
