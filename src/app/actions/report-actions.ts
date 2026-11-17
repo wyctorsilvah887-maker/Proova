@@ -172,7 +172,7 @@ export async function sendWeeklyPerformanceReport(userId: string) {
                       <table width="100%" cellspacing="0" cellpadding="0" style="border-top: 1px solid #e2e8f0; padding-top: 32px;">
                         <tr>
                           <td style="padding-bottom: 32px;">
-                            <h3 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.1em;">Dica do Consultor Proova</h3>
+                            <h3 style="margin: 0 0 8px 0; font-size: 13px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 0.1em;">Dica do Consultor Proova AI</h3>
                             <p style="margin: 0; font-size: 14px; color: #64748b; line-height: 1.6;">
                               ${currentCount > 0 
                                 ? "Seu fluxo de coleta está estável. Considere gerar novos Social Cards para as redes sociais para manter o engajamento em alta." 

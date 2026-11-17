@@ -1,5 +1,5 @@
 /**
- * @fileOverview Motor de Árvore de Decisão do Consultor Proova (Não-IA).
+ * @fileOverview Motor de Árvore de Decisão do Consultor Proova AI (Não-IA).
  * Estrutura hierárquica para guiar o usuário através das ferramentas da plataforma.
  */
 

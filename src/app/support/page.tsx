@@ -16,6 +16,7 @@ import {
   Clock,
   Info,
   Sparkles,
+  BellRing,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -61,6 +62,7 @@ import { getConsultantResponse, matchConsultantKey } from '@/lib/consultant-rule
 import { ppPlanOf } from '@/lib/pp-plans';
 import { toast } from '@/hooks/use-toast';
 import { LoadingScreen } from '@/components/loading-screen';
+import { getPushToken } from '@/lib/push-client';
 import { formatMessage } from '@/components/support/format-message';
 import { SupportInfoPanel, SUPPORT_TOPICS } from '@/components/support/support-info-panel';
 
@@ -81,6 +83,7 @@ export default function SupportPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isInfoOpen, setIsInfoOpen] = useState(false);
   const [showJump, setShowJump] = useState(false);
+  const [pushState, setPushState] = useState<'hidden' | 'ask' | 'busy'>('hidden');
   const listRef = useRef<HTMLDivElement>(null);
   const nearBottomRef = useRef(true);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -164,6 +167,39 @@ export default function SupportPage() {
     const near = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
     nearBottomRef.current = near;
     if (near) setShowJump(false);
+  };
+
+  // Avisos push: se já autorizado, só renova o token; se ainda não, oferece ativar (uma faixa discreta).
+  const sendTokenToServer = async (token: string) => {
+    const tk = await auth?.currentUser?.getIdToken();
+    if (!tk) return;
+    await fetch('/api/push-token', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${tk}` }, body: JSON.stringify({ token }) });
+  };
+  useEffect(() => {
+    if (!user || typeof window === 'undefined' || !('Notification' in window) || !process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY) return;
+    if (Notification.permission === 'granted') {
+      getPushToken().then(sendTokenToServer).catch(() => {});
+    } else if (Notification.permission === 'default') {
+      try { if (localStorage.getItem('proova_push_dismissed') === '1') return; } catch {}
+      setPushState('ask');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+
+  const enablePush = async () => {
+    setPushState('busy');
+    try {
+      await sendTokenToServer(await getPushToken());
+      setPushState('hidden');
+      toast({ title: 'Avisos ativados', description: 'Você será notificado quando o atendente entrar no chat.' });
+    } catch (e: any) {
+      setPushState('hidden');
+      toast({ variant: 'destructive', title: 'Não foi possível ativar', description: e?.message || 'Tente novamente.' });
+    }
+  };
+  const dismissPush = () => {
+    setPushState('hidden');
+    try { localStorage.setItem('proova_push_dismissed', '1'); } catch {}
   };
 
   const handleTyping = () => {
@@ -414,6 +450,17 @@ export default function SupportPage() {
                 <Info className="w-4 h-4" />
               </Button>
             </div>
+
+            {pushState !== 'hidden' && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-primary/5 border-b text-xs font-medium shrink-0">
+                <BellRing className="w-4 h-4 text-primary shrink-0" />
+                <span className="flex-1 min-w-0">Quer ser avisado no celular quando o atendente responder?</span>
+                <Button type="button" size="sm" className="h-7 rounded-lg text-[11px] font-black" onClick={enablePush} disabled={pushState === 'busy'}>
+                  {pushState === 'busy' ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Ativar'}
+                </Button>
+                <button type="button" onClick={dismissPush} className="text-muted-foreground hover:text-foreground p-1" aria-label="Agora não"><XCircle className="w-4 h-4" /></button>
+              </div>
+            )}
 
             {/* Mensagens */}
             <div className="relative flex-1 min-h-0">
