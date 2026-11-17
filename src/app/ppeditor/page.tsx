@@ -53,8 +53,11 @@ import {
   BarChart3,
   Headphones,
   ImageIcon,
-  Menu
+  Menu,
+  CircleHelp
 } from 'lucide-react';
+import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
+import { usePageTour } from '@/hooks/use-page-tour';
 import { 
   Sheet, 
   SheetContent, 
@@ -718,6 +721,19 @@ export default function PPEditorPage() {
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
+  const tour = usePageTour(userDocRef, userData, 'editorTourDone');
+  const tourSteps: TourStep[] = useMemo(() => {
+    const desktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
+    return [
+      { title: 'Seu Studio da página pública ✨', text: 'Aqui você monta o seu Link in Bio. Tudo o que mudar aparece na hora no celular ao lado. Vamos ver o essencial em 1 minuto.' },
+      desktop
+        ? { target: 'e-panel', title: 'Painel de edição', text: 'Cores, seleção de depoimentos, textos, blocos (Sobre, Horários, Perguntas, Mapa), layout e contato. Use as abas no topo do painel.' }
+        : { target: 'e-panel-btn', title: 'Menu de edição', text: 'Toque aqui para abrir cores, depoimentos, textos, blocos, layout e contato. As abas ficam no topo do menu.' },
+      { target: 'e-preview', title: 'Pré-visualização ao vivo', text: 'É assim que seus clientes verão a página no celular. Ela muda conforme você edita.' },
+      { target: 'e-view', title: 'Visualizar', text: 'Abre a página pública real, do jeito que está salva.' },
+      { target: 'e-save', title: 'Salvar', text: 'As mudanças só vão para o ar quando você salvar. Alguns recursos dependem do seu plano e aparecem com cadeado.' },
+    ] as TourStep[];
+  }, []);
 
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
   const ppRef = useMemo(() => {
@@ -993,6 +1009,7 @@ export default function PPEditorPage() {
         </div>
         <div className="ml-auto flex items-center gap-2 md:gap-4">
           <Button 
+            data-tour="e-view"
             variant="outline"
             className="flex h-10 md:h-12 px-3 md:px-6 rounded-xl font-bold gap-2 border-primary/20 text-primary hover:bg-primary/5 shadow-sm transition-all active:scale-95"
             onClick={() => router.push(`/pp/${activeSlug}`)}
@@ -1001,6 +1018,7 @@ export default function PPEditorPage() {
             <span className="hidden xs:inline">Visualizar</span>
           </Button>
           <Button 
+            data-tour="e-save"
             onClick={handleSave} 
             disabled={isSaving || isUploading} 
             className="flex h-10 md:h-12 px-3 md:px-6 rounded-xl font-bold gap-2 shadow-lg bg-primary hover:bg-primary/90 text-white transition-all active:scale-95"
@@ -1010,10 +1028,11 @@ export default function PPEditorPage() {
         </div>
       </header>
 
+      {tour.open && <OnboardingTour steps={tourSteps} onFinish={tour.finish} />}
       <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} isAdmin={userData?.isAdmin === true} pendingCount={currentSelection.filter(t => t.status === 'pending').length} />
 
       <main className="flex-1 flex overflow-hidden relative w-full h-full pt-16 md:pt-20">
-        <aside className="hidden lg:flex w-[340px] bg-background border-r flex flex-col shrink-0 h-full shadow-2xl z-50">
+        <aside data-tour="e-panel" className="hidden lg:flex w-[340px] bg-background border-r flex flex-col shrink-0 h-full shadow-2xl z-50">
           <PublicPageSettings 
             themeColor={themeColor} setThemeColor={setThemeColor} secondaryColor={secondaryColor} setSecondaryColor={setSecondaryColor}
             layout={layout} setLayout={setLayout} logoUrl={logoUrl} setLogoUrl={setLogoUrl}
@@ -1042,11 +1061,12 @@ export default function PPEditorPage() {
                  <div className="space-y-1">
                     <h2 className="text-2xl font-black font-headline tracking-tighter uppercase">Editor de Página Pública</h2>
                     <p className="text-xs text-muted-foreground font-medium uppercase tracking-tight">Visualize suas alterações em tempo real.</p>
+                    <button type="button" onClick={tour.start} className="mt-1 text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-1.5"><CircleHelp className="w-3.5 h-3.5" /> Como funciona</button>
                  </div>
                  <div className="flex items-center gap-4">
                     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                       <SheetTrigger asChild>
-                         <Button variant="outline" className="lg:hidden h-12 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 border-primary/20 text-primary shadow-sm bg-background"><Palette className="w-4 h-4" /> Menu de Edição</Button>
+                         <Button data-tour="e-panel-btn" variant="outline" className="lg:hidden h-12 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 border-primary/20 text-primary shadow-sm bg-background"><Palette className="w-4 h-4" /> Menu de Edição</Button>
                       </SheetTrigger>
                       <SheetContent side="left" className="p-0 w-full sm:max-w-xs border-none shadow-2xl overflow-hidden">
                          <SheetHeader className="sr-only">
@@ -1087,7 +1107,7 @@ export default function PPEditorPage() {
                     </div>
                   </div>
                   
-                  <div className="relative w-full max-w-[360px] flex-1 bg-background rounded-[3rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border-[10px] border-muted overflow-hidden flex flex-col aspect-[9/19] scale-[0.85] sm:scale-100 transition-all duration-700 ring-1 ring-primary/5">
+                  <div data-tour="e-preview" className="relative w-full max-w-[360px] flex-1 bg-background rounded-[3rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] border-[10px] border-muted overflow-hidden flex flex-col aspect-[9/19] scale-[0.85] sm:scale-100 transition-all duration-700 ring-1 ring-primary/5">
                     <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col">
                         <header className="p-8 text-center space-y-6 shrink-0 pt-12">
                           {logoUrl && (
