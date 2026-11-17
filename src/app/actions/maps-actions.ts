@@ -6,7 +6,7 @@ import { checkRateLimit } from '@/lib/rate-limit';
 import { collection, query, getDocs, addDoc, serverTimestamp, limit, where } from 'firebase/firestore';
 
 /**
- * Consulta detalhes técnicos de um local no Google Maps para o Consultor Proova.
+ * Consulta detalhes técnicos de um local no Google Maps para o Consultor Proova AI.
  */
 export async function getGooglePlaceDetails(placeId: string) {
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;

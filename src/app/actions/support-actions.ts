@@ -4,29 +4,54 @@
 import { SITE_URL } from '@/lib/site';
 import { mailFrom } from '@/lib/mail';
 import { Resend } from 'resend';
-import { initializeFirebase } from '@/firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { escapeHtml } from '@/lib/feedback-alert';
+import { adminAuth, adminDb } from '@/lib/firebase-admin';
+import { getMessaging } from 'firebase-admin/messaging';
 
 /**
- * Notifica o usuário por e-mail que um consultor humano entrou no chat.
+ * Notifica o usuário (e-mail + push) que um consultor humano entrou no chat.
+ * Só administradores podem disparar: o ID token do admin é verificado no servidor.
  */
-export async function notifySupportPresence(targetUserId: string) {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return { success: false, error: "Serviço de e-mail não configurado." };
-
-  const { firestore } = initializeFirebase();
-  const resend = new Resend(apiKey);
+export async function notifySupportPresence(targetUserId: string, adminIdToken: string) {
+  try {
+    const uid = (await adminAuth().verifyIdToken(adminIdToken)).uid;
+    const adminSnap = await adminDb().doc(`users/${uid}`).get();
+    if (adminSnap.data()?.isAdmin !== true) return { success: false, error: 'forbidden' };
+  } catch {
+    return { success: false, error: 'unauthorized' };
+  }
+  if (!targetUserId || targetUserId.includes('/')) return { success: false };
 
   try {
-    const userSnap = await getDoc(doc(firestore, 'users', targetUserId));
-    if (!userSnap.exists()) return { success: false };
+    const userSnap = await adminDb().doc(`users/${targetUserId}`).get();
+    if (!userSnap.exists) return { success: false };
+    const userData = userSnap.data()!;
+    const userEmail = userData.email as string | undefined;
+    const userName = escapeHtml(userData.name || 'Parceiro');
 
-    const userData = userSnap.data();
-    const userEmail = userData.email;
-    const userName = userData.name || 'Parceiro';
+    // Push (segundo plano): só dados, o service worker monta a notificação.
+    try {
+      const pushRef = adminDb().doc(`user_push/${targetUserId}`);
+      const tokens: string[] = (await pushRef.get()).data()?.tokens || [];
+      if (tokens.length) {
+        const res = await getMessaging().sendEachForMulticast({
+          tokens,
+          data: { title: '🎧 Um atendente entrou no seu chat', body: 'Volte ao Proova AI para conversar em tempo real.', link: `${SITE_URL}/support`, tag: 'support-presence' },
+          webpush: { headers: { Urgency: 'high', TTL: '3600' } },
+        });
+        const alive = tokens.filter((_, i) => {
+          const code = res.responses[i].error?.code || '';
+          return res.responses[i].success || !(code.includes('not-registered') || code.includes('invalid-registration-token') || code.includes('invalid-argument'));
+        });
+        if (alive.length !== tokens.length) await pushRef.set({ tokens: alive }, { merge: true });
+      }
+    } catch (e) {
+      console.error('[support-presence] push', e);
+    }
 
-    if (!userEmail) return { success: false };
-
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey || !userEmail) return { success: true };
+    const resend = new Resend(apiKey);
     await resend.emails.send({
       from: mailFrom('Proova AI Suporte'),
       to: [userEmail],

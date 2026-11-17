@@ -100,7 +100,7 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
             createdAt: serverTimestamp(),
             isSystem: true
           });
-          notifySupportPresence(userId);
+          adminUser?.getIdToken().then((tk) => notifySupportPresence(userId, tk)).catch(() => {});
         }
       }
     }
@@ -180,7 +180,7 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
       
       const messagesRef = collection(db, 'users', userId, 'support_messages');
       batch.set(doc(messagesRef), {
-        text: "O atendimento humano foi concluído com sucesso. ✅\nO **Consultor Proova** foi reativado para te auxiliar. Como posso ajudar?",
+        text: "O atendimento humano foi concluído com sucesso. ✅\nO **Consultor Proova AI** foi reativado para te auxiliar. Como posso ajudar?",
         sender: 'support',
         createdAt: serverTimestamp(),
         isSystem: true

@@ -228,11 +228,11 @@ export default function AdminPage() {
           </div>
 
           <Tabs defaultValue="leads" className="w-full">
-            <TabsList className="bg-background border rounded-xl h-12 p-1 gap-1">
-              <TabsTrigger value="leads" className="rounded-lg text-[10px] font-black uppercase tracking-widest">Usuários</TabsTrigger>
-              <TabsTrigger value="payments" className="rounded-lg text-[10px] font-black uppercase tracking-widest">Pagamentos</TabsTrigger>
-              <TabsTrigger value="refunds" className="rounded-lg text-[10px] font-black uppercase tracking-widest">Reembolsos{pendingRefunds > 0 && <span className="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[9px] text-white">{pendingRefunds}</span>}</TabsTrigger>
-              <TabsTrigger value="actions" className="rounded-lg text-[10px] font-black uppercase tracking-widest">Ações</TabsTrigger>
+            <TabsList className="bg-background border rounded-xl h-12 p-1 gap-1 w-full justify-start overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <TabsTrigger value="leads" className="rounded-lg text-[10px] font-black uppercase tracking-widest shrink-0 flex-1 px-4">Usuários</TabsTrigger>
+              <TabsTrigger value="payments" className="rounded-lg text-[10px] font-black uppercase tracking-widest shrink-0 flex-1 px-4">Pagamentos</TabsTrigger>
+              <TabsTrigger value="refunds" className="rounded-lg text-[10px] font-black uppercase tracking-widest shrink-0 flex-1 px-4">Reembolsos{pendingRefunds > 0 && <span className="ml-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[9px] text-white">{pendingRefunds}</span>}</TabsTrigger>
+              <TabsTrigger value="actions" className="rounded-lg text-[10px] font-black uppercase tracking-widest shrink-0 flex-1 px-4">Ações</TabsTrigger>
             </TabsList>
             
             <TabsContent value="leads" className="pt-6">
