@@ -193,6 +193,12 @@ export default function SupportPage() {
       });
       const plan = ppPlanOf(userData.membershipStatus);
       const planMessage = plan === 'pro' ? "Você está na **fila prioritária**." : (plan === 'premium' ? "Você está na **fila de espera** para o suporte." : "Aguarde até **2 horas** em horário comercial para obter sua resposta.");
+      // Avisa os admins (e-mail + push). Falha aqui não afeta o ticket.
+      auth?.currentUser?.getIdToken().then((tk) => fetch('/api/support-alert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${tk}` },
+        body: JSON.stringify({ ticketId: ticketRef.id }),
+      })).catch((e) => console.error('[support-alert]', e));
       const finalBotMsg = `Seu ticket foi criado com sucesso! 🎟️\nProtocolo: **${ticketRef.id}**\n\n${planMessage}`;
       await addDoc(collection(db, 'users', user.uid, 'support_messages'), {
         text: finalBotMsg,
