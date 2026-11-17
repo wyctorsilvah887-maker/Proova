@@ -4,7 +4,7 @@ import type { RefObject } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import {
-  BarChart3, Globe, Headphones, ImageIcon, Inbox, LayoutGrid, Link2, LogOut, QrCode, Settings, User,
+  BarChart3, Globe, Headphones, ImageIcon, Inbox, LayoutGrid, Link2, LogOut, QrCode, Settings, Shield, User,
   type LucideIcon,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
@@ -38,6 +38,7 @@ export function AppSideMenu({
   companyName,
   membershipLabel,
   pendingCount = 0,
+  isAdmin = false,
   onHome,
   onHash,
 }: {
@@ -47,6 +48,8 @@ export function AppSideMenu({
   companyName?: string;
   membershipLabel: string;
   pendingCount?: number;
+  /** Mostra o atalho para o painel de administração. */
+  isAdmin?: boolean;
   onHome?: () => void;
   onHash?: (hash: string) => void;
 }) {
@@ -79,6 +82,7 @@ export function AppSideMenu({
         { label: 'Suporte VIP', icon: Headphones, href: '/support' },
       ],
     },
+    ...(isAdmin ? [{ title: 'Administração', items: [{ label: 'Painel Admin', icon: Shield, href: '/admin' }] as Item[] }] : []),
   ];
 
   const go = (item: Item) => {
