@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ArrowLeft, Loader2, Mail, Lock, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
 import { useAuth, useUser, useFirestore } from '@/firebase';
+import { getAttribution } from '@/lib/attribution';
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { toast } from '@/hooks/use-toast';
@@ -97,6 +98,7 @@ export default function LoginPage() {
           onboardingDone: false,
           membershipStatus: 'base',
           createdAt: serverTimestamp(),
+          attribution: getAttribution(),
           googleConnected: true,
           lastGoogleSync: serverTimestamp()
         });
