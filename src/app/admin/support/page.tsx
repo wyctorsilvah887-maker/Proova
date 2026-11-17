@@ -19,6 +19,7 @@ import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { LoadingScreen } from '@/components/loading-screen';
+import { AdminNotifyCard } from '@/components/admin-notify-card';
 
 export default function AdminSupportPage() {
   const db = useFirestore();
@@ -102,6 +103,8 @@ export default function AdminSupportPage() {
                />
             </div>
           </header>
+
+          {user && <AdminNotifyCard uid={user.uid} email={user.email} name={userData?.name} />}
 
           {ticketsLoading ? (
             <div className="flex flex-col items-center justify-center py-24 space-y-4">

@@ -14,17 +14,31 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Escutador para mensagens em background (aba fechada)
+// Mensagens em segundo plano (aba/app fechado). Os avisos do suporte chegam só com `data`
+// (title, body, link, tag) e a notificação é montada aqui; se vier com `notification`, o navegador já exibe.
 messaging.onBackgroundMessage((payload) => {
-  console.log('[firebase-messaging-sw.js] Mensagem em background recebida: ', payload);
-  
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
+  if (payload.notification) return;
+  const d = payload.data || {};
+  self.registration.showNotification(d.title || 'Proova AI', {
+    body: d.body || '',
     icon: '/maskable_icon_x192 (6).png',
     badge: '/favicon-32x32.png',
-    data: payload.data
-  };
+    tag: d.tag || undefined,
+    renotify: !!d.tag,
+    requireInteraction: true,
+    data: { link: d.link || '/' },
+  });
+});
 
-  self.registration.showNotification(notificationTitle, notificationOptions);
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const link = (event.notification.data && event.notification.data.link) || '/';
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+      for (const c of list) {
+        if (c.url === link && 'focus' in c) return c.focus();
+      }
+      return clients.openWindow(link);
+    })
+  );
 });
