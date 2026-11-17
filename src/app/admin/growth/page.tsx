@@ -159,26 +159,26 @@ export default function AdminGrowthPage() {
   const maxMrr = Math.max(1, ...stats.byPlan.map((p) => p.mrr));
 
   return (
-    <div className="min-h-screen bg-muted/30 font-body text-foreground">
-      <main className="max-w-7xl mx-auto p-4 md:p-8 space-y-8">
+    <div className="min-h-screen bg-muted/30 font-body text-foreground overflow-x-hidden">
+      <main className="max-w-7xl mx-auto p-4 md:p-8 space-y-6 md:space-y-8 pb-[max(2rem,env(safe-area-inset-bottom))]">
         <div className="space-y-3">
           <Link href="/admin"><Button variant="ghost" size="sm" className="gap-2 -ml-3 text-muted-foreground hover:text-primary font-bold uppercase tracking-widest text-[10px]"><ArrowLeft className="w-4 h-4" /> Painel admin</Button></Link>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <h1 className="text-2xl md:text-3xl font-black font-headline tracking-tighter uppercase flex items-center gap-3"><TrendingUp className="w-7 h-7 text-primary" /> Growth & MRR</h1>
+              <h1 className="text-xl md:text-3xl font-black font-headline tracking-tighter uppercase flex items-center gap-2.5"><TrendingUp className="w-6 h-6 md:w-7 md:h-7 text-primary shrink-0" /> Growth & MRR</h1>
               <p className="text-xs text-muted-foreground font-medium">De onde vêm os cadastros e as assinaturas, e a receita recorrente por plano.</p>
             </div>
-            <div className="flex gap-1 bg-background border rounded-xl p-1 self-start">
+            <div className="grid grid-cols-4 md:flex gap-1 bg-background border rounded-xl p-1 w-full md:w-auto">
               {PERIODS.map((p) => (
                 <button key={p.id} type="button" onClick={() => setPeriod(p.id)}
-                  className={cn('px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest', period === p.id ? 'bg-primary text-white' : 'text-muted-foreground hover:text-primary')}>{p.label}</button>
+                  className={cn('px-2 md:px-3 py-2 md:py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest text-center', period === p.id ? 'bg-primary text-white' : 'text-muted-foreground hover:text-primary')}>{p.label}</button>
               ))}
             </div>
           </div>
         </div>
 
         {/* KPIs */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 md:gap-6">
           {[
             { label: 'MRR atual', value: brl(stats.mrr), icon: Crown, hl: true, sub: `ARR ${brl(stats.mrr * 12)}` },
             { label: 'Assinantes', value: String(stats.paying), icon: Users, sub: `de ${stats.total} contas` },
@@ -186,25 +186,44 @@ export default function AdminGrowthPage() {
             { label: 'Cadastro → pago', value: pct(stats.convPaid, stats.inPeriod), icon: TrendingUp, sub: `${stats.convPaid} assinaram` },
           ].map((k) => (
             <Card key={k.label} className={cn('rounded-2xl border-none shadow-sm', k.hl && 'bg-primary/5')}>
-              <CardHeader className="pb-1"><CardTitle className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-1.5"><k.icon className="w-3.5 h-3.5" />{k.label}</CardTitle></CardHeader>
-              <CardContent><div className={cn('text-2xl md:text-3xl font-black', k.hl && 'text-primary')}>{loading ? '…' : k.value}</div><p className="text-[11px] text-muted-foreground font-medium mt-1">{k.sub}</p></CardContent>
+              <CardHeader className="p-3 pb-1 md:p-6 md:pb-2"><CardTitle className="text-[9px] md:text-[10px] font-black uppercase tracking-wider text-muted-foreground flex items-start gap-1.5 leading-tight"><k.icon className="w-3.5 h-3.5 shrink-0" /><span className="min-w-0">{k.label}</span></CardTitle></CardHeader>
+              <CardContent className="p-3 pt-0 md:p-6 md:pt-0"><div className={cn('text-xl md:text-3xl font-black truncate', k.hl && 'text-primary')}>{loading ? '…' : k.value}</div><p className="text-[10px] md:text-[11px] text-muted-foreground font-medium mt-1 leading-tight">{k.sub}</p></CardContent>
             </Card>
           ))}
         </div>
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Origem */}
-          <Card className="rounded-[2rem] border-none shadow-sm lg:col-span-2">
-            <CardHeader className="flex flex-row items-start justify-between gap-3">
+          <Card className="rounded-3xl md:rounded-[2rem] border-none shadow-sm lg:col-span-2">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
               <div><CardTitle className="text-sm font-black uppercase tracking-tight">De onde vêm os usuários</CardTitle><CardDescription className="text-xs">Cadastros do período e quantos já pagam.</CardDescription></div>
-              <div className="flex gap-1 bg-muted rounded-lg p-0.5 shrink-0">
+              <div className="flex gap-1 bg-muted rounded-lg p-0.5 shrink-0 self-start">
                 {(['source', 'campaign'] as const).map((g) => (
                   <button key={g} type="button" onClick={() => setGroupBy(g)} className={cn('px-2.5 py-1 rounded-md text-[10px] font-black uppercase', groupBy === g ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground')}>{g === 'source' ? 'Origem' : 'Campanha'}</button>
                 ))}
               </div>
             </CardHeader>
-            <CardContent className="overflow-x-auto">
-              <table className="w-full text-sm min-w-[520px]">
+            <CardContent>
+              {/* Celular: cartões empilhados */}
+              <ul className="sm:hidden space-y-2.5">
+                {stats.sources.length === 0 && <li className="py-6 text-center text-muted-foreground text-xs">Nenhum cadastro no período.</li>}
+                {stats.sources.map((s) => (
+                  <li key={s.key} className="rounded-2xl border bg-muted/20 p-3.5 space-y-2.5">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="text-sm font-black capitalize break-words min-w-0">{s.key === 'sem-origem' ? 'Sem origem (antes do rastreio)' : s.key}</p>
+                      <p className="text-sm font-black text-primary tabular-nums shrink-0">{brl(s.mrr)}</p>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 text-center">
+                      <div className="rounded-xl bg-background p-2"><p className="text-base font-black tabular-nums">{s.signups}</p><p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Cadastros</p></div>
+                      <div className="rounded-xl bg-background p-2"><p className="text-base font-black tabular-nums">{s.paid}</p><p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Pagantes</p></div>
+                      <div className="rounded-xl bg-background p-2"><p className="text-base font-black tabular-nums">{pct(s.paid, s.signups)}</p><p className="text-[9px] font-bold uppercase tracking-wider text-muted-foreground">Conversão</p></div>
+                    </div>
+                    {s.paid > 0 && <p className="text-[10px] text-muted-foreground font-medium">{s.premium} Premium · {s.pro} PRO</p>}
+                  </li>
+                ))}
+              </ul>
+              {/* Tablet/desktop: tabela */}
+              <table className="hidden sm:table w-full text-sm">
                 <thead><tr className="text-left text-[10px] font-black uppercase tracking-widest text-muted-foreground border-b">
                   <th className="py-2 pr-3">{groupBy === 'source' ? 'Origem' : 'Origem · campanha'}</th><th className="py-2 px-2 text-right">Cadastros</th><th className="py-2 px-2 text-right">Pagantes</th><th className="py-2 px-2 text-right">Conv.</th><th className="py-2 pl-2 text-right">MRR</th>
                 </tr></thead>
@@ -225,7 +244,7 @@ export default function AdminGrowthPage() {
           </Card>
 
           {/* Planos */}
-          <Card className="rounded-[2rem] border-none shadow-sm">
+          <Card className="rounded-3xl md:rounded-[2rem] border-none shadow-sm">
             <CardHeader><CardTitle className="text-sm font-black uppercase tracking-tight">MRR por plano</CardTitle><CardDescription className="text-xs">Snapshot de hoje.</CardDescription></CardHeader>
             <CardContent className="space-y-4">
               {stats.byPlan.map((p) => (
@@ -240,7 +259,7 @@ export default function AdminGrowthPage() {
         </div>
 
         {/* Cadastros por dia */}
-        <Card className="rounded-[2rem] border-none shadow-sm">
+        <Card className="rounded-3xl md:rounded-[2rem] border-none shadow-sm">
           <CardHeader><CardTitle className="text-sm font-black uppercase tracking-tight">Cadastros por dia</CardTitle></CardHeader>
           <CardContent>
             <div className="flex items-end gap-1 h-32">
@@ -256,14 +275,14 @@ export default function AdminGrowthPage() {
 
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Gerador de links */}
-          <Card className="rounded-[2rem] border-none shadow-sm">
+          <Card className="rounded-3xl md:rounded-[2rem] border-none shadow-sm">
             <CardHeader><CardTitle className="text-sm font-black uppercase tracking-tight flex items-center gap-2"><Link2 className="w-4 h-4 text-primary" /> Links rastreáveis</CardTitle><CardDescription className="text-xs">Use cada link em um lugar. Quem se cadastrar por ele aparece na origem certa. Só administradores veem esta ferramenta.</CardDescription></CardHeader>
             <CardContent className="space-y-4">
               <div>
                 <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-2">Para onde levar</p>
                 <div className="flex flex-wrap gap-1.5">
                   {DESTINATIONS.map((d) => (
-                    <button key={d.id} type="button" onClick={() => setDest(d.id)} className={cn('px-3 py-1.5 rounded-full border text-xs font-bold', dest === d.id ? 'bg-primary text-white border-primary' : 'hover:bg-primary/5')}>{d.label}</button>
+                    <button key={d.id} type="button" onClick={() => setDest(d.id)} className={cn('px-3 py-2 rounded-full border text-xs font-bold', dest === d.id ? 'bg-primary text-white border-primary' : 'hover:bg-primary/5')}>{d.label}</button>
                   ))}
                 </div>
               </div>
@@ -272,24 +291,24 @@ export default function AdminGrowthPage() {
                 <div className="flex flex-wrap gap-1.5">
                   {CHANNELS.map((c) => (
                     <button key={c.label} type="button" onClick={() => { setSource(c.source); setMedium(c.medium); }}
-                      className={cn('px-3 py-1.5 rounded-full border text-xs font-bold', source === c.source && medium === c.medium ? 'bg-primary text-white border-primary' : 'hover:bg-primary/5')}>{c.label}</button>
+                      className={cn('px-3 py-2 rounded-full border text-xs font-bold', source === c.source && medium === c.medium ? 'bg-primary text-white border-primary' : 'hover:bg-primary/5')}>{c.label}</button>
                   ))}
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <Input value={source} onChange={(e) => setSource(e.target.value)} placeholder="origem" className="rounded-xl text-sm" aria-label="utm_source" />
                 <Input value={medium} onChange={(e) => setMedium(e.target.value)} placeholder="meio" className="rounded-xl text-sm" aria-label="utm_medium" />
                 <Input value={campaign} onChange={(e) => setCampaign(e.target.value)} placeholder="campanha (opcional)" className="rounded-xl text-sm" aria-label="utm_campaign" />
               </div>
               <div className="rounded-2xl bg-muted/50 border p-3 space-y-2">
-                <p className="text-xs font-mono break-all">{link}</p>
-                <Button type="button" size="sm" className="rounded-xl font-black gap-2" onClick={() => copy(link, 'main')}>{copied === 'main' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} {copied === 'main' ? 'Copiado!' : 'Copiar link'}</Button>
+                <p className="text-[11px] sm:text-xs font-mono break-all leading-relaxed">{link}</p>
+                <Button type="button" size="sm" className="rounded-xl font-black gap-2 w-full sm:w-auto h-10" onClick={() => copy(link, 'main')}>{copied === 'main' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} {copied === 'main' ? 'Copiado!' : 'Copiar link'}</Button>
               </div>
             </CardContent>
           </Card>
 
           {/* Assinantes recentes */}
-          <Card className="rounded-[2rem] border-none shadow-sm">
+          <Card className="rounded-3xl md:rounded-[2rem] border-none shadow-sm">
             <CardHeader><CardTitle className="text-sm font-black uppercase tracking-tight">Assinantes recentes</CardTitle><CardDescription className="text-xs">Quem assinou e por qual canal chegou.</CardDescription></CardHeader>
             <CardContent>
               {stats.recentPaying.length === 0 ? <p className="text-xs text-muted-foreground py-6 text-center">Ainda não há assinantes.</p> : (
