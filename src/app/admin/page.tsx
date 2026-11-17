@@ -194,11 +194,16 @@ export default function AdminPage() {
 
       <main className="container mx-auto p-4 md:p-6 space-y-8 flex-1 max-w-7xl overflow-x-hidden pt-24 md:pt-32">
         <div className="flex flex-col gap-4">
-          <Link href="/dash">
-            <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-primary transition-colors h-8 px-0 font-bold uppercase tracking-widest text-[10px]">
-              <ArrowLeft className="w-4 h-4" /> Voltar ao Dashboard
-            </Button>
-          </Link>
+          <div className="flex items-center justify-between gap-3">
+            <Link href="/dash">
+              <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-primary transition-colors h-8 px-0 font-bold uppercase tracking-widest text-[10px]">
+                <ArrowLeft className="w-4 h-4" /> Voltar ao Dashboard
+              </Button>
+            </Link>
+            <Link href="/admin/growth">
+              <Button size="sm" className="rounded-xl h-9 font-black uppercase tracking-widest text-[10px] gap-2">Growth & MRR</Button>
+            </Link>
+          </div>
           
           <div className="grid gap-6 md:grid-cols-3">
              <Card className="rounded-2xl border-none shadow-sm">

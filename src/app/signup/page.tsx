@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Link from "next/link";
 import { doc, setDoc, serverTimestamp, getDoc, writeBatch, type Firestore } from "firebase/firestore";
+import { getAttribution } from '@/lib/attribution';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useFirestore, useAuth, useUser } from "@/firebase";
 import { toast } from "@/hooks/use-toast";
@@ -197,6 +198,7 @@ export default function SignupPage() {
           createdAt: serverTimestamp(),
           termsAccepted: true,
           termsAcceptedAt: serverTimestamp(),
+          attribution: getAttribution(),
           googleConnected: true
         });
         toast({ title: "Bem-vindo!", description: "Sua conta foi criada com sucesso via Google." });
@@ -269,7 +271,8 @@ export default function SignupPage() {
         createdAt: serverTimestamp(),
         termsAccepted: true,
         termsAcceptedAt: serverTimestamp(),
-        legalConsentVersion: '4.0'
+        legalConsentVersion: '4.0',
+        attribution: getAttribution(),
       };
 
       batch.set(doc(db, "users", newUser.uid), userData);

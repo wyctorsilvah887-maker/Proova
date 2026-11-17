@@ -95,6 +95,14 @@ export default function PricingPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData } = useDoc(userDocRef);
 
+  // Link compartilhável: /pricing?plan=gold|pro abre o plano já expandido.
+  useEffect(() => {
+    try {
+      const p = new URLSearchParams(window.location.search).get('plan');
+      if (p === 'gold' || p === 'pro') setExpandedPlan(p);
+    } catch {}
+  }, []);
+
   useEffect(() => {
     if (typeof window !== 'undefined' && user) {
       const cached = localStorage.getItem(`proova_user_profile_${user.uid}`);
