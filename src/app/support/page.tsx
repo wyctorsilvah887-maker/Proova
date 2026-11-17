@@ -17,6 +17,7 @@ import {
   Info,
   Sparkles,
   BellRing,
+  CircleHelp,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -63,6 +64,8 @@ import { ppPlanOf } from '@/lib/pp-plans';
 import { toast } from '@/hooks/use-toast';
 import { LoadingScreen } from '@/components/loading-screen';
 import { getPushToken } from '@/lib/push-client';
+import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
+import { usePageTour } from '@/hooks/use-page-tour';
 import { formatMessage } from '@/components/support/format-message';
 import { SupportInfoPanel, SUPPORT_TOPICS } from '@/components/support/support-info-panel';
 
@@ -91,6 +94,18 @@ export default function SupportPage() {
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
+  const tour = usePageTour(userDocRef, userData, 'supportTourDone');
+  const tourSteps: TourStep[] = useMemo(() => {
+    const desktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
+    return [
+      { title: 'Suporte Proova AI 🎧', text: 'Aqui você tira dúvidas na hora com o assistente e, se precisar, fala com um atendente de verdade. Veja como funciona.' },
+      { target: 's-chips', title: 'Atalhos rápidos', text: 'Toque em um tópico (G-Boost, Inbox, Link in Bio, Social Cards, Planos) ou em "Menu" para a resposta imediata.' },
+      { target: 's-compose', title: 'Escreva sua dúvida', text: 'Digite aqui e envie com Enter (Shift+Enter quebra linha). Para falar com uma pessoa, use "Falar com atendente".' },
+      desktop
+        ? { target: 's-info', title: 'Seu atendimento', text: 'Mostra seu plano, o protocolo do ticket (com botão de copiar), o andamento e a opção de encerrar o atendimento.' }
+        : { target: 's-info-btn', title: 'Ticket e tópicos', text: 'Toque no "i" para ver o protocolo do ticket, o andamento do atendimento e encerrar a conversa.' },
+    ] as TourStep[];
+  }, []);
 
   const supportTicketQuery = useMemo(() => {
     if (!db || !user) return null;
@@ -427,11 +442,12 @@ export default function SupportPage() {
         </div>
       </header>
 
+      {tour.open && <OnboardingTour steps={tourSteps} onFinish={tour.finish} />}
       <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} isAdmin={userData?.isAdmin === true} />
 
       <main className="flex-1 min-h-0 pt-16 md:pt-20">
         <div className="h-full max-w-7xl mx-auto lg:p-6 lg:gap-6 flex">
-          <aside className="hidden lg:block w-[340px] shrink-0 overflow-y-auto">{infoPanel}</aside>
+          <aside data-tour="s-info" className="hidden lg:block w-[340px] shrink-0 overflow-y-auto">{infoPanel}</aside>
 
           <section className="flex-1 min-w-0 flex flex-col bg-background lg:border lg:rounded-3xl lg:shadow-xl overflow-hidden">
             {/* Cabeçalho do chat */}
@@ -446,7 +462,8 @@ export default function SupportPage() {
                   <span className="text-[11px] font-medium text-muted-foreground truncate">{statusText}</span>
                 </div>
               </div>
-              <Button type="button" variant="outline" size="icon" className="lg:hidden h-9 w-9 rounded-xl shrink-0" onClick={() => setIsInfoOpen(true)} aria-label="Ver ticket e tópicos">
+              <Button type="button" variant="ghost" size="icon" className="h-9 w-9 rounded-xl shrink-0 text-muted-foreground" onClick={tour.start} aria-label="Como funciona"><CircleHelp className="w-4 h-4" /></Button>
+              <Button data-tour="s-info-btn" type="button" variant="outline" size="icon" className="lg:hidden h-9 w-9 rounded-xl shrink-0" onClick={() => setIsInfoOpen(true)} aria-label="Ver ticket e tópicos">
                 <Info className="w-4 h-4" />
               </Button>
             </div>
@@ -554,7 +571,7 @@ export default function SupportPage() {
             {/* Atalhos + campo de envio */}
             <div className="border-t bg-background shrink-0 pb-[env(safe-area-inset-bottom)]">
               {!isHumanSupportPresent && (
-                <div className="flex gap-2 overflow-x-auto px-3 sm:px-6 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div data-tour="s-chips" className="flex gap-2 overflow-x-auto px-3 sm:px-6 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                   {quickChips.map((c) => (
                     <button key={c.key} type="button" disabled={isSending || isEndingChat} onClick={() => sendText(c.key)}
                       className={cn('shrink-0 rounded-full border px-3.5 py-1.5 text-xs font-bold transition-colors disabled:opacity-50',
@@ -569,7 +586,7 @@ export default function SupportPage() {
                   <Clock className="w-3 h-3" /> Ticket aberto. Escreva sua dúvida que o atendente responde por aqui.
                 </p>
               )}
-              <form onSubmit={handleSendMessage} className="flex items-end gap-2 p-3 sm:px-6 sm:pb-4">
+              <form data-tour="s-compose" onSubmit={handleSendMessage} className="flex items-end gap-2 p-3 sm:px-6 sm:pb-4">
                 <Textarea
                   value={message}
                   rows={1}
