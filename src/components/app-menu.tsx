@@ -1,18 +1,34 @@
 'use client';
 
-import type { RefObject } from 'react';
+import { useEffect, useMemo, useState, type RefObject } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import {
-  BarChart3, Globe, Headphones, ImageIcon, Inbox, LayoutGrid, Link2, LogOut, QrCode, Settings, Shield, User,
+  BarChart3, Copy, ExternalLink, Globe, Headphones, ImageIcon, Inbox, LayoutGrid, Link2, LogOut, QrCode, Settings, Shield, Sparkles,
   type LucideIcon,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useAuth } from '@/firebase';
+import { useAuth, useUser, useFirestore, useDoc } from '@/firebase';
+import { doc } from 'firebase/firestore';
+import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+
+/** Cor do selo de acordo com o plano (membershipLabel das páginas). */
+const PLAN_STYLE: Record<string, string> = {
+  PRO: 'bg-amber-500/15 text-amber-600 border-amber-500/30',
+  PREMIUM: 'bg-primary/15 text-primary border-primary/30',
+  TRIAL: 'bg-sky-500/15 text-sky-600 border-sky-500/30',
+  EXPIRADO: 'bg-destructive/10 text-destructive border-destructive/30',
+};
+
+const initialsOf = (name?: string | null) => {
+  const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return 'P';
+  return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
+};
 
 type Item = {
   label: string;
@@ -36,6 +52,7 @@ export function AppSideMenu({
   onOpenChange,
   toggleRef,
   companyName,
+  companySlug,
   membershipLabel,
   pendingCount = 0,
   isAdmin = false,
@@ -46,6 +63,8 @@ export function AppSideMenu({
   onOpenChange: (open: boolean) => void;
   toggleRef: RefObject<HTMLButtonElement | null>;
   companyName?: string;
+  /** Slug da página pública (habilita logo e atalhos de "ver/copiar página"). */
+  companySlug?: string;
   membershipLabel: string;
   pendingCount?: number;
   /** Mostra o atalho para o painel de administração. */
@@ -56,6 +75,33 @@ export function AppSideMenu({
   const router = useRouter();
   const pathname = usePathname();
   const auth = useAuth();
+  const db = useFirestore();
+  const { user } = useUser();
+
+  // Logo da clínica: lê a página pública só depois que o menu é aberto pela primeira vez (1 leitura).
+  const [everOpened, setEverOpened] = useState(false);
+  useEffect(() => { if (open) setEverOpened(true); }, [open]);
+  const ppRef = useMemo(
+    () => (everOpened && db && user && companySlug ? doc(db, 'users', user.uid, 'pp', companySlug) : null),
+    [everOpened, db, user, companySlug]
+  );
+  const { data: ppData } = useDoc(ppRef);
+  const logoUrl: string | null = ppData?.logoUrl && !/\.(mp4|webm|mov)(\?|$)/i.test(ppData.logoUrl) ? ppData.logoUrl : null;
+  const [logoFailed, setLogoFailed] = useState(false);
+  useEffect(() => { setLogoFailed(false); }, [logoUrl]);
+
+  const publicUrl = companySlug && typeof window !== 'undefined' ? `${window.location.origin}/pp/${companySlug}` : '';
+  const copyPublicUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(publicUrl);
+      toast({ title: 'Link copiado!', description: 'O link da sua página pública está na área de transferência.' });
+    } catch {
+      toast({ variant: 'destructive', title: 'Não foi possível copiar' });
+    }
+  };
+  const planStyle = PLAN_STYLE[membershipLabel] || 'bg-muted text-muted-foreground border-border';
+  const canUpgrade = membershipLabel !== 'PRO';
+  const displayName = companyName || user?.displayName || 'Minha conta';
 
   const groups: { title: string; items: Item[] }[] = [
     { title: 'Início', items: [{ label: 'Visão Geral', icon: LayoutGrid, home: true }] },
@@ -117,23 +163,49 @@ export function AppSideMenu({
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto scrollbar-hide flex flex-col pt-20">
-          <div className="p-6 border-b bg-muted/10 shrink-0">
-            <div className="flex items-center gap-4">
-              <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner">
-                <User className="w-6 h-6 text-primary" />
+          <div className="p-5 border-b bg-muted/10 shrink-0 space-y-4">
+            <div className="flex items-center gap-3.5">
+              <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center border border-primary/20 shrink-0 shadow-inner overflow-hidden">
+                {logoUrl && !logoFailed ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={logoUrl} alt="" className="h-full w-full object-cover" onError={() => setLogoFailed(true)} />
+                ) : (
+                  <span className="text-base font-black text-primary tracking-tight">{initialsOf(displayName)}</span>
+                )}
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-black uppercase tracking-tight truncate">{companyName}</p>
-                <span className="text-[8px] font-black uppercase tracking-widest text-primary">{membershipLabel}</span>
+              <div className="min-w-0 flex-1 space-y-1">
+                <p className="text-sm font-black uppercase tracking-tight truncate leading-tight">{displayName}</p>
+                {user?.email && <p className="text-[11px] font-medium text-muted-foreground truncate leading-tight">{user.email}</p>}
+                <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest', planStyle)}>{membershipLabel}</span>
               </div>
             </div>
+
+            {companySlug && (
+              <div className="grid grid-cols-2 gap-2">
+                <a href={`/pp/${companySlug}`} target="_blank" rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-1.5 h-9 rounded-xl border bg-background hover:bg-primary/5 text-[10px] font-black uppercase tracking-wider transition-all">
+                  <ExternalLink className="w-3.5 h-3.5 text-primary" /> Ver página
+                </a>
+                <button type="button" onClick={copyPublicUrl}
+                  className="flex items-center justify-center gap-1.5 h-9 rounded-xl border bg-background hover:bg-primary/5 text-[10px] font-black uppercase tracking-wider transition-all">
+                  <Copy className="w-3.5 h-3.5 text-primary" /> Copiar link
+                </button>
+              </div>
+            )}
+
+            {canUpgrade && (
+              <button type="button" onClick={() => { router.push('/pricing'); onOpenChange(false); }}
+                className="w-full flex items-center justify-center gap-2 h-10 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-widest shadow-md hover:bg-primary/90 active:scale-[0.98] transition-all">
+                <Sparkles className="w-3.5 h-3.5" /> {membershipLabel === 'PREMIUM' ? 'Conhecer o PRO' : 'Fazer upgrade'}
+              </button>
+            )}
           </div>
 
           <ScrollArea className="flex-1">
-            <div className="px-4 py-6 space-y-6">
+            <div className="px-4 py-5 space-y-5">
               {groups.map((g) => (
                 <div key={g.title}>
-                  <p className="px-3.5 mb-2 text-[8px] font-black uppercase tracking-[0.3em] text-muted-foreground opacity-60">{g.title}</p>
+                  <p className="px-3.5 mb-1.5 text-[9px] font-black uppercase tracking-[0.28em] text-muted-foreground opacity-70">{g.title}</p>
                   {g.items.map((item) => (
                     <button
                       key={item.label}
@@ -141,8 +213,8 @@ export function AppSideMenu({
                       onClick={() => go(item)}
                       aria-current={isActive(item) ? 'page' : undefined}
                       className={cn(
-                        'w-full flex items-center justify-between p-3.5 rounded-xl hover:bg-primary/5 text-[10px] font-black uppercase tracking-widest transition-all group outline-none focus:ring-0',
-                        isActive(item) && 'bg-primary/10 text-primary'
+                        'relative w-full flex items-center justify-between px-3.5 py-3 rounded-xl hover:bg-primary/5 text-[11px] font-black uppercase tracking-wider transition-all group outline-none focus-visible:ring-2 focus-visible:ring-primary/30',
+                        isActive(item) && 'bg-primary/10 text-primary before:absolute before:left-0 before:top-2 before:bottom-2 before:w-1 before:rounded-full before:bg-primary'
                       )}
                     >
                       <div className="flex items-center gap-4">
@@ -150,7 +222,7 @@ export function AppSideMenu({
                         <span>{item.label}</span>
                       </div>
                       {!!item.badge && item.badge > 0 && (
-                        <Badge className="bg-destructive text-white h-4 px-1.5 text-[8px]">{item.badge}</Badge>
+                        <Badge className="bg-destructive text-white h-5 min-w-5 justify-center px-1.5 text-[9px]">{item.badge}</Badge>
                       )}
                     </button>
                   ))}

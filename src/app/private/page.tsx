@@ -228,7 +228,7 @@ export default function PrivateInboxPage() {
         </div>
       </header>
 
-      <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} isAdmin={userData?.isAdmin === true} pendingCount={(pendingList?.length || 0)} />
+      <AppSideMenu companySlug={userData?.companySlug} open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} isAdmin={userData?.isAdmin === true} pendingCount={(pendingList?.length || 0)} />
 
       <main className="flex-1 p-4 md:p-8 space-y-8 max-w-5xl mx-auto w-full pt-24 md:pt-32 pb-12">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">

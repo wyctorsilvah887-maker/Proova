@@ -1,7 +1,7 @@
 'use client';
 
 import { forwardRef, type CSSProperties } from 'react';
-import { Star, CheckCircle2, Quote } from 'lucide-react';
+import { Star, CheckCircle2, Quote, Play } from 'lucide-react';
 
 export type CardFormat = 'square' | 'feed' | 'story';
 
@@ -30,6 +30,8 @@ type Props = {
   logoUrl?: string | null;
   showProova?: boolean;
   anchor?: 'center' | 'bottom';
+  /** Capa de depoimento em vídeo: mostra o botão de play e o texto vira legenda opcional. */
+  video?: boolean;
   style?: CSSProperties;
 };
 
@@ -38,7 +40,7 @@ type Props = {
  * no celular e no computador. A tela só aplica `transform: scale()` para caber no dialog.
  */
 export const SocialCardArt = forwardRef<HTMLDivElement, Props>(function SocialCardArt(
-  { testimonial, imageUrl, background = '#000', lightText, format, companyName, logoUrl, showProova = true, anchor = 'center', style }, ref
+  { testimonial, imageUrl, background = '#000', lightText, format, companyName, logoUrl, showProova = true, anchor = 'center', video = false, style }, ref
 ) {
   const { w, h } = CARD_SIZES[format];
   const pad = PAD[format];
@@ -56,12 +58,17 @@ export const SocialCardArt = forwardRef<HTMLDivElement, Props>(function SocialCa
       {imageUrl && <img src={imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
       <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', padding: `${pad.top}px 34px ${pad.bottom}px`, color: fg }}>
         {/* Rótulo (fica pequeno para não competir com a arte do template) */}
-        <p style={{ fontSize: 9, fontWeight: 800, letterSpacing: '.24em', textTransform: 'uppercase', color: soft, textAlign: 'center' }}>Relato de cliente</p>
+        <p style={{ fontSize: 9, fontWeight: 800, letterSpacing: '.24em', textTransform: 'uppercase', color: soft, textAlign: 'center' }}>{video ? 'Depoimento em vídeo' : 'Relato de cliente'}</p>
 
         <div style={{ flex: 1 }} />
 
         {/* Nota + depoimento */}
         <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+          {video && (
+            <div style={{ width: format === 'square' ? 64 : 84, height: format === 'square' ? 64 : 84, borderRadius: '50%', background: '#f97316', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 10px 30px rgba(249,115,22,.55), 0 0 0 8px rgba(255,255,255,.22)', marginBottom: 4 }}>
+              <Play size={format === 'square' ? 28 : 38} color="#fff" fill="#fff" style={{ marginLeft: 4 }} />
+            </div>
+          )}
           {rating > 0 && (
             <div style={{ display: 'flex', gap: 4 }}>
               {[1, 2, 3, 4, 5].map((n) => (
@@ -69,6 +76,7 @@ export const SocialCardArt = forwardRef<HTMLDivElement, Props>(function SocialCa
               ))}
             </div>
           )}
+          {text.trim() && (
           <div style={{ position: 'relative', width: '100%', maxWidth: 330 }}>
             <Quote size={18} color={fg} style={{ position: 'absolute', top: -10, left: -10, opacity: 0.25, transform: 'rotate(180deg)' }} />
             <div style={{ padding: format === 'square' ? '14px 18px' : '18px 20px', borderRadius: 22, background: lightText ? 'rgba(0,0,0,.45)' : 'rgba(255,255,255,.74)', border: `1px solid ${line}`, textAlign: 'center' }}>
@@ -76,6 +84,7 @@ export const SocialCardArt = forwardRef<HTMLDivElement, Props>(function SocialCa
             </div>
             <Quote size={18} color={fg} style={{ position: 'absolute', bottom: -10, right: -10, opacity: 0.25 }} />
           </div>
+          )}
         </div>
 
         <div style={{ flex: anchor === 'bottom' ? '0 0 16px' : 1 }} />

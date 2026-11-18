@@ -34,10 +34,14 @@ import {
   CircleHelp,
   Square,
   RectangleVertical,
-  Smartphone
+  Smartphone,
+  RotateCcw,
+  Scissors,
+  UserRound
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
@@ -67,6 +71,35 @@ import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
 import { usePageTour } from '@/hooks/use-page-tour';
 import { ppPlanOf, ppCaps } from '@/lib/pp-plans';
 
+type NameMode = 'full' | 'initial' | 'anon';
+
+/** Nome exibido no card: completo, "Maria S." ou "Cliente". */
+function displayAuthor(name: any, mode: NameMode) {
+  const full = String(name || '').trim().replace(/\s+/g, ' ');
+  if (mode === 'anon' || !full) return 'Cliente';
+  if (mode === 'full') return full;
+  const parts = full.split(' ');
+  if (parts.length === 1) return parts[0];
+  const last = parts[parts.length - 1];
+  return `${parts[0]} ${last[0].toUpperCase()}.`;
+}
+
+/** Encurta o relato mantendo frases inteiras (ou corta na última palavra com reticências). */
+function shortenText(text: string, max = 140) {
+  const t = text.trim().replace(/\s+/g, ' ');
+  if (t.length <= max) return t;
+  const sentences = t.match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g) || [t];
+  let out = '';
+  for (const sn of sentences) {
+    if ((out + sn).trim().length > max) break;
+    out += sn;
+  }
+  out = out.trim();
+  if (out.length >= 30) return out;
+  const cut = t.slice(0, max - 1);
+  return cut.slice(0, Math.max(cut.lastIndexOf(' '), 30)).replace(/[\s,;:.\-–]+$/, '') + '…';
+}
+
 export default function SocialCardsPage() {
   const { user, loading: authLoading } = useUser();
   const auth = useAuth();
@@ -79,6 +112,10 @@ export default function SocialCardsPage() {
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
   const [isExportingCard, setIsExportingCard] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [nameMode, setNameMode] = useState<NameMode>('full');
+  const [draftText, setDraftText] = useState('');
+  const [canShare, setCanShare] = useState(false);
+  useEffect(() => { setCanShare(typeof navigator !== 'undefined' && typeof (navigator as any).share === 'function'); }, []);
   
   // Templates Dinâmicos
   const [availableTemplates, setAvailableTemplates] = useState<TemplateMetadata[]>([]);
@@ -114,7 +151,7 @@ export default function SocialCardsPage() {
   const tourSteps: TourStep[] = useMemo(() => [
     { title: 'Social Card Studio ✨', text: 'Aqui você transforma depoimentos aprovados em artes prontas para Instagram, Stories e outras redes. Vamos ver como funciona.' },
     { target: 'cards-search', title: 'Encontre o depoimento', text: 'Pesquise pelo nome do cliente ou por um trecho do relato.' },
-    { target: 'cards-grid', title: 'Escolha e toque em "Criar Card"', text: 'Ao tocar, abre o estúdio: você escolhe o formato (Quadrado, Feed ou Story), o template e baixa a arte pronta em alta qualidade.' },
+    { target: 'cards-grid', title: 'Escolha e toque em "Criar Card"', text: 'Ao tocar, abre o estúdio: escolha formato, template, como o nome aparece e ajuste o texto. Depois baixe a arte em alta qualidade ou compartilhe direto do celular. Depoimentos em vídeo geram uma capa com botão de play.' },
     { title: 'Sua marca no card', text: 'O card leva o nome e o logo da sua clínica (definidos no editor da página pública) e a nota real do cliente. Templates VIP são dos planos Premium e PRO.' },
   ] as TourStep[], []);
 
@@ -190,52 +227,87 @@ export default function SocialCardsPage() {
 
   const openShareDialog = (testimonial: any) => {
     setSelectedTestimonialForShare(testimonial);
+    setDraftText(String(testimonial?.text || ''));
+    setNameMode('full');
     if (availableTemplates.length > 0) {
       setSelectedTemplateId(availableTemplates[0].id);
     }
     setIsShareDialogOpen(true);
   };
 
-  const handleDownloadContent = async () => {
-    if (!selectedTestimonialForShare) return;
+  const isVideoCard = !!selectedTestimonialForShare?.videoUrl;
+  // Testimonial exibido no card: texto editado e nome no modo escolhido (o depoimento original não é alterado).
+  const cardTestimonial = useMemo(
+    () => (selectedTestimonialForShare ? { ...selectedTestimonialForShare, text: draftText, userName: displayAuthor(selectedTestimonialForShare.userName, nameMode) } : null),
+    [selectedTestimonialForShare, draftText, nameMode]
+  );
+  const slugOf = (v: any) => String(v || 'cliente').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'cliente';
 
-    if (selectedTestimonialForShare.videoUrl) {
-      setIsExportingCard(true);
-      shadcnToast({ title: "Processando Vídeo", description: "Iniciando download... aguarde." });
-      try {
-        const link = document.createElement('a');
-        link.href = selectedTestimonialForShare.videoUrl;
-        link.download = `proova-video-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.mp4`;
-        link.target = "_blank";
-        link.click();
-      } catch (err) {
-        shadcnToast({ variant: "destructive", title: "Erro no download" });
-      } finally {
-        setIsExportingCard(false);
-      }
-      return;
+  /** Renderiza a arte em PNG 1080 px de largura. */
+  const renderPng = async (): Promise<string> => {
+    if (!shareCardRef.current) throw new Error('no-card');
+    const opts = { pixelRatio: 1080 / cardSize.w, width: cardSize.w, height: cardSize.h, cacheBust: true, backgroundColor: undefined, style: { transform: 'none', borderRadius: '0' } };
+    try {
+      return await toPng(shareCardRef.current, opts as any);
+    } catch (e) {
+      // Logo hospedado sem CORS pode impedir a exportação: refaz sem o logo.
+      setSkipLogo(true);
+      await new Promise((r) => setTimeout(r, 250));
+      return await toPng(shareCardRef.current, opts as any);
     }
+  };
 
+  const handleDownloadCard = async () => {
+    if (!selectedTestimonialForShare) return;
     setIsExportingCard(true);
     try {
-      if (!shareCardRef.current) return;
-      const opts = { pixelRatio: 1080 / cardSize.w, width: cardSize.w, height: cardSize.h, cacheBust: true, backgroundColor: undefined, style: { transform: 'none', borderRadius: '0' } };
-      let dataUrl: string;
-      try {
-        dataUrl = await toPng(shareCardRef.current, opts as any);
-      } catch (e) {
-        // Logo hospedado sem CORS pode impedir a exportação: refaz sem o logo.
-        setSkipLogo(true);
-        await new Promise((r) => setTimeout(r, 250));
-        dataUrl = await toPng(shareCardRef.current, opts as any);
-      }
+      const dataUrl = await renderPng();
       const link = document.createElement('a');
-      link.download = `proova-card-${String(selectedTestimonialForShare.userName || 'cliente').toLowerCase().replace(/\s+/g, '-')}-${format}.png`;
+      link.download = `proova-${isVideoCard ? 'capa-video' : 'card'}-${slugOf(selectedTestimonialForShare.userName)}-${format}.png`;
       link.href = dataUrl;
       link.click();
-      shadcnToast({ title: "Card Gerado!", description: `Arte ${cardSize.label} (${cardSize.ratio}) pronta para as redes sociais.` });
+      shadcnToast({ title: isVideoCard ? 'Capa gerada!' : 'Card Gerado!', description: `Arte ${cardSize.label} (${cardSize.ratio}) pronta para as redes sociais.` });
     } catch (err) {
-      shadcnToast({ variant: "destructive", title: "Erro ao exportar" });
+      shadcnToast({ variant: 'destructive', title: 'Erro ao exportar' });
+    } finally {
+      setIsExportingCard(false);
+      setSkipLogo(false);
+    }
+  };
+
+  const handleDownloadVideo = () => {
+    if (!selectedTestimonialForShare?.videoUrl) return;
+    try {
+      const link = document.createElement('a');
+      link.href = selectedTestimonialForShare.videoUrl;
+      link.download = `proova-video-${slugOf(selectedTestimonialForShare.userName)}.mp4`;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.click();
+      shadcnToast({ title: 'Baixando vídeo', description: 'O download do depoimento em vídeo foi iniciado.' });
+    } catch {
+      shadcnToast({ variant: 'destructive', title: 'Erro no download' });
+    }
+  };
+
+  /** Compartilhamento nativo (abre Instagram, WhatsApp etc. direto no celular). */
+  const handleShareCard = async () => {
+    if (!selectedTestimonialForShare) return;
+    setIsExportingCard(true);
+    try {
+      const dataUrl = await renderPng();
+      const blob = await (await fetch(dataUrl)).blob();
+      const file = new File([blob], `proova-card-${slugOf(selectedTestimonialForShare.userName)}-${format}.png`, { type: 'image/png' });
+      const text = isVideoCard ? `Assista ao depoimento: ${selectedTestimonialForShare.videoUrl}` : (userData?.companyName ? `Depoimento de cliente — ${userData.companyName}` : 'Depoimento de cliente');
+      const nav: any = navigator;
+      if (nav.canShare?.({ files: [file] })) {
+        await nav.share({ files: [file], text });
+      } else {
+        await nav.share({ title: 'Depoimento de cliente', text });
+        shadcnToast({ title: 'Seu aparelho não compartilha imagens direto', description: 'Use "Gerar PNG" e envie o arquivo.' });
+      }
+    } catch (err: any) {
+      if (err?.name !== 'AbortError') shadcnToast({ variant: 'destructive', title: 'Não foi possível compartilhar', description: 'Gere o PNG e envie o arquivo manualmente.' });
     } finally {
       setIsExportingCard(false);
       setSkipLogo(false);
@@ -293,13 +365,13 @@ export default function SocialCardsPage() {
       </header>
 
       {tour.open && <OnboardingTour steps={tourSteps} onFinish={tour.finish} />}
-      <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} isAdmin={userData?.isAdmin === true} pendingCount={allApprovedTestimonials.filter(t => t.status === 'pending').length} />
+      <AppSideMenu companySlug={userData?.companySlug} open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} isAdmin={userData?.isAdmin === true} pendingCount={allApprovedTestimonials.filter(t => t.status === 'pending').length} />
 
       <main className="flex-1 overflow-y-auto p-4 md:p-8 pt-24 md:pt-32 pb-20">
         <div className="max-w-6xl mx-auto space-y-8 animate-in fade-in duration-700">
           <header className="space-y-4">
              <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter uppercase">Social Card Studio</h1>
-             <p className="text-muted-foreground text-sm md:text-lg font-medium leading-relaxed max-w-2xl">Transforme depoimentos de texto em artes de alta autoridade para o seu Instagram.</p>
+             <p className="text-muted-foreground text-sm md:text-lg font-medium leading-relaxed max-w-2xl">Transforme depoimentos (texto ou vídeo) em artes de alta autoridade para Instagram, Stories e WhatsApp.</p>
              <button type="button" onClick={tour.start} className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-1.5"><CircleHelp className="w-3.5 h-3.5" /> Como funciona</button>
           </header>
 
@@ -407,11 +479,46 @@ export default function SocialCardsPage() {
               </div>
             </div>
 
+            <div className="w-full shrink-0 space-y-3">
+              <div>
+                <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-2 ml-1 flex items-center gap-1"><UserRound className="w-3 h-3" /> Nome no card:</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {([['full', 'Completo'], ['initial', 'Nome + inicial'], ['anon', 'Anônimo']] as const).map(([m, label]) => (
+                    <button key={m} type="button" onClick={() => setNameMode(m)}
+                      className={cn("rounded-xl border-2 px-1 py-2 text-[9px] font-black uppercase tracking-wide transition-all", nameMode === m ? "border-primary bg-primary/5 shadow-md" : "border-transparent bg-muted/30 hover:border-primary/20")}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[9px] text-muted-foreground mt-1.5 ml-1 font-medium">Aparece como: <b className="text-foreground">{displayAuthor(selectedTestimonialForShare?.userName, nameMode)}</b></p>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2 ml-1">
+                  <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-muted-foreground">{isVideoCard ? 'Legenda (opcional):' : 'Texto do card:'}</p>
+                  <div className="flex items-center gap-1">
+                    <button type="button" onClick={() => setDraftText(shortenText(draftText))} disabled={draftText.trim().length <= 140}
+                      className="flex items-center gap-1 rounded-lg px-2 py-1 text-[9px] font-black uppercase tracking-wide text-primary hover:bg-primary/10 disabled:opacity-30 disabled:hover:bg-transparent transition-all">
+                      <Scissors className="w-3 h-3" /> Encurtar
+                    </button>
+                    <button type="button" onClick={() => setDraftText(String(selectedTestimonialForShare?.text || ''))} disabled={draftText === String(selectedTestimonialForShare?.text || '')}
+                      className="flex items-center gap-1 rounded-lg px-2 py-1 text-[9px] font-black uppercase tracking-wide text-muted-foreground hover:bg-muted disabled:opacity-30 disabled:hover:bg-transparent transition-all">
+                      <RotateCcw className="w-3 h-3" /> Original
+                    </button>
+                  </div>
+                </div>
+                <Textarea value={draftText} onChange={(e) => setDraftText(e.target.value.slice(0, 400))} rows={3}
+                  className="rounded-xl text-sm font-medium resize-none bg-muted/20" placeholder={isVideoCard ? 'Ex.: Veja o que a Maria achou do atendimento' : ''} />
+                <p className={cn("text-[9px] mt-1 ml-1 font-bold", draftText.length > 220 ? "text-amber-600" : "text-muted-foreground")}>{draftText.length}/400 · só altera o card, o depoimento original continua igual{draftText.length > 220 ? ' · textos curtos ficam mais legíveis' : ''}</p>
+              </div>
+            </div>
+
             <div className="w-full flex justify-center py-1 shrink-0">
               <div className="overflow-hidden shadow-2xl rounded-2xl transition-all" style={{ width: cardSize.w * cardScale, height: cardSize.h * cardScale }}>
                 <SocialCardArt
                   ref={shareCardRef}
-                  testimonial={selectedTestimonialForShare}
+                  testimonial={cardTestimonial}
+                  video={isVideoCard}
                   imageUrl={activeTemplate?.imageUrl}
                   background={activeTemplate?.style.background}
                   lightText={activeTemplate?.style.color === '#ffffff'}
@@ -425,14 +532,29 @@ export default function SocialCardsPage() {
               </div>
             </div>
 
-            <Button 
-              className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-[10px] sm:text-xs bg-primary hover:bg-primary/90 text-white"
-              onClick={handleDownloadContent}
-              disabled={isExportingCard || availableTemplates.length === 0}
-            >
-              {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-4 h-4 sm:w-5 sm:h-5" />}
-              {selectedTestimonialForShare?.videoUrl ? 'Baixar Vídeo Review' : 'Gerar Arte PNG'}
-            </Button>
+            <div className="w-full shrink-0 space-y-2">
+              <Button
+                className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-[10px] sm:text-xs bg-primary hover:bg-primary/90 text-white"
+                onClick={handleDownloadCard}
+                disabled={isExportingCard || availableTemplates.length === 0}
+              >
+                {isExportingCard ? <Loader2 className="animate-spin h-5 w-5" /> : <Download className="w-4 h-4 sm:w-5 sm:h-5" />}
+                {isVideoCard ? 'Gerar capa PNG' : 'Gerar Arte PNG'}
+              </Button>
+              <div className={cn("grid gap-2", canShare && isVideoCard ? "grid-cols-2" : "grid-cols-1")}>
+                {canShare && (
+                  <Button variant="outline" className="h-11 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 border-primary/30 text-primary hover:bg-primary/5"
+                    onClick={handleShareCard} disabled={isExportingCard || availableTemplates.length === 0}>
+                    <Share2 className="w-4 h-4" /> Compartilhar
+                  </Button>
+                )}
+                {isVideoCard && (
+                  <Button variant="outline" className="h-11 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2" onClick={handleDownloadVideo}>
+                    <Play className="w-4 h-4" /> Baixar vídeo
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
           
           <DialogFooter className="p-4 sm:p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">

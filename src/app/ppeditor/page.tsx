@@ -1029,7 +1029,7 @@ export default function PPEditorPage() {
       </header>
 
       {tour.open && <OnboardingTour steps={tourSteps} onFinish={tour.finish} />}
-      <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} isAdmin={userData?.isAdmin === true} pendingCount={currentSelection.filter(t => t.status === 'pending').length} />
+      <AppSideMenu companySlug={userData?.companySlug} open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} isAdmin={userData?.isAdmin === true} pendingCount={currentSelection.filter(t => t.status === 'pending').length} />
 
       <main className="flex-1 flex overflow-hidden relative w-full h-full pt-16 md:pt-20">
         <aside data-tour="e-panel" className="hidden lg:flex w-[340px] bg-background border-r flex flex-col shrink-0 h-full shadow-2xl z-50">
