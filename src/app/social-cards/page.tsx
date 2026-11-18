@@ -423,7 +423,7 @@ export default function SocialCardsPage() {
       </main>
 
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
-        <DialogContent className="!flex flex-col gap-0 p-0 overflow-hidden bg-background border-none shadow-2xl w-screen max-w-none h-[100dvh] max-h-[100dvh] rounded-none !left-0 !top-0 !translate-x-0 !translate-y-0 sm:!left-[50%] sm:!top-[50%] sm:!translate-x-[-50%] sm:!translate-y-[-50%] sm:w-full sm:max-w-md sm:h-auto sm:max-h-[92vh] sm:rounded-[2.5rem]">
+        <DialogContent className="!z-[200] !flex flex-col gap-0 p-0 overflow-hidden bg-background border-none shadow-2xl w-screen max-w-none h-[100dvh] max-h-[100dvh] rounded-none !left-0 !top-0 !translate-x-0 !translate-y-0 sm:!left-[50%] sm:!top-[50%] sm:!translate-x-[-50%] sm:!translate-y-[-50%] sm:w-full sm:max-w-md sm:h-auto sm:max-h-[92vh] sm:rounded-[2.5rem]">
           <DialogHeader className="px-12 pt-4 pb-2 sm:p-8 sm:pb-2 text-center shrink-0">
             <div className="flex items-center justify-center gap-2 mb-1">
                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
