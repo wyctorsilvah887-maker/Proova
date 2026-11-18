@@ -1,10 +1,10 @@
-import { FieldValue } from 'firebase-admin/firestore';
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { timingSafeEqual } from 'node:crypto';
 import { adminDb } from '@/lib/firebase-admin';
 import { generateReply } from '@/ai/reply';
 import { reserveAiReplies, releaseAiReplies } from '@/lib/ai-quota';
 import { startApifyRun, fetchDatasetReviews } from './apify';
-import { AUTO_FETCH_PLANS } from './types';
+import { AUTO_FETCH_PLANS, REVIEW_RETENTION_MS } from './types';
 
 const MAX_NEW_PER_RUN = 20;
 
@@ -70,10 +70,26 @@ export async function ingestDataset(uid: string, datasetId: string): Promise<{ s
       }
       await col.doc(r.reviewId.replace(/\//g, '_')).create({
         ...r, status: 'pending', aiReply, source: 'apify', fetchedAt: FieldValue.serverTimestamp(),
+        expireAt: Timestamp.fromMillis(Date.now() + REVIEW_RETENTION_MS),
       }).then(() => { saved++; }).catch((e) => { if (e?.code !== 6) throw e; }); // 6 = já existe
     }));
   }
   // A busca dos últimos 30 dias só conta como feita depois que o resultado chegou com sucesso.
   await db.doc(`users/${uid}`).update({ reviewsBackfilled: true }).catch(() => {});
   return { saved, skipped: all.length - saved };
+}
+
+/**
+ * Apaga as avaliações do Google guardadas há mais de 30 dias (de um usuário).
+ * Devolve quantas foram removidas. Chamada pelo cron diário.
+ */
+export async function purgeExpiredReviews(uid: string): Promise<number> {
+  const db = adminDb();
+  const cutoff = Timestamp.fromMillis(Date.now() - REVIEW_RETENTION_MS);
+  const snap = await db.collection(`users/${uid}/googleReviews`).where('fetchedAt', '<', cutoff).limit(300).get();
+  if (snap.empty) return 0;
+  const batch = db.batch();
+  snap.docs.forEach((d) => batch.delete(d.ref));
+  await batch.commit();
+  return snap.size;
 }

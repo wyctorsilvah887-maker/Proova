@@ -112,6 +112,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/componen
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebase';
 import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
+import { REVIEW_RETENTION_DAYS, REVIEW_RETENTION_MS } from '@/lib/reviews/types';
 import { saveGooglePlace } from '@/lib/google-place-client';
 import { normalizeBrWhatsapp, whatsappLink, maskBrPhone } from '@/lib/whatsapp';
 import { doc, collection, query, updateDoc, orderBy, limit, where, getDocs, Timestamp, serverTimestamp, arrayUnion, deleteField } from 'firebase/firestore';
@@ -129,6 +130,17 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { useNotifications } from '@/hooks/use-notifications';
 import { LoadingScreen } from '@/components/loading-screen';
 import { regenerateReplyAction } from '@/app/actions/ai-reply-actions';
+
+/** Dias restantes até a avaliação do Google ser apagada (null se ainda não há data do servidor). */
+function reviewDaysLeft(r: any): number | null {
+  const ms = r?.fetchedAt?.toMillis?.();
+  if (!ms) return null;
+  return Math.max(0, Math.ceil((ms + REVIEW_RETENTION_MS - Date.now()) / 86400000));
+}
+function reviewExpired(r: any): boolean {
+  const left = reviewDaysLeft(r);
+  return left !== null && left <= 0;
+}
 
 export default function DashPage() {
   const { user, loading: authLoading } = useUser();
@@ -175,6 +187,7 @@ export default function DashPage() {
     { target: 'setup', title: 'Complete sua configuração', text: 'Informe a localização e o link do Google Maps para a coleta e o redirecionamento de avaliações funcionarem. Este aviso some quando terminar.' },
     { target: 'metrics', title: 'Seus números', text: 'Acompanhe os elogios coletados e a sua nota. Use o filtro de período para ver a evolução.' },
     { target: 'reviews', title: 'Avaliações & IA', text: 'Os depoimentos e avaliações chegam aqui. Gere uma resposta com IA, copie e responda em segundos.' },
+    { target: 'reviews', title: `Avaliações do Google: ${REVIEW_RETENTION_DAYS} dias ⏳`, text: `As avaliações do Google ficam visíveis aqui por ${REVIEW_RETENTION_DAYS} dias e depois são apagadas automaticamente. Responda dentro desse prazo. Elas aparecem só para você e não vão para a página pública nem para os cards. Já os depoimentos coletados pelo seu link não expiram.` },
     { title: 'Tudo pronto! 🚀', text: 'Depois de configurar, compartilhe seu link de coleta com os clientes e veja a prova social crescer. Para rever este tour, abra o painel com ?tour=1 no endereço.' },
   ], []);
   // Mini-tour da tela de localização: só na primeira vez (cidade ainda não definida).
@@ -204,7 +217,7 @@ export default function DashPage() {
   const { data: googleReviews, loading: isLoadingApi } = useCollection(googleReviewsQuery);
   // Só as que ainda precisam de atenção do dono
   const apiSuggestions = useMemo(
-    () => (googleReviews || []).filter((r: any) => r.status === 'pending' || r.status === 'copied'),
+    () => (googleReviews || []).filter((r: any) => (r.status === 'pending' || r.status === 'copied') && !reviewExpired(r)),
     [googleReviews]
   );
 
@@ -839,6 +852,7 @@ export default function DashPage() {
                    <Sparkles className="w-5 h-5 text-primary" />
                    <h2 className="text-sm md:text-lg font-black uppercase tracking-tight">Avaliações Recentes & IA</h2>
                 </div>
+                <p className="basis-full text-[10px] font-medium text-muted-foreground leading-snug">As avaliações do Google ficam aqui por {REVIEW_RETENTION_DAYS} dias e depois são apagadas automaticamente; só você as vê. Os depoimentos coletados pelo seu link não expiram.</p>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                   {isPremiumUser && (userData?.googlePlaceId || userData?.googleMapsUrl) && (
                     <button onClick={handleRefreshReviews} disabled={isRefreshingReviews} className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-primary hover:underline disabled:opacity-50">
@@ -886,7 +900,7 @@ export default function DashPage() {
                               </div>
                            </div>
                            <span className="text-[8px] font-bold text-muted-foreground uppercase flex items-center gap-1">
-                              <Clock className="w-2.5 h-2.5" /> {r.publishedAt ? new Date(r.publishedAt).toLocaleDateString('pt-BR') : 'Recentemente'}
+                              <Clock className="w-2.5 h-2.5" /> {r.publishedAt ? new Date(r.publishedAt).toLocaleDateString('pt-BR') : 'Recentemente'}{reviewDaysLeft(r) !== null && <span className="ml-1 normal-case text-amber-600">· some em {reviewDaysLeft(r)} {reviewDaysLeft(r) === 1 ? 'dia' : 'dias'}</span>}
                            </span>
                         </div>
 

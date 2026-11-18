@@ -62,7 +62,7 @@ export default function TermsPage() {
               <Scale className="w-3.5 h-3.5" /> Acordo de Serviço
            </div>
            <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter uppercase leading-tight">Termos de Uso</h1>
-           <p className="text-muted-foreground font-medium text-sm md:text-lg">Regras e diretrizes para o uso da plataforma Proova AI. Última atualização: 15 de novembro de 2026.</p>
+           <p className="text-muted-foreground font-medium text-sm md:text-lg">Regras e diretrizes para o uso da plataforma Proova AI. Última atualização: 18 de novembro de 2026.</p>
         </section>
 
         <div className="grid gap-6">
@@ -96,6 +96,8 @@ export default function TermsPage() {
             <CardContent className="p-6 md:p-8 pt-0">
               <p className="text-sm md:text-base leading-relaxed text-muted-foreground font-medium">
                 Para exibir as avaliações da empresa no painel, o Proova AI lê as avaliações <strong>públicas</strong> da ficha do Google Maps indicada pelo usuário (identificada pelo Place ID), por meio de um provedor de coleta terceirizado. Nessa modalidade o Proova AI <strong>não publica respostas</strong> no Google em nome do usuário: ele recebe a resposta sugerida e a publica por conta própria. Quando disponível, a integração oficial com o Google Business Profile exigirá autorização explícita do usuário via protocolo OAuth do Google, e qualquer publicação automática ocorrerá somente conforme essa autorização e as configurações escolhidas pelo usuário. O usuário compromete-se a utilizar a plataforma em estrita conformidade com as Políticas de Conteúdo e Diretrizes do Google Business Profile, abstendo-se de publicar respostas com conteúdo ofensivo, spam, desinformação ou violação de privacidade de pacientes.
+                <br /><br />
+                <strong>Prazo de guarda das avaliações do Google.</strong> As avaliações públicas lidas do Google ficam armazenadas e visíveis <strong>apenas para o usuário, no painel, por até 30 dias</strong> contados da leitura, e depois são <strong>apagadas automaticamente</strong>. Elas não são publicadas na página pública do Proova AI, em widgets, cards ou materiais de divulgação. Para esses usos, o usuário deve contar com os depoimentos coletados pelo link de coleta, que possuem autorização do cliente final. Esse prazo pode ser revisto para cumprir as regras do Google.
               </p>
             </CardContent>
           </Card>
@@ -133,7 +135,9 @@ export default function TermsPage() {
             </CardHeader>
             <CardContent className="p-6 md:p-8 pt-0">
               <p className="text-sm md:text-base leading-relaxed text-muted-foreground font-medium">
-                Os links de coleta, QR Codes e páginas públicas de prova social disponibilizados pelo sistema destinam-se à captação orgânica de feedbacks reais de clientes atendidos. É vedada a prática de compra de avaliações falsas ou incentivo financeiro condicionado a notas máximas, em conformidade com as leis de defesa do consumidor e regras das plataformas integradas.
+                Os links de coleta, QR Codes e páginas públicas de prova social disponibilizados pelo sistema destinam-se à captação orgânica de feedbacks reais de clientes atendidos. É vedada a prática de compra de avaliações falsas ou incentivo financeiro condicionado a notas máximas, em conformidade com as leis de defesa do consumidor e regras das plataformas integradas. O link de coleta deve ser oferecido a todos os clientes, sem selecionar apenas os que tendem a dar notas altas e sem desencorajar avaliações negativas.
+                <br /><br />
+                <strong>Autorização do cliente final.</strong> Para enviar um depoimento pelo link de coleta, o cliente final precisa marcar uma caixa de autorização para a publicação do depoimento e do nome informado pela empresa. O Proova AI registra essa autorização (data e versão do texto exibido) junto ao depoimento. A empresa usuária, como controladora desses dados, deve usar os depoimentos somente nos termos dessa autorização e atender prontamente aos pedidos de remoção feitos pelos clientes.
               </p>
             </CardContent>
           </Card>

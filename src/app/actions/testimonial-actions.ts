@@ -7,6 +7,9 @@ import { sendFeedbackAlert } from '@/lib/feedback-alert';
 import { generateReply } from '@/ai/reply';
 import { reserveAiReplies, releaseAiReplies } from '@/lib/ai-quota';
 
+/** Versão do texto de autorização exibido no formulário de coleta (mude ao alterar o texto). */
+const CONSENT_TEXT_VERSION = '2026-11-v1';
+
 /**
  * Salva um depoimento com resposta automática via IA.
  */
@@ -19,11 +22,18 @@ export async function submitTestimonialAction(data: {
   text: string;
   videoUrl?: string;
   photoUrl?: string;
+  /** Autorização do cliente final para publicar o depoimento (obrigatória no envio público). */
+  publishConsent?: boolean;
+  mediaConsent?: boolean;
 }) {
   try {
     await checkRateLimit('submit_testimonial', 15, 'Limite de envios excedido. Tente novamente em instantes.');
     const { firestore } = initializeFirebase();
     
+    if (data.destination === 'public' && data.publishConsent !== true) {
+      throw new Error('É necessário autorizar a publicação do depoimento para enviar.');
+    }
+
     const userRef = doc(firestore, 'users', data.targetUserId);
     const userSnap = await getDoc(userRef);
     if (!userSnap.exists()) throw new Error("Empresa não localizada.");
@@ -72,6 +82,10 @@ export async function submitTestimonialAction(data: {
       aiReply: isLowRating ? null : aiReply,
       aiReplyDraft: isLowRating ? aiReply : null,
       createdAt: serverTimestamp(),
+      // Registro da autorização dada pelo cliente final (data e versão do texto exibido no formulário).
+      consent: data.destination === 'public'
+        ? { publish: true, media: data.mediaConsent === true, textVersion: CONSENT_TEXT_VERSION, at: serverTimestamp() }
+        : null,
     };
 
     const collectionName = data.destination === 'public' ? 'testimonials' : 'private_feedbacks';
