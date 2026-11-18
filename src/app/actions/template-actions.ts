@@ -14,6 +14,8 @@ export interface TemplateMetadata {
     background: string;
     color: string;
   };
+  /** Onde o texto fica no card: 'bottom' deixa a arte do template (rosto, título) livre no alto. */
+  anchor?: 'center' | 'bottom';
 }
 
 export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
@@ -162,5 +164,6 @@ export async function getAvailableTemplates(): Promise<TemplateMetadata[]> {
     }
   ];
 
-  return masterTemplates;
+  const centered = new Set(["card-proova-padrao-dark-1", "card-proova-padrao-laranja", "card-black-vip", "card-proova-social-vip"]);
+  return masterTemplates.map((t) => ({ ...t, anchor: centered.has(t.id) ? 'center' as const : 'bottom' as const }));
 }
