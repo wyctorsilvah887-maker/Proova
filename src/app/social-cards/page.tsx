@@ -29,7 +29,8 @@ import {
   BarChart3,
   Settings,
   ImageIcon,
-  Menu
+  Menu,
+  Lock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -368,9 +369,15 @@ export default function SocialCardsPage() {
                         <p className={cn("text-[9px] sm:text-[11px] font-black uppercase tracking-[0.2em]", activeTemplate?.style.color === '#ffffff' ? "text-white/80" : "text-black/80")}>RELATO DE CLIENTE</p>
                       </div>
                       <div className="flex-1 flex flex-col justify-center items-center w-full py-2 text-center">
-                        <div className="flex justify-center gap-1 mb-3 sm:mb-4">
-                            {[1,2,3,4,5].map((_, i) => <Star key={i} className="w-4 h-4 sm:w-7 sm:h-7 fill-[#fbbf24] text-[#fbbf24] drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" />)}
-                        </div>
+                        {(() => {
+                          // Mostra a nota real do depoimento (nunca 5 estrelas fixas).
+                          const r = Math.max(0, Math.min(5, Math.round(Number(selectedTestimonialForShare?.rating) || 0)));
+                          return r > 0 ? (
+                            <div className="flex justify-center gap-1 mb-3 sm:mb-4">
+                              {[1,2,3,4,5].map((n) => <Star key={n} className={cn("w-4 h-4 sm:w-7 sm:h-7", n <= r ? "fill-[#fbbf24] text-[#fbbf24] drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" : "fill-transparent text-current opacity-25")} />)}
+                            </div>
+                          ) : null;
+                        })()}
                         <div className="relative w-full max-w-[90%] sm:max-w-[85%]">
                           <Quote className={cn("absolute -top-2 -left-2 sm:-top-3 sm:-left-3 w-4 h-4 sm:w-5 sm:h-5 opacity-20 rotate-180", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")} />
                           <div className={cn("p-4 sm:p-7 rounded-[1.5rem] sm:rounded-[1.8rem] shadow-2xl ring-1", activeTemplate?.style.color === '#ffffff' ? "bg-white/5 backdrop-blur-xl border-white/10 ring-white/5" : "bg-black/5 backdrop-blur-md border-black/5 ring-black/5")}>
