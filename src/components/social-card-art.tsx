@@ -1,6 +1,6 @@
 'use client';
 
-import { forwardRef, type CSSProperties } from 'react';
+import { forwardRef, useEffect, useState, type CSSProperties } from 'react';
 import { Star, CheckCircle2, Quote, Play } from 'lucide-react';
 
 export type CardFormat = 'square' | 'feed' | 'story';
@@ -51,14 +51,16 @@ export const SocialCardArt = forwardRef<HTMLDivElement, Props>(function SocialCa
   const rating = Math.max(0, Math.min(5, Math.round(Number(testimonial?.rating) || 0)));
   const base = text.length > 220 ? 13 : text.length > 180 ? 14 : text.length > 120 ? 16 : text.length > 80 ? 19 : 23;
   const fs = format === 'square' ? Math.max(12, base - 2) : base;
-  const logo = !isVideoUrl(logoUrl) ? logoUrl : null;
+  const [logoFailed, setLogoFailed] = useState(false);
+  useEffect(() => { setLogoFailed(false); }, [logoUrl]);
+  const logo = !isVideoUrl(logoUrl) && !logoFailed ? logoUrl : null;
 
   return (
     <div ref={ref} style={{ width: w, height: h, position: 'relative', overflow: 'hidden', backgroundColor: background, transformOrigin: 'top left', fontFamily: 'inherit', ...style }}>
       {imageUrl && <img src={imageUrl} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
       <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', padding: `${pad.top}px 34px ${pad.bottom}px`, color: fg }}>
         {/* Rótulo (fica pequeno para não competir com a arte do template) */}
-        <p style={{ fontSize: 9, fontWeight: 800, letterSpacing: '.24em', textTransform: 'uppercase', color: soft, textAlign: 'center' }}>{video ? 'Depoimento em vídeo' : 'Relato de cliente'}</p>
+        <p style={{ fontSize: 9, fontWeight: 800, letterSpacing: '.24em', textTransform: 'uppercase', color: fg, textAlign: 'center', padding: '4px 10px', borderRadius: 999, background: lightText ? 'rgba(0,0,0,.4)' : 'rgba(255,255,255,.7)' }}>{video ? 'Depoimento em vídeo' : 'Relato de cliente'}</p>
 
         <div style={{ flex: 1 }} />
 
@@ -96,7 +98,7 @@ export const SocialCardArt = forwardRef<HTMLDivElement, Props>(function SocialCa
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, maxWidth: 330 }}>
               {logo && (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={logo} alt="" crossOrigin="anonymous" style={{ width: format === 'square' ? 22 : 28, height: format === 'square' ? 22 : 28, borderRadius: '50%', objectFit: 'cover', border: `1.5px solid ${line}`, background: '#fff', flexShrink: 0 }} />
+                <img src={logo} alt="" crossOrigin="anonymous" onError={() => setLogoFailed(true)} style={{ width: format === 'square' ? 22 : 28, height: format === 'square' ? 22 : 28, borderRadius: '50%', objectFit: 'cover', border: `1.5px solid ${line}`, background: '#fff', flexShrink: 0 }} />
               )}
               {companyName && <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase', color: soft, lineHeight: 1.15, textAlign: 'center' }}>{companyName}</p>}
             </div>
