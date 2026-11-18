@@ -30,7 +30,11 @@ import {
   Settings,
   ImageIcon,
   Menu,
-  Lock
+  Lock,
+  CircleHelp,
+  Square,
+  RectangleVertical,
+  Smartphone
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -58,6 +62,10 @@ import { toast as shadcnToast } from '@/hooks/use-toast';
 import { LoadingScreen } from '@/components/loading-screen';
 import { ScrollBar } from '@/components/ui/scroll-area';
 import { getAvailableTemplates, type TemplateMetadata } from '@/app/actions/template-actions';
+import { SocialCardArt, CARD_SIZES, type CardFormat } from '@/components/social-card-art';
+import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
+import { usePageTour } from '@/hooks/use-page-tour';
+import { ppPlanOf, ppCaps } from '@/lib/pp-plans';
 
 export default function SocialCardsPage() {
   const { user, loading: authLoading } = useUser();
@@ -83,6 +91,32 @@ export default function SocialCardsPage() {
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData } = useDoc(userDocRef);
+  const tour = usePageTour(userDocRef, userData, 'cardsTourDone');
+
+  // Marca da clínica (logo e nome) vem da página pública do usuário.
+  const ppRef = useMemo(() => (db && user && userData?.companySlug ? doc(db, 'users', user.uid, 'pp', userData.companySlug) : null), [db, user, userData?.companySlug]);
+  const { data: ppData } = useDoc(ppRef);
+  const caps = useMemo(() => ppCaps(ppPlanOf(userData?.membershipStatus)), [userData?.membershipStatus]);
+  const showProova = caps.removeBranding ? ppData?.showLogo !== false : true;
+
+  const [format, setFormat] = useState<CardFormat>('feed');
+  const [skipLogo, setSkipLogo] = useState(false);
+  const [vw, setVw] = useState(420);
+  useEffect(() => {
+    const on = () => setVw(window.innerWidth);
+    on(); window.addEventListener('resize', on);
+    return () => window.removeEventListener('resize', on);
+  }, []);
+  const cardSize = CARD_SIZES[format];
+  // Escala só na tela: cabe na largura do dialog e numa altura razoável. O PNG sai sempre em 1080 px de largura.
+  const cardScale = Math.min(1, (Math.min(vw, 448) - 48) / cardSize.w, (format === 'story' ? 500 : 460) / cardSize.h);
+
+  const tourSteps: TourStep[] = useMemo(() => [
+    { title: 'Social Card Studio ✨', text: 'Aqui você transforma depoimentos aprovados em artes prontas para Instagram, Stories e outras redes. Vamos ver como funciona.' },
+    { target: 'cards-search', title: 'Encontre o depoimento', text: 'Pesquise pelo nome do cliente ou por um trecho do relato.' },
+    { target: 'cards-grid', title: 'Escolha e toque em "Criar Card"', text: 'Ao tocar, abre o estúdio: você escolhe o formato (Quadrado, Feed ou Story), o template e baixa a arte pronta em alta qualidade.' },
+    { title: 'Sua marca no card', text: 'O card leva o nome e o logo da sua clínica (definidos no editor da página pública) e a nota real do cliente. Templates VIP são dos planos Premium e PRO.' },
+  ] as TourStep[], []);
 
   const isPremiumUser = useMemo(() => {
     const status = userData?.membershipStatus;
@@ -185,23 +219,26 @@ export default function SocialCardsPage() {
     setIsExportingCard(true);
     try {
       if (!shareCardRef.current) return;
-      
-      const dataUrl = await toPng(shareCardRef.current, { 
-        quality: 1.0, 
-        pixelRatio: 3, 
-        backgroundColor: null, 
-        style: { borderRadius: '0' }
-      });
-      
+      const opts = { pixelRatio: 1080 / cardSize.w, width: cardSize.w, height: cardSize.h, cacheBust: true, backgroundColor: undefined, style: { transform: 'none', borderRadius: '0' } };
+      let dataUrl: string;
+      try {
+        dataUrl = await toPng(shareCardRef.current, opts as any);
+      } catch (e) {
+        // Logo hospedado sem CORS pode impedir a exportação: refaz sem o logo.
+        setSkipLogo(true);
+        await new Promise((r) => setTimeout(r, 250));
+        dataUrl = await toPng(shareCardRef.current, opts as any);
+      }
       const link = document.createElement('a');
-      link.download = `proova-card-${selectedTestimonialForShare.userName.toLowerCase().replace(/\s+/g, '-')}.png`;
+      link.download = `proova-card-${String(selectedTestimonialForShare.userName || 'cliente').toLowerCase().replace(/\s+/g, '-')}-${format}.png`;
       link.href = dataUrl;
       link.click();
-      shadcnToast({ title: "Card Gerado!", description: "Sua arte está pronta para as redes sociais." });
+      shadcnToast({ title: "Card Gerado!", description: `Arte ${cardSize.label} (${cardSize.ratio}) pronta para as redes sociais.` });
     } catch (err) {
       shadcnToast({ variant: "destructive", title: "Erro ao exportar" });
     } finally {
       setIsExportingCard(false);
+      setSkipLogo(false);
     }
   };
 
@@ -255,6 +292,7 @@ export default function SocialCardsPage() {
         </div>
       </header>
 
+      {tour.open && <OnboardingTour steps={tourSteps} onFinish={tour.finish} />}
       <AppSideMenu open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} isAdmin={userData?.isAdmin === true} pendingCount={allApprovedTestimonials.filter(t => t.status === 'pending').length} />
 
       <main className="flex-1 overflow-y-auto p-4 md:p-8 pt-24 md:pt-32 pb-20">
@@ -262,9 +300,10 @@ export default function SocialCardsPage() {
           <header className="space-y-4">
              <h1 className="text-3xl md:text-5xl font-black font-headline tracking-tighter uppercase">Social Card Studio</h1>
              <p className="text-muted-foreground text-sm md:text-lg font-medium leading-relaxed max-w-2xl">Transforme depoimentos de texto em artes de alta autoridade para o seu Instagram.</p>
+             <button type="button" onClick={tour.start} className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-1.5"><CircleHelp className="w-3.5 h-3.5" /> Como funciona</button>
           </header>
 
-          <div className="relative group">
+          <div className="relative group" data-tour="cards-search">
             <Search className="absolute left-4 top-4 h-5 w-5 text-muted-foreground/30 group-focus-within:text-primary transition-colors" />
             <Input 
               placeholder="Pesquisar por nome do cliente ou trecho do relato..." 
@@ -274,7 +313,7 @@ export default function SocialCardsPage() {
             />
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div data-tour="cards-grid" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredTestimonials.length === 0 ? (
               <div className="col-span-full py-32 text-center opacity-30 border-2 border-dashed rounded-[3rem] bg-muted/10">
                 <MessageSquare className="w-16 h-16 mx-auto mb-4" />
@@ -354,48 +393,35 @@ export default function SocialCardsPage() {
               )}
             </div>
 
+            <div className="w-full shrink-0">
+              <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-2 ml-1">Formato:</p>
+              <div className="grid grid-cols-3 gap-2">
+                {([['square', Square], ['feed', RectangleVertical], ['story', Smartphone]] as const).map(([f, Icon]) => (
+                  <button key={f} type="button" onClick={() => setFormat(f)}
+                    className={cn("flex flex-col items-center gap-0.5 rounded-xl border-2 py-2 transition-all", format === f ? "border-primary bg-primary/5 shadow-md" : "border-transparent bg-muted/30 hover:border-primary/20")}>
+                    <Icon className="w-4 h-4 text-primary" />
+                    <span className="text-[9px] font-black uppercase tracking-wide">{CARD_SIZES[f].label}</span>
+                    <span className="text-[8px] font-bold text-muted-foreground">{CARD_SIZES[f].ratio}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div className="w-full flex justify-center py-1 shrink-0">
-              <div 
-                ref={shareCardRef}
-                className={cn(
-                  "relative overflow-hidden shadow-2xl transition-all duration-700",
-                  "w-[min(92vw,400px)] aspect-square rounded-[2rem] sm:rounded-[2.5rem] flex flex-col items-center"
-                )}
-                style={{ backgroundColor: activeTemplate?.style.background || '#000000' }}
-              >
-                   {activeTemplate?.imageUrl && <div className="absolute inset-0 z-0"><Image src={activeTemplate.imageUrl} alt="Bg" fill className="object-cover" priority /></div>}
-                   <div className="relative z-10 w-full flex flex-col h-full justify-between items-center p-6 sm:p-12">
-                      <div className="text-center space-y-1 mt-2 sm:mt-4">
-                        <p className={cn("text-[9px] sm:text-[11px] font-black uppercase tracking-[0.2em]", activeTemplate?.style.color === '#ffffff' ? "text-white/80" : "text-black/80")}>RELATO DE CLIENTE</p>
-                      </div>
-                      <div className="flex-1 flex flex-col justify-center items-center w-full py-2 text-center">
-                        {(() => {
-                          // Mostra a nota real do depoimento (nunca 5 estrelas fixas).
-                          const r = Math.max(0, Math.min(5, Math.round(Number(selectedTestimonialForShare?.rating) || 0)));
-                          return r > 0 ? (
-                            <div className="flex justify-center gap-1 mb-3 sm:mb-4">
-                              {[1,2,3,4,5].map((n) => <Star key={n} className={cn("w-4 h-4 sm:w-7 sm:h-7", n <= r ? "fill-[#fbbf24] text-[#fbbf24] drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]" : "fill-transparent text-current opacity-25")} />)}
-                            </div>
-                          ) : null;
-                        })()}
-                        <div className="relative w-full max-w-[90%] sm:max-w-[85%]">
-                          <Quote className={cn("absolute -top-2 -left-2 sm:-top-3 sm:-left-3 w-4 h-4 sm:w-5 sm:h-5 opacity-20 rotate-180", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")} />
-                          <div className={cn("p-4 sm:p-7 rounded-[1.5rem] sm:rounded-[1.8rem] shadow-2xl ring-1", activeTemplate?.style.color === '#ffffff' ? "bg-white/5 backdrop-blur-xl border-white/10 ring-white/5" : "bg-black/5 backdrop-blur-md border-black/5 ring-black/5")}>
-                            <p className={cn("font-black font-headline leading-tight italic tracking-tight", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black", (selectedTestimonialForShare?.text?.length || 0) > 180 ? "text-[9px] sm:text-xs" : (selectedTestimonialForShare?.text?.length || 0) > 120 ? "text-[10px] sm:text-sm" : (selectedTestimonialForShare?.text?.length || 0) > 80 ? "text-xs sm:text-base" : "text-base sm:text-xl")}>"{selectedTestimonialForShare?.text}"</p>
-                          </div>
-                          <Quote className={cn("absolute -bottom-2 -right-2 sm:-bottom-3 sm:-right-3 w-4 h-4 sm:w-5 sm:h-5 opacity-20", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")} />
-                        </div>
-                      </div>
-                      <div className={cn("w-full pt-3 sm:pt-4 mb-2 sm:mb-4", activeTemplate?.style.color === '#ffffff' ? "border-t border-white/10" : "border-t border-black/10")}>
-                          <div className="flex flex-col items-center gap-1.5 sm:gap-2">
-                            <p className={cn("font-black text-[9px] sm:text-xs uppercase tracking-[0.3em]", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>{selectedTestimonialForShare?.userName}</p>
-                            <div className={cn("px-3 sm:px-4 py-0.5 sm:py-1 rounded-full border inline-flex items-center gap-1 sm:gap-1.5 backdrop-blur-md shadow-sm", activeTemplate?.style.color === '#ffffff' ? "bg-primary/20 border-primary/30" : "bg-primary/10 border-primary/20")}>
-                                <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-primary fill-primary/5" />
-                                <p className={cn("text-[5px] sm:text-[7px] font-black uppercase tracking-[0.15em]", activeTemplate?.style.color === '#ffffff' ? "text-white" : "text-black")}>coletado via Proova</p>
-                            </div>
-                          </div>
-                      </div>
-                   </div>
+              <div className="overflow-hidden shadow-2xl rounded-2xl transition-all" style={{ width: cardSize.w * cardScale, height: cardSize.h * cardScale }}>
+                <SocialCardArt
+                  ref={shareCardRef}
+                  testimonial={selectedTestimonialForShare}
+                  imageUrl={activeTemplate?.imageUrl}
+                  background={activeTemplate?.style.background}
+                  lightText={activeTemplate?.style.color === '#ffffff'}
+                  format={format}
+                  companyName={userData?.companyName}
+                  logoUrl={skipLogo ? null : ppData?.logoUrl}
+                  showProova={showProova}
+                  anchor={activeTemplate?.anchor}
+                  style={{ transform: `scale(${cardScale})` }}
+                />
               </div>
             </div>
 
@@ -411,7 +437,7 @@ export default function SocialCardsPage() {
           
           <DialogFooter className="p-4 sm:p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
             <p className="text-[8px] sm:text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
-              <Zap className="w-3 h-3 text-primary" /> Dica: Poste este card no seu Story para aumentar seu alcance.
+              <Zap className="w-3 h-3 text-primary" /> Dica: use o formato Story para postar direto nos Stories e aumentar seu alcance.
             </p>
           </DialogFooter>
         </DialogContent>
