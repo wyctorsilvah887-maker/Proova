@@ -139,14 +139,19 @@ export default function SocialCardsPage() {
   const [format, setFormat] = useState<CardFormat>('feed');
   const [skipLogo, setSkipLogo] = useState(false);
   const [vw, setVw] = useState(420);
+  const [vh, setVh] = useState(800);
   useEffect(() => {
-    const on = () => setVw(window.innerWidth);
+    const on = () => { setVw(window.innerWidth); setVh(window.innerHeight); };
     on(); window.addEventListener('resize', on);
     return () => window.removeEventListener('resize', on);
   }, []);
   const cardSize = CARD_SIZES[format];
   // Escala só na tela: cabe na largura do dialog e numa altura razoável. O PNG sai sempre em 1080 px de largura.
-  const cardScale = Math.min(1, (Math.min(vw, 448) - 48) / cardSize.w, (format === 'story' ? 500 : 460) / cardSize.h);
+  const isMobileView = vw < 640;
+  // Largura útil: tela inteira no celular (dialog em tela cheia) ou 448 px no desktop. Altura: no máximo ~44% da tela no celular.
+  const availW = (isMobileView ? vw : 448) - 40;
+  const availH = isMobileView ? Math.max(180, vh * 0.44) : Math.min(500, Math.max(220, vh * 0.5));
+  const cardScale = Math.min(1, availW / cardSize.w, availH / cardSize.h);
 
   const tourSteps: TourStep[] = useMemo(() => [
     { title: 'Social Card Studio ✨', text: 'Aqui você transforma depoimentos aprovados em artes prontas para Instagram, Stories e outras redes. Vamos ver como funciona.' },
@@ -418,8 +423,8 @@ export default function SocialCardsPage() {
       </main>
 
       <Dialog open={isShareDialogOpen} onOpenChange={setIsShareDialogOpen}>
-        <DialogContent className="rounded-[2.5rem] sm:max-w-md border-none shadow-2xl p-0 overflow-hidden bg-background max-h-[92vh] flex flex-col">
-          <DialogHeader className="p-4 sm:p-8 pb-2 text-center shrink-0">
+        <DialogContent className="!flex flex-col gap-0 p-0 overflow-hidden bg-background border-none shadow-2xl w-screen max-w-none h-[100dvh] max-h-[100dvh] rounded-none !left-0 !top-0 !translate-x-0 !translate-y-0 sm:!left-[50%] sm:!top-[50%] sm:!translate-x-[-50%] sm:!translate-y-[-50%] sm:w-full sm:max-w-md sm:h-auto sm:max-h-[92vh] sm:rounded-[2.5rem]">
+          <DialogHeader className="px-12 pt-4 pb-2 sm:p-8 sm:pb-2 text-center shrink-0">
             <div className="flex items-center justify-center gap-2 mb-1">
                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                <DialogTitle className="text-lg sm:text-xl font-black font-headline uppercase tracking-tight">Social Design Studio</DialogTitle>
@@ -427,7 +432,26 @@ export default function SocialCardsPage() {
             <DialogDescription className="text-[10px] sm:text-xs font-medium">Selecione um template e gere sua arte para post.</DialogDescription>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto px-3 sm:px-6 pb-6 flex flex-col items-center gap-4 sm:gap-6 scrollbar-hide">
+          <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 sm:px-6 pb-4 flex flex-col items-center gap-4 sm:gap-5 scrollbar-hide">
+            <div className="w-full flex justify-center py-1 shrink-0">
+              <div className="overflow-hidden shadow-2xl rounded-2xl transition-all" style={{ width: cardSize.w * cardScale, height: cardSize.h * cardScale }}>
+                <SocialCardArt
+                  ref={shareCardRef}
+                  testimonial={cardTestimonial}
+                  video={isVideoCard}
+                  imageUrl={activeTemplate?.imageUrl}
+                  background={activeTemplate?.style.background}
+                  lightText={activeTemplate?.style.color === '#ffffff'}
+                  format={format}
+                  companyName={userData?.companyName}
+                  logoUrl={skipLogo ? null : ppData?.logoUrl}
+                  showProova={showProova}
+                  anchor={activeTemplate?.anchor}
+                  style={{ transform: `scale(${cardScale})` }}
+                />
+              </div>
+            </div>
+
             <div className="w-full shrink-0">
               <p className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-muted-foreground mb-2 sm:mb-3 ml-1">Templates Disponíveis:</p>
               {isLoadingTemplates ? (
@@ -513,26 +537,10 @@ export default function SocialCardsPage() {
               </div>
             </div>
 
-            <div className="w-full flex justify-center py-1 shrink-0">
-              <div className="overflow-hidden shadow-2xl rounded-2xl transition-all" style={{ width: cardSize.w * cardScale, height: cardSize.h * cardScale }}>
-                <SocialCardArt
-                  ref={shareCardRef}
-                  testimonial={cardTestimonial}
-                  video={isVideoCard}
-                  imageUrl={activeTemplate?.imageUrl}
-                  background={activeTemplate?.style.background}
-                  lightText={activeTemplate?.style.color === '#ffffff'}
-                  format={format}
-                  companyName={userData?.companyName}
-                  logoUrl={skipLogo ? null : ppData?.logoUrl}
-                  showProova={showProova}
-                  anchor={activeTemplate?.anchor}
-                  style={{ transform: `scale(${cardScale})` }}
-                />
-              </div>
-            </div>
-
-            <div className="w-full shrink-0 space-y-2">
+          </div>
+          
+          <div className="shrink-0 border-t bg-background/95 backdrop-blur px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6 sm:pb-4">
+            <div className="w-full space-y-2">
               <Button
                 className="w-full h-12 sm:h-14 rounded-xl sm:rounded-2xl font-black uppercase tracking-widest shadow-2xl gap-3 transition-all active:scale-95 text-[10px] sm:text-xs bg-primary hover:bg-primary/90 text-white"
                 onClick={handleDownloadCard}
@@ -555,13 +563,10 @@ export default function SocialCardsPage() {
                 )}
               </div>
             </div>
-          </div>
-          
-          <DialogFooter className="p-4 sm:p-6 bg-muted/30 border-t flex flex-col items-center text-center shrink-0">
-            <p className="text-[8px] sm:text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
-              <Zap className="w-3 h-3 text-primary" /> Dica: use o formato Story para postar direto nos Stories e aumentar seu alcance.
+            <p className="hidden sm:flex mt-3 items-center justify-center gap-2 text-center text-[9px] font-black uppercase text-muted-foreground tracking-[0.2em]">
+              <Zap className="w-3 h-3 text-primary" /> Dica: use o formato Story para postar direto nos Stories.
             </p>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
