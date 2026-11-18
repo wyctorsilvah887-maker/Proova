@@ -711,6 +711,66 @@ const PublicPageSettings = ({
   );
 };
 
+/**
+ * Fecha o painel lateral esquerdo arrastando para a esquerda (celular).
+ * Ignora gestos que começam em campos, sliders ou áreas com rolagem horizontal.
+ */
+function useSwipeClose(onClose: () => void) {
+  const ref = useRef<HTMLDivElement | null>(null);
+  const st = useRef<{ x: number; y: number; lock: 'h' | 'v' | null; dx: number } | null>(null);
+
+  const blocked = (el: EventTarget | null) => {
+    let n = el as HTMLElement | null;
+    while (n && n !== ref.current) {
+      if (n.matches?.('input, textarea, select, [role="slider"], [data-no-swipe]')) return true;
+      if (n.scrollWidth > n.clientWidth + 2) {
+        const ox = getComputedStyle(n).overflowX;
+        if (ox === 'auto' || ox === 'scroll') return true;
+      }
+      n = n.parentElement;
+    }
+    return false;
+  };
+
+  return {
+    ref,
+    onTouchStart: (e: React.TouchEvent) => {
+      if (e.touches.length !== 1 || blocked(e.target)) { st.current = null; return; }
+      st.current = { x: e.touches[0].clientX, y: e.touches[0].clientY, lock: null, dx: 0 };
+    },
+    onTouchMove: (e: React.TouchEvent) => {
+      const s = st.current; const el = ref.current;
+      if (!s || !el) return;
+      const dx = e.touches[0].clientX - s.x;
+      const dy = e.touches[0].clientY - s.y;
+      if (!s.lock) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        s.lock = Math.abs(dx) > Math.abs(dy) * 1.2 ? 'h' : 'v';
+      }
+      if (s.lock !== 'h') return;
+      s.dx = Math.min(0, dx);
+      el.style.transition = 'none';
+      el.style.transform = `translateX(${s.dx}px)`;
+    },
+    onTouchEnd: () => {
+      const s = st.current; const el = ref.current;
+      st.current = null;
+      if (!s || !el || s.lock !== 'h') return;
+      el.style.transition = '';
+      if (s.dx < -70) {
+        onClose();
+        setTimeout(() => { if (ref.current) ref.current.style.transform = ''; }, 400);
+      } else {
+        el.style.transform = '';
+      }
+    },
+    onTouchCancel: () => {
+      st.current = null;
+      if (ref.current) { ref.current.style.transition = ''; ref.current.style.transform = ''; }
+    },
+  };
+}
+
 export default function PPEditorPage() {
   const { user, loading: authLoading } = useUser();
   const db = useFirestore();
@@ -722,13 +782,15 @@ export default function PPEditorPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
   const tour = usePageTour(userDocRef, userData, 'editorTourDone');
+  const swipe = useSwipeClose(() => setIsSheetOpen(false));
   const tourSteps: TourStep[] = useMemo(() => {
     const desktop = typeof window !== 'undefined' && window.innerWidth >= 1024;
     return [
       { title: 'Seu Studio da página pública ✨', text: 'Aqui você monta o seu Link in Bio. Tudo o que mudar aparece na hora no celular ao lado. Vamos ver o essencial em 1 minuto.' },
       desktop
         ? { target: 'e-panel', title: 'Painel de edição', text: 'Cores, seleção de depoimentos, textos, blocos (Sobre, Horários, Perguntas, Mapa), layout e contato. Use as abas no topo do painel.' }
-        : { target: 'e-panel-btn', title: 'Menu de edição', text: 'Toque aqui para abrir cores, depoimentos, textos, blocos, layout e contato. As abas ficam no topo do menu.' },
+        : { target: 'e-panel-btn', title: 'Menu de edição', text: 'Toque aqui para abrir cores, depoimentos, textos, blocos, layout e contato. As abas ficam no topo do menu. Para fechar, é só arrastar o menu para a esquerda (deslizar).' },
+      ...(desktop ? [] : [{ title: 'Fechar deslizando 👈', text: 'No celular, para fechar o menu de edição basta arrastar/deslizar o painel para a esquerda. Você também pode tocar no X.' }]),
       { target: 'e-preview', title: 'Pré-visualização ao vivo', text: 'É assim que seus clientes verão a página no celular. Ela muda conforme você edita.' },
       { target: 'e-view', title: 'Visualizar', text: 'Abre a página pública real, do jeito que está salva.' },
       { target: 'e-save', title: 'Salvar', text: 'As mudanças só vão para o ar quando você salvar. Alguns recursos dependem do seu plano e aparecem com cadeado.' },
@@ -1068,7 +1130,7 @@ export default function PPEditorPage() {
                       <SheetTrigger asChild>
                          <Button data-tour="e-panel-btn" variant="outline" className="lg:hidden h-12 rounded-xl font-black uppercase tracking-widest text-[10px] gap-2 border-primary/20 text-primary shadow-sm bg-background"><Palette className="w-4 h-4" /> Menu de Edição</Button>
                       </SheetTrigger>
-                      <SheetContent side="left" className="p-0 w-full sm:max-w-xs border-none shadow-2xl overflow-hidden">
+                      <SheetContent ref={swipe.ref} onTouchStart={swipe.onTouchStart} onTouchMove={swipe.onTouchMove} onTouchEnd={swipe.onTouchEnd} onTouchCancel={swipe.onTouchCancel} side="left" className="p-0 w-full sm:max-w-xs border-none shadow-2xl overflow-hidden">
                          <SheetHeader className="sr-only">
                            <SheetTitle>Painel de Edição VIP</SheetTitle>
                            <SheetDescription>Configurações avançadas da sua página de autoridade.</SheetDescription>
