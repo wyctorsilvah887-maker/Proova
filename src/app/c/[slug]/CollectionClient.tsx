@@ -54,6 +54,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
   const [membershipStatus, setMembershipStatus] = useState<string | null>(null);
   const [activeMode, setActiveMode] = useState<CollectionMode>(null);
   const [mediaConsent, setMediaConsent] = useState(false);
+  const [publishConsent, setPublishConsent] = useState(false);
   
   const [recordedVideoUrl, setRecordedVideoUrl] = useState<string | null>(null);
   const [videoBlob, setVideoBlob] = useState<Blob | null>(null);
@@ -163,6 +164,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
       return; 
     }
     
+    if (!publishConsent) { toast({ variant: "destructive", title: "Autorização necessária", description: "Marque a autorização para a publicação do seu depoimento." }); return; }
     if ((videoBlob || photoBlob) && !mediaConsent) { toast({ variant: "destructive", title: "Autorização necessária", description: "Confirme a autorização de uso da foto/vídeo." }); return; }
     
     if (!targetUserId) return;
@@ -198,7 +200,9 @@ export default function CollectionClient({ slug }: { slug: string }) {
       rating, 
       text: text.trim(), 
       videoUrl: finalVideoUrl,
-      photoUrl: finalPhotoUrl
+      photoUrl: finalPhotoUrl,
+      publishConsent: true,
+      mediaConsent: !!(videoBlob || photoBlob) && mediaConsent
     });
 
     if (result.success) {
@@ -297,7 +301,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
   const hasMedia = !!recordedPhotoUrl || !!recordedVideoUrl;
   const shouldShowForm = rating > 0 || activeMode === 'text' || hasMedia;
   
-  const isFormValid = rating > 0 && (!hasMedia || mediaConsent);
+  const isFormValid = rating > 0 && publishConsent && (!hasMedia || mediaConsent);
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col items-center p-4 font-body text-foreground overflow-x-hidden">
@@ -434,9 +438,12 @@ export default function CollectionClient({ slug }: { slug: string }) {
                   </label>
                 )}
 
-                <p className="text-[10px] text-muted-foreground font-medium text-center leading-snug">
-                  Ao enviar, você autoriza {companyNameDisplay} a exibir seu depoimento em seus canais. Veja a <Link href="/privacy" target="_blank" className="underline hover:text-primary">Política de Privacidade</Link>.
-                </p>
+                <label className="flex items-start gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-3 cursor-pointer">
+                  <input type="checkbox" checked={publishConsent} onChange={(e) => setPublishConsent(e.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[hsl(var(--primary))]" />
+                  <span className="text-[11px] font-medium leading-snug">
+                    Autorizo {companyNameDisplay} a publicar meu depoimento e meu nome em seu site, redes sociais e materiais de divulgação. Posso pedir a remoção a qualquer momento falando com {companyNameDisplay}. Veja a <Link href="/privacy" target="_blank" className="underline hover:text-primary">Política de Privacidade</Link>.
+                  </span>
+                </label>
 
                 <Button 
                   type="button" 

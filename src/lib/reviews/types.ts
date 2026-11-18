@@ -18,6 +18,7 @@ export interface StoredReview extends NormalizedReview {
   aiReply: string | null;
   source: 'apify' | 'google_business_profile';
   fetchedAt: unknown; // Timestamp do servidor
+  expireAt?: unknown; // fetchedAt + 30 dias; depois disso a avaliação é apagada automaticamente
   copiedAt?: unknown;
 }
 
@@ -25,6 +26,10 @@ export interface StoredReview extends NormalizedReview {
 export interface ReviewSource {
   name: StoredReview['source'];
 }
+
+/** Por quanto tempo uma avaliação do Google fica guardada (e visível no painel) antes de ser apagada. */
+export const REVIEW_RETENTION_DAYS = 30;
+export const REVIEW_RETENTION_MS = REVIEW_RETENTION_DAYS * 24 * 60 * 60 * 1000;
 
 /** Planos que recebem a busca automática ('trial' só por compatibilidade com contas antigas; não é mais vendido). */
 export const AUTO_FETCH_PLANS = ['gold', 'enterprise', 'trial'] as const;

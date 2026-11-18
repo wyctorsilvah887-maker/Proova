@@ -2,6 +2,7 @@
 # Proova - Log de Desenvolvimento
 
 ## 📝 Histórico de Alterações Recentes
+- **Consentimento e retenção (Google) - [FINALIZADO]:** Formulário de coleta agora exige caixa de autorização de publicação (registrada em `consent` no depoimento: data, mídia e versão do texto `2026-11-v1`). Avaliações do Google lidas pelo Apify passam a ter `expireAt` e são apagadas após 30 dias pelo cron diário (`purgeExpiredReviews`); o painel mostra o prazo e o tour do dash explica. Termos e Privacidade atualizados (18/11/2026). Motivo: políticas do Google (Places/Business Profile) limitam guarda e redistribuição de avaliações; revisar com advogado antes de escalar.
 - **Correção Crítica (FCM) - [FINALIZADO]:** Criado o arquivo `public/firebase-messaging-sw.js` e ajustado o hook `useNotifications` para registrar o service worker e salvar o token corretamente no Firestore.
 - **Ajuste de Produção (FCM) - [EM ANDAMENTO]:** Identificada a necessidade de redeploy para injeção da `NEXT_PUBLIC_VAPID_KEY` via variáveis de ambiente do provedor de hospedagem.
 - **Notificações Push (FCM) - [FINALIZADO]:** Implementada a infraestrutura completa para Web Push. Adicionado suporte a VAPID via variáveis de ambiente, registro de tokens no perfil do usuário e Service Worker para recebimento em background.
