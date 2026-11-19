@@ -15,7 +15,7 @@ import { useAuth, useUser, useFirestore, useDoc } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { getPushToken } from '@/lib/push-client';
+import { getPushToken, listenForeground } from '@/lib/push-client';
 
 /** Cor do selo de acordo com o plano (membershipLabel das páginas). */
 const PLAN_STYLE: Record<string, string> = {
@@ -114,6 +114,16 @@ export function AppSideMenu({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isPaid]);
+  // Aviso recebido com o app aberto: mostra na tela (o FCM não aciona o service worker em primeiro plano).
+  useEffect(() => {
+    if (pushPerm !== 'granted') return;
+    let unsub: (() => void) | undefined;
+    let dead = false;
+    listenForeground((m) => {
+      toast({ title: m.title, description: m.body });
+    }).then((u) => { if (dead) u(); else unsub = u; });
+    return () => { dead = true; unsub?.(); };
+  }, [pushPerm]);
   const enablePush = async () => {
     setPushBusy(true);
     try {
@@ -133,7 +143,7 @@ export function AppSideMenu({
       const r = await fetch('/api/push-test', { method: 'POST', headers: { Authorization: `Bearer ${idToken}` } });
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j?.error === 'no_tokens' ? 'Nenhum aparelho registrado.' : `Falha no servidor (${j?.error || r.status}).`);
-      if (j.success > 0) toast({ title: 'Aviso de teste enviado', description: `Chegou em ${j.success} aparelho(s). Se não aparecer, confira se as notificações do navegador/celular estão permitidas.` });
+      if (j.success > 0) toast({ title: 'Aviso de teste enviado', description: `Chegou em ${j.success} aparelho(s). Com o app aberto, o aviso aparece aqui na tela; para ver a notificação do sistema, minimize ou troque de aba e teste de novo.` });
       else toast({ variant: 'destructive', title: 'O envio falhou', description: `Motivo: ${(j.errors || []).join(', ') || 'desconhecido'}.` });
     } catch (e: any) {
       toast({ variant: 'destructive', title: 'Teste não concluído', description: e?.message || 'Tente novamente.' });
