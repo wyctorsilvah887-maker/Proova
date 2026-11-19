@@ -44,7 +44,8 @@ import {
   X,
   Menu,
   BadgeCheck,
-  RefreshCw
+  RefreshCw,
+  Clock
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -556,6 +557,21 @@ export default function SettingsPage() {
                        <div>
                           <p className="text-sm font-black uppercase tracking-tight">Status do Plano: <span className="text-primary">{membershipLabel}</span></p>
                           <p className="text-xs text-muted-foreground font-medium">Sua conta possui acesso {userData?.membershipStatus === 'base' ? 'limitado' : 'premium'} aos recursos estratégicos.</p>
+                          {(() => {
+                            if (userData?.membershipStatus !== 'gold' && userData?.membershipStatus !== 'enterprise') return null;
+                            const exact = userData?.planRenewsAt?.toMillis?.();
+                            const last = userData?.planUpdatedAt?.toMillis?.() || userData?.planActivatedAt?.toMillis?.();
+                            const ms = exact || (last ? last + 30 * 86400000 : 0);
+                            if (!ms) return null;
+                            const date = new Date(ms).toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', timeZone: 'America/Fortaleza' });
+                            const days = Math.ceil((ms - Date.now()) / 86400000);
+                            return (
+                              <p className="text-xs font-bold mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary px-3 py-1">
+                                <Clock className="w-3.5 h-3.5" />
+                                {exact ? 'Próxima renovação' : 'Renovação prevista'}: {date}{days >= 0 && days <= 30 ? ` (${days === 0 ? 'hoje' : days === 1 ? 'amanhã' : `em ${days} dias`})` : ''}
+                              </p>
+                            );
+                          })()}
                        </div>
                     </div>
                     <Button variant="outline" onClick={() => router.push('/pricing')} className="w-full sm:w-auto h-12 px-8 rounded-xl font-black uppercase tracking-widest text-[9px] border-primary/20 text-primary hover:bg-primary hover:text-white transition-all shadow-sm">Ver Planos e Upgrade</Button>

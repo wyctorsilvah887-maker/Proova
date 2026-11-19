@@ -42,3 +42,4 @@
 - Webhook Cakto grava `planRenewsAt` (de `data.subscription.next_payment_date`, ou hoje + `recurrence_period`) ao ativar/renovar e apaga ao cancelar.
 - `src/lib/plan-renewal.ts`: 3 dias e 1 dia antes da cobrança, e-mail (Resend) + push, só Premium/PRO. Dedup por ciclo (`renewalNoticeFor`/`renewalNoticeStage`). Quem assinou antes do `planRenewsAt` existir usa estimativa: última cobrança (`planUpdatedAt`) + 30 dias, e o e-mail diz "por volta de".
 - O cron `/api/cron/review-reminder` agora roda todo dia (Hobby = 2 crons): renovação todo dia, lembrete de avaliação só de segunda a sexta.
+- Configurações: cartão do plano mostra "Próxima renovação: dd de mês (em N dias)" (ou "Renovação prevista" quando é estimativa) para Premium/PRO.
