@@ -117,6 +117,7 @@ import { saveGooglePlace } from '@/lib/google-place-client';
 import { normalizeBrWhatsapp, whatsappLink, maskBrPhone } from '@/lib/whatsapp';
 import { doc, collection, query, updateDoc, orderBy, limit, where, getDocs, Timestamp, serverTimestamp, arrayUnion, deleteField } from 'firebase/firestore';
 import Link from 'next/link';
+import { Switch } from '@/components/ui/switch';
 import { signOut } from 'firebase/auth';
 import { toast as shadcnToast } from '@/hooks/use-toast';
 import { QRCodeSVG } from 'qrcode.react';
@@ -642,6 +643,19 @@ export default function DashPage() {
                     </div>
                     <LinkShareBox url={collectionLink} label="Link de coleta" shareMessage="Conta pra gente como foi seu atendimento, leva menos de 1 minuto:" onCopy={copyToClipboard} />
                     <p className="text-center text-[11px] font-medium text-muted-foreground leading-relaxed">Dica: envie pelo WhatsApp logo após a consulta, quando a experiência ainda está fresca.</p>
+                    {['gold', 'enterprise', 'trial'].includes(userData?.membershipStatus) && (
+                      <div className="flex items-center gap-3 rounded-2xl border bg-muted/20 px-4 py-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-black">Lembrete diário no celular</p>
+                          <p className="text-[11px] text-muted-foreground leading-snug">Um aviso de segunda a sexta, às 9h, para você pedir avaliação.</p>
+                        </div>
+                        <Switch
+                          checked={userData?.reminderPush !== false}
+                          onCheckedChange={(v) => { if (userDocRef) updateDoc(userDocRef, { reminderPush: v }).then(() => shadcnToast({ title: v ? 'Lembrete ligado' : 'Lembrete desligado' })).catch(() => shadcnToast({ variant: 'destructive', title: 'Não foi possível salvar' })); }}
+                          aria-label="Lembrete diário"
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
 
