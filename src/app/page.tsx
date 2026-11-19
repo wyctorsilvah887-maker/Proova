@@ -368,6 +368,21 @@ VersatilitySection.displayName = "VersatilitySection";
 const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   const plans = [
     {
+      id: 'base',
+      name: "Proova AI Base",
+      price: "R$ 0",
+      period: "grátis",
+      description: "Para começar a coletar depoimentos sem pagar nada.",
+      highlight: false,
+      benefits: [
+        "Link de coleta e QR Code de balcão",
+        "Página pública com até 5 depoimentos",
+        "Blocos Sobre e Horários",
+        "Inbox privado para críticas",
+        "20 respostas por IA por mês",
+      ],
+    },
+    {
       id: 'premium',
       name: "Proova AI Premium",
       price: "R$ 147",
@@ -405,12 +420,12 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 
   return (
     <section id="planos" ref={ref} className="w-full py-20 md:py-24 bg-background border-b">
-      <div className="container px-4 mx-auto max-w-4xl">
+      <div className="container px-4 mx-auto max-w-6xl">
         <header className={cn("text-center space-y-3 mb-12 transition-all duration-700", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6")}>
           <h2 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight">Planos e <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">preços</span></h2>
-          <p className="text-sm md:text-base text-muted-foreground font-medium">Garantia de 7 dias com reembolso integral. Cancele quando quiser.</p>
+          <p className="text-sm md:text-base text-muted-foreground font-medium">Comece grátis. Nos planos pagos: garantia de 7 dias com reembolso integral e cancelamento quando quiser.</p>
         </header>
-        <div className="grid gap-6 md:grid-cols-2 items-stretch">
+        <div className="grid gap-6 md:grid-cols-3 items-stretch">
           {plans.map((plan) => (
             <div key={plan.id} className={cn("relative flex flex-col rounded-2xl border p-6 md:p-8", plan.highlight ? "border-primary shadow-lg bg-card" : "bg-card")}>
               {plan.highlight && (
@@ -432,7 +447,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
               </ul>
               <Link href="/signup" className="mt-8 block">
                 <Button className="w-full h-12 rounded-xl text-xs font-bold uppercase tracking-wide gap-2" variant={plan.highlight ? "default" : "outline"}>
-                  Garantir meu acesso <ArrowRight className="w-4 h-4" />
+                  {plan.id === 'base' ? 'Criar conta grátis' : 'Garantir meu acesso'} <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
             </div>

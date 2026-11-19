@@ -13,7 +13,6 @@ import {
   Star, 
   Shield, 
   ArrowLeft, 
-  User, 
   LogOut, 
   TrendingUp, 
   Layout, 
@@ -141,6 +140,26 @@ export default function PricingPage() {
 
   const plans = [
     {
+      id: 'base',
+      name: "Proova AI Base",
+      price: "R$ 0",
+      period: "grátis",
+      description: "Para começar a coletar depoimentos",
+      icon: Gem,
+      highlight: false,
+      cta: user ? (status === 'base' ? "Plano Ativo" : "Plano gratuito") : "Criar conta grátis",
+      disabled: !!user,
+      checkoutUrl: "",
+      benefits: [
+        "Link de coleta e QR Code de balcão",
+        `Página pública com até ${FREE.selectionLimit} depoimentos`,
+        "Blocos Sobre e Horários",
+        "Inbox privado: críticas de 1 a 3 estrelas ficam só com você",
+        `Respostas por IA: até ${AI_MONTHLY_LIMIT.free} por mês`,
+        "Autorização de publicação registrada em cada depoimento",
+      ]
+    },
+    {
       id: 'gold',
       name: "Proova AI Premium",
       price: "R$ 147",
@@ -212,7 +231,7 @@ export default function PricingPage() {
         </div>
 
         <div className="ml-auto flex items-center gap-2 md:gap-4">
-          <ThemeToggle className="hidden sm:flex border-none bg-transparent shadow-none" />
+          <ThemeToggle className="flex border-none bg-transparent shadow-none hover:bg-transparent" />
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -220,9 +239,6 @@ export default function PricingPage() {
                   <div className="flex flex-col items-end">
                     <span className="text-[10px] md:text-xs font-bold truncate max-w-[70px] sm:max-w-[120px] group-hover:text-primary leading-tight transition-colors">{effectiveUserData?.companyName || 'Empresa'}</span>
                     <span className="text-[6px] md:text-[8px] uppercase tracking-widest font-black text-primary leading-tight">{membershipLabel}</span>
-                  </div>
-                  <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20 group-hover:bg-primary group-hover:text-white transition-colors">
-                    <User className="w-3.5 h-3.5 md:w-4 md:h-4" />
                   </div>
                 </Button>
               </DropdownMenuTrigger>
@@ -343,7 +359,7 @@ export default function PricingPage() {
 
                       <div className="pt-4">
                         <Button 
-                          onClick={() => plan.checkoutUrl && window.open(plan.checkoutUrl, '_blank')}
+                          onClick={() => (plan.id === 'base' ? router.push('/signup') : plan.checkoutUrl && window.open(plan.checkoutUrl, '_blank'))}
                           disabled={plan.disabled}
                           className={cn(
                             "w-full h-14 md:h-16 rounded-2xl text-[9px] sm:text-sm font-black uppercase tracking-tight sm:tracking-widest shadow-2xl transition-all active:scale-95 gap-3",
@@ -354,7 +370,7 @@ export default function PricingPage() {
                         >
                           {plan.cta} <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
                         </Button>
-                        {!plan.disabled && (
+                        {!plan.disabled && plan.id !== 'base' && (
                           <p className={cn(
                             "text-[7px] md:text-[8px] font-black uppercase tracking-[0.2em] text-center mt-4 opacity-50 px-2",
                             plan.highlight ? "text-white" : "text-muted-foreground"

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, type RefObject } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import {
-  BarChart3, Copy, ExternalLink, Globe, Headphones, ImageIcon, Inbox, LayoutGrid, Link2, LogOut, QrCode, Settings, Shield, Sparkles,
+  BarChart3, Copy, ExternalLink, Gem, Globe, Headphones, ImageIcon, Inbox, LayoutGrid, Link2, LogOut, QrCode, Settings, Shield, Sparkles,
   type LucideIcon,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
@@ -128,6 +128,7 @@ export function AppSideMenu({
     {
       title: 'Conta',
       items: [
+        { label: 'Planos e Preços', icon: Gem, href: '/pricing' },
         { label: 'Configurações', icon: Settings, href: '/settings' },
         { label: 'Suporte VIP', icon: Headphones, href: '/support' },
       ],
