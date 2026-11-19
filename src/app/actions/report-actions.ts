@@ -62,8 +62,17 @@ export async function sendWeeklyPerformanceReport(userId: string) {
     }
 
     // Média da Semana
-    const sumRating = currentDocs.reduce((acc, t: any) => acc + (t.rating || 0), 0);
-    const avgRatingWeek = currentCount > 0 ? (sumRating / currentCount).toFixed(1) : "0.0";
+    // Inclui as críticas privadas do Inbox: a média precisa ser a real.
+    let privateDocs: any[] = [];
+    try {
+      const { adminDb } = await import('@/lib/firebase-admin');
+      const privSnap = await adminDb().collection(`users/${userId}/private_feedbacks`)
+        .where('createdAt', '>=', Timestamp.fromDate(sevenDaysAgo)).get();
+      privateDocs = privSnap.docs.map(d => d.data());
+    } catch {}
+    const ratedWeek = [...currentDocs, ...privateDocs];
+    const sumRating = ratedWeek.reduce((acc, t: any) => acc + (t.rating || 0), 0);
+    const avgRatingWeek = ratedWeek.length > 0 ? (sumRating / ratedWeek.length).toFixed(1) : "0.0";
 
     // Melhor Depoimento
     let topT: any = null;

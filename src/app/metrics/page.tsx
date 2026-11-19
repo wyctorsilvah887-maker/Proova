@@ -119,6 +119,9 @@ export default function MetricsPage() {
   }, [db, user]);
 
   const { data: rawTestimonials, loading: testimonialsLoading } = useCollection(testimonialsQuery);
+  // Críticas privadas (Inbox) também entram na nota: a média tem que refletir a realidade.
+  const privateQuery = useMemo(() => (db && user ? collection(db, 'users', user.uid, 'private_feedbacks') : null), [db, user]);
+  const { data: rawPrivate } = useCollection(privateQuery);
 
   const pendingTestimonialsCount = useMemo(() => {
     if (!rawTestimonials) return 0;
@@ -179,8 +182,14 @@ export default function MetricsPage() {
       return period === 'all' || date >= cutoff;
     });
 
-    const sum = filtered.reduce((acc, t: any) => acc + (t.rating || 0), 0);
-    const avg = filtered.length > 0 ? (sum / filtered.length).toFixed(1) : "0.0";
+    const privateFiltered = (rawPrivate || []).filter((t: any) => {
+      if (!t.rating) return false;
+      const date = t.createdAt?.toDate?.() || new Date();
+      return period === 'all' || date >= cutoff;
+    });
+    const rated = [...filtered, ...privateFiltered];
+    const sum = rated.reduce((acc, t: any) => acc + (t.rating || 0), 0);
+    const avg = rated.length > 0 ? (sum / rated.length).toFixed(1) : "0.0";
 
     const lastNDays = Array.from({ length: days > 30 ? 30 : days }, (_, i) => {
       const d = new Date();
@@ -199,7 +208,7 @@ export default function MetricsPage() {
       count: dayCounts[date] || 0
     }));
 
-    const ratings = filtered.reduce((acc: any, t: any) => {
+    const ratings = rated.reduce((acc: any, t: any) => {
       const r = t.rating || 5;
       acc[r] = (acc[r] || 0) + 1;
       return acc;
@@ -218,7 +227,7 @@ export default function MetricsPage() {
       chartData,
       pieData
     };
-  }, [rawTestimonials, period]);
+  }, [rawTestimonials, rawPrivate, period]);
 
   const ppConversionRate = useMemo(() => {
     const visits = userData?.ppVisitCount || 0;
@@ -345,7 +354,7 @@ export default function MetricsPage() {
 
             <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem]">
               <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
-                <div className="flex items-center gap-1.5"><p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Média Geral</p><HelpTip text="Nota média (de 1 a 5 estrelas) dos depoimentos aprovados no período escolhido." /></div>
+                <div className="flex items-center gap-1.5"><p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Média Geral</p><HelpTip text="Nota média (de 1 a 5 estrelas) de todas as avaliações do período, inclusive as críticas privadas do Inbox. É a nota real do seu atendimento." /></div>
                 <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
               </CardHeader>
               <CardContent className="px-4 md:px-6 pb-4">
