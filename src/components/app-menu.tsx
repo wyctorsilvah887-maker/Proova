@@ -135,20 +135,6 @@ export function AppSideMenu({
       toast({ variant: 'destructive', title: 'Não foi possível ativar', description: e?.message || 'Tente novamente.' });
     } finally { setPushBusy(false); }
   };
-  const testPush = async () => {
-    setPushBusy(true);
-    try {
-      await registerToken();
-      const idToken = await auth?.currentUser?.getIdToken();
-      const r = await fetch('/api/push-test', { method: 'POST', headers: { Authorization: `Bearer ${idToken}` } });
-      const j = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(j?.error === 'no_tokens' ? 'Nenhum aparelho registrado.' : `Falha no servidor (${j?.error || r.status}).`);
-      if (j.success > 0) toast({ title: 'Aviso de teste enviado', description: `Chegou em ${j.success} aparelho(s). Com o app aberto, o aviso aparece aqui na tela; para ver a notificação do sistema, minimize ou troque de aba e teste de novo.` });
-      else toast({ variant: 'destructive', title: 'O envio falhou', description: `Motivo: ${(j.errors || []).join(', ') || 'desconhecido'}.` });
-    } catch (e: any) {
-      toast({ variant: 'destructive', title: 'Teste não concluído', description: e?.message || 'Tente novamente.' });
-    } finally { setPushBusy(false); }
-  };
   const logoUrl: string | null = ppData?.logoUrl && !/\.(mp4|webm|mov)(\?|$)/i.test(ppData.logoUrl) ? ppData.logoUrl : null;
   const [logoFailed, setLogoFailed] = useState(false);
   useEffect(() => { setLogoFailed(false); }, [logoUrl]);
@@ -260,8 +246,7 @@ export function AppSideMenu({
             {isPaid && pushPerm && pushPerm !== 'unsupported' && (
               pushPerm === 'granted' ? (
                 <div className="flex items-center gap-2 rounded-xl border bg-background px-3 py-2 text-[10px] font-black uppercase tracking-wider">
-                  <BellRing className="w-3.5 h-3.5 text-primary" /> <span className="flex-1">Avisos ativos</span>
-                  <button type="button" onClick={testPush} disabled={pushBusy} className="text-primary underline underline-offset-2 disabled:opacity-50">{pushBusy ? 'Enviando...' : 'Testar'}</button>
+                  <BellRing className="w-3.5 h-3.5 text-primary" /> <span className="flex-1">Avisos ativos neste aparelho</span>
                 </div>
               ) : pushPerm === 'denied' ? (
                 <p className="rounded-xl border bg-muted/40 px-3 py-2 text-[10px] font-medium text-muted-foreground leading-snug">Avisos bloqueados no navegador. Libere as notificações deste site nas configurações para receber alertas de críticas.</p>

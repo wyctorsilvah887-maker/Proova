@@ -3,6 +3,7 @@ import { getMessaging } from 'firebase-admin/messaging';
 import { adminDb } from '@/lib/firebase-admin';
 import { safeEqual } from '@/lib/reviews/sync';
 import { SITE_URL } from '@/lib/site';
+import { runRenewalNotices } from '@/lib/plan-renewal';
 
 export const maxDuration = 60;
 
@@ -17,20 +18,28 @@ const MSGS = [
   { title: '🚀 Pequeno hábito, grande reputação', body: 'Todo dia 1 pedido de avaliação. Abra o Proova AI e compartilhe seu link.' },
 ];
 
-/** Vercel Cron, dias úteis às 09h (Fortaleza). Authorization: Bearer CRON_SECRET. */
+/**
+ * Vercel Cron diário, 09h (Fortaleza). Authorization: Bearer CRON_SECRET.
+ * Todo dia: avisos de renovação do plano. De segunda a sexta: lembrete de pedir avaliação.
+ * (A Hobby só permite 2 crons, por isso as duas tarefas dividem esta rota.)
+ */
 export async function GET(req: Request) {
   const t0 = Date.now();
   const auth = req.headers.get('authorization') || '';
   if (!safeEqual(auth.replace(/^Bearer /, ''), process.env.CRON_SECRET)) {
     return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
   }
+  let renewals: any = null;
+  try { renewals = await runRenewalNotices(t0 + 25_000); } catch (e) { console.error('[cron renewal]', (e as Error).message); }
+  const dow = new Date().getUTCDay(); // 0 = domingo, 6 = sábado
+  if (dow === 0 || dow === 6) return NextResponse.json({ ok: true, renewals, reminders: 'weekend_skip' });
   const msg = MSGS[new Date().getUTCDate() % MSGS.length];
   const snap = await adminDb().collection('users').where('membershipStatus', 'in', PAID).get();
   const targets = snap.docs.filter((d) => d.data().reminderPush !== false && !!d.data().companySlug);
   let sent = 0, noTokens = 0, failed = 0;
   const CONC = 10;
   for (let i = 0; i < targets.length; i += CONC) {
-    if (Date.now() - t0 > 50_000) break;
+    if (Date.now() - t0 > 55_000) break;
     await Promise.all(targets.slice(i, i + CONC).map(async (d) => {
       try {
         const pushRef = adminDb().doc(`user_push/${d.id}`);
@@ -53,5 +62,5 @@ export async function GET(req: Request) {
       }
     }));
   }
-  return NextResponse.json({ ok: true, sent, noTokens, failed });
+  return NextResponse.json({ ok: true, sent, noTokens, failed, renewals });
 }
