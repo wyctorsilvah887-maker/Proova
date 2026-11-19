@@ -26,3 +26,5 @@
 - `/private` reescrito: abas Críticas/Curadoria, filtros Novas/Resolvidas, responder por WhatsApp/e-mail com mensagem pronta, sugestão da IA, resolver/reabrir, publicar (com confirmação), excluir, opt-in de push e tour (`inboxTourDone`).
 - Menu: selo do Inbox = curadoria pendente + `inboxNewCount`; dash mostra faixa com críticas novas.
 - Atenção: métricas, cards e página pública leem só `testimonials`, então críticas privadas não entram nelas.
+- Nota média real: `/metrics` e o relatório semanal agora somam as críticas privadas (`private_feedbacks`) à média e ao gráfico de notas.
+- Lembrete diário (dias úteis, 09h Fortaleza): `/api/cron/review-reminder` manda push para planos pagos com token, convidando a enviar o link de coleta. Desligável por usuário com `reminderPush:false`.
