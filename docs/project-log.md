@@ -28,3 +28,4 @@
 - Atenção: métricas, cards e página pública leem só `testimonials`, então críticas privadas não entram nelas.
 - Nota média real: `/metrics` e o relatório semanal agora somam as críticas privadas (`private_feedbacks`) à média e ao gráfico de notas.
 - Lembrete diário (dias úteis, 09h Fortaleza): `/api/cron/review-reminder` manda push para planos pagos com token, convidando a enviar o link de coleta. Desligável por usuário com `reminderPush:false`.
+- Interruptor "Lembrete diário no celular" no dash (aba Link de coleta, planos pagos) grava `reminderPush`. Tabela e cards de planos em /pricing listam Inbox Reputation Shield, alertas, resposta rápida, lembrete e nota real.
