@@ -30,3 +30,7 @@
 - Lembrete diário (dias úteis, 09h Fortaleza): `/api/cron/review-reminder` manda push para planos pagos com token, convidando a enviar o link de coleta. Desligável por usuário com `reminderPush:false`.
 - Interruptor "Lembrete diário no celular" no dash (aba Link de coleta, planos pagos) grava `reminderPush`. Tabela e cards de planos em /pricing listam Inbox Reputation Shield, alertas, resposta rápida, lembrete e nota real.
 - Plano Base visível em /pricing e na landing (cards de 3 colunas); /pricing: tema sempre visível (sem borda/fundo), ícone de usuário removido do cabeçalho; menu lateral ganhou "Planos e Preços".
+
+## 2026-11-19 — Landing focada em conversão + vídeo "Como funciona"
+- `public/video/como-funciona.mp4` (54s, 1280x720, 1,4 MB, sem áudio) + poster webp. Motion com réplicas das telas reais (dash, coleta, Inbox, resposta IA do Google, página pública). Fonte do vídeo (HTML + engine) fica fora do repo (scratchpad).
+- Landing: hero com benefício e CTA "Criar conta grátis" + "Ver como funciona", selos (Base grátis, sem cartão, 1 minuto), vídeo logo abaixo (autoplay só quando visível, mudo, botão pausar), seção de dor/solução, 3 passos, FAQ de objeções (grátis, sem app, críticas privadas, autorização), CTA final e barra fixa no mobile (o widget do mural sobe 84px quando a barra aparece).
