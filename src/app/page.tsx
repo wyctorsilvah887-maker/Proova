@@ -37,7 +37,9 @@ import {
   Bot,
   BrainCircuit,
   Layout,
-  LayoutGrid
+  LayoutGrid,
+  Play,
+  Pause
 } from "lucide-react";
 import { 
   Sheet as SheetUI, 
@@ -92,7 +94,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
           <div className="hidden sm:flex items-center gap-6">
             <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Acesso Membro</Link>
             <Link href="/signup">
-              <Button className="font-black uppercase tracking-widest shadow-lg px-4 h-9 text-[9px] rounded-xl">Iniciar Estratégia</Button>
+              <Button className="font-black uppercase tracking-widest shadow-lg px-4 h-9 text-[9px] rounded-xl">Criar conta grátis</Button>
             </Link>
           </div>
 
@@ -122,6 +124,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
                   </div>
                   <div className="flex-1 p-4 space-y-1 overflow-y-auto">
                     {[
+                      { id: 'como-funciona', label: 'Como funciona', icon: Play },
                       { id: 'valor-reputacao', label: 'Reputação Local', icon: TrendingUp },
                       { id: 'metodologia', label: 'Gestão via IA', icon: Bot },
                       { id: 'planos', label: 'Planos SaaS', icon: Gem },
@@ -181,10 +184,9 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
   );
 };
 
-const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
+const HeroSection = ({ isVisible, scrollToSection }: { isVisible: boolean; scrollToSection: (id: string) => void }) => {
   return (
-    <section className="relative w-full pb-12 md:pb-24 flex items-center justify-center overflow-hidden border-b min-h-[75vh] pt-8 md:pt-16">
-      
+    <section className="relative w-full pb-10 md:pb-16 flex items-center justify-center overflow-hidden pt-8 md:pt-16">
       <div className="container relative z-10 px-4 mx-auto">
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <header>
@@ -192,38 +194,97 @@ const HeroSection = ({ isVisible }: { isVisible: boolean }) => {
               "inline-flex items-center text-primary px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] transition-all duration-1000 bg-primary/5 rounded-full border border-primary/10 mb-6",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
             )}>
-              SaaS DE GESTÃO DE REPUTAÇÃO E AUTOMAÇÃO COM IA
+              Reputação online para clínicas e profissionais da saúde
             </div>
-            
+
             <h1 className={cn(
               "text-3xl font-extrabold tracking-tight sm:text-4xl md:text-6xl font-headline leading-[1.1] transition-all duration-1000",
               isVisible ? "animate-in fade-in slide-in-from-left-20 opacity-100" : "opacity-0"
             )}>
-              Respostas prontas para suas avaliações no <br className="hidden sm:block" />
+              Mais avaliações{" "}
               <span className="inline-block relative bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">
-                Google Meu Negócio
-              </span> com IA
+                5 estrelas.
+              </span>
+              <br className="hidden sm:block" /> Críticas resolvidas antes de virarem problema.
             </h1>
           </header>
-          
+
           <p className={cn(
             "max-w-2xl mx-auto text-muted-foreground text-sm md:text-xl font-medium leading-relaxed transition-all duration-1000 delay-300",
             isVisible ? "animate-in fade-in slide-in-from-right-20 opacity-100" : "opacity-0"
           )}>
-            Veja as avaliações da sua empresa no Google, receba a resposta pronta da IA (Gemini) e gerencie sua prova social em um só painel. Feito para profissionais da saúde.
+            Envie um link para o cliente avaliar em 1 minuto. Elogios viram prova social, críticas chegam só para você com alerta no celular e a IA deixa a resposta do Google pronta.
           </p>
-          
+
           <div className={cn(
-            "flex flex-col sm:flex-row items-center justify-center gap-4 pt-6 transition-all duration-1000 delay-500",
+            "flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 transition-all duration-1000 delay-500",
             isVisible ? "animate-in fade-in slide-in-from-bottom-5 opacity-100" : "opacity-0"
           )}>
             <Link href="/signup" className="w-full sm:w-auto">
-              <Button className="w-full sm:w-auto h-14 px-8 rounded-2xl text-[10px] font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white">
-                COMEÇAR AGORA <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+              <Button className="w-full sm:w-auto h-14 px-8 rounded-2xl text-[11px] font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white uppercase tracking-widest">
+                Criar conta grátis <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
               </Button>
             </Link>
+            <Button type="button" variant="outline" onClick={() => scrollToSection('como-funciona')} className="w-full sm:w-auto h-14 px-8 rounded-2xl text-[11px] font-black uppercase tracking-widest gap-2">
+              <Play className="w-4 h-4 fill-current" /> Ver como funciona
+            </Button>
           </div>
+
+          <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pt-2 text-[11px] md:text-xs font-bold text-muted-foreground">
+            {["Plano Base grátis", "Sem cartão de crédito", "Pronto em 1 minuto"].map((t) => (
+              <li key={t} className="inline-flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-primary" />{t}</li>
+            ))}
+          </ul>
         </div>
+      </div>
+    </section>
+  );
+};
+
+const HowItWorksVideo = () => {
+  const ref = useRef<HTMLVideoElement>(null);
+  const [playing, setPlaying] = useState(true);
+
+  // Toca só quando está visível na tela (economiza dados no celular).
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) v.play().catch(() => {});
+      else v.pause();
+    }, { threshold: 0.35 });
+    io.observe(v);
+    return () => io.disconnect();
+  }, []);
+
+  const toggle = () => {
+    const v = ref.current;
+    if (!v) return;
+    if (v.paused) { v.play().catch(() => {}); setPlaying(true); } else { v.pause(); setPlaying(false); }
+  };
+
+  return (
+    <section id="como-funciona" className="w-full pb-16 md:pb-24">
+      <div className="container px-4 mx-auto max-w-5xl space-y-6">
+        <div className="relative rounded-2xl md:rounded-[2rem] overflow-hidden border bg-zinc-950 shadow-2xl ring-1 ring-primary/10">
+          <video
+            ref={ref}
+            className="w-full aspect-video block"
+            src="/video/como-funciona.mp4"
+            poster="/video/como-funciona-poster.webp"
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            aria-label="Vídeo mostrando como o Proova AI funciona em 5 passos"
+            onPlay={() => setPlaying(true)}
+            onPause={() => setPlaying(false)}
+          />
+          <button type="button" onClick={toggle} aria-label={playing ? 'Pausar vídeo' : 'Reproduzir vídeo'} className="absolute bottom-3 right-3 h-10 w-10 rounded-full bg-black/60 text-white backdrop-blur flex items-center justify-center hover:bg-black/80 transition-colors">
+            {playing ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
+          </button>
+        </div>
+        <p className="text-center text-xs md:text-sm text-muted-foreground font-medium">Veja o fluxo completo em menos de 1 minuto: do link de coleta à resposta com IA.</p>
       </div>
     </section>
   );
@@ -240,30 +301,30 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         )}>
           <h2 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight leading-tight">
-            Gestão Unificada de <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-1">Autoridade Digital.</span>
+            Uma avaliação ruim pode custar pacientes. <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-1">O Proova te dá o controle.</span>
           </h2>
-          <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">O Proova lê as avaliações do Google da sua empresa, prepara a resposta com IA e reúne todos os seus depoimentos em um só painel, para você escalar seu ranking orgânico com dados reais.</p>
+          <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">Hoje, quem fica insatisfeito vai direto para o Google e você só descobre depois. Com o Proova, você ouve o cliente primeiro, resolve a tempo e ainda ganha prova social com quem gostou.</p>
         </header>
 
         <div className="grid gap-12 lg:grid-cols-3">
           {[
-            { 
-              icon: MapPin, 
-              title: "Inbox Unificado", 
-              desc: "Receba alertas instantâneos de cada novo depoimento enviado pelo seu link de coleta Proova e modere tudo em um único inbox unificado.", 
+            {
+              icon: Shield,
+              title: "Críticas só para você",
+              desc: "Notas de 1 a 3 estrelas chegam a um inbox privado, com alerta no celular e resposta em 1 toque pelo WhatsApp. Você resolve antes de virar problema.",
               color: "text-primary"
             },
-            { 
-              icon: Bot, 
-              title: "Respostas Prontas com IA", 
-              desc: "Nossa IA (Gemini) analisa o sentimento da avaliação e gera respostas profissionais e éticas em segundos, prontas para você revisar, copiar e publicar.", 
-              color: "text-primary" 
+            {
+              icon: Bot,
+              title: "Respostas do Google prontas",
+              desc: "A IA (Gemini) lê cada avaliação do Google da sua ficha e escreve uma resposta profissional e ética. Você revisa, copia e publica em segundos.",
+              color: "text-primary"
             },
-            { 
-              icon: Zap, 
-              title: "Estratégia G-Boost", 
-              desc: "Aumente seu volume de avaliações 5 estrelas no Google através do nosso fluxo de redirecionamento inteligente.", 
-              color: "text-primary" 
+            {
+              icon: Star,
+              title: "Elogios viram prova social",
+              desc: "Depoimentos aprovados ganham página pública, cards prontos para Instagram e convite para o cliente avaliar também no Google.",
+              color: "text-primary"
             }
           ].map((item, idx) => (
             <article key={idx} className={cn(
@@ -295,16 +356,16 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
         )}>
           <h2 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight">
-            Como o Proova <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">Automatiza sua Reputação.</span>
+            Comece em 3 passos <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">e deixe o Proova trabalhar.</span>
           </h2>
         </header>
         
         <div className="max-w-4xl mx-auto relative px-4 md:px-0">
           <div className="space-y-12 md:space-y-16">
             {[
-              { number: '01', title: '01. Conecte sua ficha do Google', desc: 'Informe sua empresa pelo Google Maps e o Proova passa a ler as avaliações públicas da sua ficha, sem precisar da senha da sua conta.' },
-              { number: '02', title: '02. IA Generativa (Gemini)', desc: 'O Proova utiliza modelos avançados de IA para preparar respostas com empatia, mantendo o tom de voz da sua marca.' },
-              { number: '03', title: '03. Link in Bio de Autoridade', desc: 'Transforme sua biografia do Instagram em um hub de conversão com uma vitrine dinâmica de depoimentos e botão de contato direto.' }
+              { number: '01', title: 'Crie sua conta e envie o link de coleta', desc: 'Em 1 minuto você tem um link e um QR Code de balcão. Envie pelo WhatsApp logo após o atendimento, quando a experiência está fresca.' },
+              { number: '02', title: 'Receba elogios e críticas, cada um no lugar certo', desc: 'Elogios vão para sua página pública e para os cards do Instagram. Críticas chegam ao Inbox privado com alerta, para você responder em 1 toque.' },
+              { number: '03', title: 'Conecte sua ficha do Google e responda com IA', desc: 'Informe sua empresa pelo Google Maps (sem senha) e receba as avaliações com resposta sugerida pela IA, no tom da sua clínica.' }
             ].map((step, idx) => (
               <div key={idx} className={cn(
                 "flex items-start gap-8 md:gap-16 relative transition-all duration-1000", 
@@ -461,13 +522,16 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 PricingSection.displayName = "PricingSection";
 
 const FAQ_ITEMS = [
+  { q: "Preciso pagar ou colocar cartão para começar?", a: "Não. O plano Base é gratuito, sem cartão de crédito. Você cria a conta, envia o link de coleta e só migra para um plano pago se quiser mais recursos." },
+  { q: "Meu cliente precisa baixar algum app ou criar conta?", a: "Não. Ele abre o link no celular, escolhe as estrelas, escreve (ou envia uma foto) e envia. Leva menos de 1 minuto." },
+  { q: "As críticas ficam escondidas do público?", a: "Notas de 1 a 3 estrelas dadas pelo seu link de coleta vão para o seu Inbox privado e não aparecem na sua página. O Proova não impede ninguém de avaliar no Google: ele te dá a chance de ouvir e resolver antes. A nota média do seu painel inclui todas as avaliações, inclusive as críticas." },
+  { q: "O cliente autoriza a publicação do depoimento?", a: "Sim. Antes de enviar, o cliente marca um aceite autorizando a publicação do depoimento e do nome. A autorização fica registrada em cada depoimento e você remove quando ele pedir." },
   { q: "Preciso dar a senha da minha conta do Google?", a: "Não. Você informa sua empresa pelo Google Maps e o Proova lê as avaliações públicas da sua ficha." },
-  { q: "A IA responde avaliações antigas?", a: "A IA atua nos feedbacks recebidos depois que o seu plano é ativado. Nos depoimentos coletados antes disso ela não responde sozinha (você pode pedir uma sugestão no painel). Nas avaliações do Google, a primeira busca traz os últimos 30 dias e, depois, só as mais recentes." },
   { q: "O Proova publica as respostas por mim?", a: "Hoje a IA prepara a resposta e você copia e publica em segundos, com controle total do que vai ao ar. A publicação automática chegará com a integração oficial do Google." },
-  { q: "Como funcionam os alertas?", a: "Cada novo depoimento enviado pelo seu link de coleta Proova chega ao seu inbox unificado com alerta instantâneo, para você moderar antes de publicar." },
-  { q: "Com que frequência as avaliações do Google são atualizadas?", a: "Automaticamente uma vez por dia e, quando você quiser, na hora pelo botão \"Atualizar agora\" (planos pagos)." },
+  { q: "Como funcionam os alertas de críticas?", a: "Quando chega um feedback crítico, nos planos Premium e PRO você recebe e-mail e push no celular, e o Inbox já mostra o contato do cliente e uma mensagem pronta para o WhatsApp." },
+  { q: "A IA responde avaliações antigas?", a: "A primeira busca do Google traz os últimos 30 dias e, depois, só as mais recentes. Nos depoimentos antigos você pode pedir uma sugestão de resposta no painel." },
   { q: "Posso cancelar quando quiser?", a: "Sim, sem multa. O cancelamento pode ser feito pelo e-mail contato@useproovaai.com.br." },
-  { q: "E se eu não gostar?", a: "Você tem 7 dias de garantia: peça o reembolso integral direto no painel, em Configurações." },
+  { q: "E se eu não gostar de um plano pago?", a: "Você tem 7 dias de garantia: peça o reembolso integral direto no painel, em Configurações." },
 ];
 
 const FaqSection = () => (
@@ -524,6 +588,7 @@ export default function Home() {
   const [isPricingVisible, setIsPricingVisible] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [showSticky, setShowSticky] = useState(false);
 
   const agitationRef = useRef<HTMLElement>(null);
   const pillarsRef = useRef<HTMLElement>(null);
@@ -555,7 +620,12 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    const f = document.getElementById('proova-mural-widget');
+    if (f) f.style.bottom = showSticky && window.innerWidth < 768 ? '84px' : '20px';
+  }, [showSticky]);
+
+  useEffect(() => {
+    const handleScroll = () => { setIsScrolled(window.scrollY > 20); setShowSticky(window.scrollY > 650); };
     window.addEventListener("scroll", handleScroll);
     
     const fallbackTimer = setTimeout(() => {
@@ -619,7 +689,8 @@ export default function Home() {
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
       <Navigation isScrolled={isScrolled} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} scrollToSection={scrollToSection} />
       <main className="flex-1 pt-20">
-        <HeroSection isVisible={isHeroVisible} />
+        <HeroSection isVisible={isHeroVisible} scrollToSection={scrollToSection} />
+        <HowItWorksVideo />
         <AgitationSection ref={agitationRef} isVisible={isAgitationVisible} />
         <PillarsSection ref={pillarsRef} isVisible={isPillarsVisible} />
         <VersatilitySection ref={versatilityRef} isVisible={isVersatilityVisible} />
@@ -631,22 +702,27 @@ export default function Home() {
           <div className="container relative z-10 px-4 mx-auto text-center space-y-10">
             <header className="space-y-4">
               <h2 className="text-3xl md:text-5xl font-extrabold font-headline tracking-tight leading-tight">
-                Gestão de Reputação com <span className="text-primary italic">IA ao seu lado.</span>
+                Sua próxima avaliação 5 estrelas <span className="text-primary italic">começa com um link.</span>
               </h2>
               <p className="max-w-lg mx-auto text-sm md:text-lg font-medium text-white/80">
-                Assuma a liderança regional através da prova social estratégica e IA.
+                Crie sua conta grátis, envie o primeiro link de coleta hoje e veja quem aprova (e quem precisa de atenção) antes de ir para o Google.
               </p>
             </header>
             <Link href="/signup" className="w-full sm:w-auto">
               <Button size="lg" variant="secondary" className="w-full sm:w-auto h-14 md:h-16 px-10 rounded-xl text-sm md:text-base font-bold shadow-2xl hover:scale-105 transition-all bg-white text-black hover:bg-white/90">
-                CRIAR MINHA CONTA AGORA
+                CRIAR CONTA GRÁTIS
               </Button>
             </Link>
-            <p className="text-xs md:text-sm font-bold text-white/70">Garantia de 7 dias com reembolso integral • Cancele quando quiser</p>
+            <p className="text-xs md:text-sm font-bold text-white/70">Plano Base grátis • Sem cartão • Planos pagos com garantia de 7 dias</p>
           </div>
         </section>
       </main>
       <Footer />
+      <div className={cn("fixed inset-x-0 bottom-0 z-[60] md:hidden border-t bg-background/95 backdrop-blur px-4 py-3 transition-transform duration-300", showSticky ? "translate-y-0" : "translate-y-full")}>
+        <Link href="/signup" className="block">
+          <Button className="w-full h-12 rounded-xl text-[11px] font-black uppercase tracking-widest gap-2">Criar conta grátis <ArrowRight className="w-4 h-4" /></Button>
+        </Link>
+      </div>
     </div>
   );
 }
