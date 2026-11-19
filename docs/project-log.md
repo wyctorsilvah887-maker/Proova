@@ -19,3 +19,10 @@
 - [ ] **ROI da Confiança**: Cálculo de valor gerado por prova social.
 - [ ] **Daily Pick**: Notificação diária do melhor depoimento para o Instagram.
 - [ ] Ativação da Moderação Automática com Genkit (Shield).
+
+## 2026-11-19 — Inbox / Reputation Shield (`claude/inbox`)
+- Feedbacks 1–3★ (ou destino "private") agora são gravados em `private_feedbacks` (status `new`), não vão mais ao público.
+- `src/lib/inbox-alert.ts`: incrementa `users/{uid}.inboxNewCount` e envia push (Premium/PRO/trial); e-mail de alerta também só para planos pagos.
+- `/private` reescrito: abas Críticas/Curadoria, filtros Novas/Resolvidas, responder por WhatsApp/e-mail com mensagem pronta, sugestão da IA, resolver/reabrir, publicar (com confirmação), excluir, opt-in de push e tour (`inboxTourDone`).
+- Menu: selo do Inbox = curadoria pendente + `inboxNewCount`; dash mostra faixa com críticas novas.
+- Atenção: métricas, cards e página pública leem só `testimonials`, então críticas privadas não entram nelas.

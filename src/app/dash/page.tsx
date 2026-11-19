@@ -877,6 +877,14 @@ export default function DashPage() {
                   </Card>
                 )}
 
+                {(Number(userData?.inboxNewCount) || 0) > 0 && (
+                  <Link href="/private" className="flex items-center gap-3 rounded-2xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm font-bold hover:bg-destructive/10 transition-all">
+                    <ShieldAlert className="w-5 h-5 text-destructive shrink-0" />
+                    <span className="flex-1">Você tem {Number(userData?.inboxNewCount)} {Number(userData?.inboxNewCount) === 1 ? 'feedback crítico novo' : 'feedbacks críticos novos'} no Inbox</span>
+                    <span className="text-[11px] font-black uppercase text-destructive">Responder</span>
+                  </Link>
+                )}
+
                 {/* Avaliações do Google Maps com rascunho de resposta da IA */}
                 {apiSuggestions.map((r: any) => {
                   const reply: string = localReplies[r.id] ?? r.aiReply ?? '';

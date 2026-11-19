@@ -6,6 +6,7 @@ import { collection, query, getDocs, addDoc, serverTimestamp, doc, updateDoc, in
 import { sendFeedbackAlert } from '@/lib/feedback-alert';
 import { generateReply } from '@/ai/reply';
 import { reserveAiReplies, releaseAiReplies } from '@/lib/ai-quota';
+import { notifyOwnerNewFeedback } from '@/lib/inbox-alert';
 
 /** Versão do texto de autorização exibido no formulário de coleta (mude ao alterar o texto). */
 const CONSENT_TEXT_VERSION = '2026-11-v1';
@@ -65,9 +66,11 @@ export async function submitTestimonialAction(data: {
       }
     }
 
+    // Reputation Shield: notas de 1 a 3 estrelas NÃO vão para a página pública; caem no Inbox Privado do dono.
+    const isShield = data.destination === 'private' || data.rating <= 3;
     // Avaliação só com nota (sem texto/mídia) não vai direto para a página pública: fica na moderação.
     const hasContent = !!(data.text?.trim() || data.videoUrl || data.photoUrl);
-    const initialStatus = hasContent ? 'approved' : 'pending';
+    const initialStatus = isShield ? 'new' : (hasContent ? 'approved' : 'pending');
 
     // Nota baixa: a resposta da IA vira rascunho (não aparece na página pública até o dono aprovar).
     const isLowRating = data.rating <= 3;
@@ -88,15 +91,16 @@ export async function submitTestimonialAction(data: {
         : null,
     };
 
-    const collectionName = data.destination === 'public' ? 'testimonials' : 'private_feedbacks';
+    const collectionName = isShield ? 'private_feedbacks' : 'testimonials';
     const feedbacksRef = collection(firestore, 'users', data.targetUserId, collectionName);
 
     await updateDoc(userRef, { testimonialsCount: increment(1) });
     const created = await addDoc(feedbacksRef, testimonialData);
 
-    // Alertas por e-mail (Premium)
+    // Aviso no Inbox (contador + push nos planos pagos) e e-mail (Premium)
+    if (isShield) await notifyOwnerNewFeedback(data.targetUserId, { clientName: testimonialData.userName, rating: data.rating, push: isPremium });
     if (isPremium) {
-      if (data.destination === 'private' || data.rating <= 3) {
+      if (isShield) {
         await sendFeedbackAlert({
           ownerEmail: userData.email,
           companyName: userData.companyName,

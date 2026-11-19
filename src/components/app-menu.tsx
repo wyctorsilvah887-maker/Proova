@@ -86,6 +86,10 @@ export function AppSideMenu({
     [everOpened, db, user, companySlug]
   );
   const { data: ppData } = useDoc(ppRef);
+  // Selo do Inbox: pendências da curadoria + feedbacks críticos novos (contador no próprio perfil, sem leituras extras).
+  const meRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
+  const { data: me } = useDoc(meRef);
+  const inboxBadge = (pendingCount || 0) + (Number(me?.inboxNewCount) || 0);
   const logoUrl: string | null = ppData?.logoUrl && !/\.(mp4|webm|mov)(\?|$)/i.test(ppData.logoUrl) ? ppData.logoUrl : null;
   const [logoFailed, setLogoFailed] = useState(false);
   useEffect(() => { setLogoFailed(false); }, [logoUrl]);
@@ -116,7 +120,7 @@ export function AppSideMenu({
     {
       title: 'Gestão',
       items: [
-        { label: 'Moderação Inbox', icon: Inbox, href: '/private', badge: pendingCount },
+        { label: 'Moderação Inbox', icon: Inbox, href: '/private', badge: inboxBadge },
         { label: 'Social Cards', icon: ImageIcon, href: '/social-cards' },
         { label: 'Métricas & ROI', icon: BarChart3, href: '/metrics' },
       ],
