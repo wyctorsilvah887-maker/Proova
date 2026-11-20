@@ -64,3 +64,6 @@
 - `users/{uid}.firstApprovedAt`: gravado pelo servidor quando o 1º depoimento já nasce aprovado e pelo dono (`src/lib/activation.ts`) ao aprovar/promover no Inbox. Evento `first_approved` no funil e no cartão "Ativação" do /admin/growth.
 - `trackPPVisit`/`trackWhatsappClick`: ignoram bots (User-Agent) no servidor; o navegador conta 1x por dia por página e nunca conta o dono/admin (`proova_owner`/`proova_notrack`). Se o armazenamento do navegador estiver bloqueado, não conta (subconta em vez de inflar). Os contadores antigos continuam, mas só os novos são "únicos por dia".
 - Antes/depois: o dono informa uma vez a nota e o nº de avaliações do Google (`users/{uid}.baseline`, autodeclarado) no /metrics; "hoje" vem ao vivo do Google (`/api/google-rating`). **Decisão de conformidade:** não gravamos nota/contagem do Google no banco, porque os Termos do Google Maps Platform restringem guardar esses dados. Por isso a linha de base é informada pelo cliente em vez de capturada automaticamente no cadastro.
+
+## 2026-11-20 — Documentação
+- `README.md` reescrito (stack, rodar local, variáveis de ambiente, publicação), `.env.example` (sem valores) e `docs/arquitetura.md` (planos, Inbox, Google, push, crons, cobrança, analytics, IA, segurança).
