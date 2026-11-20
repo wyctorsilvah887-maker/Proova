@@ -8,10 +8,12 @@ interface LinkShareBoxProps {
   label: string;
   shareMessage: string;
   onCopy: (text: string, description: string) => void;
+  /** Chamado quando o usuário toca em "WhatsApp" (conta como link enviado). */
+  onShare?: () => void;
 }
 
 /** Caixa com o link visível (sem estourar o card), copiar, abrir e enviar por WhatsApp. */
-export function LinkShareBox({ url, label, shareMessage, onCopy }: LinkShareBoxProps) {
+export function LinkShareBox({ url, label, shareMessage, onCopy, onShare }: LinkShareBoxProps) {
   const waHref = `https://wa.me/?text=${encodeURIComponent(`${shareMessage} ${url}`)}`;
   return (
     <div className="w-full space-y-3">
@@ -23,7 +25,7 @@ export function LinkShareBox({ url, label, shareMessage, onCopy }: LinkShareBoxP
       </div>
       <div className="grid grid-cols-2 gap-2">
         <Button asChild variant="outline" className="h-12 rounded-xl border-primary/20 text-primary font-black text-[10px] uppercase tracking-widest gap-2">
-          <a href={waHref} target="_blank" rel="noopener noreferrer"><MessageCircle className="w-4 h-4" /> WhatsApp</a>
+          <a href={waHref} target="_blank" rel="noopener noreferrer" onClick={onShare}><MessageCircle className="w-4 h-4" /> WhatsApp</a>
         </Button>
         <Button asChild variant="outline" className="h-12 rounded-xl border-primary/20 text-primary font-black text-[10px] uppercase tracking-widest gap-2">
           <a href={url} target="_blank" rel="noopener noreferrer"><ExternalLink className="w-4 h-4" /> Abrir</a>

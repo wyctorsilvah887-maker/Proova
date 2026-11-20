@@ -331,9 +331,15 @@ export default function DashPage() {
     return { labels: missing.map((m) => m.label).join(' e '), action: missing[0].action };
   }, [setupSteps, userData, userDataLoading]);
 
+  // Ativação: a 1ª vez que o dono copia ou manda o link de coleta fica gravada (firstLinkSharedAt)
+  const markLinkShared = () => {
+    trackEvent('link_copied');
+    if (userDocRef && userData && !userData.firstLinkSharedAt) updateDoc(userDocRef, { firstLinkSharedAt: serverTimestamp() }).catch(() => {});
+  };
+
   const copyToClipboard = (text: string, description: string) => {
     navigator.clipboard.writeText(text);
-    if (text.includes('/c/')) trackEvent('link_copied');
+    if (text.includes('/c/')) markLinkShared();
     shadcnToast({ title: "Copiado!", description: `${description} copiado.` });
   };
 
@@ -643,7 +649,7 @@ export default function DashPage() {
                        <div className="p-5 rounded-3xl bg-primary/10 text-primary"><Link2 className="w-10 h-10" /></div>
                        <p className="text-sm font-medium text-muted-foreground">Envie este link aos seus clientes após o atendimento para capturar elogios instantâneos.</p>
                     </div>
-                    <LinkShareBox url={collectionLink} label="Link de coleta" shareMessage="Conta pra gente como foi seu atendimento, leva menos de 1 minuto:" onCopy={copyToClipboard} />
+                    <LinkShareBox url={collectionLink} label="Link de coleta" shareMessage="Conta pra gente como foi seu atendimento, leva menos de 1 minuto:" onCopy={copyToClipboard} onShare={markLinkShared} />
                     <p className="text-center text-[11px] font-medium text-muted-foreground leading-relaxed">Dica: envie pelo WhatsApp logo após a consulta, quando a experiência ainda está fresca.</p>
                     {['gold', 'enterprise', 'trial'].includes(userData?.membershipStatus) && (
                       <div className="flex items-center gap-3 rounded-2xl border bg-muted/20 px-4 py-3">
@@ -667,7 +673,7 @@ export default function DashPage() {
                        <div className="p-5 rounded-3xl bg-primary/10 text-primary"><Globe className="w-10 h-10" /></div>
                        <p className="text-sm font-medium text-muted-foreground">Sua vitrine oficial de depoimentos. Ideal para o link da bio do Instagram.</p>
                     </div>
-                    <LinkShareBox url={publicPageLink} label="Link da bio" shareMessage="Veja os depoimentos de quem já passou por aqui:" onCopy={copyToClipboard} />
+                    <LinkShareBox url={publicPageLink} label="Link da bio" shareMessage="Veja os depoimentos de quem já passou por aqui:" onCopy={copyToClipboard} onShare={markLinkShared} />
                     <Button variant="outline" className="w-full h-14 rounded-xl font-black uppercase tracking-widest gap-3 border-primary/20 text-primary" onClick={() => router.push('/ppeditor')}>
                        <Settings className="w-5 h-5" /> Configurar Temas
                     </Button>
@@ -690,7 +696,7 @@ export default function DashPage() {
                       <Button variant="outline" className="w-full h-12 rounded-xl border-primary/20 text-primary font-black text-[10px] uppercase tracking-widest gap-2" onClick={handleDownloadPng}>
                         <ImageIcon className="w-4 h-4" /> Baixar imagem (PNG)
                       </Button>
-                      <LinkShareBox url={collectionLink} label="Link de coleta" shareMessage="Conta pra gente como foi seu atendimento:" onCopy={copyToClipboard} />
+                      <LinkShareBox url={collectionLink} label="Link de coleta" shareMessage="Conta pra gente como foi seu atendimento:" onCopy={copyToClipboard} onShare={markLinkShared} />
                       <p className="text-center text-[11px] font-medium text-muted-foreground leading-relaxed">Imprima e deixe no balcão ou na recepção. O cliente aponta a câmera do celular e avalia em segundos.</p>
                     </div>
                   </div>

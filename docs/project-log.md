@@ -51,3 +51,7 @@
 - `firestore.rules`: nova coleção `analytics_daily` (leitura só admin, escrita negada). **Publicar as regras no Console** (a Vercel não publica).
 - Limites: único por dia somado no período (não é único real); só passa a medir após o deploy; sem histórico anterior.
 - Cliques em "Criar conta" detalhados: cada botão da landing tem `data-cta` (nav, menu-mobile, hero, plano-base, cta-final, barra-mobile); o plano Base em /pricing (botão, não link) também conta. Novo evento `checkout_click` (planos pagos em /pricing). `/admin/growth` mostra cliques por botão (total) e checkout (únicos). Dados em `analytics_daily.{dia}.cta.{evento}.{botão}`.
+
+## 2026-11-20 — Ativação medida por conta
+- `users/{uid}.firstLinkSharedAt` (gravado pelo dono na 1ª vez que copia o link de coleta ou toca em "WhatsApp" no dash) e `firstFeedbackAt` (gravado pelo servidor, Admin SDK, na 1ª avaliação recebida). `LinkShareBox` ganhou `onShare`.
+- `/admin/growth`: cartão "Ativação" com cadastros do período → enviaram o 1º link → receberam a 1ª avaliação. Quem já tinha avaliações antes (testimonialsCount > 0) conta como ativado; o "enviou o link" só vale para quem usou depois do deploy.

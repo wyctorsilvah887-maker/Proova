@@ -125,7 +125,13 @@ export default function AdminGrowthPage() {
 
     const recentPaying = [...paying].sort((a, b) => (b.activated?.getTime() || 0) - (a.activated?.getTime() || 0)).slice(0, 10);
     const tracked = rows.filter((r) => r.source !== 'sem-origem').length;
-    return { total: rows.length, mrr, paying: paying.length, inPeriod: inPeriod.length, convPaid: convPaid.length, byPlan, sources, daily, recentPaying, tracked };
+    const cohort = users ? (users as any[]).filter((u) => { const d = toDate(u.createdAt); return !since || (d && d.getTime() >= since); }) : [];
+    const activation = {
+      signups: cohort.length,
+      linkShared: cohort.filter((u) => !!u.firstLinkSharedAt).length,
+      firstFeedback: cohort.filter((u) => !!u.firstFeedbackAt || (u.testimonialsCount || 0) > 0).length,
+    };
+    return { activation, total: rows.length, mrr, paying: paying.length, inPeriod: inPeriod.length, convPaid: convPaid.length, byPlan, sources, daily, recentPaying, tracked };
   }, [users, period, groupBy]);
 
   // ---------- funil de visitas (analytics próprio) ----------
@@ -286,6 +292,26 @@ export default function AdminGrowthPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Ativação dos cadastros */}
+        <Card className="rounded-3xl md:rounded-[2rem] border-none shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-sm font-black uppercase tracking-tight">Ativação: o cadastro virou uso?</CardTitle>
+            <CardDescription className="text-xs">Por conta criada no período. "Enviou o 1º link" só existe para quem usou depois deste recurso; "recebeu a 1ª avaliação" vale para todas.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            {[
+              { label: 'Cadastros', n: stats.activation.signups },
+              { label: 'Copiaram ou enviaram o link de coleta', n: stats.activation.linkShared },
+              { label: 'Receberam a 1ª avaliação', n: stats.activation.firstFeedback },
+            ].map((r, i) => (
+              <div key={r.label} className="space-y-1.5">
+                <div className="flex justify-between text-xs font-bold gap-3"><span>{r.label}</span><span className="tabular-nums shrink-0">{r.n}{i > 0 && <span className="text-muted-foreground font-medium"> · {pct(r.n, stats.activation.signups)} dos cadastros</span>}</span></div>
+                <div className="h-2 rounded-full bg-muted overflow-hidden"><div className="h-full rounded-full bg-primary" style={{ width: `${(r.n / Math.max(1, stats.activation.signups)) * 100}%` }} /></div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
 
         {/* Funil de visitas (analytics próprio) */}
         <Card className="rounded-3xl md:rounded-[2rem] border-none shadow-sm">
