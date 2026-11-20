@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, type RefObject } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import {
-  BarChart3, Copy, ExternalLink, Gem, Globe, Headphones, ImageIcon, Inbox, LayoutGrid, Link2, LogOut, QrCode, Settings, Shield, Sparkles,
+  BarChart3, Copy, ExternalLink, Gem, Globe, Headphones, ImageIcon, Inbox, LayoutGrid, Link2, LogOut, QrCode, Settings, Shield, Sparkles, BellRing,
   type LucideIcon,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
@@ -15,6 +15,7 @@ import { useAuth, useUser, useFirestore, useDoc } from '@/firebase';
 import { doc } from 'firebase/firestore';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { getPushToken, listenForeground } from '@/lib/push-client';
 
 /** Cor do selo de acordo com o plano (membershipLabel das páginas). */
 const PLAN_STYLE: Record<string, string> = {
@@ -90,6 +91,50 @@ export function AppSideMenu({
   const meRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: me } = useDoc(meRef);
   const inboxBadge = (pendingCount || 0) + (Number(me?.inboxNewCount) || 0);
+  // Avisos no celular (planos pagos): renova o token em silêncio a cada sessão e oferece ativar/testar aqui,
+  // para o usuário não depender de ter visitado uma página específica.
+  const isPaid = ['gold', 'enterprise', 'trial'].includes(me?.membershipStatus);
+  const [pushPerm, setPushPerm] = useState<'' | 'granted' | 'default' | 'denied' | 'unsupported'>('');
+  const [pushBusy, setPushBusy] = useState(false);
+  const registerToken = async () => {
+    const idToken = await auth?.currentUser?.getIdToken();
+    if (!idToken) throw new Error('Sessão expirada. Entre novamente.');
+    const token = await getPushToken();
+    const r = await fetch('/api/push-token', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` }, body: JSON.stringify({ token }) });
+    if (!r.ok) throw new Error('Não foi possível registrar este aparelho.');
+  };
+  useEffect(() => {
+    if (!user || !isPaid || typeof window === 'undefined') return;
+    if (!('Notification' in window) || !process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY) { setPushPerm('unsupported'); return; }
+    setPushPerm(Notification.permission as any);
+    if (Notification.permission === 'granted') {
+      let done = false;
+      try { done = sessionStorage.getItem('proova_push_synced') === user.uid; } catch {}
+      if (!done) registerToken().then(() => { try { sessionStorage.setItem('proova_push_synced', user.uid); } catch {} }).catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, isPaid]);
+  // Aviso recebido com o app aberto: mostra na tela (o FCM não aciona o service worker em primeiro plano).
+  useEffect(() => {
+    if (pushPerm !== 'granted') return;
+    let unsub: (() => void) | undefined;
+    let dead = false;
+    listenForeground((m) => {
+      toast({ title: m.title, description: m.body });
+    }).then((u) => { if (dead) u(); else unsub = u; });
+    return () => { dead = true; unsub?.(); };
+  }, [pushPerm]);
+  const enablePush = async () => {
+    setPushBusy(true);
+    try {
+      await registerToken();
+      setPushPerm('granted');
+      toast({ title: 'Avisos ativados', description: 'Você receberá alertas de críticas e lembretes neste aparelho.' });
+    } catch (e: any) {
+      setPushPerm((typeof Notification !== 'undefined' ? Notification.permission : 'unsupported') as any);
+      toast({ variant: 'destructive', title: 'Não foi possível ativar', description: e?.message || 'Tente novamente.' });
+    } finally { setPushBusy(false); }
+  };
   const logoUrl: string | null = ppData?.logoUrl && !/\.(mp4|webm|mov)(\?|$)/i.test(ppData.logoUrl) ? ppData.logoUrl : null;
   const [logoFailed, setLogoFailed] = useState(false);
   useEffect(() => { setLogoFailed(false); }, [logoUrl]);
@@ -196,6 +241,21 @@ export function AppSideMenu({
                   <Copy className="w-3.5 h-3.5 text-primary" /> Copiar link
                 </button>
               </div>
+            )}
+
+            {isPaid && pushPerm && pushPerm !== 'unsupported' && (
+              pushPerm === 'granted' ? (
+                <div className="flex items-center gap-2 rounded-xl border bg-background px-3 py-2 text-[10px] font-black uppercase tracking-wider">
+                  <BellRing className="w-3.5 h-3.5 text-primary" /> <span className="flex-1">Avisos ativos neste aparelho</span>
+                </div>
+              ) : pushPerm === 'denied' ? (
+                <p className="rounded-xl border bg-muted/40 px-3 py-2 text-[10px] font-medium text-muted-foreground leading-snug">Avisos bloqueados no navegador. Libere as notificações deste site nas configurações para receber alertas de críticas.</p>
+              ) : (
+                <button type="button" onClick={enablePush} disabled={pushBusy}
+                  className="w-full flex items-center justify-center gap-2 h-10 rounded-xl border border-primary/30 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-widest hover:bg-primary/10 active:scale-[0.98] transition-all disabled:opacity-50">
+                  <BellRing className="w-3.5 h-3.5" /> Ativar avisos no celular
+                </button>
+              )
             )}
 
             {canUpgrade && (

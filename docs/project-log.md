@@ -34,6 +34,15 @@
 ## 2026-11-19 — Landing focada em conversão + vídeo "Como funciona"
 - `public/video/como-funciona.mp4` (54s, 1280x720, 1,4 MB, sem áudio) + poster webp. Motion com réplicas das telas reais (dash, coleta, Inbox, resposta IA do Google, página pública). Fonte do vídeo (HTML + engine) fica fora do repo (scratchpad).
 - Landing: hero com benefício e CTA "Criar conta grátis" + "Ver como funciona", selos (Base grátis, sem cartão, 1 minuto), vídeo logo abaixo (autoplay só quando visível, mudo, botão pausar), seção de dor/solução, 3 passos, FAQ de objeções (grátis, sem app, críticas privadas, autorização), CTA final e barra fixa no mobile (o widget do mural sobe 84px quando a barra aparece).
+- Push: o token só era registrado em /support e /private, então quem nunca passou por lá não recebia nada (e quem dispensou o aviso no suporte nunca via o convite). Agora o menu lateral (todas as páginas, planos pagos) renova o token em silêncio, oferece "Ativar avisos no celular" e tem "Testar" (`/api/push-test` devolve o motivo da falha). Corrigido o ícone do service worker (arquivo inexistente).
+- Push em primeiro plano: com a aba aberta o FCM não aciona o service worker, então o teste "enviava" mas nada aparecia. `listenForeground` (push-client) mostra o aviso na tela e a notificação do sistema.
+
+## 2026-11-19 — Avisos de renovação do plano
+- Removido o botão "Testar" do menu e a rota `/api/push-test`.
+- Webhook Cakto grava `planRenewsAt` (de `data.subscription.next_payment_date`, ou hoje + `recurrence_period`) ao ativar/renovar e apaga ao cancelar.
+- `src/lib/plan-renewal.ts`: 3 dias e 1 dia antes da cobrança, e-mail (Resend) + push, só Premium/PRO. Dedup por ciclo (`renewalNoticeFor`/`renewalNoticeStage`). Quem assinou antes do `planRenewsAt` existir usa estimativa: última cobrança (`planUpdatedAt`) + 30 dias, e o e-mail diz "por volta de".
+- O cron `/api/cron/review-reminder` agora roda todo dia (Hobby = 2 crons): renovação todo dia, lembrete de avaliação só de segunda a sexta.
+- Configurações: cartão do plano mostra "Próxima renovação: dd de mês (em N dias)" (ou "Renovação prevista" quando é estimativa) para Premium/PRO.
 
 ## 2026-11-20 — Analytics próprio do funil (estudo de taxas de sucesso, item 1)
 - Sem ferramenta externa nem cookies de terceiros. `src/lib/track.ts` + `PageTracker` (layout) enviam eventos para `POST /api/track` (ignora bots por User-Agent; o admin é excluído via flag `proova_notrack`). Contador "único" = 1ª vez do dia por navegador.

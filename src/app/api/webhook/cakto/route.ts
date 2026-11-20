@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { FieldValue, type Firestore } from 'firebase-admin/firestore';
+import { FieldValue, Timestamp, type Firestore } from 'firebase-admin/firestore';
 import { adminDb } from '@/lib/firebase-admin';
 import { safeEqual } from '@/lib/safe-equal';
 import { customerOf, decide, resolvePlan } from '@/lib/billing/cakto';
@@ -101,11 +101,18 @@ export async function POST(request: Request) {
         // Início do plano atual (base da garantia de 7 dias). Renovação do mesmo plano não reinicia.
         if (current !== decision.plan) update.planActivatedAt = FieldValue.serverTimestamp();
         if (data.subscription?.id) update.caktoSubscriptionId = data.subscription.id;
+        // Próxima cobrança (base dos avisos de renovação): data informada pela Cakto ou, na falta dela, hoje + período.
+        const sub = data.subscription || {};
+        const next = sub.next_payment_date ? new Date(sub.next_payment_date) : null;
+        const period = Number(sub.recurrence_period);
+        if (next && !isNaN(next.getTime()) && next.getTime() > Date.now()) update.planRenewsAt = Timestamp.fromDate(next);
+        else if (period > 0) update.planRenewsAt = Timestamp.fromMillis(Date.now() + period * 86400000);
+        else update.planRenewsAt = FieldValue.delete();
         await userRef.update(update);
         outcome = 'activated';
         reason = decision.plan;
       } else if (decision.action === 'deactivate') {
-        await userRef.update({ membershipStatus: 'base', planUpdatedAt: FieldValue.serverTimestamp() });
+        await userRef.update({ membershipStatus: 'base', planUpdatedAt: FieldValue.serverTimestamp(), planRenewsAt: FieldValue.delete() });
         if (event === 'refund' || event === 'chargeback') {
           const open = await db.collection('refund_requests').where('uid', '==', userRef.id).where('status', '==', 'pending').get();
           await Promise.all(open.docs.map((d) => d.ref.update({ status: 'refunded', resolvedAt: FieldValue.serverTimestamp() })));

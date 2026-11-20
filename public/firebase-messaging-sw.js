@@ -21,7 +21,7 @@ messaging.onBackgroundMessage((payload) => {
   const d = payload.data || {};
   self.registration.showNotification(d.title || 'Proova AI', {
     body: d.body || '',
-    icon: '/maskable_icon_x192 (6).png',
+    icon: '/android-chrome-192x192.png',
     badge: '/favicon-32x32.png',
     tag: d.tag || undefined,
     renotify: !!d.tag,
