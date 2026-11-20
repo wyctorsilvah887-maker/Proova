@@ -146,6 +146,8 @@ function reviewExpired(r: any): boolean {
 
 export default function DashPage() {
   const { user, loading: authLoading } = useUser();
+  // Marca este navegador como "do dono": as aberturas do próprio link de coleta não entram na contagem
+  useEffect(() => { if (user) { try { localStorage.setItem('proova_owner', '1'); } catch { /* ignore */ } } }, [user]);
   const db = useFirestore();
   const auth = useAuth();
   const router = useRouter();

@@ -154,7 +154,7 @@ export default function AdminGrowthPage() {
       ctaMap.set(key, (ctaMap.get(key) || 0) + (v as number));
     })));
     const ctas = [...ctaMap.entries()].map(([k, n]) => ({ k, n })).sort((a, b) => b.n - a.n);
-    return { rows, sources, ctas, checkout: uniq('checkout_click'), hasData: docs.length > 0 };
+    return { rows, sources, ctas, checkout: uniq('checkout_click'), collectionViews: uniq('collection_view'), hasData: docs.length > 0 };
   }, [analyticsDocs, period]);
 
   // ---------- gerador de links ----------
@@ -349,6 +349,7 @@ export default function AdminGrowthPage() {
                       ))}
                     </div>
                   )}
+                  <p className="text-[11px] text-muted-foreground font-medium">Aberturas de links de coleta de todos os clientes (por sessão): <b>{funnel.collectionViews}</b></p>
                   <p className="text-[11px] text-muted-foreground font-medium">Cliques em "Ir para o checkout" (planos pagos, únicos): <b>{funnel.checkout}</b></p>
                 </div>
                 {funnel.sources.length > 0 && (
