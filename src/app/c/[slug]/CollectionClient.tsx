@@ -96,6 +96,18 @@ export default function CollectionClient({ slug }: { slug: string }) {
     findCompany();
   }, [db, slug]);
 
+  // Mede a abertura do link (1x por sessão; ignora o dono e o admin testando no próprio navegador)
+  useEffect(() => {
+    if (!targetUserId) return;
+    try {
+      if (localStorage.getItem('proova_owner') || localStorage.getItem('proova_notrack')) return;
+      const key = `col_view_${targetUserId}`;
+      if (sessionStorage.getItem(key)) return;
+      sessionStorage.setItem(key, '1');
+      fetch('/api/collection-view', { method: 'POST', keepalive: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ targetUserId }) }).catch(() => {});
+    } catch { /* storage bloqueado: não mede */ }
+  }, [targetUserId]);
+
   const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {

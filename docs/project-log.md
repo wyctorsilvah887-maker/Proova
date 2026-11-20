@@ -51,3 +51,8 @@
 - `firestore.rules`: nova coleção `analytics_daily` (leitura só admin, escrita negada). **Publicar as regras no Console** (a Vercel não publica).
 - Limites: único por dia somado no período (não é único real); só passa a medir após o deploy; sem histórico anterior.
 - Cliques em "Criar conta" detalhados: cada botão da landing tem `data-cta` (nav, menu-mobile, hero, plano-base, cta-final, barra-mobile); o plano Base em /pricing (botão, não link) também conta. Novo evento `checkout_click` (planos pagos em /pricing). `/admin/growth` mostra cliques por botão (total) e checkout (únicos). Dados em `analytics_daily.{dia}.cta.{evento}.{botão}`.
+
+## 2026-11-20 — Aberturas do link de coleta (funil enviado → aberto → avaliou)
+- `POST /api/collection-view` (público, ignora bots e o robô de pré-visualização do WhatsApp) soma `users/{id}.collectionViewCount` e o evento diário `collection_view`. O navegador manda 1x por sessão e não manda se for do dono (`proova_owner`, gravado no dash) ou do admin (`proova_notrack`).
+- Dono: cartão "Seu link de coleta" em /metrics (aberturas, avaliações recebidas, % que abriu e avaliou). Admin: total de aberturas de todos os clientes em /admin/growth.
+- Limites: só conta após o deploy; `testimonialsCount` inclui avaliações privadas e públicas; a taxa é aproximada (aberturas por sessão vs avaliações do mesmo período total).

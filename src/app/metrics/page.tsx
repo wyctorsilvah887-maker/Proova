@@ -26,7 +26,7 @@ import {
   ImageIcon,
   BarChart3 as BarChart3Icon,
   Menu,
-  CircleHelp
+  CircleHelp, Link2
 } from 'lucide-react';
 import { 
   Sheet, 
@@ -428,6 +428,20 @@ export default function MetricsPage() {
                   <Badge variant="outline" className="mb-1 text-[8px] font-black uppercase bg-green-500/10 text-green-600 border-none">Taxa de Lead</Badge>
                 </div>
                 <p className="text-[9px] text-green-600/60 uppercase font-bold mt-1">Visitas que se tornaram contatos reais</p>
+              </CardContent>
+            </Card>
+
+            <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem] bg-primary/5 border border-primary/10 col-span-2 lg:col-span-4">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
+                <div className="flex items-center gap-1.5"><p className="text-[10px] font-black uppercase tracking-widest text-primary">Seu link de coleta</p><HelpTip text="Quantas pessoas abriram o seu link de avaliação e quantas enviaram. Só conta aberturas feitas depois que este recurso entrou no ar; a sua própria visita e a pré-visualização do WhatsApp não entram." /></div>
+                <Link2 className="w-4 h-4 text-primary" />
+              </CardHeader>
+              <CardContent className="px-4 md:px-6 pb-4">
+                <div className="grid grid-cols-3 gap-3 text-center sm:text-left">
+                  <div><div className="text-2xl font-black">{userData?.collectionViewCount || 0}</div><p className="text-[9px] text-muted-foreground uppercase font-bold">Aberturas</p></div>
+                  <div><div className="text-2xl font-black">{userData?.testimonialsCount || 0}</div><p className="text-[9px] text-muted-foreground uppercase font-bold">Avaliações recebidas</p></div>
+                  <div><div className="text-2xl font-black text-primary">{(userData?.collectionViewCount || 0) > 0 ? `${Math.min(100, Math.round(((userData?.testimonialsCount || 0) / userData.collectionViewCount) * 100))}%` : '—'}</div><p className="text-[9px] text-muted-foreground uppercase font-bold">Abriram e avaliaram</p></div>
+                </div>
               </CardContent>
             </Card>
           </div>
