@@ -59,6 +59,13 @@ service cloud.firestore {
       allow read: if true;
     }
 
+    // Analytics próprio (funil de aquisição). Escrita só pelo servidor (Admin SDK); leitura só admin.
+    match /analytics_daily/{day} {
+      allow read: if request.auth != null &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow write: if false;
+    }
+
     // Regras para a coleção de usuários e subcoleções
     match /users/{userId} {
       // Contadores que o servidor do Proova atualiza SEM login (páginas públicas e envio de

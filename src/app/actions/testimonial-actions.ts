@@ -97,6 +97,14 @@ export async function submitTestimonialAction(data: {
     await updateDoc(userRef, { testimonialsCount: increment(1) });
     const created = await addDoc(feedbacksRef, testimonialData);
 
+    // Ativação: 1ª avaliação recebida pela empresa (alimenta o funil em /admin/growth)
+    if (!(userData.testimonialsCount > 0)) {
+      try {
+        const { bumpEvent } = await import('@/lib/analytics-server');
+        await bumpEvent('first_feedback', userData.attribution?.source || 'direto', true);
+      } catch { /* métrica nunca bloqueia o envio */ }
+    }
+
     // Aviso no Inbox (contador + push nos planos pagos) e e-mail (Premium)
     if (isShield) await notifyOwnerNewFeedback(data.targetUserId, { clientName: testimonialData.userName, rating: data.rating, push: isPremium });
     if (isPremium) {

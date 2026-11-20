@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { collection, doc, query, where } from 'firebase/firestore';
 import { ArrowLeft, Copy, Check, TrendingUp, Users, Crown, Link2, Megaphone, Shield } from 'lucide-react';
@@ -13,6 +13,8 @@ import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { SITE_URL } from '@/lib/site';
 import { ppPlanOf } from '@/lib/pp-plans';
+import { FUNNEL } from '@/lib/analytics-events';
+import { disableTracking } from '@/lib/track';
 
 const PRICE = { free: 0, premium: 147, pro: 270 } as const;
 const PLAN_LABEL = { free: 'Base', premium: 'Premium', pro: 'PRO' } as const;
@@ -64,6 +66,10 @@ export default function AdminGrowthPage() {
 
   const usersQuery = useMemo(() => (db && user && isAdmin ? query(collection(db, 'users'), where('isAdmin', '==', false)) : null), [db, user, isAdmin]);
   const { data: users, loading } = useCollection(usersQuery);
+
+  const analyticsQuery = useMemo(() => (db && user && isAdmin ? collection(db, 'analytics_daily') : null), [db, user, isAdmin]);
+  const { data: analyticsDocs } = useCollection(analyticsQuery);
+  useEffect(() => { if (isAdmin) disableTracking(); }, [isAdmin]);
 
   const [period, setPeriod] = useState<(typeof PERIODS)[number]['id']>('30');
   const [groupBy, setGroupBy] = useState<'source' | 'campaign'>('source');
@@ -121,6 +127,23 @@ export default function AdminGrowthPage() {
     const tracked = rows.filter((r) => r.source !== 'sem-origem').length;
     return { total: rows.length, mrr, paying: paying.length, inPeriod: inPeriod.length, convPaid: convPaid.length, byPlan, sources, daily, recentPaying, tracked };
   }, [users, period, groupBy]);
+
+  // ---------- funil de visitas (analytics próprio) ----------
+  const funnel = useMemo(() => {
+    const days = PERIODS.find((p) => p.id === period)?.days || 0;
+    const from = days ? new Date(Date.now() - days * 86400000).toLocaleDateString('en-CA', { timeZone: 'America/Fortaleza' }) : '';
+    const docs = ((analyticsDocs as any[]) || []).filter((d) => !from || String(d.id) >= from);
+    const uniq = (e: string) => docs.reduce((s, d) => s + (d.ev?.[e]?.uniq || 0), 0);
+    const rows = FUNNEL.map((f) => ({ ...f, n: uniq(f.id) }));
+    const bySource = new Map<string, Record<string, number>>();
+    docs.forEach((d) => Object.entries(d.src || {}).forEach(([src, evs]: [string, any]) => {
+      const e = bySource.get(src) || {};
+      Object.entries(evs).forEach(([k, v]) => { e[k] = (e[k] || 0) + (v as number); });
+      bySource.set(src, e);
+    }));
+    const sources = [...bySource.entries()].map(([src, e]) => ({ src, views: e.landing_view || 0, done: e.signup_done || 0 })).sort((a, b) => b.views - a.views);
+    return { rows, sources, hasData: docs.length > 0 };
+  }, [analyticsDocs, period]);
 
   // ---------- gerador de links ----------
   const [dest, setDest] = useState(DESTINATIONS[0].id);
@@ -257,6 +280,50 @@ export default function AdminGrowthPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Funil de visitas (analytics próprio) */}
+        <Card className="rounded-3xl md:rounded-[2rem] border-none shadow-sm">
+          <CardHeader>
+            <CardTitle className="text-sm font-black uppercase tracking-tight">Funil: visita → cadastro → ativação</CardTitle>
+            <CardDescription className="text-xs">Visitantes únicos por dia, somados no período (quem volta em outro dia conta de novo). Bots e o admin ficam de fora. Medição começa quando este recurso entra no ar.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            {!funnel.hasData ? (
+              <p className="text-xs text-muted-foreground font-medium">Ainda sem dados no período.</p>
+            ) : (
+              <>
+                <div className="space-y-3">
+                  {funnel.rows.map((r, i) => {
+                    const top = Math.max(1, funnel.rows[0].n);
+                    const prev = i > 0 ? funnel.rows[i - 1].n : 0;
+                    return (
+                      <div key={r.id} className="space-y-1.5">
+                        <div className="flex justify-between text-xs font-bold gap-3">
+                          <span>{r.label}</span>
+                          <span className="tabular-nums shrink-0">{r.n}{i > 0 && <span className="text-muted-foreground font-medium"> · {pct(r.n, prev)} da etapa anterior</span>}</span>
+                        </div>
+                        <div className="h-2 rounded-full bg-muted overflow-hidden"><div className="h-full rounded-full bg-primary" style={{ width: `${(r.n / top) * 100}%` }} /></div>
+                      </div>
+                    );
+                  })}
+                  <p className="text-[11px] text-muted-foreground font-medium">Visita → cadastro: <b>{pct(funnel.rows[3].n, funnel.rows[0].n)}</b> · Cadastro → recebeu 1ª avaliação: <b>{pct(funnel.rows[5].n, funnel.rows[3].n)}</b></p>
+                </div>
+                {funnel.sources.length > 0 && (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead><tr className="text-left text-[10px] uppercase tracking-widest text-muted-foreground"><th className="py-2 pr-2">Origem</th><th className="py-2 px-2 text-right">Visitas</th><th className="py-2 px-2 text-right">Cadastros</th><th className="py-2 pl-2 text-right">Conversão</th></tr></thead>
+                      <tbody className="divide-y">
+                        {funnel.sources.map((s) => (
+                          <tr key={s.src}><td className="py-2.5 pr-2 font-bold">{s.src}</td><td className="py-2.5 px-2 text-right tabular-nums">{s.views}</td><td className="py-2.5 px-2 text-right tabular-nums">{s.done}</td><td className="py-2.5 pl-2 text-right font-black tabular-nums">{pct(s.done, s.views)}</td></tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </>
+            )}
+          </CardContent>
+        </Card>
 
         {/* Cadastros por dia */}
         <Card className="rounded-3xl md:rounded-[2rem] border-none shadow-sm">

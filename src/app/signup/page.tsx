@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Link from "next/link";
 import { doc, setDoc, serverTimestamp, getDoc, writeBatch, type Firestore } from "firebase/firestore";
 import { getAttribution } from '@/lib/attribution';
+import { trackEvent } from '@/lib/track';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { useFirestore, useAuth, useUser } from "@/firebase";
 import { toast } from "@/hooks/use-toast";
@@ -201,6 +202,7 @@ export default function SignupPage() {
           attribution: getAttribution(),
           googleConnected: true
         });
+        trackEvent('signup_done');
         toast({ title: "Bem-vindo!", description: "Sua conta foi criada com sucesso via Google." });
       }
 
@@ -278,6 +280,7 @@ export default function SignupPage() {
       batch.set(doc(db, "users", newUser.uid), userData);
       await batch.commit();
       
+      trackEvent('signup_done');
       toast({ title: "Conta Criada!", description: "Bem-vindo à nova era da prova social." });
       router.push('/dash');
     } catch (error: any) {

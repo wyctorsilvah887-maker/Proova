@@ -43,3 +43,10 @@
 - `src/lib/plan-renewal.ts`: 3 dias e 1 dia antes da cobrança, e-mail (Resend) + push, só Premium/PRO. Dedup por ciclo (`renewalNoticeFor`/`renewalNoticeStage`). Quem assinou antes do `planRenewsAt` existir usa estimativa: última cobrança (`planUpdatedAt`) + 30 dias, e o e-mail diz "por volta de".
 - O cron `/api/cron/review-reminder` agora roda todo dia (Hobby = 2 crons): renovação todo dia, lembrete de avaliação só de segunda a sexta.
 - Configurações: cartão do plano mostra "Próxima renovação: dd de mês (em N dias)" (ou "Renovação prevista" quando é estimativa) para Premium/PRO.
+
+## 2026-11-20 — Analytics próprio do funil (estudo de taxas de sucesso, item 1)
+- Sem ferramenta externa nem cookies de terceiros. `src/lib/track.ts` + `PageTracker` (layout) enviam eventos para `POST /api/track` (ignora bots por User-Agent; o admin é excluído via flag `proova_notrack`). Contador "único" = 1ª vez do dia por navegador.
+- Eventos: `landing_view`, `pricing_view`, `signup_view`, `signup_click` (clique em link /signup), `signup_done` (e-mail e Google), `link_copied` (copiou o link de coleta no dash), `first_feedback` (servidor, 1ª avaliação recebida). Totais por dia e por origem (utm/referrer) em `analytics_daily/{AAAA-MM-DD}` (dia em America/Fortaleza), gravados só pelo Admin SDK.
+- `/admin/growth`: novo cartão "Funil: visita → cadastro → ativação" com conversão por etapa e tabela por origem.
+- `firestore.rules`: nova coleção `analytics_daily` (leitura só admin, escrita negada). **Publicar as regras no Console** (a Vercel não publica).
+- Limites: único por dia somado no período (não é único real); só passa a medir após o deploy; sem histórico anterior.
