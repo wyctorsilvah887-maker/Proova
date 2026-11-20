@@ -1,5 +1,6 @@
 'use client';
 
+import { trackEvent } from '@/lib/track';
 import React, { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -359,7 +360,10 @@ export default function PricingPage() {
 
                       <div className="pt-4">
                         <Button 
-                          onClick={() => (plan.id === 'base' ? router.push('/signup') : plan.checkoutUrl && window.open(plan.checkoutUrl, '_blank'))}
+                          onClick={() => {
+                            if (plan.id === 'base') { trackEvent('signup_click', 'planos-base'); router.push('/signup'); }
+                            else if (plan.checkoutUrl) { trackEvent('checkout_click', `planos-${plan.id}`); window.open(plan.checkoutUrl, '_blank'); }
+                          }}
                           disabled={plan.disabled}
                           className={cn(
                             "w-full h-14 md:h-16 rounded-2xl text-[9px] sm:text-sm font-black uppercase tracking-tight sm:tracking-widest shadow-2xl transition-all active:scale-95 gap-3",

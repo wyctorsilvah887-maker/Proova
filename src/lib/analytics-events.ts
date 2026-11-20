@@ -8,5 +8,5 @@ export const FUNNEL = [
   { id: 'first_feedback', label: 'Recebeu a 1ª avaliação', side: 'server' },
 ] as const;
 
-export type EventId = (typeof FUNNEL)[number]['id'] | 'pricing_view';
-export const CLIENT_EVENTS: string[] = [...FUNNEL.filter((f) => f.side === 'client').map((f) => f.id), 'pricing_view'];
+export type EventId = (typeof FUNNEL)[number]['id'] | 'pricing_view' | 'checkout_click';
+export const CLIENT_EVENTS: string[] = [...FUNNEL.filter((f) => f.side === 'client').map((f) => f.id), 'pricing_view', 'checkout_click'];
