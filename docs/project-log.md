@@ -56,3 +56,6 @@
 - `POST /api/collection-view` (público, ignora bots e o robô de pré-visualização do WhatsApp) soma `users/{id}.collectionViewCount` e o evento diário `collection_view`. O navegador manda 1x por sessão e não manda se for do dono (`proova_owner`, gravado no dash) ou do admin (`proova_notrack`).
 - Dono: cartão "Seu link de coleta" em /metrics (aberturas, avaliações recebidas, % que abriu e avaliou). Admin: total de aberturas de todos os clientes em /admin/growth.
 - Limites: só conta após o deploy; `testimonialsCount` inclui avaliações privadas e públicas; a taxa é aproximada (aberturas por sessão vs avaliações do mesmo período total).
+## 2026-11-20 — Ativação medida por conta
+- `users/{uid}.firstLinkSharedAt` (gravado pelo dono na 1ª vez que copia o link de coleta ou toca em "WhatsApp" no dash) e `firstFeedbackAt` (gravado pelo servidor, Admin SDK, na 1ª avaliação recebida). `LinkShareBox` ganhou `onShare`.
+- `/admin/growth`: cartão "Ativação" com cadastros do período → enviaram o 1º link → receberam a 1ª avaliação. Quem já tinha avaliações antes (testimonialsCount > 0) conta como ativado; o "enviou o link" só vale para quem usou depois do deploy.

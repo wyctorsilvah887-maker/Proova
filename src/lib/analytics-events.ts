@@ -4,7 +4,7 @@ export const FUNNEL = [
   { id: 'signup_click', label: 'Clicou em "Criar conta"', side: 'client' },
   { id: 'signup_view', label: 'Abriu o cadastro', side: 'client' },
   { id: 'signup_done', label: 'Concluiu o cadastro', side: 'client' },
-  { id: 'link_copied', label: 'Copiou o link de coleta (ativação)', side: 'client' },
+  { id: 'link_copied', label: 'Copiou ou enviou o link de coleta (ativação)', side: 'client' },
   { id: 'first_feedback', label: 'Recebeu a 1ª avaliação', side: 'server' },
 ] as const;
 

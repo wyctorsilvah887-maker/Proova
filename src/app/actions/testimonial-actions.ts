@@ -102,6 +102,9 @@ export async function submitTestimonialAction(data: {
       try {
         const { bumpEvent } = await import('@/lib/analytics-server');
         await bumpEvent('first_feedback', userData.attribution?.source || 'direto', true);
+        const { adminDb } = await import('@/lib/firebase-admin');
+        const { FieldValue } = await import('firebase-admin/firestore');
+        await adminDb().doc(`users/${data.targetUserId}`).update({ firstFeedbackAt: FieldValue.serverTimestamp() });
       } catch { /* métrica nunca bloqueia o envio */ }
     }
 
