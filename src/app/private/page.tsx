@@ -1,5 +1,6 @@
 'use client';
 
+import { markFirstApproved } from '@/lib/activation';
 import { AppSideMenu } from '@/components/app-menu';
 import { useMemo, useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -165,6 +166,7 @@ export default function PrivateInboxPage() {
     try {
       await updateDoc(doc(db, 'users', user.uid, 'testimonials', id), { status: 'approved' });
       await firstWidgetInject(id);
+      markFirstApproved(userDocRef, userData);
       toast({ title: 'Publicado!', description: 'Avaliação aprovada e adicionada ao seu mural.' });
     } catch {
       toast({ variant: 'destructive', title: 'Erro na aprovação' });
@@ -219,6 +221,7 @@ export default function PrivateInboxPage() {
         source: 'cloned_from_private',
       });
       await firstWidgetInject(newDocRef.id);
+      markFirstApproved(userDocRef, userData);
       await deleteDoc(doc(db, 'users', user.uid, 'private_feedbacks', feedback.id));
       toast({ title: 'Feedback publicado', description: 'O item foi movido para os depoimentos públicos.' });
     } catch (err) {

@@ -32,6 +32,17 @@ import { normalizeStudio, applyStudioCaps, proovaAverage } from '@/lib/studio';
 import { normalizeBrWhatsapp } from '@/lib/whatsapp';
 import { ppCaps, ppPlanOf } from '@/lib/pp-plans';
 
+/** Visitante único por dia: 1 contagem por navegador por dia; o dono e o admin (no próprio navegador) ficam de fora. */
+function shouldCountOnce(key: string) {
+  try {
+    if (localStorage.getItem('proova_owner') || localStorage.getItem('proova_notrack')) return false;
+    const today = new Date().toISOString().slice(0, 10);
+    if (localStorage.getItem(key) === today) return false;
+    localStorage.setItem(key, today);
+    return true;
+  } catch { return false; }
+}
+
 export default function PPClient({ slug }: { slug: string }) {
   const db = useFirestore();
   const { user } = useUser();
@@ -70,11 +81,7 @@ export default function PPClient({ slug }: { slug: string }) {
           setOwnerStatus(snap1.docs[0].data().membershipStatus || '');
           setOwnerWhatsapp(snap1.docs[0].data().contactWhatsapp || '');
 
-          const hasVisited = sessionStorage.getItem(`pp_visited_${uId}`);
-          if (!hasVisited) {
-            trackPPVisit(uId);
-            sessionStorage.setItem(`pp_visited_${uId}`, 'true');
-          }
+          if (shouldCountOnce(`pp_visited_${uId}`)) trackPPVisit(uId);
         }
       } catch (err) {
         console.error("Erro ao resolver slug:", err);
@@ -244,11 +251,7 @@ export default function PPClient({ slug }: { slug: string }) {
 
   const handleWhatsappClick = () => {
     if (targetUserId) {
-      const hasClicked = sessionStorage.getItem(`pp_whatsapp_clicked_${targetUserId}`);
-      if (!hasClicked) {
-        trackWhatsappClick(targetUserId);
-        sessionStorage.setItem(`pp_whatsapp_clicked_${targetUserId}`, 'true');
-      }
+      if (shouldCountOnce(`pp_whatsapp_clicked_${targetUserId}`)) trackWhatsappClick(targetUserId);
     }
   };
 

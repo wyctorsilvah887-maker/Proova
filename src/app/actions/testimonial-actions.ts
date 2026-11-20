@@ -107,6 +107,16 @@ export async function submitTestimonialAction(data: {
         await adminDb().doc(`users/${data.targetUserId}`).update({ firstFeedbackAt: FieldValue.serverTimestamp() });
       } catch { /* métrica nunca bloqueia o envio */ }
     }
+    // Ativação: 1º depoimento que chegou a ficar público (aprovado direto, com texto ou mídia)
+    if (initialStatus === 'approved' && !userData.firstApprovedAt) {
+      try {
+        const { bumpEvent } = await import('@/lib/analytics-server');
+        const { adminDb } = await import('@/lib/firebase-admin');
+        const { FieldValue } = await import('firebase-admin/firestore');
+        await adminDb().doc(`users/${data.targetUserId}`).update({ firstApprovedAt: FieldValue.serverTimestamp() });
+        await bumpEvent('first_approved', userData.attribution?.source || 'direto', true);
+      } catch { /* métrica nunca bloqueia o envio */ }
+    }
 
     // Aviso no Inbox (contador + push nos planos pagos) e e-mail (Premium)
     if (isShield) await notifyOwnerNewFeedback(data.targetUserId, { clientName: testimonialData.userName, rating: data.rating, push: isPremium });

@@ -57,7 +57,9 @@ import {
   Cell
 } from 'recharts';
 import { useUser, useFirestore, useDoc, useAuth, useCollection } from '@/firebase';
-import { doc, collection, query, where } from 'firebase/firestore';
+import { doc, collection, query, where, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { useGoogleRating } from '@/hooks/use-google-rating';
+import { Input } from '@/components/ui/input';
 import { signOut } from 'firebase/auth';
 import { useTheme } from 'next-themes';
 import Link from 'next/link';
@@ -98,6 +100,17 @@ export default function MetricsPage() {
 
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
+  const googleNow = useGoogleRating(user?.uid);
+  const [blRating, setBlRating] = useState('');
+  const [blCount, setBlCount] = useState('');
+  const saveBaseline = async () => {
+    const r = parseFloat(blRating.replace(',', '.')); const c = parseInt(blCount, 10);
+    if (!userDocRef || !(r >= 1 && r <= 5) || !(c >= 0)) { toast({ variant: 'destructive', title: 'Confira os valores', description: 'Nota de 1 a 5 e quantidade de avaliações (0 ou mais).' }); return; }
+    try {
+      await updateDoc(userDocRef, { baseline: { googleRating: Math.round(r * 10) / 10, googleReviewCount: c, source: 'self', at: serverTimestamp() } });
+      toast({ title: 'Ponto de partida salvo' });
+    } catch { toast({ variant: 'destructive', title: 'Não foi possível salvar' }); }
+  };
   const tour = usePageTour(userDocRef, userData, 'metricsTourDone');
   const tourSteps: TourStep[] = useMemo(() => [
     { title: 'Entenda seus resultados 📊', text: 'Esta página mostra o impacto da sua prova social. Em 1 minuto você vai saber o que cada número quer dizer. Toque no ícone ? de qualquer card para rever a explicação.' },
@@ -442,6 +455,28 @@ export default function MetricsPage() {
                   <div><div className="text-2xl font-black">{userData?.testimonialsCount || 0}</div><p className="text-[9px] text-muted-foreground uppercase font-bold">Avaliações recebidas</p></div>
                   <div><div className="text-2xl font-black text-primary">{(userData?.collectionViewCount || 0) > 0 ? `${Math.min(100, Math.round(((userData?.testimonialsCount || 0) / userData.collectionViewCount) * 100))}%` : '—'}</div><p className="text-[9px] text-muted-foreground uppercase font-bold">Abriram e avaliaram</p></div>
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-none shadow-sm overflow-hidden rounded-[1.5rem] bg-primary/5 border border-primary/10 col-span-2 lg:col-span-4">
+              <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 px-4 md:px-6">
+                <div className="flex items-center gap-1.5"><p className="text-[10px] font-black uppercase tracking-widest text-primary">Antes e depois no Google</p><HelpTip text="Informe uma vez a nota e a quantidade de avaliações que você tinha no Google ao começar a usar o Proova. A nota de hoje vem direto do Google. Assim você vê a evolução real." /></div>
+                <TrendingUp className="w-4 h-4 text-primary" />
+              </CardHeader>
+              <CardContent className="px-4 md:px-6 pb-4">
+                {userData?.baseline ? (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><p className="text-[9px] text-muted-foreground uppercase font-bold">Nota no Google</p><div className="text-2xl font-black">{userData.baseline.googleRating?.toString().replace('.', ',')} <span className="text-muted-foreground">→</span> <span className="text-primary">{googleNow ? googleNow.rating.toString().replace('.', ',') : '—'}</span></div></div>
+                    <div><p className="text-[9px] text-muted-foreground uppercase font-bold">Avaliações no Google</p><div className="text-2xl font-black">{userData.baseline.googleReviewCount} <span className="text-muted-foreground">→</span> <span className="text-primary">{googleNow ? googleNow.count : '—'}</span>{googleNow && <span className="ml-2 text-xs font-black text-green-600">{googleNow.count - userData.baseline.googleReviewCount >= 0 ? '+' : ''}{googleNow.count - userData.baseline.googleReviewCount}</span>}</div></div>
+                    <p className="col-span-2 text-[10px] text-muted-foreground font-medium">Ponto de partida informado por você. Hoje: dados do Google (atualizam a cada poucas horas). {!googleNow && 'Vincule sua empresa em Configurações para ver o valor atual.'}</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col sm:flex-row gap-2 sm:items-end">
+                    <div className="flex-1"><p className="text-[9px] text-muted-foreground uppercase font-bold mb-1">Nota atual no Google</p><Input inputMode="decimal" placeholder="Ex.: 4,3" value={blRating} onChange={(e) => setBlRating(e.target.value)} className="h-11 rounded-xl" /></div>
+                    <div className="flex-1"><p className="text-[9px] text-muted-foreground uppercase font-bold mb-1">Nº de avaliações no Google</p><Input inputMode="numeric" placeholder="Ex.: 37" value={blCount} onChange={(e) => setBlCount(e.target.value)} className="h-11 rounded-xl" /></div>
+                    <Button onClick={saveBaseline} className="h-11 rounded-xl font-black uppercase text-[10px] tracking-widest">Salvar ponto de partida</Button>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
