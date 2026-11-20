@@ -67,3 +67,6 @@
 
 ## 2026-11-20 — Documentação
 - `README.md` reescrito (stack, rodar local, variáveis de ambiente, publicação), `.env.example` (sem valores) e `docs/arquitetura.md` (planos, Inbox, Google, push, crons, cobrança, analytics, IA, segurança).
+
+## 2026-11-20 — Cabeçalho de /pricing
+- Removido o nome da clínica do cabeçalho; o menu da conta continua abrindo pelo rótulo do plano (um pouco maior, já que agora é o único texto).

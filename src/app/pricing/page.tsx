@@ -238,8 +238,7 @@ export default function PricingPage() {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-10 md:h-12 px-1 md:px-2 gap-1.5 md:gap-2 rounded-xl hover:bg-primary/5 group transition-all active:bg-primary/10 shadow-none focus-visible:ring-0">
                   <div className="flex flex-col items-end">
-                    <span className="text-[10px] md:text-xs font-bold truncate max-w-[70px] sm:max-w-[120px] group-hover:text-primary leading-tight transition-colors">{effectiveUserData?.companyName || 'Empresa'}</span>
-                    <span className="text-[6px] md:text-[8px] uppercase tracking-widest font-black text-primary leading-tight">{membershipLabel}</span>
+                    <span className="text-[9px] md:text-[11px] uppercase tracking-widest font-black text-primary leading-tight group-hover:opacity-80 transition-opacity">{membershipLabel}</span>
                   </div>
                 </Button>
               </DropdownMenuTrigger>
