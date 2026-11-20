@@ -6,6 +6,7 @@ export const FUNNEL = [
   { id: 'signup_done', label: 'Concluiu o cadastro', side: 'client' },
   { id: 'link_copied', label: 'Copiou ou enviou o link de coleta (ativação)', side: 'client' },
   { id: 'first_feedback', label: 'Recebeu a 1ª avaliação', side: 'server' },
+  { id: 'first_approved', label: 'Teve o 1º depoimento aprovado (público)', side: 'client' },
 ] as const;
 
 export type EventId = (typeof FUNNEL)[number]['id'] | 'pricing_view' | 'checkout_click';

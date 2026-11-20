@@ -129,6 +129,8 @@ export default function AdminGrowthPage() {
     const activation = {
       signups: cohort.length,
       linkShared: cohort.filter((u) => !!u.firstLinkSharedAt).length,
+      firstApproved: cohort.filter((u) => !!u.firstApprovedAt).length,
+      baseline: cohort.filter((u) => !!u.baseline).length,
       firstFeedback: cohort.filter((u) => !!u.firstFeedbackAt || (u.testimonialsCount || 0) > 0).length,
     };
     return { activation, total: rows.length, mrr, paying: paying.length, inPeriod: inPeriod.length, convPaid: convPaid.length, byPlan, sources, daily, recentPaying, tracked };
@@ -304,6 +306,8 @@ export default function AdminGrowthPage() {
               { label: 'Cadastros', n: stats.activation.signups },
               { label: 'Copiaram ou enviaram o link de coleta', n: stats.activation.linkShared },
               { label: 'Receberam a 1ª avaliação', n: stats.activation.firstFeedback },
+              { label: 'Tiveram o 1º depoimento aprovado (só após o deploy)', n: stats.activation.firstApproved },
+              { label: 'Informaram o ponto de partida no Google (antes/depois)', n: stats.activation.baseline },
             ].map((r, i) => (
               <div key={r.label} className="space-y-1.5">
                 <div className="flex justify-between text-xs font-bold gap-3"><span>{r.label}</span><span className="tabular-nums shrink-0">{r.n}{i > 0 && <span className="text-muted-foreground font-medium"> · {pct(r.n, stats.activation.signups)} dos cadastros</span>}</span></div>

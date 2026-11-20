@@ -59,3 +59,8 @@
 ## 2026-11-20 — Ativação medida por conta
 - `users/{uid}.firstLinkSharedAt` (gravado pelo dono na 1ª vez que copia o link de coleta ou toca em "WhatsApp" no dash) e `firstFeedbackAt` (gravado pelo servidor, Admin SDK, na 1ª avaliação recebida). `LinkShareBox` ganhou `onShare`.
 - `/admin/growth`: cartão "Ativação" com cadastros do período → enviaram o 1º link → receberam a 1ª avaliação. Quem já tinha avaliações antes (testimonialsCount > 0) conta como ativado; o "enviou o link" só vale para quem usou depois do deploy.
+
+## 2026-11-20 — Medição de resultados (1º depoimento aprovado, Link in Bio confiável, antes/depois)
+- `users/{uid}.firstApprovedAt`: gravado pelo servidor quando o 1º depoimento já nasce aprovado e pelo dono (`src/lib/activation.ts`) ao aprovar/promover no Inbox. Evento `first_approved` no funil e no cartão "Ativação" do /admin/growth.
+- `trackPPVisit`/`trackWhatsappClick`: ignoram bots (User-Agent) no servidor; o navegador conta 1x por dia por página e nunca conta o dono/admin (`proova_owner`/`proova_notrack`). Se o armazenamento do navegador estiver bloqueado, não conta (subconta em vez de inflar). Os contadores antigos continuam, mas só os novos são "únicos por dia".
+- Antes/depois: o dono informa uma vez a nota e o nº de avaliações do Google (`users/{uid}.baseline`, autodeclarado) no /metrics; "hoje" vem ao vivo do Google (`/api/google-rating`). **Decisão de conformidade:** não gravamos nota/contagem do Google no banco, porque os Termos do Google Maps Platform restringem guardar esses dados. Por isso a linha de base é informada pelo cliente em vez de capturada automaticamente no cadastro.
