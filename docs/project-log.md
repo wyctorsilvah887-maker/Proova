@@ -50,3 +50,4 @@
 - `/admin/growth`: novo cartão "Funil: visita → cadastro → ativação" com conversão por etapa e tabela por origem.
 - `firestore.rules`: nova coleção `analytics_daily` (leitura só admin, escrita negada). **Publicar as regras no Console** (a Vercel não publica).
 - Limites: único por dia somado no período (não é único real); só passa a medir após o deploy; sem histórico anterior.
+- Cliques em "Criar conta" detalhados: cada botão da landing tem `data-cta` (nav, menu-mobile, hero, plano-base, cta-final, barra-mobile); o plano Base em /pricing (botão, não link) também conta. Novo evento `checkout_click` (planos pagos em /pricing). `/admin/growth` mostra cliques por botão (total) e checkout (únicos). Dados em `analytics_daily.{dia}.cta.{evento}.{botão}`.

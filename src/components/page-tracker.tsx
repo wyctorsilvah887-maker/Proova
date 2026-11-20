@@ -19,7 +19,7 @@ export function PageTracker() {
     const onClick = (e: MouseEvent) => {
       const a = (e.target as HTMLElement | null)?.closest?.('a');
       const href = a?.getAttribute('href') || '';
-      if (href.startsWith('/signup') && window.location.pathname !== '/signup') trackEvent('signup_click');
+      if (href.startsWith('/signup') && window.location.pathname !== '/signup') trackEvent('signup_click', (a as HTMLElement).dataset.cta || (window.location.pathname === '/' ? 'landing' : window.location.pathname.slice(1) || 'outro'));
     };
     document.addEventListener('click', onClick, true);
     return () => document.removeEventListener('click', onClick, true);

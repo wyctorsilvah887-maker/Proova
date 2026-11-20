@@ -12,7 +12,8 @@ export async function POST(req: Request) {
     const e = typeof body?.e === 'string' ? body.e : '';
     if (!CLIENT_EVENTS.includes(e)) return NextResponse.json({ error: 'bad_event' }, { status: 400 });
     const s = typeof body?.s === 'string' ? body.s.slice(0, 40) : 'direto';
-    await bumpEvent(e, s, body?.u === true);
+    const c = typeof body?.c === 'string' ? body.c.slice(0, 40) : undefined;
+    await bumpEvent(e, s, body?.u === true, c);
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error('[track]', (err as Error).message);

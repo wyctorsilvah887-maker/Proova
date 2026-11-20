@@ -93,7 +93,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
           
           <div className="hidden sm:flex items-center gap-6">
             <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Acesso Membro</Link>
-            <Link href="/signup">
+            <Link href="/signup" data-cta="nav">
               <Button className="font-black uppercase tracking-widest shadow-lg px-4 h-9 text-[9px] rounded-xl">Criar conta grátis</Button>
             </Link>
           </div>
@@ -168,7 +168,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
                         <Link href="/login" className="block" onClick={() => setIsMenuOpen(false)}>
                           <Button variant="outline" className="w-full h-11 rounded-xl font-black uppercase tracking-widest text-[8px]">Acessar Dashboard</Button>
                         </Link>
-                        <Link href="/signup" className="block" onClick={() => setIsMenuOpen(false)}>
+                        <Link href="/signup" data-cta="menu-mobile" className="block" onClick={() => setIsMenuOpen(false)}>
                           <Button className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-2xl">Ativar Licença</Button>
                         </Link>
                       </div>
@@ -220,7 +220,7 @@ const HeroSection = ({ isVisible, scrollToSection }: { isVisible: boolean; scrol
             "flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 transition-all duration-1000 delay-500",
             isVisible ? "animate-in fade-in slide-in-from-bottom-5 opacity-100" : "opacity-0"
           )}>
-            <Link href="/signup" className="w-full sm:w-auto">
+            <Link href="/signup" data-cta="hero" className="w-full sm:w-auto">
               <Button className="w-full sm:w-auto h-14 px-8 rounded-2xl text-[11px] font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white uppercase tracking-widest">
                 Criar conta grátis <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
               </Button>
@@ -506,7 +506,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                   </li>
                 ))}
               </ul>
-              <Link href="/signup" className="mt-8 block">
+              <Link href="/signup" data-cta="plano-base" className="mt-8 block">
                 <Button className="w-full h-12 rounded-xl text-xs font-bold uppercase tracking-wide gap-2" variant={plan.highlight ? "default" : "outline"}>
                   {plan.id === 'base' ? 'Criar conta grátis' : 'Garantir meu acesso'} <ArrowRight className="w-4 h-4" />
                 </Button>
@@ -708,7 +708,7 @@ export default function Home() {
                 Crie sua conta grátis, envie o primeiro link de coleta hoje e veja quem aprova (e quem precisa de atenção) antes de ir para o Google.
               </p>
             </header>
-            <Link href="/signup" className="w-full sm:w-auto">
+            <Link href="/signup" data-cta="cta-final" className="w-full sm:w-auto">
               <Button size="lg" variant="secondary" className="w-full sm:w-auto h-14 md:h-16 px-10 rounded-xl text-sm md:text-base font-bold shadow-2xl hover:scale-105 transition-all bg-white text-black hover:bg-white/90">
                 CRIAR CONTA GRÁTIS
               </Button>
@@ -719,7 +719,7 @@ export default function Home() {
       </main>
       <Footer />
       <div className={cn("fixed inset-x-0 bottom-0 z-[60] md:hidden border-t bg-background/95 backdrop-blur px-4 py-3 transition-transform duration-300", showSticky ? "translate-y-0" : "translate-y-full")}>
-        <Link href="/signup" className="block">
+        <Link href="/signup" data-cta="barra-mobile" className="block">
           <Button className="w-full h-12 rounded-xl text-[11px] font-black uppercase tracking-widest gap-2">Criar conta grátis <ArrowRight className="w-4 h-4" /></Button>
         </Link>
       </div>

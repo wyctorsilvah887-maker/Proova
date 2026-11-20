@@ -142,7 +142,13 @@ export default function AdminGrowthPage() {
       bySource.set(src, e);
     }));
     const sources = [...bySource.entries()].map(([src, e]) => ({ src, views: e.landing_view || 0, done: e.signup_done || 0 })).sort((a, b) => b.views - a.views);
-    return { rows, sources, hasData: docs.length > 0 };
+    const ctaMap = new Map<string, number>();
+    docs.forEach((d) => ['signup_click', 'checkout_click'].forEach((ev) => Object.entries(d.cta?.[ev] || {}).forEach(([k, v]) => {
+      const key = `${ev === 'checkout_click' ? 'Checkout' : 'Cadastro'} · ${k}`;
+      ctaMap.set(key, (ctaMap.get(key) || 0) + (v as number));
+    })));
+    const ctas = [...ctaMap.entries()].map(([k, n]) => ({ k, n })).sort((a, b) => b.n - a.n);
+    return { rows, sources, ctas, checkout: uniq('checkout_click'), hasData: docs.length > 0 };
   }, [analyticsDocs, period]);
 
   // ---------- gerador de links ----------
@@ -307,6 +313,17 @@ export default function AdminGrowthPage() {
                     );
                   })}
                   <p className="text-[11px] text-muted-foreground font-medium">Visita → cadastro: <b>{pct(funnel.rows[3].n, funnel.rows[0].n)}</b> · Cadastro → recebeu 1ª avaliação: <b>{pct(funnel.rows[5].n, funnel.rows[3].n)}</b></p>
+                </div>
+                <div className="space-y-2">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Cliques por botão (total no período)</p>
+                  {funnel.ctas.length === 0 ? <p className="text-xs text-muted-foreground font-medium">Sem cliques registrados ainda.</p> : (
+                    <div className="grid sm:grid-cols-2 gap-x-6 gap-y-1.5">
+                      {funnel.ctas.map((c) => (
+                        <div key={c.k} className="flex justify-between text-xs border-b border-dashed py-1.5"><span className="font-bold">{c.k}</span><span className="tabular-nums font-black">{c.n}</span></div>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-[11px] text-muted-foreground font-medium">Cliques em "Ir para o checkout" (planos pagos, únicos): <b>{funnel.checkout}</b></p>
                 </div>
                 {funnel.sources.length > 0 && (
                   <div className="overflow-x-auto">
