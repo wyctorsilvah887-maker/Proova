@@ -1,5 +1,6 @@
 'use client';
 
+import { trackEvent } from '@/lib/track';
 import { AppSideMenu } from '@/components/app-menu';
 import { useMemo, useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -332,6 +333,7 @@ export default function DashPage() {
 
   const copyToClipboard = (text: string, description: string) => {
     navigator.clipboard.writeText(text);
+    if (text.includes('/c/')) trackEvent('link_copied');
     shadcnToast({ title: "Copiado!", description: `${description} copiado.` });
   };
 

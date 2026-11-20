@@ -6,6 +6,7 @@ import { FirebaseClientProvider } from "@/firebase/client-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { AttributionCapture } from '@/components/attribution-capture';
+import { PageTracker } from '@/components/page-tracker';
 import { SITE_URL } from '@/lib/site';
 
 const inter = Inter({ subsets: ["latin"] });
@@ -97,6 +98,7 @@ export default function RootLayout({
           <FirebaseClientProvider>
             {children}
             <AttributionCapture />
+            <PageTracker />
             <Toaster />
           </FirebaseClientProvider>
         </ThemeProvider>

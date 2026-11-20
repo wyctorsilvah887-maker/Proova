@@ -34,3 +34,10 @@
 ## 2026-11-19 — Landing focada em conversão + vídeo "Como funciona"
 - `public/video/como-funciona.mp4` (54s, 1280x720, 1,4 MB, sem áudio) + poster webp. Motion com réplicas das telas reais (dash, coleta, Inbox, resposta IA do Google, página pública). Fonte do vídeo (HTML + engine) fica fora do repo (scratchpad).
 - Landing: hero com benefício e CTA "Criar conta grátis" + "Ver como funciona", selos (Base grátis, sem cartão, 1 minuto), vídeo logo abaixo (autoplay só quando visível, mudo, botão pausar), seção de dor/solução, 3 passos, FAQ de objeções (grátis, sem app, críticas privadas, autorização), CTA final e barra fixa no mobile (o widget do mural sobe 84px quando a barra aparece).
+
+## 2026-11-20 — Analytics próprio do funil (estudo de taxas de sucesso, item 1)
+- Sem ferramenta externa nem cookies de terceiros. `src/lib/track.ts` + `PageTracker` (layout) enviam eventos para `POST /api/track` (ignora bots por User-Agent; o admin é excluído via flag `proova_notrack`). Contador "único" = 1ª vez do dia por navegador.
+- Eventos: `landing_view`, `pricing_view`, `signup_view`, `signup_click` (clique em link /signup), `signup_done` (e-mail e Google), `link_copied` (copiou o link de coleta no dash), `first_feedback` (servidor, 1ª avaliação recebida). Totais por dia e por origem (utm/referrer) em `analytics_daily/{AAAA-MM-DD}` (dia em America/Fortaleza), gravados só pelo Admin SDK.
+- `/admin/growth`: novo cartão "Funil: visita → cadastro → ativação" com conversão por etapa e tabela por origem.
+- `firestore.rules`: nova coleção `analytics_daily` (leitura só admin, escrita negada). **Publicar as regras no Console** (a Vercel não publica).
+- Limites: único por dia somado no período (não é único real); só passa a medir após o deploy; sem histórico anterior.
