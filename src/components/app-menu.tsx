@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, type RefObject } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { signOut } from 'firebase/auth';
 import {
-  BarChart3, Copy, ExternalLink, Gem, Globe, Headphones, ImageIcon, Inbox, LayoutGrid, Link2, LogOut, QrCode, Settings, Shield, Sparkles, BellRing,
+  BarChart3, BookOpen, Copy, ExternalLink, Gem, Globe, Headphones, ImageIcon, Inbox, LayoutGrid, Link2, LogOut, QrCode, Settings, Shield, Sparkles, BellRing,
   type LucideIcon,
 } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from '@/components/ui/sheet';
@@ -41,6 +41,8 @@ type Item = {
   /** Visão geral do painel. */
   home?: boolean;
   badge?: number;
+  /** Endereço fora do app: abre na mesma aba. */
+  external?: string;
 };
 
 /**
@@ -176,6 +178,7 @@ export function AppSideMenu({
         { label: 'Planos e Preços', icon: Gem, href: '/pricing' },
         { label: 'Configurações', icon: Settings, href: '/settings' },
         { label: 'Suporte VIP', icon: Headphones, href: '/support' },
+        { label: 'Blog', icon: BookOpen, external: 'https://blog.useproovaai.com.br' },
       ],
     },
     ...(isAdmin ? [{ title: 'Administração', items: [{ label: 'Painel Admin', icon: Shield, href: '/admin' }] as Item[] }] : []),
@@ -188,6 +191,9 @@ export function AppSideMenu({
     } else if (item.hash) {
       if (onHash) onHash(item.hash);
       else router.push(`/dash#${item.hash}`);
+    } else if (item.external) {
+      window.location.href = item.external;
+      return;
     } else if (item.href) {
       router.push(item.href);
     }
