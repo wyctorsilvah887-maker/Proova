@@ -127,22 +127,13 @@ export function ScrollProgress() {
   );
 }
 
-/** Fundo do topo: luzes laranja flutuando + grade de pontos que some nas bordas. */
+/** Fundo do topo: luzes laranja flutuando (o pontilhado vem do fundo da página). */
 export function Aurora() {
   return (
     <div aria-hidden className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
       <div className="absolute -top-24 left-1/2 -translate-x-1/2 h-[420px] w-[720px] max-w-[140vw] rounded-full bg-primary/20 blur-[110px] animate-orb" />
       <div className="absolute top-40 -left-24 h-72 w-72 rounded-full bg-orange-400/15 blur-[90px] animate-orb-slow" />
       <div className="absolute top-20 -right-24 h-72 w-72 rounded-full bg-amber-300/15 blur-[90px] animate-orb-slow [animation-delay:-6s]" />
-      <div
-        className="absolute inset-0 opacity-[0.35] dark:opacity-[0.25]"
-        style={{
-          backgroundImage: 'radial-gradient(hsl(var(--foreground) / 0.18) 1px, transparent 1px)',
-          backgroundSize: '26px 26px',
-          maskImage: 'radial-gradient(ellipse 70% 60% at 50% 30%, black 20%, transparent 75%)',
-          WebkitMaskImage: 'radial-gradient(ellipse 70% 60% at 50% 30%, black 20%, transparent 75%)',
-        }}
-      />
     </div>
   );
 }

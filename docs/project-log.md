@@ -82,3 +82,9 @@
 ## 2026-11-22 — Landing: cards de planos em 3D e tema chumbo/alaranjado
 - Cards de planos com profundidade real: `preserve-3d`, borda inferior grossa, sombras em camadas e elementos em `translateZ` (selo, nome, preço, botão); inclinação até 11° com o mouse.
 - Tema só da landing (`html:has(#landing-root)` em `globals.css`, o app não muda): escuro em preto chumbo (fundo `220 8% 5%`, cards e seções em grafite) e claro com fundo pêssego/alaranjado em vez de branco puro, mais luzes de fundo suaves. Seções que tinham `zinc-950` fixo agora usam o chumbo.
+
+## 2026-11-22 — Landing: pontilhado no lugar do tema tingido
+- Removido o tema tingido (chumbo/pêssego). Agora o fundo da landing é pontilhado em toda a página (`#landing-root` em `globals.css`): claro = muitos pontinhos laranja sobre o branco; escuro = pontinhos chumbo sobre o preto. Seções e rodapé ficam transparentes para o pontilhado aparecer (cards continuam sólidos); a seção do CTA final mantém o fundo escuro próprio (`#cta-final-section`). Removida a grade de pontos duplicada do `Aurora`.
+
+## 2026-11-22 — Landing: pontilhado removido
+- Removido todo o pontilhado (fundo da página e grade do hero) a pedido do usuário. A landing volta às cores padrão do tema (branco e preto), mantendo os cards 3D e as animações.
