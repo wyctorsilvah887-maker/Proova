@@ -709,7 +709,7 @@ export default function Home() {
         <PricingSection ref={pricingRef} isVisible={isPricingVisible} />
         <FaqSection />
         
-        <section className="relative w-full py-20 md:py-28 bg-[hsl(220_8%_6%)] text-white overflow-hidden">
+        <section id="cta-final-section" className="relative w-full py-20 md:py-28 bg-[hsl(220_8%_6%)] text-white overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-[hsl(220_8%_4%)] via-[hsl(220_8%_6%)]/80 to-primary/10" />
           <div aria-hidden className="pointer-events-none absolute -top-20 right-10 h-72 w-72 rounded-full bg-primary/25 blur-[100px] animate-orb-slow" />
           <div aria-hidden className="pointer-events-none absolute -bottom-24 left-10 h-64 w-64 rounded-full bg-orange-500/15 blur-[100px] animate-orb-slow [animation-delay:-8s]" />
