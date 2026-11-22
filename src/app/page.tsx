@@ -299,7 +299,7 @@ const HowItWorksVideo = () => {
 
 const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   return (
-    <section id="valor-reputacao" ref={ref} className="w-full py-24 bg-muted/30 dark:bg-zinc-950 text-foreground dark:text-white overflow-hidden relative border-y border-border/50 dark:border-zinc-900/30 min-h-[400px]">
+    <section id="valor-reputacao" ref={ref} className="w-full py-24 bg-muted/30 dark:bg-[hsl(220_8%_7%)] text-foreground dark:text-white overflow-hidden relative border-y border-border/50 dark:border-zinc-900/30 min-h-[400px]">
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent opacity-50" />
       
       <div className="container px-4 mx-auto text-center space-y-16">
@@ -497,17 +497,17 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
         </header>
         <div className="grid gap-6 md:grid-cols-3 items-stretch">
           {plans.map((plan, idx) => (
-            <Reveal key={plan.id} delay={idx * 120} className="h-full"><TiltCard className="h-full rounded-2xl" max={5}><div className={cn("relative flex h-full flex-col rounded-2xl border p-6 md:p-8 transition-shadow duration-300", plan.highlight ? "border-primary shadow-2xl shadow-primary/20 bg-card ring-1 ring-primary/30" : "bg-card hover:shadow-xl hover:border-primary/30")}>
+            <Reveal key={plan.id} delay={idx * 120} className="h-full"><TiltCard className="h-full rounded-2xl" max={11}><div style={{ transformStyle: "preserve-3d" }} className={cn("relative flex h-full flex-col rounded-2xl border border-b-[6px] p-6 md:p-8 bg-gradient-to-b from-card to-muted/60 transition-shadow duration-300 shadow-[inset_0_1px_0_hsl(0_0%_100%/0.35),0_34px_60px_-28px_hsl(var(--primary)/0.45),0_14px_26px_-14px_rgb(0_0_0/0.35)] hover:shadow-[inset_0_1px_0_hsl(0_0%_100%/0.4),0_50px_80px_-30px_hsl(var(--primary)/0.6),0_20px_34px_-14px_rgb(0_0_0/0.45)]", plan.highlight ? "border-primary/60 border-b-primary ring-1 ring-primary/30" : "border-b-border")}>
               {plan.highlight && (
-                <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary-foreground">Mais escolhido</span>
+                <span style={{ transform: "translateZ(50px)" }} className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary-foreground">Mais escolhido</span>
               )}
-              <h3 className="text-lg font-bold font-headline">{plan.name}</h3>
+              <h3 style={{ transform: "translateZ(26px)" }} className="text-lg font-bold font-headline">{plan.name}</h3>
               <p className="mt-1 text-xs text-muted-foreground font-medium min-h-[2.5rem]">{plan.description}</p>
-              <p className="mt-4 flex items-baseline gap-1">
+              <p style={{ transform: "translateZ(44px)" }} className="mt-4 flex items-baseline gap-1 drop-shadow-[0_8px_10px_rgb(0_0_0/0.15)]">
                 <span className="text-4xl font-extrabold tracking-tight">{plan.price}</span>
                 <span className="text-sm text-muted-foreground font-medium">{plan.period}</span>
               </p>
-              <ul className="mt-6 space-y-3 flex-1">
+              <ul style={{ transform: "translateZ(14px)" }} className="mt-6 space-y-3 flex-1">
                 {plan.benefits.map((benefit) => (
                   <li key={benefit} className="flex items-start gap-3 text-sm font-medium">
                     <Check className="w-4 h-4 mt-0.5 shrink-0 text-primary" />
@@ -515,7 +515,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                   </li>
                 ))}
               </ul>
-              <Link href="/signup" data-cta="plano-base" className="mt-8 block">
+              <Link href="/signup" data-cta="plano-base" style={{ transform: "translateZ(34px)" }} className="mt-8 block">
                 <Button className="w-full h-12 rounded-xl text-xs font-bold uppercase tracking-wide gap-2" variant={plan.highlight ? "default" : "outline"}>
                   {plan.id === 'base' ? 'Criar conta grátis' : 'Garantir meu acesso'} <ArrowRight className="w-4 h-4" />
                 </Button>
@@ -695,7 +695,7 @@ export default function Home() {
   if (loading || user) return <LoadingScreen />;
 
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
+    <div id="landing-root" className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
       <ScrollProgress />
       <Navigation isScrolled={isScrolled} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} scrollToSection={scrollToSection} />
       <main className="flex-1 pt-20">
@@ -709,8 +709,8 @@ export default function Home() {
         <PricingSection ref={pricingRef} isVisible={isPricingVisible} />
         <FaqSection />
         
-        <section className="relative w-full py-20 md:py-28 bg-zinc-950 text-white overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-primary/10" />
+        <section className="relative w-full py-20 md:py-28 bg-[hsl(220_8%_6%)] text-white overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-[hsl(220_8%_4%)] via-[hsl(220_8%_6%)]/80 to-primary/10" />
           <div aria-hidden className="pointer-events-none absolute -top-20 right-10 h-72 w-72 rounded-full bg-primary/25 blur-[100px] animate-orb-slow" />
           <div aria-hidden className="pointer-events-none absolute -bottom-24 left-10 h-64 w-64 rounded-full bg-orange-500/15 blur-[100px] animate-orb-slow [animation-delay:-8s]" />
           <div className="container relative z-10 px-4 mx-auto text-center space-y-10">
