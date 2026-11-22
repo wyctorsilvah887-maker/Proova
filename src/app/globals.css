@@ -77,26 +77,3 @@
   .animate-orb, .animate-orb-slow, .animate-float, .animate-text-shine, .animate-pop { animation: none !important; }
 }
 
-
-/* Fundo da landing: pontilhado por toda a página (só vale quando #landing-root existe; o app não muda).
-   Claro: muitos pontinhos laranja para quebrar o branco puro. Escuro: pontinhos chumbo sobre o preto. */
-#landing-root {
-  background-image:
-    radial-gradient(hsl(24 95% 53% / 0.42) 1.5px, transparent 1.9px),
-    radial-gradient(hsl(28 95% 58% / 0.26) 1.2px, transparent 1.6px),
-    radial-gradient(900px 520px at 50% -8%, hsl(24 95% 58% / 0.10), transparent 62%);
-  background-size: 18px 18px, 18px 18px, auto;
-  background-position: 0 0, 9px 9px, 0 0;
-  background-repeat: repeat, repeat, no-repeat;
-}
-.dark #landing-root {
-  background-image:
-    radial-gradient(hsl(220 9% 30%) 1.5px, transparent 1.9px),
-    radial-gradient(hsl(220 9% 22%) 1.2px, transparent 1.6px),
-    radial-gradient(900px 520px at 50% -8%, hsl(220 12% 20% / 0.45), transparent 62%);
-}
-/* Seções transparentes para o pontilhado aparecer em toda a tela (cards continuam sólidos). */
-#landing-root > main > section:not(#cta-final-section),
-#landing-root > footer {
-  background-color: transparent !important;
-}

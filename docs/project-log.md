@@ -85,3 +85,6 @@
 
 ## 2026-11-22 — Landing: pontilhado no lugar do tema tingido
 - Removido o tema tingido (chumbo/pêssego). Agora o fundo da landing é pontilhado em toda a página (`#landing-root` em `globals.css`): claro = muitos pontinhos laranja sobre o branco; escuro = pontinhos chumbo sobre o preto. Seções e rodapé ficam transparentes para o pontilhado aparecer (cards continuam sólidos); a seção do CTA final mantém o fundo escuro próprio (`#cta-final-section`). Removida a grade de pontos duplicada do `Aurora`.
+
+## 2026-11-22 — Landing: pontilhado removido
+- Removido todo o pontilhado (fundo da página e grade do hero) a pedido do usuário. A landing volta às cores padrão do tema (branco e preto), mantendo os cards 3D e as animações.
