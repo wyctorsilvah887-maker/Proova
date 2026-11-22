@@ -55,6 +55,8 @@ import { useUser } from "@/firebase";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 import { LoadingScreen } from "@/components/loading-screen";
+import { Aurora, Reveal, ScrollProgress, TiltCard } from "@/components/landing-fx";
+import { FactsStrip, HeroNotifications, RatingSimulator } from "@/components/landing-demo";
 
 // --- SUB-COMPONENTS ---
 
@@ -125,6 +127,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
                   <div className="flex-1 p-4 space-y-1 overflow-y-auto">
                     {[
                       { id: 'como-funciona', label: 'Como funciona', icon: Play },
+                      { id: 'simulador', label: 'Teste na prática', icon: MousePointerClick },
                       { id: 'valor-reputacao', label: 'Reputação Local', icon: TrendingUp },
                       { id: 'metodologia', label: 'Gestão via IA', icon: Bot },
                       { id: 'planos', label: 'Planos SaaS', icon: Gem },
@@ -187,6 +190,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
 const HeroSection = ({ isVisible, scrollToSection }: { isVisible: boolean; scrollToSection: (id: string) => void }) => {
   return (
     <section className="relative w-full pb-10 md:pb-16 flex items-center justify-center overflow-hidden pt-8 md:pt-16">
+      <Aurora />
       <div className="container relative z-10 px-4 mx-auto">
         <div className="max-w-4xl mx-auto text-center space-y-6">
           <header>
@@ -221,8 +225,9 @@ const HeroSection = ({ isVisible, scrollToSection }: { isVisible: boolean; scrol
             isVisible ? "animate-in fade-in slide-in-from-bottom-5 opacity-100" : "opacity-0"
           )}>
             <Link href="/signup" data-cta="hero" className="w-full sm:w-auto">
-              <Button className="w-full sm:w-auto h-14 px-8 rounded-2xl text-[11px] font-black shadow-2xl transition-all hover:scale-105 active:scale-95 group bg-primary hover:bg-primary/90 text-white uppercase tracking-widest">
-                Criar conta grátis <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+              <Button className="relative overflow-hidden w-full sm:w-auto h-14 px-8 rounded-2xl text-[11px] font-black shadow-2xl shadow-primary/30 transition-all hover:scale-105 hover:shadow-primary/50 active:scale-95 group bg-primary hover:bg-primary/90 text-white uppercase tracking-widest">
+                <span aria-hidden className="pointer-events-none absolute inset-0 -translate-x-full animate-shine bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                <span className="relative inline-flex items-center">Criar conta grátis <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" /></span>
               </Button>
             </Link>
             <Button type="button" variant="outline" onClick={() => scrollToSection('como-funciona')} className="w-full sm:w-auto h-14 px-8 rounded-2xl text-[11px] font-black uppercase tracking-widest gap-2">
@@ -235,6 +240,8 @@ const HeroSection = ({ isVisible, scrollToSection }: { isVisible: boolean; scrol
               <li key={t} className="inline-flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-primary" />{t}</li>
             ))}
           </ul>
+
+          <HeroNotifications />
         </div>
       </div>
     </section>
@@ -265,8 +272,8 @@ const HowItWorksVideo = () => {
 
   return (
     <section id="como-funciona" className="w-full pb-16 md:pb-24">
-      <div className="container px-4 mx-auto max-w-5xl space-y-6">
-        <div className="relative rounded-2xl md:rounded-[2rem] overflow-hidden border bg-zinc-950 shadow-2xl ring-1 ring-primary/10">
+      <Reveal className="container px-4 mx-auto max-w-5xl space-y-6">
+        <div className="relative rounded-2xl md:rounded-[2rem] overflow-hidden border bg-zinc-950 shadow-2xl shadow-primary/10 ring-1 ring-primary/10 transition-transform duration-500 hover:scale-[1.01]">
           <video
             ref={ref}
             className="w-full aspect-video block"
@@ -285,7 +292,7 @@ const HowItWorksVideo = () => {
           </button>
         </div>
         <p className="text-center text-xs md:text-sm text-muted-foreground font-medium">Veja o fluxo completo em menos de 1 minuto: do link de coleta à resposta com IA.</p>
-      </div>
+      </Reveal>
     </section>
   );
 };
@@ -306,7 +313,7 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
           <p className="max-w-2xl mx-auto text-muted-foreground dark:text-zinc-400 text-sm md:text-base font-medium">Hoje, quem fica insatisfeito vai direto para o Google e você só descobre depois. Com o Proova, você ouve o cliente primeiro, resolve a tempo e ainda ganha prova social com quem gostou.</p>
         </header>
 
-        <div className="grid gap-12 lg:grid-cols-3">
+        <div className="grid gap-6 lg:gap-8 lg:grid-cols-3">
           {[
             {
               icon: Shield,
@@ -327,18 +334,18 @@ const AgitationSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVi
               color: "text-primary"
             }
           ].map((item, idx) => (
-            <article key={idx} className={cn(
-              "space-y-4 transition-all duration-1000",
+            <TiltCard key={idx} className="rounded-3xl"><article className={cn(
+              "space-y-4 rounded-3xl border border-transparent hover:border-primary/30 bg-background/40 dark:bg-zinc-900/40 py-8 transition-all duration-1000",
               isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
             )} style={{ transitionDelay: `${(idx + 1) * 200}ms` }}>
               <div className="flex justify-center">
-                <div className="p-4 rounded-2xl bg-primary/5 text-primary">
+                <div className="p-4 rounded-2xl bg-primary/5 text-primary transition-transform duration-300 group-hover/tilt:scale-110 group-hover/tilt:-rotate-3">
                   <item.icon className="w-10 h-10" />
                 </div>
               </div>
               <h3 className="text-xl font-bold font-headline px-4">{item.title}</h3>
               <p className="text-muted-foreground dark:text-zinc-500 text-sm leading-relaxed font-medium px-6">{item.desc}</p>
-            </article>
+            </article></TiltCard>
           ))}
         </div>
       </div>
@@ -361,7 +368,9 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
         </header>
         
         <div className="max-w-4xl mx-auto relative px-4 md:px-0">
-          <div className="space-y-12 md:space-y-16">
+          <div className="relative space-y-12 md:space-y-16">
+            <div aria-hidden className="absolute left-[21px] md:left-[26px] top-6 bottom-6 w-px bg-border" />
+            <div aria-hidden className={cn("absolute left-[21px] md:left-[26px] top-6 bottom-6 w-px origin-top bg-gradient-to-b from-primary to-primary/0 transition-transform duration-[1800ms] ease-out", isVisible ? "scale-y-100" : "scale-y-0")} />
             {[
               { number: '01', title: 'Crie sua conta e envie o link de coleta', desc: 'Em 1 minuto você tem um link e um QR Code de balcão. Envie pelo WhatsApp logo após o atendimento, quando a experiência está fresca.' },
               { number: '02', title: 'Receba elogios e críticas, cada um no lugar certo', desc: 'Elogios vão para sua página pública e para os cards do Instagram. Críticas chegam ao Inbox privado com alerta, para você responder em 1 toque.' },
@@ -371,9 +380,9 @@ const PillarsSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                 "flex items-start gap-8 md:gap-16 relative transition-all duration-1000", 
                 isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10"
               )} style={{ transitionDelay: `${idx * 200}ms` }}>
-                <div className="flex flex-col items-center shrink-0 w-11">
-                  <div className="text-lg md:text-3xl font-black font-headline text-primary">
-                    {step.number.split('.')[0]}
+                <div className="flex flex-col items-center shrink-0 w-11 md:w-[52px]">
+                  <div className="relative z-10 flex h-11 w-11 md:h-[52px] md:w-[52px] items-center justify-center rounded-full border-2 border-primary/30 bg-background text-sm md:text-lg font-black font-headline text-primary shadow-lg shadow-primary/10 transition-transform duration-300 hover:scale-110">
+                    {step.number}
                   </div>
                 </div>
                 <article className="space-y-3 md:space-y-4 pt-1 md:pt-2 flex-1">
@@ -413,11 +422,11 @@ const VersatilitySection = forwardRef<HTMLElement, { isVisible: boolean }>(({ is
         </header>
         <div className="grid gap-4 md:grid-cols-3">
           {items.map((item, idx) => (
-            <article key={idx} className={cn("rounded-2xl border bg-card p-6 space-y-3 transition-all duration-700", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6")} style={{ transitionDelay: `${idx * 120}ms` }}>
-              <div className="inline-flex p-2.5 rounded-xl bg-primary/10 text-primary"><item.icon className="w-5 h-5" /></div>
+            <TiltCard key={idx} className="rounded-2xl h-full"><article className={cn("h-full rounded-2xl border bg-card p-6 space-y-3 transition-all duration-700 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6")} style={{ transitionDelay: `${idx * 120}ms` }}>
+              <div className="inline-flex p-2.5 rounded-xl bg-primary/10 text-primary transition-transform duration-300 group-hover/tilt:scale-110 group-hover/tilt:-rotate-3"><item.icon className="w-5 h-5" /></div>
               <h3 className="font-bold text-base font-headline">{item.title}</h3>
               <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
-            </article>
+            </article></TiltCard>
           ))}
         </div>
       </div>
@@ -487,8 +496,8 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
           <p className="text-sm md:text-base text-muted-foreground font-medium">Comece grátis. Nos planos pagos: garantia de 7 dias com reembolso integral e cancelamento quando quiser.</p>
         </header>
         <div className="grid gap-6 md:grid-cols-3 items-stretch">
-          {plans.map((plan) => (
-            <div key={plan.id} className={cn("relative flex flex-col rounded-2xl border p-6 md:p-8", plan.highlight ? "border-primary shadow-lg bg-card" : "bg-card")}>
+          {plans.map((plan, idx) => (
+            <Reveal key={plan.id} delay={idx * 120} className="h-full"><TiltCard className="h-full rounded-2xl" max={5}><div className={cn("relative flex h-full flex-col rounded-2xl border p-6 md:p-8 transition-shadow duration-300", plan.highlight ? "border-primary shadow-2xl shadow-primary/20 bg-card ring-1 ring-primary/30" : "bg-card hover:shadow-xl hover:border-primary/30")}>
               {plan.highlight && (
                 <span className="absolute -top-3 left-6 rounded-full bg-primary px-3 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary-foreground">Mais escolhido</span>
               )}
@@ -511,7 +520,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                   {plan.id === 'base' ? 'Criar conta grátis' : 'Garantir meu acesso'} <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
-            </div>
+            </div></TiltCard></Reveal>
           ))}
         </div>
         <p className="mt-6 text-center text-xs text-muted-foreground font-medium">Crie sua conta gratuitamente e contrate o plano em seguida, com o mesmo e-mail.</p>
@@ -542,12 +551,12 @@ const FaqSection = () => (
       </header>
       <div className="space-y-2">
         {FAQ_ITEMS.map((item) => (
-          <details key={item.q} className="group rounded-xl border bg-card px-4 py-3">
+          <details key={item.q} className="group rounded-xl border bg-card px-4 py-3 transition-colors hover:border-primary/30 open:border-primary/40 open:shadow-md">
             <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-xs md:text-sm font-bold">
               {item.q}
               <ChevronDown className="w-3.5 h-3.5 shrink-0 transition-transform group-open:rotate-180" />
             </summary>
-            <p className="pt-2 text-xs md:text-sm text-muted-foreground font-medium leading-relaxed">{item.a}</p>
+            <p className="pt-2 text-xs md:text-sm text-muted-foreground font-medium leading-relaxed group-open:animate-in group-open:fade-in group-open:slide-in-from-top-1 duration-300">{item.a}</p>
           </details>
         ))}
       </div>
@@ -687,10 +696,13 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground font-body overflow-x-hidden">
+      <ScrollProgress />
       <Navigation isScrolled={isScrolled} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} scrollToSection={scrollToSection} />
       <main className="flex-1 pt-20">
         <HeroSection isVisible={isHeroVisible} scrollToSection={scrollToSection} />
         <HowItWorksVideo />
+        <FactsStrip />
+        <RatingSimulator />
         <AgitationSection ref={agitationRef} isVisible={isAgitationVisible} />
         <PillarsSection ref={pillarsRef} isVisible={isPillarsVisible} />
         <VersatilitySection ref={versatilityRef} isVisible={isVersatilityVisible} />
@@ -699,6 +711,8 @@ export default function Home() {
         
         <section className="relative w-full py-20 md:py-28 bg-zinc-950 text-white overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-r from-black via-black/80 to-primary/10" />
+          <div aria-hidden className="pointer-events-none absolute -top-20 right-10 h-72 w-72 rounded-full bg-primary/25 blur-[100px] animate-orb-slow" />
+          <div aria-hidden className="pointer-events-none absolute -bottom-24 left-10 h-64 w-64 rounded-full bg-orange-500/15 blur-[100px] animate-orb-slow [animation-delay:-8s]" />
           <div className="container relative z-10 px-4 mx-auto text-center space-y-10">
             <header className="space-y-4">
               <h2 className="text-3xl md:text-5xl font-extrabold font-headline tracking-tight leading-tight">
@@ -709,7 +723,7 @@ export default function Home() {
               </p>
             </header>
             <Link href="/signup" data-cta="cta-final" className="w-full sm:w-auto">
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto h-14 md:h-16 px-10 rounded-xl text-sm md:text-base font-bold shadow-2xl hover:scale-105 transition-all bg-white text-black hover:bg-white/90">
+              <Button size="lg" variant="secondary" className="w-full sm:w-auto h-14 md:h-16 px-10 rounded-xl text-sm md:text-base font-bold shadow-2xl shadow-primary/30 hover:scale-105 hover:shadow-primary/50 active:scale-95 transition-all bg-white text-black hover:bg-white/90">
                 CRIAR CONTA GRÁTIS
               </Button>
             </Link>

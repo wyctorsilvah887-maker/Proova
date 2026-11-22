@@ -73,3 +73,8 @@
 
 ## 2026-11-22 — Atalho "Blog" no menu lateral
 - Novo item "Blog" no grupo Conta do `AppSideMenu`, abre https://blog.useproovaai.com.br na mesma aba (`external` no tipo `Item`).
+
+## 2026-11-22 — Landing premium (animações e interações)
+- Sem biblioteca nova. `src/components/landing-fx.tsx`: `Reveal` (entrada ao rolar, em cascata), `TiltCard` (inclinação 3D + brilho que segue o mouse, só com mouse), `CountUp`, `ScrollProgress` (barra de leitura no topo), `Aurora` (luzes e grade de pontos no hero). Todos respeitam `prefers-reduced-motion` e têm rede de segurança para nunca deixar conteúdo escondido.
+- `src/components/landing-demo.tsx`: `HeroNotifications` (avisos que se alternam), `FactsStrip` (R$ 0, 1 min, 7 dias, 100% das notas do link na média: só fatos do produto, nada inventado) e `RatingSimulator` (seção "Teste na prática": o visitante toca nas estrelas e vê o destino: ≤3 Inbox privado com alerta; 4–5 prova social e convite ao Google).
+- Landing: botão principal com brilho, cards com tilt, linha do tempo nos 3 passos, cards de planos com entrada em cascata, FAQ com abertura animada, luzes no CTA final. Novos keyframes `orb`, `orb-slow`, `pop` em `tailwind.config.ts`. Item "Teste na prática" no menu mobile.
