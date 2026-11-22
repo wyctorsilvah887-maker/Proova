@@ -70,3 +70,6 @@
 
 ## 2026-11-20 — Cabeçalho de /pricing
 - Removido o nome da clínica do cabeçalho; o menu da conta continua abrindo pelo rótulo do plano (um pouco maior, já que agora é o único texto).
+
+## 2026-11-22 — Atalho "Blog" no menu lateral
+- Novo item "Blog" no grupo Conta do `AppSideMenu`, abre https://blog.useproovaai.com.br na mesma aba (`external` no tipo `Item`).
