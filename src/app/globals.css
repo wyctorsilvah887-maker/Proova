@@ -70,3 +70,9 @@
     scrollbar-width: none;
   }
 }
+
+
+/* Menos movimento para quem pede no sistema (landing premium) */
+@media (prefers-reduced-motion: reduce) {
+  .animate-orb, .animate-orb-slow, .animate-float, .animate-text-shine, .animate-pop { animation: none !important; }
+}

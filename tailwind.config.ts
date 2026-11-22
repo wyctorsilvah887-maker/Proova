@@ -87,6 +87,19 @@ export default {
           '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
           '50%': { transform: 'translateY(-20px) rotate(5deg)' },
         },
+        'orb': {
+          '0%, 100%': { transform: 'translate(-50%, 0) scale(1)', opacity: '0.9' },
+          '50%': { transform: 'translate(-46%, 18px) scale(1.08)', opacity: '1' },
+        },
+        'orb-slow': {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '50%': { transform: 'translate(24px, -26px) scale(1.12)' },
+        },
+        'pop': {
+          '0%': { transform: 'scale(0.6)', opacity: '0' },
+          '60%': { transform: 'scale(1.12)', opacity: '1' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
         'scanner': {
           '0%': { top: '0%' },
           '50%': { top: '100%' },
@@ -107,6 +120,9 @@ export default {
         'shine': 'shine 2s infinite linear',
         'text-shine': 'text-shine 3s linear infinite',
         'float': 'float 6s ease-in-out infinite',
+        'orb': 'orb 14s ease-in-out infinite',
+        'orb-slow': 'orb-slow 18s ease-in-out infinite',
+        'pop': 'pop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both',
         'float-delayed': 'float 8s ease-in-out 2s infinite',
         'scanner': 'scanner 3s linear infinite',
         'scanner-gradient': 'scanner-gradient 3s linear infinite'
