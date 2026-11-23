@@ -268,6 +268,12 @@ export default function PricingPage() {
            <p className="text-muted-foreground font-medium text-xs md:text-lg max-w-xl mx-auto leading-relaxed px-4">
              A reputação da sua marca é o seu maior ativo. Invista nas ferramentas certas para dominar o seu mercado local.
            </p>
+           {status === 'expired' && (
+             <p className="mx-auto max-w-xl rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-xs md:text-sm font-bold">Seu teste de 14 dias terminou. Assine Premium ou PRO para voltar a usar o painel: seus dados estão salvos.</p>
+           )}
+           {status === 'trial' && trialLeft <= 3 && (
+             <p className="mx-auto max-w-xl rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-xs md:text-sm font-bold">Seu teste termina em {trialLeft === 0 ? 'poucas horas' : `${trialLeft} ${trialLeft === 1 ? 'dia' : 'dias'}`}. Assine agora para não perder o acesso.</p>
+           )}
         </section>
 
         <section className="space-y-4">

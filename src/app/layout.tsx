@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { AttributionCapture } from '@/components/attribution-capture';
 import { PageTracker } from '@/components/page-tracker';
+import { TrialGate } from '@/components/trial-gate';
 import { SITE_URL } from '@/lib/site';
 
 const inter = Inter({ subsets: ["latin"] });
@@ -99,6 +100,7 @@ export default function RootLayout({
             {children}
             <AttributionCapture />
             <PageTracker />
+            <TrialGate />
             <Toaster />
           </FirebaseClientProvider>
         </ThemeProvider>
