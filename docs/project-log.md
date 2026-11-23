@@ -88,3 +88,5 @@
 
 ## 2026-11-22 — Landing: pontilhado removido
 - Removido todo o pontilhado (fundo da página e grade do hero) a pedido do usuário. A landing volta às cores padrão do tema (branco e preto), mantendo os cards 3D e as animações.
+
+- **Plano Base → teste grátis de 14 dias - [FINALIZADO]:** Landing e /pricing trocam o card "Base" por "Teste grátis de 14 dias" (recursos Premium, sem cartão). Contas no Base que nunca fizeram teste viram `trial` com `trialEndsAt` (+14 dias) ao abrir o painel (`POST /api/trial/sync`, Admin SDK; o cliente não forja status nem data). Vencido → `expired` (limites do antigo gratuito), também varrido pelo cron `review-reminder`. Banner de dias restantes no /dash. Reembolso/chargeback agora rebaixam para `expired`. `firestore.rules`: `trialEndsAt` protegido contra edição do cliente (publicar no Console).

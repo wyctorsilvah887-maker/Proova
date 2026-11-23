@@ -439,10 +439,10 @@ export default function AdminPage() {
                         <SelectValue placeholder="Selecione o plano" />
                      </SelectTrigger>
                      <SelectContent>
-                        <SelectItem value="base">Base (Grátis)</SelectItem>
+                        <SelectItem value="base">Base (legado)</SelectItem>
                         <SelectItem value="gold">Proova AI Premium</SelectItem>
                         <SelectItem value="enterprise">Proova AI PRO</SelectItem>
-                        <SelectItem value="expired">Expirado</SelectItem>
+                        <SelectItem value="expired">Expirado (teste encerrado)</SelectItem>
                      </SelectContent>
                   </Select>
                   <Button onClick={handleUpdatePlan} disabled={isUpdatingPlan} className="w-full h-12 rounded-xl font-bold">{isUpdatingPlan ? <Loader2 className="animate-spin" /> : "Atualizar Privilégios"}</Button>
