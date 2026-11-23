@@ -1,5 +1,7 @@
 'use client';
 
+import { isAccessLocked } from '@/lib/trial';
+import { PageOffline } from '@/components/page-offline';
 import { sanitizeHtml, safeUrl } from '@/lib/safe-html';
 import { useState, useMemo, useEffect, use } from 'react';
 import { useFirestore, useUser } from '@/firebase';
@@ -177,6 +179,8 @@ export default function PublicPage({ params }: { params: Promise<{ slug: string,
     
     return filteredTestimonials;
   }, [filteredTestimonials, muralIndex, layout]);
+
+  if (!isLoading && isAccessLocked(companyData)) return <PageOffline />;
 
   if (isLoading) {
     return (

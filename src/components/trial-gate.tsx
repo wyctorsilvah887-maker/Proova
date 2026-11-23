@@ -37,7 +37,7 @@ export function TrialGate() {
         <div className="space-y-2">
           <h1 className="text-2xl md:text-3xl font-black font-headline tracking-tight">Seu teste de 14 dias terminou</h1>
           <p className="text-sm text-muted-foreground font-medium leading-relaxed">
-            Para continuar usando o Proova AI, escolha um plano. Seus depoimentos, a página pública e todas as configurações estão salvos e voltam na hora depois da assinatura.
+            Sem um plano ativo, o painel, o seu link de coleta, a página pública e o widget estão fora do ar. Seus depoimentos e configurações estão salvos e tudo volta na hora depois da assinatura.
           </p>
         </div>
         <div className="space-y-3">

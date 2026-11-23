@@ -161,7 +161,7 @@ export default function PricingPage() {
         `Respostas por IA (Gemini): até ${AI_MONTHLY_LIMIT.premium} por mês`,
         "Busca automática das novas avaliações do Google",
         "Social Cards, métricas e relatório semanal",
-        "Ao fim dos 14 dias, escolha Premium ou PRO para manter tudo (seus dados ficam salvos)",
+        "Ao fim dos 14 dias o acesso só continua com assinatura: sem plano, painel, link de coleta, página pública e widget saem do ar (seus dados ficam salvos)",
       ]
     },
     {
@@ -269,10 +269,10 @@ export default function PricingPage() {
              A reputação da sua marca é o seu maior ativo. Invista nas ferramentas certas para dominar o seu mercado local.
            </p>
            {status === 'expired' && (
-             <p className="mx-auto max-w-xl rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-xs md:text-sm font-bold">Seu teste de 14 dias terminou. Assine Premium ou PRO para voltar a usar o painel: seus dados estão salvos.</p>
+             <p className="mx-auto max-w-xl rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-xs md:text-sm font-bold">Seu teste terminou: o painel, o link de coleta e a página pública estão fora do ar. Assine Premium ou PRO para reativar tudo na hora; seus dados estão salvos.</p>
            )}
            {status === 'trial' && trialLeft <= 3 && (
-             <p className="mx-auto max-w-xl rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-xs md:text-sm font-bold">Seu teste termina em {trialLeft === 0 ? 'poucas horas' : `${trialLeft} ${trialLeft === 1 ? 'dia' : 'dias'}`}. Assine agora para não perder o acesso.</p>
+             <p className="mx-auto max-w-xl rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-xs md:text-sm font-bold">Seu teste termina em {trialLeft === 0 ? 'poucas horas' : `${trialLeft} ${trialLeft === 1 ? 'dia' : 'dias'}`}. Sem assinatura, o painel, o link de coleta, a página pública e o widget saem do ar.</p>
            )}
         </section>
 

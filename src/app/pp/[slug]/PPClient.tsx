@@ -1,5 +1,7 @@
 'use client';
 
+import { isAccessLocked } from '@/lib/trial';
+import { PageOffline } from '@/components/page-offline';
 import { sanitizeHtml, safeUrl } from '@/lib/safe-html';
 import { useState, useMemo, useEffect } from 'react';
 import { useFirestore, useUser } from '@/firebase';
@@ -55,6 +57,7 @@ export default function PPClient({ slug }: { slug: string }) {
   const [isStandalone, setIsStandalone] = useState(false);
   const [companyName, setCompanyName] = useState('');
   const [ownerStatus, setOwnerStatus] = useState('');
+  const [ownerLocked, setOwnerLocked] = useState(false);
   const [ownerWhatsapp, setOwnerWhatsapp] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
   const [api, setApi] = useState<CarouselApi>();
@@ -75,6 +78,7 @@ export default function PPClient({ slug }: { slug: string }) {
         const q1 = query(usersRef, where('companySlug', '==', decodedSlug), limit(1));
         const snap1 = await getDocs(q1);
         if (!snap1.empty) {
+          if (isAccessLocked(snap1.docs[0].data())) { setOwnerLocked(true); return; }
           const uId = snap1.docs[0].id;
           setTargetUserId(uId);
           setCompanyName(snap1.docs[0].data().companyName);
@@ -174,6 +178,7 @@ export default function PPClient({ slug }: { slug: string }) {
   }, [filteredTestimonials, muralIndex, layout]);
 
   if (isLoading) return <LoadingScreen />;
+  if (ownerLocked) return <PageOffline />;
 
   const TestimonialCard = ({ t, index = 0 }: { t: any, index?: number }) => {
     const hasSecondary = !!secondaryColor && secondaryColor !== 'transparent' && secondaryColor !== '';
