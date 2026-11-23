@@ -633,7 +633,7 @@ export default function DashPage() {
       <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pt-20 md:pt-32 pb-12">
         {(trialLeft !== null || trialEnded) && (
           <Link href="/pricing" className="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-xs md:text-sm font-bold">
-            <span>{trialEnded ? 'Seu teste de 14 dias terminou. Escolha um plano para continuar com os recursos Premium.' : trialLeft === 0 ? 'Seu teste grátis termina hoje.' : `Teste grátis: ${trialLeft} ${trialLeft === 1 ? 'dia restante' : 'dias restantes'}.`}</span>
+            <span>{trialEnded ? 'Seu teste de 14 dias terminou. Assine um plano para voltar a usar o painel.' : trialLeft === 0 ? 'Seu teste grátis termina hoje. Assine um plano para não perder o acesso.' : trialLeft <= 3 ? `Faltam ${trialLeft} ${trialLeft === 1 ? 'dia' : 'dias'} de teste. Assine um plano para não perder o acesso.` : `Teste grátis: ${trialLeft} dias restantes.`}</span>
             <span className="shrink-0 text-primary font-black uppercase tracking-wider text-[10px]">Ver planos</span>
           </Link>
         )}
