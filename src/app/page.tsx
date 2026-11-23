@@ -96,7 +96,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
           <div className="hidden sm:flex items-center gap-6">
             <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Acesso Membro</Link>
             <Link href="/signup" data-cta="nav">
-              <Button className="font-black uppercase tracking-widest shadow-lg px-4 h-9 text-[9px] rounded-xl">Criar conta grátis</Button>
+              <Button className="font-black uppercase tracking-widest shadow-lg px-4 h-9 text-[9px] rounded-xl">Teste grátis</Button>
             </Link>
           </div>
 
@@ -227,7 +227,7 @@ const HeroSection = ({ isVisible, scrollToSection }: { isVisible: boolean; scrol
             <Link href="/signup" data-cta="hero" className="w-full sm:w-auto">
               <Button className="relative overflow-hidden w-full sm:w-auto h-14 px-8 rounded-2xl text-[11px] font-black shadow-2xl shadow-primary/30 transition-all hover:scale-105 hover:shadow-primary/50 active:scale-95 group bg-primary hover:bg-primary/90 text-white uppercase tracking-widest">
                 <span aria-hidden className="pointer-events-none absolute inset-0 -translate-x-full animate-shine bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                <span className="relative inline-flex items-center">Criar conta grátis <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" /></span>
+                <span className="relative inline-flex items-center">Começar teste grátis de 14 dias <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" /></span>
               </Button>
             </Link>
             <Button type="button" variant="outline" onClick={() => scrollToSection('como-funciona')} className="w-full sm:w-auto h-14 px-8 rounded-2xl text-[11px] font-black uppercase tracking-widest gap-2">
@@ -236,7 +236,7 @@ const HeroSection = ({ isVisible, scrollToSection }: { isVisible: boolean; scrol
           </div>
 
           <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pt-2 text-[11px] md:text-xs font-bold text-muted-foreground">
-            {["Plano Base grátis", "Sem cartão de crédito", "Pronto em 1 minuto"].map((t) => (
+            {["14 dias grátis", "Sem cartão de crédito", "Pronto em 1 minuto"].map((t) => (
               <li key={t} className="inline-flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-primary" />{t}</li>
             ))}
           </ul>
@@ -439,17 +439,17 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
   const plans = [
     {
       id: 'base',
-      name: "Proova AI Base",
+      name: "Teste grátis de 14 dias",
       price: "R$ 0",
-      period: "grátis",
-      description: "Para começar a coletar depoimentos sem pagar nada.",
+      period: "por 14 dias",
+      description: "Use tudo do Premium por 14 dias, sem cartão de crédito.",
       highlight: false,
       benefits: [
         "Link de coleta e QR Code de balcão",
-        "Página pública com até 5 depoimentos",
-        "Blocos Sobre e Horários",
+        "Página pública completa",
         "Inbox privado para críticas",
-        "20 respostas por IA por mês",
+        "Respostas por IA e busca automática de avaliações",
+        "Escolha um plano só se gostar",
       ],
     },
     {
@@ -493,7 +493,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
       <div className="container px-4 mx-auto max-w-6xl">
         <header className={cn("text-center space-y-3 mb-12 transition-all duration-700", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6")}>
           <h2 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight">Planos e <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">preços</span></h2>
-          <p className="text-sm md:text-base text-muted-foreground font-medium">Comece grátis. Nos planos pagos: garantia de 7 dias com reembolso integral e cancelamento quando quiser.</p>
+          <p className="text-sm md:text-base text-muted-foreground font-medium">Teste 14 dias grátis. Nos planos pagos: garantia de 7 dias com reembolso integral e cancelamento quando quiser.</p>
         </header>
         <div className="grid gap-6 md:grid-cols-3 items-stretch">
           {plans.map((plan, idx) => (
@@ -517,7 +517,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
               </ul>
               <Link href="/signup" data-cta="plano-base" style={{ transform: "translateZ(34px)" }} className="mt-8 block">
                 <Button className="w-full h-12 rounded-xl text-xs font-bold uppercase tracking-wide gap-2" variant={plan.highlight ? "default" : "outline"}>
-                  {plan.id === 'base' ? 'Criar conta grátis' : 'Garantir meu acesso'} <ArrowRight className="w-4 h-4" />
+                  {plan.id === 'base' ? 'Começar teste grátis' : 'Garantir meu acesso'} <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
             </div></TiltCard></Reveal>
@@ -531,7 +531,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 PricingSection.displayName = "PricingSection";
 
 const FAQ_ITEMS = [
-  { q: "Preciso pagar ou colocar cartão para começar?", a: "Não. O plano Base é gratuito, sem cartão de crédito. Você cria a conta, envia o link de coleta e só migra para um plano pago se quiser mais recursos." },
+  { q: "Preciso pagar ou colocar cartão para começar?", a: "Não. Você testa 14 dias grátis, com os recursos do Premium e sem cartão de crédito. Ao fim do teste, escolhe um plano pago para continuar com tudo; seus dados ficam salvos." },
   { q: "Meu cliente precisa baixar algum app ou criar conta?", a: "Não. Ele abre o link no celular, escolhe as estrelas, escreve (ou envia uma foto) e envia. Leva menos de 1 minuto." },
   { q: "As críticas ficam escondidas do público?", a: "Notas de 1 a 3 estrelas dadas pelo seu link de coleta vão para o seu Inbox privado e não aparecem na sua página. O Proova não impede ninguém de avaliar no Google: ele te dá a chance de ouvir e resolver antes. A nota média do seu painel inclui todas as avaliações, inclusive as críticas." },
   { q: "O cliente autoriza a publicação do depoimento?", a: "Sim. Antes de enviar, o cliente marca um aceite autorizando a publicação do depoimento e do nome. A autorização fica registrada em cada depoimento e você remove quando ele pedir." },
@@ -719,7 +719,7 @@ export default function Home() {
                 Sua próxima avaliação 5 estrelas <span className="text-primary italic">começa com um link.</span>
               </h2>
               <p className="max-w-lg mx-auto text-sm md:text-lg font-medium text-white/80">
-                Crie sua conta grátis, envie o primeiro link de coleta hoje e veja quem aprova (e quem precisa de atenção) antes de ir para o Google.
+                Crie sua conta, teste 14 dias grátis, envie o primeiro link de coleta hoje e veja quem aprova (e quem precisa de atenção) antes de ir para o Google.
               </p>
             </header>
             <Link href="/signup" data-cta="cta-final" className="w-full sm:w-auto">
@@ -727,14 +727,14 @@ export default function Home() {
                 CRIAR CONTA GRÁTIS
               </Button>
             </Link>
-            <p className="text-xs md:text-sm font-bold text-white/70">Plano Base grátis • Sem cartão • Planos pagos com garantia de 7 dias</p>
+            <p className="text-xs md:text-sm font-bold text-white/70">14 dias grátis • Sem cartão • Planos pagos com garantia de 7 dias</p>
           </div>
         </section>
       </main>
       <Footer />
       <div className={cn("fixed inset-x-0 bottom-0 z-[60] md:hidden border-t bg-background/95 backdrop-blur px-4 py-3 transition-transform duration-300", showSticky ? "translate-y-0" : "translate-y-full")}>
         <Link href="/signup" data-cta="barra-mobile" className="block">
-          <Button className="w-full h-12 rounded-xl text-[11px] font-black uppercase tracking-widest gap-2">Criar conta grátis <ArrowRight className="w-4 h-4" /></Button>
+          <Button className="w-full h-12 rounded-xl text-[11px] font-black uppercase tracking-widest gap-2">Começar teste grátis de 14 dias <ArrowRight className="w-4 h-4" /></Button>
         </Link>
       </div>
     </div>

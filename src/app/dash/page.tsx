@@ -1,6 +1,7 @@
 'use client';
 
 import { trackEvent } from '@/lib/track';
+import { trialDaysLeft } from '@/lib/trial';
 import { AppSideMenu } from '@/components/app-menu';
 import { useMemo, useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -178,6 +179,20 @@ export default function DashPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
+  // Teste grátis de 14 dias: inicia (contas no plano Base) ou encerra (vencido) no servidor.
+  const trialSyncedRef = useRef(false);
+  useEffect(() => {
+    if (!user || !userData || trialSyncedRef.current) return;
+    const st = (userData as any).membershipStatus || 'base';
+    const ends = (userData as any).trialEndsAt?.toMillis?.();
+    const needs = ((st === 'base' || st === 'lead') && !(userData as any).trialUsed) || (st === 'trial' && (!ends || ends <= Date.now()));
+    if (!needs) return;
+    trialSyncedRef.current = true;
+    user.getIdToken().then((t: string) => fetch('/api/trial/sync', { method: 'POST', headers: { Authorization: `Bearer ${t}` } })).catch(() => { trialSyncedRef.current = false; });
+  }, [user, userData]);
+  const trialLeft = (userData as any)?.membershipStatus === 'trial' ? trialDaysLeft((userData as any)?.trialEndsAt) : null;
+  const trialEnded = (userData as any)?.membershipStatus === 'expired';
+
   // Tour de boas-vindas: só para contas novas (onboardingDone === false) ou ao abrir /dash?tour=1.
   const [tourForced, setTourForced] = useState(false);
   const [tourClosed, setTourClosed] = useState(false);
@@ -301,8 +316,8 @@ export default function DashPage() {
     const status = userData?.membershipStatus;
     if (status === 'enterprise') return 'PRO';
     if (status === 'gold') return 'PREMIUM';
-    if (status === 'trial') return 'TRIAL';
-    return 'PLANO BASE';
+    if (status === 'trial') return 'TESTE GRÁTIS';
+    return 'SEM PLANO';
   }, [userData]);
 
   useEffect(() => { if (typeof window !== 'undefined') setBaseUrl(window.location.origin); }, []);
@@ -616,6 +631,12 @@ export default function DashPage() {
       <AppSideMenu companySlug={userData?.companySlug} open={isMenuOpen} onOpenChange={setIsMenuOpen} toggleRef={toggleButtonRef} companyName={userData?.companyName} membershipLabel={membershipLabel} isAdmin={userData?.isAdmin === true} pendingCount={pendingTestimonialsCount} onHome={clearHash} onHash={(h) => { window.location.hash = h; }} />
 
       <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pt-20 md:pt-32 pb-12">
+        {(trialLeft !== null || trialEnded) && (
+          <Link href="/pricing" className="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-xs md:text-sm font-bold">
+            <span>{trialEnded ? 'Seu teste de 14 dias terminou. Escolha um plano para continuar com os recursos Premium.' : trialLeft === 0 ? 'Seu teste grátis termina hoje.' : `Teste grátis: ${trialLeft} ${trialLeft === 1 ? 'dia restante' : 'dias restantes'}.`}</span>
+            <span className="shrink-0 text-primary font-black uppercase tracking-wider text-[10px]">Ver planos</span>
+          </Link>
+        )}
         
         {activeHash ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-10">

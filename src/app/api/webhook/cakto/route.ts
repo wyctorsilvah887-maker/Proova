@@ -112,7 +112,7 @@ export async function POST(request: Request) {
         outcome = 'activated';
         reason = decision.plan;
       } else if (decision.action === 'deactivate') {
-        await userRef.update({ membershipStatus: 'base', planUpdatedAt: FieldValue.serverTimestamp(), planRenewsAt: FieldValue.delete() });
+        await userRef.update({ membershipStatus: 'expired', planUpdatedAt: FieldValue.serverTimestamp(), planRenewsAt: FieldValue.delete() });
         if (event === 'refund' || event === 'chargeback') {
           const open = await db.collection('refund_requests').where('uid', '==', userRef.id).where('status', '==', 'pending').get();
           await Promise.all(open.docs.map((d) => d.ref.update({ status: 'refunded', resolvedAt: FieldValue.serverTimestamp() })));

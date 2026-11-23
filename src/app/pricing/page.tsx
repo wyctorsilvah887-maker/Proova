@@ -1,5 +1,6 @@
 'use client';
 
+import { trialDaysLeft } from '@/lib/trial';
 import { trackEvent } from '@/lib/track';
 import React, { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -64,25 +65,25 @@ const num = (n: number) => (n === Infinity ? 'Ilimitados' : String(n));
 // Valores de página pública vêm de pp-plans.ts (mesma fonte do editor), então a tabela nunca diverge.
 const COMPARE_ROWS: { label: string; base: string | boolean; premium: string | boolean; pro: string | boolean }[] = [
   { label: 'Link de coleta e QR Code de balcão', base: true, premium: true, pro: true },
-  { label: 'Depoimentos na página pública', base: num(FREE.selectionLimit), premium: num(PREMIUM.selectionLimit), pro: num(PRO.selectionLimit) },
-  { label: 'Layouts de depoimentos', base: String(FREE.layouts.length), premium: String(PREMIUM.layouts.length), pro: String(PRO.layouts.length) },
-  { label: 'Blocos Sobre e Horários', base: FREE.blocks.about, premium: PREMIUM.blocks.about, pro: PRO.blocks.about },
-  { label: 'Perguntas frequentes, redes sociais e mapa', base: FREE.blocks.faq, premium: PREMIUM.blocks.faq, pro: PRO.blocks.faq },
-  { label: 'Reordenar os blocos da página', base: FREE.reorder, premium: PREMIUM.reorder, pro: PRO.reorder },
-  { label: 'Botão de WhatsApp e botão do site', base: FREE.whatsappButton, premium: PREMIUM.whatsappButton, pro: PRO.whatsappButton },
-  { label: 'Cor secundária e link personalizado', base: FREE.secondaryColor, premium: PREMIUM.secondaryColor, pro: PRO.secondaryColor },
-  { label: 'Seções de texto livres', base: String(FREE.customSections), premium: String(PREMIUM.customSections), pro: String(PRO.customSections) },
-  { label: 'Ocultar "Powered by Proova AI"', base: FREE.removeBranding, premium: PREMIUM.removeBranding, pro: PRO.removeBranding },
-  { label: 'Busca automática de novas avaliações do Google', base: false, premium: true, pro: true },
-  { label: 'Respostas por IA (por mês)', base: String(AI_MONTHLY_LIMIT.free), premium: String(AI_MONTHLY_LIMIT.premium), pro: String(AI_MONTHLY_LIMIT.pro) },
-  { label: 'Resposta automática assim que o depoimento chega', base: false, premium: true, pro: true },
+  { label: 'Depoimentos na página pública', base: num(PREMIUM.selectionLimit), premium: num(PREMIUM.selectionLimit), pro: num(PRO.selectionLimit) },
+  { label: 'Layouts de depoimentos', base: String(PREMIUM.layouts.length), premium: String(PREMIUM.layouts.length), pro: String(PRO.layouts.length) },
+  { label: 'Blocos Sobre e Horários', base: PREMIUM.blocks.about, premium: PREMIUM.blocks.about, pro: PRO.blocks.about },
+  { label: 'Perguntas frequentes, redes sociais e mapa', base: PREMIUM.blocks.faq, premium: PREMIUM.blocks.faq, pro: PRO.blocks.faq },
+  { label: 'Reordenar os blocos da página', base: PREMIUM.reorder, premium: PREMIUM.reorder, pro: PRO.reorder },
+  { label: 'Botão de WhatsApp e botão do site', base: PREMIUM.whatsappButton, premium: PREMIUM.whatsappButton, pro: PRO.whatsappButton },
+  { label: 'Cor secundária e link personalizado', base: PREMIUM.secondaryColor, premium: PREMIUM.secondaryColor, pro: PRO.secondaryColor },
+  { label: 'Seções de texto livres', base: String(PREMIUM.customSections), premium: String(PREMIUM.customSections), pro: String(PRO.customSections) },
+  { label: 'Ocultar "Powered by Proova AI"', base: PREMIUM.removeBranding, premium: PREMIUM.removeBranding, pro: PRO.removeBranding },
+  { label: 'Busca automática de novas avaliações do Google', base: true, premium: true, pro: true },
+  { label: 'Respostas por IA (por mês)', base: String(AI_MONTHLY_LIMIT.premium), premium: String(AI_MONTHLY_LIMIT.premium), pro: String(AI_MONTHLY_LIMIT.pro) },
+  { label: 'Resposta automática assim que o depoimento chega', base: true, premium: true, pro: true },
   { label: 'Inbox privado de críticas (Reputation Shield)', base: true, premium: true, pro: true },
-  { label: 'Alerta de crítica por e-mail e push no celular', base: false, premium: true, pro: true },
-  { label: 'Responder crítica por WhatsApp/e-mail com mensagem pronta', base: false, premium: true, pro: true },
-  { label: 'Lembrete diário no celular para pedir avaliação', base: false, premium: true, pro: true },
-  { label: 'Nota média real (inclui críticas privadas)', base: false, premium: true, pro: true },
-  { label: 'Social Cards VIP (post e story)', base: false, premium: true, pro: true },
-  { label: 'Métricas e relatório semanal', base: false, premium: true, pro: true },
+  { label: 'Alerta de crítica por e-mail e push no celular', base: true, premium: true, pro: true },
+  { label: 'Responder crítica por WhatsApp/e-mail com mensagem pronta', base: true, premium: true, pro: true },
+  { label: 'Lembrete diário no celular para pedir avaliação', base: true, premium: true, pro: true },
+  { label: 'Nota média real (inclui críticas privadas)', base: true, premium: true, pro: true },
+  { label: 'Social Cards VIP (post e story)', base: true, premium: true, pro: true },
+  { label: 'Métricas e relatório semanal', base: true, premium: true, pro: true },
   { label: 'Coleta de depoimento em vídeo', base: false, premium: false, pro: true },
 ];
 
@@ -127,12 +128,14 @@ export default function PricingPage() {
     return (effectiveUserData?.membershipStatus || 'base').toLowerCase();
   }, [user, effectiveUserData]);
 
+  const trialLeft = status === 'trial' ? trialDaysLeft((effectiveUserData as any)?.trialEndsAt) : 0;
+
   const membershipLabel = useMemo(() => {
     if (status === 'enterprise' || status === 'pro') return 'PRO';
     if (status === 'gold') return 'PREMIUM';
-    if (status === 'trial') return 'TRIAL';
+    if (status === 'trial') return 'TESTE GRÁTIS';
     if (status === 'guest') return 'Visitante';
-    return 'PLANO BASE';
+    return 'SEM PLANO';
   }, [status]);
 
   if (authLoading || (user && !effectiveUserData)) {
@@ -142,22 +145,23 @@ export default function PricingPage() {
   const plans = [
     {
       id: 'base',
-      name: "Proova AI Base",
+      name: "Teste grátis de 14 dias",
       price: "R$ 0",
-      period: "grátis",
-      description: "Para começar a coletar depoimentos",
+      period: "por 14 dias",
+      description: "Todos os recursos Premium, sem cartão",
       icon: Gem,
       highlight: false,
-      cta: user ? (status === 'base' ? "Plano Ativo" : "Plano gratuito") : "Criar conta grátis",
+      cta: !user ? "Começar teste grátis" : status === 'trial' ? `Teste em andamento (${trialLeft} ${trialLeft === 1 ? 'dia' : 'dias'})` : (status === 'base' ? "Teste liberado ao abrir o painel" : "Teste já utilizado"),
       disabled: !!user,
       checkoutUrl: "",
       benefits: [
-        "Link de coleta e QR Code de balcão",
-        `Página pública com até ${FREE.selectionLimit} depoimentos`,
-        "Blocos Sobre e Horários",
+        "Sem cartão de crédito: a conta já começa com o teste",
+        "Link de coleta, QR Code de balcão e página pública completa",
         "Inbox privado: críticas de 1 a 3 estrelas ficam só com você",
-        `Respostas por IA: até ${AI_MONTHLY_LIMIT.free} por mês`,
-        "Autorização de publicação registrada em cada depoimento",
+        `Respostas por IA (Gemini): até ${AI_MONTHLY_LIMIT.premium} por mês`,
+        "Busca automática das novas avaliações do Google",
+        "Social Cards, métricas e relatório semanal",
+        "Ao fim dos 14 dias, escolha Premium ou PRO para manter tudo (seus dados ficam salvos)",
       ]
     },
     {
@@ -360,7 +364,7 @@ export default function PricingPage() {
                       <div className="pt-4">
                         <Button 
                           onClick={() => {
-                            if (plan.id === 'base') { trackEvent('signup_click', 'planos-base'); router.push('/signup'); }
+                            if (plan.id === 'base') { trackEvent('signup_click', 'planos-teste'); router.push('/signup'); }
                             else if (plan.checkoutUrl) { trackEvent('checkout_click', `planos-${plan.id}`); window.open(plan.checkoutUrl, '_blank'); }
                           }}
                           disabled={plan.disabled}
@@ -401,7 +405,7 @@ export default function PricingPage() {
                 <thead>
                   <tr className="border-b bg-muted/30 font-black uppercase tracking-widest">
                     <th className="p-3 md:p-4">Recurso</th>
-                    <th className="p-3 md:p-4 text-center">Base</th>
+                    <th className="p-3 md:p-4 text-center">Teste 14 dias</th>
                     <th className="p-3 md:p-4 text-center text-primary">Premium</th>
                     <th className="p-3 md:p-4 text-center">PRO</th>
                   </tr>

@@ -260,9 +260,9 @@ export default function MetricsPage() {
     const status = userData?.membershipStatus;
     if (status === 'enterprise') return 'PRO';
     if (status === 'gold') return 'PREMIUM';
-    if (status === 'trial') return 'TRIAL';
+    if (status === 'trial') return 'TESTE GRÁTIS';
     if (status === 'expired') return 'EXPIRADO';
-    return 'PLANO BASE';
+    return 'SEM PLANO';
   }, [userData]);
 
   if (authLoading || userDataLoading || testimonialsLoading) {

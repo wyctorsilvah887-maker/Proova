@@ -49,7 +49,7 @@ export async function POST(req: Request) {
   await notifyAdminsNewTicket({
     ticketId,
     userName: String(ticket.userName || 'Usuário Proova').slice(0, 80),
-    planLabel: plan === 'pro' ? 'PRO' : plan === 'premium' ? 'PREMIUM' : 'BASE',
+    planLabel: plan === 'pro' ? 'PRO' : plan === 'premium' ? 'PREMIUM' : 'SEM PLANO',
   });
   return NextResponse.json({ ok: true });
 }

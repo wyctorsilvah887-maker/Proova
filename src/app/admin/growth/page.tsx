@@ -17,7 +17,7 @@ import { FUNNEL } from '@/lib/analytics-events';
 import { disableTracking } from '@/lib/track';
 
 const PRICE = { free: 0, premium: 147, pro: 270 } as const;
-const PLAN_LABEL = { free: 'Base', premium: 'Premium', pro: 'PRO' } as const;
+const PLAN_LABEL = { free: 'Sem plano', premium: 'Premium', pro: 'PRO' } as const;
 const brl = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
 const pct = (a: number, b: number) => (b ? `${((a / b) * 100).toFixed(1).replace('.', ',')}%` : '—');
 

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 import { adminDb } from '@/lib/firebase-admin';
 import { safeEqual } from '@/lib/reviews/sync';
@@ -31,8 +32,17 @@ export async function GET(req: Request) {
   }
   let renewals: any = null;
   try { renewals = await runRenewalNotices(t0 + 25_000); } catch (e) { console.error('[cron renewal]', (e as Error).message); }
+  // Encerra testes vencidos (rede de segurança: o painel também encerra ao abrir).
+  let trialsExpired = 0;
+  try {
+    const due = await adminDb().collection('users').where('membershipStatus', '==', 'trial').get();
+    const now = Timestamp.now().toMillis();
+    const over = due.docs.filter((d) => (d.data().trialEndsAt?.toMillis?.() ?? 0) <= now).slice(0, 400);
+    await Promise.all(over.map((d) => d.ref.update({ membershipStatus: 'expired', planUpdatedAt: FieldValue.serverTimestamp() })));
+    trialsExpired = over.length;
+  } catch (e) { console.error('[cron trial]', (e as Error).message); }
   const dow = new Date().getUTCDay(); // 0 = domingo, 6 = sábado
-  if (dow === 0 || dow === 6) return NextResponse.json({ ok: true, renewals, reminders: 'weekend_skip' });
+  if (dow === 0 || dow === 6) return NextResponse.json({ ok: true, renewals, reminders: 'weekend_skip', trialsExpired });
   const msg = MSGS[new Date().getUTCDate() % MSGS.length];
   const snap = await adminDb().collection('users').where('membershipStatus', 'in', PAID).get();
   const targets = snap.docs.filter((d) => d.data().reminderPush !== false && !!d.data().companySlug);
