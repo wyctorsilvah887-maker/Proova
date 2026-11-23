@@ -8,3 +8,14 @@ export function trialDaysLeft(trialEndsAt: any, now = Date.now()): number {
   if (ms == null) return 0;
   return Math.max(0, Math.ceil((ms - now) / 86400000));
 }
+
+/** Conta sem acesso: teste vencido (ou plano cancelado/reembolsado). Admins nunca ficam bloqueados. */
+export function isAccessLocked(u: { membershipStatus?: string; trialEndsAt?: any; isAdmin?: boolean } | null | undefined, now = Date.now()): boolean {
+  if (!u || u.isAdmin === true) return false;
+  if (u.membershipStatus === 'expired') return true;
+  if (u.membershipStatus === 'trial') {
+    const ms = u.trialEndsAt?.toMillis?.();
+    return !!ms && ms <= now;
+  }
+  return false;
+}

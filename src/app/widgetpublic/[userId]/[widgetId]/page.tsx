@@ -1,5 +1,6 @@
 'use client';
 
+import { isAccessLocked } from '@/lib/trial';
 import { useState, useMemo, useEffect, use } from 'react';
 import { useFirestore } from '@/firebase';
 import { doc, onSnapshot, collection, query, where, getDoc } from 'firebase/firestore';
@@ -103,7 +104,7 @@ export default function WidgetPublicPage({ params }: { params: Promise<{ userId:
     };
   }, [filteredTestimonials.length]);
 
-  if (isLoading || !widgetData || filteredTestimonials.length === 0) {
+  if (isLoading || !userData || isAccessLocked(userData) || !widgetData || filteredTestimonials.length === 0) {
     return (
       <style dangerouslySetInnerHTML={{ __html: `
         html, body { background: transparent !important; background-color: transparent !important; opacity: 0 !important; }

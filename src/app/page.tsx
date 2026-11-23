@@ -449,7 +449,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
         "Página pública completa",
         "Inbox privado para críticas",
         "Respostas por IA e busca automática de avaliações",
-        "Escolha um plano só se gostar",
+        "Depois dos 14 dias, o acesso só continua com assinatura",
       ],
     },
     {

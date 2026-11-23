@@ -1,5 +1,7 @@
 'use client';
 
+import { isAccessLocked } from '@/lib/trial';
+import { PageOffline } from '@/components/page-offline';
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -45,6 +47,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
   const [submitted, setSubmitted] = useState(false);
   const [targetUserId, setTargetUserId] = useState<string | null>(null);
   const [isLoadingCompany, setIsLoadingCompany] = useState(true);
+  const [ownerLocked, setOwnerLocked] = useState(false);
   const [googleMapsUrl, setGoogleMapsUrl] = useState<string | null>(null);
   const [companyNameDisplay, setCompanyNameDisplay] = useState('');
   const [contactWhatsapp, setContactWhatsapp] = useState<string | null>(null);
@@ -81,6 +84,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
         const snap1 = await getDocs(q1);
         if (!snap1.empty) {
           const data = snap1.docs[0].data();
+          if (isAccessLocked(data)) { setOwnerLocked(true); return; }
           setTargetUserId(snap1.docs[0].id);
           setCompanyNameDisplay(data.companyName);
           setGoogleMapsUrl(data.googleMapsUrl || null);
@@ -228,6 +232,7 @@ export default function CollectionClient({ slug }: { slug: string }) {
   };
 
   if (isLoadingCompany) return <LoadingScreen />;
+  if (ownerLocked) return <PageOffline />;
   if (!targetUserId) return <div className="min-h-screen flex items-center justify-center p-4 bg-muted/30"><Card className="max-w-md w-full p-10 text-center shadow-xl rounded-[2.5rem]"><Globe className="w-12 h-12 mx-auto text-muted-foreground mb-4" /><h2 className="text-xl font-bold">Empresa não encontrada</h2></Card></div>;
 
   if (submitted) {

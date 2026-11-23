@@ -35,7 +35,7 @@ export const CONSULTANT_TREE: Record<string, TreeBranch> = {
   '5': {
     title: 'Planos e Upgrade',
     keys: ['5', 'plano', 'valor', 'preco', 'upgrade'],
-    response: `**💎 Planos Proova AI**\n\n1. **Teste grátis (14 dias):** todos os recursos Premium, sem cartão de crédito.\n2. **Premium (${PLAN_PRICE.premium}/mês):** página completa e Studio, busca automática de avaliações do Google, respostas por IA, alertas de avaliação negativa, G-Boost, Social Cards VIP e métricas.\n3. **PRO (${PLAN_PRICE.pro}/mês):** tudo do Premium, mais depoimentos ilimitados, vídeo-depoimento, selo sem \"Powered by\" e suporte dedicado.\n\n*Compare tudo em **www.useproovaai.com.br/pricing**.*\n\n*Digite **0** para voltar ao menu principal.*`
+    response: `**💎 Planos Proova AI**\n\n1. **Teste grátis (14 dias):** todos os recursos Premium, sem cartão de crédito. Depois dos 14 dias o acesso só continua com assinatura: sem plano, painel, link de coleta e página pública saem do ar (os dados ficam salvos).\n2. **Premium (${PLAN_PRICE.premium}/mês):** página completa e Studio, busca automática de avaliações do Google, respostas por IA, alertas de avaliação negativa, G-Boost, Social Cards VIP e métricas.\n3. **PRO (${PLAN_PRICE.pro}/mês):** tudo do Premium, mais depoimentos ilimitados, vídeo-depoimento, selo sem \"Powered by\" e suporte dedicado.\n\n*Compare tudo em **www.useproovaai.com.br/pricing**.*\n\n*Digite **0** para voltar ao menu principal.*`
   },
   '6': {
     title: 'Falar com Humano',
