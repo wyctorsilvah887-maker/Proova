@@ -1,5 +1,7 @@
 'use client';
 
+import { continueWithGoogle, isGoogleCancel, isInAppBrowser } from '@/lib/google-auth';
+import { isAccessLocked } from '@/lib/trial';
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -168,48 +170,21 @@ export default function SignupPage() {
   };
 
   const handleGoogleSignup = async () => {
-    if (!db || isGoogleLoading) return;
+    if (!db || !auth || isGoogleLoading) return;
+    if (isInAppBrowser()) {
+      toast({ title: 'Abra no Chrome ou Safari', description: 'O Google não deixa entrar por dentro do Instagram/TikTok. Toque nos 3 pontos e escolha "Abrir no navegador".' });
+      return;
+    }
     setIsGoogleLoading(true);
-
     try {
-      const provider = new GoogleAuthProvider();
-      provider.addScope('https://www.googleapis.com/auth/business.manage');
-      provider.setCustomParameters({
-        access_type: 'offline',
-        prompt: 'consent'
-      });
-
-      const result = await signInWithPopup(auth, provider);
-      const userRef = doc(db, 'users', result.user.uid);
-      const userSnap = await getDoc(userRef);
-
-      if (!userSnap.exists()) {
-        await setDoc(userRef, {
-          name: result.user.displayName || 'Usuário Google',
-          companyName: 'Minha Empresa',
-          companySlug: `empresa-${Math.random().toString(36).substring(2, 7)}`,
-          email: result.user.email,
-          businessType: 'clinica_estetica',
-          isAdmin: false,
-          onboardingDone: false,
-          membershipStatus: 'base',
-          isSetupProcessDone: false,
-          testimonialsCount: 0,
-          googleRedirectCount: 0,
-          createdAt: serverTimestamp(),
-          termsAccepted: true,
-          termsAcceptedAt: serverTimestamp(),
-          attribution: getAttribution(),
-          googleConnected: true
-        });
-        trackEvent('signup_done');
-        toast({ title: "Bem-vindo!", description: "Sua conta foi criada com sucesso via Google." });
-      }
-
-      router.push('/dash');
+      const { isNew, userData } = await continueWithGoogle(auth, db);
+      toast({ title: isNew ? 'Bem-vindo!' : 'Bem-vindo de volta!', description: isNew ? 'Conta criada. Escolha seu plano para começar.' : undefined });
+      router.push(isNew || isAccessLocked(userData) ? '/pricing' : '/dash');
     } catch (error: any) {
-      console.error(error);
-      toast({ variant: "destructive", title: "Erro no Cadastro", description: "Não foi possível conectar com the Google agora." });
+      if (!isGoogleCancel(error)) {
+        console.error(error);
+        toast({ variant: 'destructive', title: 'Erro no Cadastro', description: 'Não foi possível conectar com o Google agora.' });
+      }
     } finally {
       setIsGoogleLoading(false);
     }
@@ -282,7 +257,7 @@ export default function SignupPage() {
       
       trackEvent('signup_done');
       toast({ title: "Conta Criada!", description: "Bem-vindo à nova era da prova social." });
-      router.push('/dash');
+      router.push('/pricing');
     } catch (error: any) {
       const friendly: Record<string, string> = {
         'auth/email-already-in-use': "Este e-mail já possui uma conta. Faça login ou redefina a senha.",

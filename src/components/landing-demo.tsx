@@ -44,9 +44,9 @@ export function HeroNotifications() {
 /** Números que a gente pode afirmar (do próprio produto), com contagem animada. */
 export function FactsStrip() {
   const facts = [
-    { node: <CountUp to={0} prefix="R$ " />, label: 'para começar, sem cartão' },
+    { node: <><CountUp to={1} /> toque</>, label: 'para criar a conta com o Google' },
     { node: <><CountUp to={1} /> min</>, label: 'para o cliente avaliar' },
-    { node: <><CountUp to={7} /> dias</>, label: 'de garantia nos planos pagos' },
+    { node: <><CountUp to={7} /> dias</>, label: 'de garantia, com reembolso integral' },
     { node: <CountUp to={100} suffix="%" />, label: 'das notas do seu link entram na média, até as críticas' },
   ];
   return (

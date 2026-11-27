@@ -1,5 +1,6 @@
 'use client';
 
+import { GoogleButton } from "@/components/google-button";
 import { useEffect, useState, useRef, forwardRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -95,9 +96,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
           
           <div className="hidden sm:flex items-center gap-6">
             <Link href="/login" className="text-[10px] font-black uppercase tracking-widest hover:text-primary transition-colors">Acesso Membro</Link>
-            <Link href="/signup" data-cta="nav">
-              <Button className="font-black uppercase tracking-widest shadow-lg px-4 h-9 text-[9px] rounded-xl">Teste grátis</Button>
-            </Link>
+            <GoogleButton cta="nav" label="Entrar com Google" className="font-black uppercase tracking-widest shadow-lg px-4 h-9 text-[9px] rounded-xl gap-2 bg-white text-zinc-900 border border-zinc-300 hover:bg-zinc-100" />
           </div>
 
           <div className="sm:hidden">
@@ -171,9 +170,7 @@ const Navigation = ({ isScrolled, isMenuOpen, setIsMenuOpen, scrollToSection }: 
                         <Link href="/login" className="block" onClick={() => setIsMenuOpen(false)}>
                           <Button variant="outline" className="w-full h-11 rounded-xl font-black uppercase tracking-widest text-[8px]">Acessar Dashboard</Button>
                         </Link>
-                        <Link href="/signup" data-cta="menu-mobile" className="block" onClick={() => setIsMenuOpen(false)}>
-                          <Button className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-2xl">Ativar Licença</Button>
-                        </Link>
+                        <GoogleButton cta="menu-mobile" label="Continuar com Google" className="w-full h-12 rounded-xl font-black uppercase tracking-widest text-[9px] shadow-2xl gap-3 bg-white text-zinc-900 border border-zinc-300 hover:bg-zinc-100" />
                       </div>
                     </div>
                   </div>
@@ -224,22 +221,21 @@ const HeroSection = ({ isVisible, scrollToSection }: { isVisible: boolean; scrol
             "flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 transition-all duration-1000 delay-500",
             isVisible ? "animate-in fade-in slide-in-from-bottom-5 opacity-100" : "opacity-0"
           )}>
-            <Link href="/signup" data-cta="hero" className="w-full sm:w-auto">
-              <Button className="relative overflow-hidden w-full sm:w-auto h-14 px-8 rounded-2xl text-[11px] font-black shadow-2xl shadow-primary/30 transition-all hover:scale-105 hover:shadow-primary/50 active:scale-95 group bg-primary hover:bg-primary/90 text-white uppercase tracking-widest">
-                <span aria-hidden className="pointer-events-none absolute inset-0 -translate-x-full animate-shine bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-                <span className="relative inline-flex items-center">Começar teste grátis de 14 dias <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" /></span>
-              </Button>
-            </Link>
+            <GoogleButton cta="hero" label="Continuar com Google" className="relative overflow-hidden w-full sm:w-auto h-14 px-8 rounded-2xl text-[11px] font-black uppercase tracking-widest gap-3 shadow-2xl shadow-primary/30 transition-all hover:scale-105 hover:shadow-primary/50 active:scale-95 bg-white text-zinc-900 border border-zinc-300 hover:bg-zinc-100" />
             <Button type="button" variant="outline" onClick={() => scrollToSection('como-funciona')} className="w-full sm:w-auto h-14 px-8 rounded-2xl text-[11px] font-black uppercase tracking-widest gap-2">
               <Play className="w-4 h-4 fill-current" /> Ver como funciona
             </Button>
           </div>
 
           <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pt-2 text-[11px] md:text-xs font-bold text-muted-foreground">
-            {["14 dias grátis", "Sem cartão de crédito", "Pronto em 1 minuto"].map((t) => (
+            {["Cadastro em 1 toque", "Garantia de 7 dias", "Pronto em 1 minuto"].map((t) => (
               <li key={t} className="inline-flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-primary" />{t}</li>
             ))}
           </ul>
+
+          <p className="text-[10px] md:text-xs text-muted-foreground font-medium">
+            Ao continuar, você aceita os <Link href="/terms" className="underline hover:text-primary">Termos de Uso</Link> e a <Link href="/privacy" className="underline hover:text-primary">Política de Privacidade</Link>. Prefere e-mail? <Link href="/signup" data-cta="hero-email" className="underline hover:text-primary">Criar conta com e-mail</Link>
+          </p>
 
           <HeroNotifications />
         </div>
@@ -438,21 +434,6 @@ VersatilitySection.displayName = "VersatilitySection";
 const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisible }, ref) => {
   const plans = [
     {
-      id: 'base',
-      name: "Teste grátis de 14 dias",
-      price: "R$ 0",
-      period: "por 14 dias",
-      description: "Use tudo do Premium por 14 dias, sem cartão de crédito.",
-      highlight: false,
-      benefits: [
-        "Link de coleta e QR Code de balcão",
-        "Página pública completa",
-        "Inbox privado para críticas",
-        "Respostas por IA e busca automática de avaliações",
-        "Depois dos 14 dias, o acesso só continua com assinatura",
-      ],
-    },
-    {
       id: 'premium',
       name: "Proova AI Premium",
       price: "R$ 147",
@@ -493,9 +474,9 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
       <div className="container px-4 mx-auto max-w-6xl">
         <header className={cn("text-center space-y-3 mb-12 transition-all duration-700", isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6")}>
           <h2 className="text-3xl md:text-4xl font-extrabold font-headline tracking-tight">Planos e <span className="inline-block bg-clip-text text-transparent bg-gradient-to-r from-primary via-orange-300 to-primary italic animate-text-shine bg-[length:200%_auto] pr-2">preços</span></h2>
-          <p className="text-sm md:text-base text-muted-foreground font-medium">Teste 14 dias grátis. Nos planos pagos: garantia de 7 dias com reembolso integral e cancelamento quando quiser.</p>
+          <p className="text-sm md:text-base text-muted-foreground font-medium">Garantia de 7 dias com reembolso integral e cancelamento quando quiser.</p>
         </header>
-        <div className="grid gap-6 md:grid-cols-3 items-stretch">
+        <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto items-stretch">
           {plans.map((plan, idx) => (
             <Reveal key={plan.id} delay={idx * 120} className="h-full"><TiltCard className="h-full rounded-2xl" max={11}><div style={{ transformStyle: "preserve-3d" }} className={cn("relative flex h-full flex-col rounded-2xl border border-b-[6px] p-6 md:p-8 bg-gradient-to-b from-card to-muted/60 transition-shadow duration-300 shadow-[inset_0_1px_0_hsl(0_0%_100%/0.35),0_34px_60px_-28px_hsl(var(--primary)/0.45),0_14px_26px_-14px_rgb(0_0_0/0.35)] hover:shadow-[inset_0_1px_0_hsl(0_0%_100%/0.4),0_50px_80px_-30px_hsl(var(--primary)/0.6),0_20px_34px_-14px_rgb(0_0_0/0.45)]", plan.highlight ? "border-primary/60 border-b-primary ring-1 ring-primary/30" : "border-b-border")}>
               {plan.highlight && (
@@ -515,15 +496,13 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
                   </li>
                 ))}
               </ul>
-              <Link href="/signup" data-cta="plano-base" style={{ transform: "translateZ(34px)" }} className="mt-8 block">
-                <Button className="w-full h-12 rounded-xl text-xs font-bold uppercase tracking-wide gap-2" variant={plan.highlight ? "default" : "outline"}>
-                  {plan.id === 'base' ? 'Começar teste grátis' : 'Garantir meu acesso'} <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
+              <div style={{ transform: "translateZ(34px)" }} className="mt-8 block">
+                <GoogleButton cta={`plano-${plan.id}`} label="Garantir meu acesso" logo={false} variant={plan.highlight ? "default" : "outline"} className="w-full h-12 rounded-xl text-xs font-bold uppercase tracking-wide gap-2" />
+              </div>
             </div></TiltCard></Reveal>
           ))}
         </div>
-        <p className="mt-6 text-center text-xs text-muted-foreground font-medium">Crie sua conta gratuitamente e contrate o plano em seguida, com o mesmo e-mail.</p>
+        <p className="mt-6 text-center text-xs text-muted-foreground font-medium">Entre com o Google, escolha o plano e pague com o mesmo e-mail da conta: o acesso é ativado na hora.</p>
       </div>
     </section>
   );
@@ -531,7 +510,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 PricingSection.displayName = "PricingSection";
 
 const FAQ_ITEMS = [
-  { q: "Preciso pagar ou colocar cartão para começar?", a: "Não. Você testa 14 dias grátis, com os recursos do Premium e sem cartão de crédito. Ao fim do teste, escolhe um plano pago para continuar com tudo; seus dados ficam salvos." },
+  { q: "O Proova AI tem plano grátis ou teste?", a: "Não. O Proova AI é 100% pago, a partir de R$ 147 por mês. Para você contratar sem medo, os planos têm garantia de 7 dias com reembolso integral: se não gostar, devolvemos o valor." },
   { q: "Meu cliente precisa baixar algum app ou criar conta?", a: "Não. Ele abre o link no celular, escolhe as estrelas, escreve (ou envia uma foto) e envia. Leva menos de 1 minuto." },
   { q: "As críticas ficam escondidas do público?", a: "Notas de 1 a 3 estrelas dadas pelo seu link de coleta vão para o seu Inbox privado e não aparecem na sua página. O Proova não impede ninguém de avaliar no Google: ele te dá a chance de ouvir e resolver antes. A nota média do seu painel inclui todas as avaliações, inclusive as críticas." },
   { q: "O cliente autoriza a publicação do depoimento?", a: "Sim. Antes de enviar, o cliente marca um aceite autorizando a publicação do depoimento e do nome. A autorização fica registrada em cada depoimento e você remove quando ele pedir." },
@@ -719,23 +698,17 @@ export default function Home() {
                 Sua próxima avaliação 5 estrelas <span className="text-primary italic">começa com um link.</span>
               </h2>
               <p className="max-w-lg mx-auto text-sm md:text-lg font-medium text-white/80">
-                Crie sua conta, teste 14 dias grátis, envie o primeiro link de coleta hoje e veja quem aprova (e quem precisa de atenção) antes de ir para o Google.
+                Entre com o Google em 1 toque, ative seu plano, envie o primeiro link de coleta hoje e veja quem aprova (e quem precisa de atenção) antes de ir para o Google.
               </p>
             </header>
-            <Link href="/signup" data-cta="cta-final" className="w-full sm:w-auto">
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto h-14 md:h-16 px-10 rounded-xl text-sm md:text-base font-bold shadow-2xl shadow-primary/30 hover:scale-105 hover:shadow-primary/50 active:scale-95 transition-all bg-white text-black hover:bg-white/90">
-                CRIAR CONTA GRÁTIS
-              </Button>
-            </Link>
-            <p className="text-xs md:text-sm font-bold text-white/70">14 dias grátis • Sem cartão • Planos pagos com garantia de 7 dias</p>
+            <GoogleButton cta="cta-final" label="Continuar com Google" size="lg" className="w-full sm:w-auto h-14 md:h-16 px-10 rounded-xl text-sm md:text-base font-bold gap-3 shadow-2xl shadow-primary/30 hover:scale-105 hover:shadow-primary/50 active:scale-95 transition-all bg-white text-black hover:bg-white/90 border-none" />
+            <p className="text-xs md:text-sm font-bold text-white/70">Cadastro em 1 toque • Garantia de 7 dias com reembolso integral</p>
           </div>
         </section>
       </main>
       <Footer />
       <div className={cn("fixed inset-x-0 bottom-0 z-[60] md:hidden border-t bg-background/95 backdrop-blur px-4 py-3 transition-transform duration-300", showSticky ? "translate-y-0" : "translate-y-full")}>
-        <Link href="/signup" data-cta="barra-mobile" className="block">
-          <Button className="w-full h-12 rounded-xl text-[11px] font-black uppercase tracking-widest gap-2">Começar teste grátis de 14 dias <ArrowRight className="w-4 h-4" /></Button>
-        </Link>
+        <GoogleButton cta="barra-mobile" label="Continuar com Google" className="w-full h-12 rounded-xl text-[11px] font-black uppercase tracking-widest gap-3 bg-white text-zinc-900 border border-zinc-300 hover:bg-zinc-100" />
       </div>
     </div>
   );

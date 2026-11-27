@@ -41,7 +41,7 @@ const DESTINATIONS = [
   { id: 'pricing', label: 'Todos os planos', path: '/pricing' },
   { id: 'premium', label: 'Plano Premium', path: '/pricing?plan=gold' },
   { id: 'pro', label: 'Plano PRO', path: '/pricing?plan=pro' },
-  { id: 'signup', label: 'Cadastro grátis', path: '/signup' },
+  { id: 'signup', label: 'Cadastro', path: '/signup' },
 ];
 
 const CHANNELS = [

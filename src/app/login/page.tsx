@@ -1,5 +1,7 @@
 'use client';
 
+import { continueWithGoogle, isGoogleCancel, isInAppBrowser } from '@/lib/google-auth';
+import { isAccessLocked } from '@/lib/trial';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -72,49 +74,21 @@ export default function LoginPage() {
   };
 
   const handleGoogleLogin = async () => {
-    if (!db || isGoogleLoading) return;
+    if (!db || !auth || isGoogleLoading) return;
+    if (isInAppBrowser()) {
+      toast({ title: 'Abra no Chrome ou Safari', description: 'O Google não deixa entrar por dentro do Instagram/TikTok. Toque nos 3 pontos e escolha "Abrir no navegador".' });
+      return;
+    }
     setIsGoogleLoading(true);
-
     try {
-      const provider = new GoogleAuthProvider();
-      provider.addScope('https://www.googleapis.com/auth/business.manage');
-      provider.setCustomParameters({
-        access_type: 'offline',
-        prompt: 'consent'
-      });
-
-      const result = await signInWithPopup(auth, provider);
-      const userRef = doc(db, 'users', result.user.uid);
-      const userSnap = await getDoc(userRef);
-
-      if (!userSnap.exists()) {
-        await setDoc(userRef, {
-          name: result.user.displayName || 'Usuário Google',
-          email: result.user.email,
-          companyName: 'Minha Empresa',
-          companySlug: `empresa-${Math.random().toString(36).substring(2, 7)}`,
-          businessType: 'clinica_estetica',
-          isAdmin: false,
-          onboardingDone: false,
-          membershipStatus: 'base',
-          createdAt: serverTimestamp(),
-          attribution: getAttribution(),
-          googleConnected: true,
-          lastGoogleSync: serverTimestamp()
-        });
-        toast({ title: "Bem-vindo!", description: "Sua conta Proova foi criada com o Google." });
-      } else {
-        toast({ title: "Bem-vindo de volta!", description: "Login realizado com sucesso." });
-      }
-
-      router.push('/dash');
+      const { isNew, userData } = await continueWithGoogle(auth, db);
+      toast({ title: isNew ? 'Conta criada!' : 'Bem-vindo de volta!', description: isNew ? 'Escolha seu plano para começar.' : 'Login realizado com sucesso.' });
+      router.push(isNew || isAccessLocked(userData) ? '/pricing' : '/dash');
     } catch (error: any) {
-      console.error("Erro no Login Google:", error);
-      toast({ 
-        variant: "destructive", 
-        title: "Erro no Login Google", 
-        description: "Não foi possível conectar com sua conta Google agora." 
-      });
+      if (!isGoogleCancel(error)) {
+        console.error('Erro no Login Google:', error);
+        toast({ variant: 'destructive', title: 'Erro no Login Google', description: 'Não foi possível conectar com sua conta Google agora.' });
+      }
     } finally {
       setIsGoogleLoading(false);
     }
@@ -242,7 +216,7 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-muted-foreground font-medium">
             Novo por aqui?{' '}
-            <Link href="/signup" className="text-primary font-bold hover:underline">Criar conta (14 dias grátis)</Link>
+            <Link href="/signup" className="text-primary font-bold hover:underline">Criar conta</Link>
           </p>
         </div>
       </main>

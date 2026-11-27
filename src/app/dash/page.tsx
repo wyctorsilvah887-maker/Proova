@@ -179,14 +179,13 @@ export default function DashPage() {
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
   const { data: userData, loading: userDataLoading } = useDoc(userDocRef);
 
-  // Teste grátis de 14 dias: inicia (contas no plano Base) ou encerra (vencido) no servidor.
+  // Contas ainda em um teste antigo: se venceu, o servidor marca como expirada.
   const trialSyncedRef = useRef(false);
   useEffect(() => {
     if (!user || !userData || trialSyncedRef.current) return;
     const st = (userData as any).membershipStatus || 'base';
     const ends = (userData as any).trialEndsAt?.toMillis?.();
-    const needs = ((st === 'base' || st === 'lead') && !(userData as any).trialUsed) || (st === 'trial' && (!ends || ends <= Date.now()));
-    if (!needs) return;
+    if (!(st === 'trial' && (!ends || ends <= Date.now()))) return;
     trialSyncedRef.current = true;
     user.getIdToken().then((t: string) => fetch('/api/trial/sync', { method: 'POST', headers: { Authorization: `Bearer ${t}` } })).catch(() => { trialSyncedRef.current = false; });
   }, [user, userData]);
@@ -633,7 +632,7 @@ export default function DashPage() {
       <main className="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full pt-20 md:pt-32 pb-12">
         {(trialLeft !== null || trialEnded) && (
           <Link href="/pricing" className="mb-6 flex items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-xs md:text-sm font-bold">
-            <span>{trialEnded ? 'Seu teste terminou: painel, link de coleta e página pública estão fora do ar. Assine um plano para reativar tudo.' : trialLeft === 0 ? 'Seu teste termina hoje. Sem assinatura, o painel, o link de coleta e a página pública saem do ar.' : trialLeft <= 3 ? `Faltam ${trialLeft} ${trialLeft === 1 ? 'dia' : 'dias'} de teste. Sem assinatura, o painel, o link de coleta e a página pública saem do ar.` : `Teste grátis: ${trialLeft} dias restantes. Depois, só com assinatura: sem plano, o painel, o link de coleta e a página pública saem do ar.`}</span>
+            <span>{trialEnded ? 'Seu plano não está ativo: painel, link de coleta e página pública estão fora do ar. Assine um plano para reativar tudo.' : trialLeft === 0 ? 'Seu teste termina hoje. Sem assinatura, o painel, o link de coleta e a página pública saem do ar.' : trialLeft <= 3 ? `Faltam ${trialLeft} ${trialLeft === 1 ? 'dia' : 'dias'} de teste. Sem assinatura, o painel, o link de coleta e a página pública saem do ar.` : `Teste grátis: ${trialLeft} dias restantes. Depois, só com assinatura: sem plano, o painel, o link de coleta e a página pública saem do ar.`}</span>
             <span className="shrink-0 text-primary font-black uppercase tracking-wider text-[10px]">Ver planos</span>
           </Link>
         )}
