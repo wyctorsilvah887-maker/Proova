@@ -146,7 +146,7 @@ export default function PricingPage() {
     {
       id: 'gold',
       name: "Proova AI Premium",
-      price: "R$ 147",
+      price: "R$ 59,90",
       period: "/mês",
       description: "Aceleração de Vendas",
       icon: Star,
@@ -175,7 +175,7 @@ export default function PricingPage() {
     {
       id: 'pro',
       name: "Proova AI PRO",
-      price: "R$ 270",
+      price: "R$ 119,99",
       period: "/mês",
       description: "Domínio de Mercado",
       icon: Zap,

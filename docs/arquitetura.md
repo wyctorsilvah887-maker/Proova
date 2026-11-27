@@ -69,7 +69,7 @@ Cakto → `/api/webhook/cakto` (ativa/desativa plano e grava `planRenewsAt`); `/
 - Ativação por conta: `firstLinkSharedAt`, `firstFeedbackAt`, `firstApprovedAt` em `users/{uid}`.
 - Link de coleta: `collectionViewCount` (abertura, 1x por sessão). Link in Bio: `ppVisitCount` e `whatsappClickCount` (1x por dia por navegador; bots ignorados).
 - Linha de base (antes/depois no Google): `users/{uid}.baseline`, informada pelo dono.
-- Painel: `/admin/growth` (funil, origem por UTM, ativação, MRR estimado por preço fixo R$ 147 e R$ 270).
+- Painel: `/admin/growth` (funil, origem por UTM, ativação, MRR estimado por preço fixo R$ 59,90 e R$ 119,99).
 
 ## IA
 
