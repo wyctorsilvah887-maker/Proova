@@ -20,11 +20,11 @@ Admin ──► /admin (inclui /admin/growth)
 
 | Valor | Plano |
 |---|---|
-| `base` | Legado (sem teste ainda): vira `trial` ao abrir o painel |
-| `trial` | Teste grátis de 14 dias (recursos Premium); `trialEndsAt` no usuário |
+| `base` | Conta nova ou legada **sem plano**: painel e páginas públicas bloqueados até assinar |
+| `trial` | Só contas que JÁ estavam em teste antigo: valem até `trialEndsAt`; não se cria mais teste |
 | `gold` | Premium |
 | `enterprise` | PRO |
-| `expired` | Teste de 14 dias encerrado (ou plano cancelado): limites do antigo plano gratuito |
+| `expired` | Teste antigo vencido ou plano cancelado/reembolsado: sem acesso |
 
 - Limites e benefícios por plano ficam em `src/lib/pp-plans.ts` (e a landing ainda tem alguns benefícios do Base escritos à mão).
 - **Só o servidor muda o plano.** O webhook da Cakto (`/api/webhook/cakto`) usa o Admin SDK, que ignora as regras do Firestore. As regras impedem o dono de alterar `membershipStatus`, `isAdmin`, datas de plano etc.

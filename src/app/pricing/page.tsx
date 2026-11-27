@@ -63,28 +63,28 @@ const PRO = ppCaps('pro');
 const num = (n: number) => (n === Infinity ? 'Ilimitados' : String(n));
 
 // Valores de página pública vêm de pp-plans.ts (mesma fonte do editor), então a tabela nunca diverge.
-const COMPARE_ROWS: { label: string; base: string | boolean; premium: string | boolean; pro: string | boolean }[] = [
-  { label: 'Link de coleta e QR Code de balcão', base: true, premium: true, pro: true },
-  { label: 'Depoimentos na página pública', base: num(PREMIUM.selectionLimit), premium: num(PREMIUM.selectionLimit), pro: num(PRO.selectionLimit) },
-  { label: 'Layouts de depoimentos', base: String(PREMIUM.layouts.length), premium: String(PREMIUM.layouts.length), pro: String(PRO.layouts.length) },
-  { label: 'Blocos Sobre e Horários', base: PREMIUM.blocks.about, premium: PREMIUM.blocks.about, pro: PRO.blocks.about },
-  { label: 'Perguntas frequentes, redes sociais e mapa', base: PREMIUM.blocks.faq, premium: PREMIUM.blocks.faq, pro: PRO.blocks.faq },
-  { label: 'Reordenar os blocos da página', base: PREMIUM.reorder, premium: PREMIUM.reorder, pro: PRO.reorder },
-  { label: 'Botão de WhatsApp e botão do site', base: PREMIUM.whatsappButton, premium: PREMIUM.whatsappButton, pro: PRO.whatsappButton },
-  { label: 'Cor secundária e link personalizado', base: PREMIUM.secondaryColor, premium: PREMIUM.secondaryColor, pro: PRO.secondaryColor },
-  { label: 'Seções de texto livres', base: String(PREMIUM.customSections), premium: String(PREMIUM.customSections), pro: String(PRO.customSections) },
-  { label: 'Ocultar "Powered by Proova AI"', base: PREMIUM.removeBranding, premium: PREMIUM.removeBranding, pro: PRO.removeBranding },
-  { label: 'Busca automática de novas avaliações do Google', base: true, premium: true, pro: true },
-  { label: 'Respostas por IA (por mês)', base: String(AI_MONTHLY_LIMIT.premium), premium: String(AI_MONTHLY_LIMIT.premium), pro: String(AI_MONTHLY_LIMIT.pro) },
-  { label: 'Resposta automática assim que o depoimento chega', base: true, premium: true, pro: true },
-  { label: 'Inbox privado de críticas (Reputation Shield)', base: true, premium: true, pro: true },
-  { label: 'Alerta de crítica por e-mail e push no celular', base: true, premium: true, pro: true },
-  { label: 'Responder crítica por WhatsApp/e-mail com mensagem pronta', base: true, premium: true, pro: true },
-  { label: 'Lembrete diário no celular para pedir avaliação', base: true, premium: true, pro: true },
-  { label: 'Nota média real (inclui críticas privadas)', base: true, premium: true, pro: true },
-  { label: 'Social Cards VIP (post e story)', base: true, premium: true, pro: true },
-  { label: 'Métricas e relatório semanal', base: true, premium: true, pro: true },
-  { label: 'Coleta de depoimento em vídeo', base: false, premium: false, pro: true },
+const COMPARE_ROWS: { label: string; premium: string | boolean; pro: string | boolean }[] = [
+  { label: 'Link de coleta e QR Code de balcão', premium: true, pro: true },
+  { label: 'Depoimentos na página pública', premium: num(PREMIUM.selectionLimit), pro: num(PRO.selectionLimit) },
+  { label: 'Layouts de depoimentos', premium: String(PREMIUM.layouts.length), pro: String(PRO.layouts.length) },
+  { label: 'Blocos Sobre e Horários', premium: PREMIUM.blocks.about, pro: PRO.blocks.about },
+  { label: 'Perguntas frequentes, redes sociais e mapa', premium: PREMIUM.blocks.faq, pro: PRO.blocks.faq },
+  { label: 'Reordenar os blocos da página', premium: PREMIUM.reorder, pro: PRO.reorder },
+  { label: 'Botão de WhatsApp e botão do site', premium: PREMIUM.whatsappButton, pro: PRO.whatsappButton },
+  { label: 'Cor secundária e link personalizado', premium: PREMIUM.secondaryColor, pro: PRO.secondaryColor },
+  { label: 'Seções de texto livres', premium: String(PREMIUM.customSections), pro: String(PRO.customSections) },
+  { label: 'Ocultar "Powered by Proova AI"', premium: PREMIUM.removeBranding, pro: PRO.removeBranding },
+  { label: 'Busca automática de novas avaliações do Google', premium: true, pro: true },
+  { label: 'Respostas por IA (por mês)', premium: String(AI_MONTHLY_LIMIT.premium), pro: String(AI_MONTHLY_LIMIT.pro) },
+  { label: 'Resposta automática assim que o depoimento chega', premium: true, pro: true },
+  { label: 'Inbox privado de críticas (Reputation Shield)', premium: true, pro: true },
+  { label: 'Alerta de crítica por e-mail e push no celular', premium: true, pro: true },
+  { label: 'Responder crítica por WhatsApp/e-mail com mensagem pronta', premium: true, pro: true },
+  { label: 'Lembrete diário no celular para pedir avaliação', premium: true, pro: true },
+  { label: 'Nota média real (inclui críticas privadas)', premium: true, pro: true },
+  { label: 'Social Cards VIP (post e story)', premium: true, pro: true },
+  { label: 'Métricas e relatório semanal', premium: true, pro: true },
+  { label: 'Coleta de depoimento em vídeo', premium: false, pro: true },
 ];
 
 export default function PricingPage() {
@@ -143,27 +143,6 @@ export default function PricingPage() {
   }
 
   const plans = [
-    {
-      id: 'base',
-      name: "Teste grátis de 14 dias",
-      price: "R$ 0",
-      period: "por 14 dias",
-      description: "Todos os recursos Premium, sem cartão",
-      icon: Gem,
-      highlight: false,
-      cta: !user ? "Começar teste grátis" : status === 'trial' ? `Teste em andamento (${trialLeft} ${trialLeft === 1 ? 'dia' : 'dias'})` : (status === 'base' ? "Teste liberado ao abrir o painel" : "Teste já utilizado"),
-      disabled: !!user,
-      checkoutUrl: "",
-      benefits: [
-        "Sem cartão de crédito: a conta já começa com o teste",
-        "Link de coleta, QR Code de balcão e página pública completa",
-        "Inbox privado: críticas de 1 a 3 estrelas ficam só com você",
-        `Respostas por IA (Gemini): até ${AI_MONTHLY_LIMIT.premium} por mês`,
-        "Busca automática das novas avaliações do Google",
-        "Social Cards, métricas e relatório semanal",
-        "Ao fim dos 14 dias o acesso só continua com assinatura: sem plano, painel, link de coleta, página pública e widget saem do ar (seus dados ficam salvos)",
-      ]
-    },
     {
       id: 'gold',
       name: "Proova AI Premium",
@@ -268,10 +247,13 @@ export default function PricingPage() {
            <p className="text-muted-foreground font-medium text-xs md:text-lg max-w-xl mx-auto leading-relaxed px-4">
              A reputação da sua marca é o seu maior ativo. Invista nas ferramentas certas para dominar o seu mercado local.
            </p>
-           {status === 'expired' && (
-             <p className="mx-auto max-w-xl rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-xs md:text-sm font-bold">Seu teste terminou: o painel, o link de coleta e a página pública estão fora do ar. Assine Premium ou PRO para reativar tudo na hora; seus dados estão salvos.</p>
+           {(status === 'base' || status === 'lead') && user && (
+             <p className="mx-auto max-w-xl rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-xs md:text-sm font-bold">Sua conta foi criada. Escolha Premium ou PRO para começar. Pague com o e-mail desta conta ({(effectiveUserData as any)?.email || 'o e-mail do cadastro'}) para ativar na hora. Garantia de 7 dias com reembolso integral.</p>
            )}
-           {status === 'trial' && trialLeft <= 3 && (
+           {status === 'expired' && (
+             <p className="mx-auto max-w-xl rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-xs md:text-sm font-bold">Seu plano não está ativo: o painel, o link de coleta e a página pública estão fora do ar. Assine Premium ou PRO para reativar tudo na hora; seus dados estão salvos.</p>
+           )}
+           {status === 'trial' && (
              <p className="mx-auto max-w-xl rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-xs md:text-sm font-bold">Seu teste termina em {trialLeft === 0 ? 'poucas horas' : `${trialLeft} ${trialLeft === 1 ? 'dia' : 'dias'}`}. Sem assinatura, o painel, o link de coleta, a página pública e o widget saem do ar.</p>
            )}
         </section>
@@ -370,8 +352,7 @@ export default function PricingPage() {
                       <div className="pt-4">
                         <Button 
                           onClick={() => {
-                            if (plan.id === 'base') { trackEvent('signup_click', 'planos-teste'); router.push('/signup'); }
-                            else if (plan.checkoutUrl) { trackEvent('checkout_click', `planos-${plan.id}`); window.open(plan.checkoutUrl, '_blank'); }
+                            if (plan.checkoutUrl) { trackEvent('checkout_click', `planos-${plan.id}`); window.open(plan.checkoutUrl, '_blank'); }
                           }}
                           disabled={plan.disabled}
                           className={cn(
@@ -383,7 +364,7 @@ export default function PricingPage() {
                         >
                           {plan.cta} <ArrowRight className="w-4 h-4 md:w-5 md:h-5" />
                         </Button>
-                        {!plan.disabled && plan.id !== 'base' && (
+                        {!plan.disabled && (
                           <p className={cn(
                             "text-[7px] md:text-[8px] font-black uppercase tracking-[0.2em] text-center mt-4 opacity-50 px-2",
                             plan.highlight ? "text-white" : "text-muted-foreground"
@@ -411,7 +392,6 @@ export default function PricingPage() {
                 <thead>
                   <tr className="border-b bg-muted/30 font-black uppercase tracking-widest">
                     <th className="p-3 md:p-4">Recurso</th>
-                    <th className="p-3 md:p-4 text-center">Teste 14 dias</th>
                     <th className="p-3 md:p-4 text-center text-primary">Premium</th>
                     <th className="p-3 md:p-4 text-center">PRO</th>
                   </tr>
@@ -420,7 +400,7 @@ export default function PricingPage() {
                   {COMPARE_ROWS.map((row) => (
                     <tr key={row.label} className="border-b last:border-0">
                       <td className="p-3 md:p-4 font-bold leading-snug">{row.label}</td>
-                      {([row.base, row.premium, row.pro] as (string | boolean)[]).map((v, i) => (
+                      {([row.premium, row.pro] as (string | boolean)[]).map((v, i) => (
                         <td key={i} className="p-3 md:p-4 text-center font-black">
                           {v === true ? <Check className="w-4 h-4 mx-auto text-green-600" /> : v === false ? <span className="opacity-25">—</span> : v}
                         </td>

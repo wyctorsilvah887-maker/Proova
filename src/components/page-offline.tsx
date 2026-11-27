@@ -1,6 +1,6 @@
 import { Globe } from 'lucide-react';
 
-/** Mostrada ao visitante quando o dono da página está sem plano ativo (teste vencido). Não expõe dados do dono. */
+/** Mostrada ao visitante quando o dono da página está sem plano ativo (sem assinatura ativa). Não expõe dados do dono. */
 export function PageOffline() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-muted/30">
