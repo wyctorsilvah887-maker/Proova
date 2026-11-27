@@ -436,7 +436,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
     {
       id: 'premium',
       name: "Proova AI Premium",
-      price: "R$ 147",
+      price: "R$ 59,90",
       period: "/mês",
       description: "Para clínicas e profissionais que querem responder todas as avaliações com agilidade.",
       highlight: true,
@@ -453,7 +453,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
     {
       id: 'pro',
       name: "Proova AI PRO",
-      price: "R$ 270",
+      price: "R$ 119,99",
       period: "/mês",
       description: "Para quem quer o máximo de personalização e acompanhamento.",
       highlight: false,
@@ -510,7 +510,7 @@ const PricingSection = forwardRef<HTMLElement, { isVisible: boolean }>(({ isVisi
 PricingSection.displayName = "PricingSection";
 
 const FAQ_ITEMS = [
-  { q: "O Proova AI tem plano grátis ou teste?", a: "Não. O Proova AI é 100% pago, a partir de R$ 147 por mês. Para você contratar sem medo, os planos têm garantia de 7 dias com reembolso integral: se não gostar, devolvemos o valor." },
+  { q: "O Proova AI tem plano grátis ou teste?", a: "Não. O Proova AI é 100% pago, a partir de R$ 59,90 por mês. Para você contratar sem medo, os planos têm garantia de 7 dias com reembolso integral: se não gostar, devolvemos o valor." },
   { q: "Meu cliente precisa baixar algum app ou criar conta?", a: "Não. Ele abre o link no celular, escolhe as estrelas, escreve (ou envia uma foto) e envia. Leva menos de 1 minuto." },
   { q: "As críticas ficam escondidas do público?", a: "Notas de 1 a 3 estrelas dadas pelo seu link de coleta vão para o seu Inbox privado e não aparecem na sua página. O Proova não impede ninguém de avaliar no Google: ele te dá a chance de ouvir e resolver antes. A nota média do seu painel inclui todas as avaliações, inclusive as críticas." },
   { q: "O cliente autoriza a publicação do depoimento?", a: "Sim. Antes de enviar, o cliente marca um aceite autorizando a publicação do depoimento e do nome. A autorização fica registrada em cada depoimento e você remove quando ele pedir." },
