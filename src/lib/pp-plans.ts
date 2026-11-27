@@ -59,4 +59,4 @@ export function ppCaps(plan: PPPlan): PPCaps {
 export const AI_MONTHLY_LIMIT: Record<PPPlan, number> = { free: 20, premium: 300, pro: 1000 };
 
 /** Preços exibidos (mensal). Mantenha igual ao checkout. */
-export const PLAN_PRICE = { premium: 'R$ 147', pro: 'R$ 270' } as const;
+export const PLAN_PRICE = { premium: 'R$ 59,90', pro: 'R$ 119,99' } as const;
