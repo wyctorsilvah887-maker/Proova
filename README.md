@@ -41,6 +41,7 @@ Configure na Vercel (Settings → Environment Variables). Nunca coloque chaves n
 | `GOOGLE_MAPS_API_KEY` | Places API: busca de empresa e nota do Google | Para Google |
 | `APIFY_TOKEN`, `APIFY_WEBHOOK_SECRET` | Coleta das avaliações do Google | Para Google |
 | `SUPPORT_ALERT_EMAILS` | E-mails (separados por vírgula) que recebem alerta de suporte | Não |
+| `ADMIN_PATH` | Endereço secreto do painel admin (ex.: `ops-7k2m9x4p`, sem barra). Com ele, `/admin` responde 404. Vazio = painel em `/admin` | Recomendada |
 | `APP_URL` | URL base usada em links gerados no servidor | Não |
 
 A configuração pública do Firebase (cliente) fica em `src/firebase/config.ts`.

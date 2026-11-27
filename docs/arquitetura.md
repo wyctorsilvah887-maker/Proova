@@ -79,6 +79,7 @@ Genkit + Gemini em `src/ai/` (`reply.ts` gera respostas, `resilience.ts` faz fal
 
 - `firestore.rules` e `storage.rules`: dono só edita o próprio perfil; visitantes só somam +1 em contadores permitidos; listagem de usuários exige `limit(1)`.
 - Rotas públicas (`/api/track`, `/api/collection-view`, `/api/google-click`) só incrementam contadores, validam entrada e ignoram bots.
+- **Painel admin em endereço secreto:** `ADMIN_PATH` + `src/middleware.ts` (reescreve `/<ADMIN_PATH>` para `/admin` e devolve 404 em `/admin`). O endereço só é entregue a administradores por `POST /api/admin/entry` (não vai no código público; links internos usam `useAdminBase`). Isso só esconde o caminho: a proteção real é o login + `isAdmin` protegido nas regras do Firestore. `/admin` não aparece mais no `robots.txt`.
 - A chave de serviço do Firebase só existe como variável de ambiente na Vercel.
 
 ## Pendências conhecidas

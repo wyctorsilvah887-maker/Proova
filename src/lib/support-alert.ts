@@ -24,7 +24,7 @@ export async function notifyAdminsNewTicket(opts: { ticketId: string; userName: 
     // Reserva opcional por variável de ambiente (lista separada por vírgula).
     (process.env.SUPPORT_ALERT_EMAILS || '').split(',').map((e) => e.trim().toLowerCase()).filter((e) => e.includes('@')).forEach((e) => emails.add(e));
 
-    const link = `${SITE_URL}/admin/support`;
+    const link = `${SITE_URL}/${(process.env.ADMIN_PATH || 'admin').replace(/^\/+|\/+$/g, '')}/support`;
     const title = '🎧 Novo pedido de atendimento';
     const body = `${opts.userName} (${opts.planLabel}) quer falar com um atendente.`;
 
