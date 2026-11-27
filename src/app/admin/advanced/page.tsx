@@ -1,5 +1,6 @@
 'use client';
 
+import { useAdminBase } from '@/lib/admin-path';
 import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -25,6 +26,7 @@ import { Label } from '@/components/ui/label';
 import { LoadingScreen } from '@/components/loading-screen';
 
 export default function AdvancedAdminPage() {
+  const adminBase = useAdminBase();
   const auth = useAuth();
   const db = useFirestore();
   const router = useRouter();
@@ -103,7 +105,7 @@ export default function AdvancedAdminPage() {
     <div className="min-h-screen bg-muted/30 font-body text-foreground flex flex-col">
       <header className="bg-background border-b h-20 md:h-28 flex items-center px-2 md:px-4 sticky top-0 z-[60] shadow-sm backdrop-blur-md bg-background/95">
         <div className="flex items-center">
-          <Link href="/admin" className="flex items-center group -ml-2 md:-ml-4">
+          <Link href={`${adminBase}`} className="flex items-center group -ml-2 md:-ml-4">
             <div className="relative w-[200px] h-[65px] md:w-[320px] md:h-[105px] transition-transform group-hover:scale-105">
               <Image src="/logo-proova-white-mode.gif" alt="Logo" fill className="object-contain object-left dark:hidden" priority unoptimized />
               <Image src="/logo-proova-dark-mode.gif" alt="Logo" fill className="object-contain object-left hidden dark:block" priority unoptimized />
@@ -119,7 +121,7 @@ export default function AdvancedAdminPage() {
 
       <main className="container mx-auto p-4 md:p-6 space-y-8 flex-1 max-w-5xl">
         <div className="flex flex-col gap-6">
-          <Link href="/admin">
+          <Link href={`${adminBase}`}>
             <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-primary transition-colors h-8 px-0 font-bold uppercase tracking-widest text-[10px]">
               <ArrowLeft className="w-4 h-4" /> Voltar ao Painel Admin
             </Button>

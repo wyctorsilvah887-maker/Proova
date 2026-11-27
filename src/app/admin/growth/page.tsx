@@ -1,5 +1,6 @@
 'use client';
 
+import { useAdminBase } from '@/lib/admin-path';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { collection, doc, query, where } from 'firebase/firestore';
@@ -58,6 +59,7 @@ const CHANNELS = [
 const slugify = (v: string) => v.trim().toLowerCase().replace(/[^a-z0-9_.\-]/g, '-').replace(/-+/g, '-').slice(0, 40);
 
 export default function AdminGrowthPage() {
+  const adminBase = useAdminBase();
   const { user, loading: authLoading } = useUser();
   const db = useFirestore();
   const userDocRef = useMemo(() => (db && user ? doc(db, 'users', user.uid) : null), [db, user]);
@@ -199,7 +201,7 @@ export default function AdminGrowthPage() {
     <div className="min-h-screen bg-muted/30 font-body text-foreground overflow-x-hidden">
       <main className="max-w-7xl mx-auto p-4 md:p-8 space-y-6 md:space-y-8 pb-[max(2rem,env(safe-area-inset-bottom))]">
         <div className="space-y-3">
-          <Link href="/admin"><Button variant="ghost" size="sm" className="gap-2 -ml-3 text-muted-foreground hover:text-primary font-bold uppercase tracking-widest text-[10px]"><ArrowLeft className="w-4 h-4" /> Painel admin</Button></Link>
+          <Link href={`${adminBase}`}><Button variant="ghost" size="sm" className="gap-2 -ml-3 text-muted-foreground hover:text-primary font-bold uppercase tracking-widest text-[10px]"><ArrowLeft className="w-4 h-4" /> Painel admin</Button></Link>
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
               <h1 className="text-xl md:text-3xl font-black font-headline tracking-tighter uppercase flex items-center gap-2.5"><TrendingUp className="w-6 h-6 md:w-7 md:h-7 text-primary shrink-0" /> Growth & MRR</h1>

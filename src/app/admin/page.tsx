@@ -1,5 +1,6 @@
 'use client';
 
+import { useAdminBase } from '@/lib/admin-path';
 import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -47,6 +48,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { LoadingScreen } from '@/components/loading-screen';
 
 export default function AdminPage() {
+  const adminBase = useAdminBase();
   const auth = useAuth();
   const db = useFirestore();
   const router = useRouter();
@@ -200,7 +202,7 @@ export default function AdminPage() {
                 <ArrowLeft className="w-4 h-4" /> Voltar ao Dashboard
               </Button>
             </Link>
-            <Link href="/admin/growth">
+            <Link href={`${adminBase}/growth`}>
               <Button size="sm" className="rounded-xl h-9 font-black uppercase tracking-widest text-[10px] gap-2">Growth & MRR</Button>
             </Link>
           </div>
@@ -390,7 +392,7 @@ export default function AdminPage() {
 
             <TabsContent value="actions" className="pt-6">
                <div className="grid gap-4 md:grid-cols-2">
-                  <Link href="/admin/support">
+                  <Link href={`${adminBase}/support`}>
                     <Card className="p-6 hover:bg-muted/10 transition-colors cursor-pointer rounded-2xl border-none shadow-sm flex items-center justify-between">
                        <div className="flex items-center gap-4">
                           <div className="p-3 rounded-xl bg-primary/10 text-primary"><Headphones className="w-6 h-6" /></div>
@@ -399,7 +401,7 @@ export default function AdminPage() {
                        <ChevronRight className="w-4 h-4 opacity-20" />
                     </Card>
                   </Link>
-                  <Link href="/admin/advanced">
+                  <Link href={`${adminBase}/advanced`}>
                     <Card className="p-6 hover:bg-muted/10 transition-colors cursor-pointer rounded-2xl border-none shadow-sm flex items-center justify-between">
                        <div className="flex items-center gap-4">
                           <div className="p-3 rounded-xl bg-orange-500/10 text-orange-600"><Megaphone className="w-6 h-6" /></div>

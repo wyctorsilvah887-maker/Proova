@@ -80,6 +80,13 @@ export function AppSideMenu({
   const auth = useAuth();
   const db = useFirestore();
   const { user } = useUser();
+  // Endereço do painel admin: vem do servidor só para administradores (não fica no código público).
+  const [adminPath, setAdminPath] = useState('admin');
+  useEffect(() => {
+    if (!isAdmin || !user) return;
+    user.getIdToken().then((t: string) => fetch('/api/admin/entry', { method: 'POST', headers: { Authorization: `Bearer ${t}` } }))
+      .then((r) => (r.ok ? r.json() : null)).then((j) => { if (j?.path) setAdminPath(j.path); }).catch(() => {});
+  }, [isAdmin, user]);
 
   // Logo da clínica: lê a página pública só depois que o menu é aberto pela primeira vez (1 leitura).
   const [everOpened, setEverOpened] = useState(false);
@@ -181,7 +188,7 @@ export function AppSideMenu({
         { label: 'Blog', icon: BookOpen, external: 'https://blog.useproovaai.com.br' },
       ],
     },
-    ...(isAdmin ? [{ title: 'Administração', items: [{ label: 'Painel Admin', icon: Shield, href: '/admin' }] as Item[] }] : []),
+    ...(isAdmin ? [{ title: 'Administração', items: [{ label: 'Painel Admin', icon: Shield, href: `/${adminPath}` }] as Item[] }] : []),
   ];
 
   const go = (item: Item) => {

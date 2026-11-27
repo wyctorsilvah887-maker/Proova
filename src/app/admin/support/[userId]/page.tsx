@@ -1,5 +1,6 @@
 'use client';
 
+import { useAdminBase } from '@/lib/admin-path';
 import { useState, useMemo, useEffect, useRef, use } from 'react';
 import Image from 'next/image';
 import { 
@@ -43,6 +44,7 @@ import { toast } from '@/hooks/use-toast';
 import { LoadingScreen } from '@/components/loading-screen';
 
 export default function AdminChatPage({ params }: { params: Promise<{ userId: string }> }) {
+  const adminBase = useAdminBase();
   const { userId } = use(params);
   const db = useFirestore();
   const router = useRouter();
@@ -194,7 +196,7 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
       toast({ title: "Atendimento Concluído", description: "O ticket foi resolvido e o bot reativado." });
       
       // Redireciona instantaneamente para a fila de suporte
-      router.push('/admin/support');
+      router.push(`${adminBase}/support`);
     } catch (err) {
       toast({ variant: "destructive", title: "Erro ao concluir" });
       setIsResolving(false);
