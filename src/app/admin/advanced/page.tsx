@@ -23,7 +23,7 @@ import Link from 'next/link';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { LoadingScreen } from '@/components/loading-screen';
+import { PageSkeleton } from '@/components/page-skeleton';
 
 export default function AdvancedAdminPage() {
   const adminBase = useAdminBase();
@@ -94,7 +94,7 @@ export default function AdvancedAdminPage() {
   };
 
   if (authLoading || userDataLoading) {
-    return <LoadingScreen />;
+    return <PageSkeleton />;
   }
 
   if (!userData?.isAdmin) {

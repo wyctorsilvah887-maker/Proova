@@ -116,7 +116,7 @@ import { Slider } from '@/components/ui/slider';
 import Cropper from 'react-easy-crop';
 import { useTheme } from 'next-themes';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { LoadingScreen } from '@/components/loading-screen';
+import { PageSkeleton } from '@/components/page-skeleton';
 import { StudioPanel } from '@/components/studio-panel';
 import { type StudioData, defaultStudio, normalizeStudio, applyStudioCaps, proovaAverage } from '@/lib/studio';
 import { PPBlock, RatingSummary } from '@/components/pp-blocks';
@@ -1041,7 +1041,7 @@ export default function PPEditorPage() {
     return 'SEM PLANO';
   }, [userData]);
 
-  if (authLoading || userDataLoading || testimonialsLoading) return <LoadingScreen />;
+  if (authLoading || userDataLoading || testimonialsLoading) return <PageSkeleton />;
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body w-full overflow-hidden text-foreground">

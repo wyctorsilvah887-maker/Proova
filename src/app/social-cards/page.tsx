@@ -63,7 +63,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { useTheme } from 'next-themes';
 import { toPng } from 'html-to-image';
 import { toast as shadcnToast } from '@/hooks/use-toast';
-import { LoadingScreen } from '@/components/loading-screen';
+import { PageSkeleton } from '@/components/page-skeleton';
 import { ScrollBar } from '@/components/ui/scroll-area';
 import { getAvailableTemplates, type TemplateMetadata } from '@/app/actions/template-actions';
 import { SocialCardArt, CARD_SIZES, type CardFormat } from '@/components/social-card-art';
@@ -334,7 +334,7 @@ export default function SocialCardsPage() {
   };
 
   if (authLoading || (user && (testimonialsLoading || !userData))) {
-    return <LoadingScreen />;
+    return <PageSkeleton />;
   }
 
   return (

@@ -76,7 +76,7 @@ import {
 import { useTheme } from 'next-themes';
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { LoadingScreen } from '@/components/loading-screen';
+import { PageSkeleton } from '@/components/page-skeleton';
 
 type LayoutType = 'grid' | 'mural' | 'carousel' | 'popup';
 
@@ -228,7 +228,7 @@ export default function EmbedEditorPage({ params }: { params: Promise<{ widgetId
   }, [userData]);
 
   if (authLoading || userDataLoading || widgetLoading || testimonialsLoading) {
-    return <LoadingScreen />;
+    return <PageSkeleton />;
   }
 
   return (

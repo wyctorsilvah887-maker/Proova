@@ -5,6 +5,7 @@ import { adminDb } from '@/lib/firebase-admin';
 import { safeEqual } from '@/lib/reviews/sync';
 import { SITE_URL } from '@/lib/site';
 import { runRenewalNotices } from '@/lib/plan-renewal';
+import { runPayNudges } from '@/lib/pay-nudge';
 
 export const maxDuration = 60;
 
@@ -32,6 +33,8 @@ export async function GET(req: Request) {
   }
   let renewals: any = null;
   try { renewals = await runRenewalNotices(t0 + 25_000); } catch (e) { console.error('[cron renewal]', (e as Error).message); }
+  let payNudges: any = null;
+  try { payNudges = await runPayNudges(t0 + 40_000); } catch (e) { console.error('[cron pay-nudge]', (e as Error).message); }
   // Encerra testes vencidos (rede de segurança: o painel também encerra ao abrir).
   let trialsExpired = 0;
   try {
@@ -42,7 +45,7 @@ export async function GET(req: Request) {
     trialsExpired = over.length;
   } catch (e) { console.error('[cron trial]', (e as Error).message); }
   const dow = new Date().getUTCDay(); // 0 = domingo, 6 = sábado
-  if (dow === 0 || dow === 6) return NextResponse.json({ ok: true, renewals, reminders: 'weekend_skip', trialsExpired });
+  if (dow === 0 || dow === 6) return NextResponse.json({ ok: true, renewals, reminders: 'weekend_skip', trialsExpired, payNudges });
   const msg = MSGS[new Date().getUTCDate() % MSGS.length];
   const snap = await adminDb().collection('users').where('membershipStatus', 'in', PAID).get();
   const targets = snap.docs.filter((d) => d.data().reminderPush !== false && !!d.data().companySlug);
@@ -72,5 +75,5 @@ export async function GET(req: Request) {
       }
     }));
   }
-  return NextResponse.json({ ok: true, sent, noTokens, failed, renewals });
+  return NextResponse.json({ ok: true, sent, noTokens, failed, renewals, payNudges });
 }

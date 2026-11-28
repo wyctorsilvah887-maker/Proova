@@ -75,7 +75,7 @@ import { useTheme } from 'next-themes';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { LoadingScreen } from '@/components/loading-screen';
+import { PageSkeleton } from '@/components/page-skeleton';
 import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
 import { usePageTour } from '@/hooks/use-page-tour';
 import { saveGooglePlace } from '@/lib/google-place-client';
@@ -453,7 +453,7 @@ export default function SettingsPage() {
   }, [user, authLoading, router]);
 
   if (authLoading || userDataLoading || (user && !userData)) {
-    return <LoadingScreen />;
+    return <PageSkeleton />;
   }
 
   return (

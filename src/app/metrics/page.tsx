@@ -68,7 +68,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from '@/hooks/use-toast';
 import { sendWeeklyPerformanceReport } from '@/app/actions/report-actions';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { LoadingScreen } from '@/components/loading-screen';
+import { PageSkeleton } from '@/components/page-skeleton';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
 import { usePageTour } from '@/hooks/use-page-tour';
@@ -266,7 +266,7 @@ export default function MetricsPage() {
   }, [userData]);
 
   if (authLoading || userDataLoading || testimonialsLoading) {
-    return <LoadingScreen />;
+    return <PageSkeleton />;
   }
 
   return (
