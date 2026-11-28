@@ -1,5 +1,6 @@
 'use client';
 
+import { notFound } from 'next/navigation';
 import { useAdminBase } from '@/lib/admin-path';
 import { useState, useMemo, useEffect } from 'react';
 import Image from 'next/image';
@@ -97,9 +98,7 @@ export default function AdvancedAdminPage() {
     return <PageSkeleton />;
   }
 
-  if (!userData?.isAdmin) {
-    return <div className="flex h-screen items-center justify-center bg-muted/30 px-4"><Card className="w-full max-w-md text-center shadow-xl"><CardHeader><Shield className="w-12 h-12 text-destructive mx-auto mb-4" /><CardTitle>Acesso Negado</CardTitle></CardHeader><CardContent><Button onClick={() => router.push('/dash')} className="w-full">Voltar</Button></CardContent></Card></div>;
-  }
+  if (!userData?.isAdmin) notFound();
 
   return (
     <div className="min-h-screen bg-muted/30 font-body text-foreground flex flex-col">

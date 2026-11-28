@@ -1,5 +1,6 @@
 'use client';
 
+import { notFound } from 'next/navigation';
 import { useAdminBase } from '@/lib/admin-path';
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
@@ -183,16 +184,7 @@ export default function AdminGrowthPage() {
   };
 
   if (authLoading || (user && userDataLoading)) return <PageSkeleton />;
-  if (!user || !isAdmin) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-muted/30 px-4 font-body">
-        <Card className="w-full max-w-md shadow-xl text-center">
-          <CardHeader><Shield className="w-12 h-12 text-destructive mx-auto mb-2" /><CardTitle>Acesso restrito</CardTitle><CardDescription>Esta página é só para administradores.</CardDescription></CardHeader>
-          <CardContent><Link href="/dash"><Button className="w-full">Voltar</Button></Link></CardContent>
-        </Card>
-      </div>
-    );
-  }
+  if (!user || !isAdmin) notFound();
 
   const maxDaily = Math.max(1, ...stats.daily.map((d) => d.n));
   const maxMrr = Math.max(1, ...stats.byPlan.map((p) => p.mrr));
