@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { LoadingScreen } from '@/components/loading-screen';
+import { readLastSession, clearLastSession, maskEmail, timeAgoPt, type LastSession } from '@/lib/last-session';
 import { canAttempt, clearAttempts, formatWait, LOGIN_LIMIT, recordAttempt } from '@/lib/client-rate-limit';
 
 export default function LoginPage() {
@@ -25,6 +26,13 @@ export default function LoginPage() {
   const router = useRouter();
   
   const [email, setEmail] = useState('');
+  // Dados do último acesso neste navegador (cache local): personalizam o painel do computador.
+  const [last, setLast] = useState<LastSession | null>(null);
+  useEffect(() => {
+    const l = readLastSession();
+    if (l) { setLast(l); setEmail((cur) => cur || l.email); }
+  }, []);
+  const forgetDevice = () => { clearLastSession(); setLast(null); setEmail(''); };
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -105,6 +113,31 @@ export default function LoginPage() {
         <div className="relative w-[180px] h-[56px]">
           <Image src="/logo-proovaai-darkmode.png" alt="Proova AI" fill className="object-contain object-left" priority />
         </div>
+        {last ? (
+          <div className="space-y-8 max-w-md">
+            <div className="space-y-2">
+              <p className="text-[11px] font-black uppercase tracking-[0.25em] text-primary">Último acesso {timeAgoPt(last.lastLoginAt)}</p>
+              <h2 className="text-3xl xl:text-4xl font-extrabold font-headline tracking-tight leading-tight">
+                {last.name ? <>Bem-vindo de volta, <span className="text-primary">{last.name}.</span></> : <>Bem-vindo de <span className="text-primary">volta.</span></>}
+              </h2>
+            </div>
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5 space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 shrink-0 rounded-2xl bg-primary/15 text-primary flex items-center justify-center text-lg font-black uppercase">{(last.company || last.name || last.email).charAt(0)}</div>
+                <div className="min-w-0">
+                  <p className="font-bold truncate">{last.company || 'Minha empresa'}</p>
+                  <p className="text-xs text-white/50 font-medium truncate">{maskEmail(last.email)}</p>
+                </div>
+                <span className="ml-auto shrink-0 rounded-full bg-primary/15 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-primary">{last.plan}</span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-center">
+                <div className="rounded-xl bg-white/5 py-3"><p className="text-2xl font-black">{last.testimonials}</p><p className="text-[10px] font-bold uppercase tracking-widest text-white/50">Depoimentos</p></div>
+                <div className="rounded-xl bg-white/5 py-3"><p className="text-sm font-black pt-2">{new Date(last.lastLoginAt).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })}</p><p className="text-[10px] font-bold uppercase tracking-widest text-white/50 pt-1">Último login</p></div>
+              </div>
+            </div>
+            <button type="button" onClick={forgetDevice} className="text-xs font-bold text-white/50 hover:text-white underline underline-offset-4">Não é você? Esquecer este dispositivo</button>
+          </div>
+        ) : (
         <div className="space-y-8 max-w-md">
           <h2 className="text-3xl xl:text-4xl font-extrabold font-headline tracking-tight leading-tight">
             Sua reputação no Google, <span className="text-primary">sob controle.</span>
@@ -122,6 +155,7 @@ export default function LoginPage() {
             ))}
           </ul>
         </div>
+        )}
         <p className="text-[11px] text-white/40 font-medium">© 2026 Proova AI</p>
       </aside>
 
