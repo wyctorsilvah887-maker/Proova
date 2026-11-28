@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AttributionCapture } from '@/components/attribution-capture';
 import { PageTracker } from '@/components/page-tracker';
 import { TrialGate } from '@/components/trial-gate';
+import { LastSessionWriter } from '@/components/last-session-writer';
 import { SITE_URL } from '@/lib/site';
 
 const inter = Inter({ subsets: ["latin"] });
@@ -101,6 +102,7 @@ export default function RootLayout({
             <AttributionCapture />
             <PageTracker />
             <TrialGate />
+            <LastSessionWriter />
             <Toaster />
           </FirebaseClientProvider>
         </ThemeProvider>
