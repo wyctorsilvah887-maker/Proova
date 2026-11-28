@@ -1,5 +1,6 @@
 'use client';
 
+import { isAccessLocked } from '@/lib/trial';
 import { trackEvent } from '@/lib/track';
 import { trialDaysLeft } from '@/lib/trial';
 import { AppSideMenu } from '@/components/app-menu';
@@ -131,7 +132,7 @@ import { cn } from '@/lib/utils';
 import { getGooglePlaceDetails, searchGooglePlaces } from '@/app/actions/maps-actions';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useNotifications } from '@/hooks/use-notifications';
-import { LoadingScreen } from '@/components/loading-screen';
+import { PageSkeleton } from '@/components/page-skeleton';
 import { regenerateReplyAction } from '@/app/actions/ai-reply-actions';
 
 /** Dias restantes até a avaliação do Google ser apagada (null se ainda não há data do servidor). */
@@ -198,7 +199,7 @@ export default function DashPage() {
   useEffect(() => {
     try { setTourForced(new URLSearchParams(window.location.search).get('tour') === '1'); } catch {}
   }, []);
-  const showTour = !tourClosed && !activeHash && (tourForced || (userData as any)?.onboardingDone === false);
+  const showTour = !tourClosed && !activeHash && !isAccessLocked(userData as any) && (tourForced || (userData as any)?.onboardingDone === false);
   const tourSteps: TourStep[] = useMemo(() => [
     { title: 'Bem-vindo ao Proova AI! 👋', text: 'Em menos de 1 minuto você vai conhecer o painel e saber por onde começar. Dá pra pular quando quiser.' },
     { target: 'menu', title: 'Menu de navegação', text: 'Aqui ficam a localização, o Google Maps, o link de coleta, o Link in Bio, o cartaz de balcão, a identidade da marca e as configurações da conta.' },
@@ -571,7 +572,7 @@ export default function DashPage() {
     return { count, label: `Últimos ${period} dias` };
   }, [approvedTestimonials, period, userData, apiSuggestions]);
 
-  if (authLoading || userDataLoading || !userData) return <LoadingScreen />;
+  if (authLoading || userDataLoading || !userData) return <PageSkeleton />;
 
   const collectionLink = `${baseUrl}/c/${userData?.companySlug}`;
   const publicPageLink = `${baseUrl}/pp/${userData?.companySlug}`;

@@ -19,7 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import { LoadingScreen } from '@/components/loading-screen';
+import { PageSkeleton } from '@/components/page-skeleton';
 import { AdminNotifyCard } from '@/components/admin-notify-card';
 
 export default function AdminSupportPage() {
@@ -51,7 +51,7 @@ export default function AdminSupportPage() {
   }, [ticketsList, searchTerm]);
 
   if (authLoading || userDataLoading) {
-    return <LoadingScreen />;
+    return <PageSkeleton />;
   }
 
   if (!userData?.isAdmin) {

@@ -41,7 +41,7 @@ import { cn } from '@/lib/utils';
 import { notifySupportPresence } from '@/app/actions/support-actions';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
-import { LoadingScreen } from '@/components/loading-screen';
+import { PageSkeleton } from '@/components/page-skeleton';
 
 export default function AdminChatPage({ params }: { params: Promise<{ userId: string }> }) {
   const adminBase = useAdminBase();
@@ -204,7 +204,7 @@ export default function AdminChatPage({ params }: { params: Promise<{ userId: st
   };
 
   if (userLoading || messagesLoading) {
-    return <LoadingScreen />;
+    return <PageSkeleton />;
   }
 
   return (

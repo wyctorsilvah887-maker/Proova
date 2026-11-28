@@ -45,7 +45,7 @@ import { Separator } from '@/components/ui/separator';
 import Link from 'next/link';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { LoadingScreen } from '@/components/loading-screen';
+import { PageSkeleton } from '@/components/page-skeleton';
 
 export default function AdminPage() {
   const adminBase = useAdminBase();
@@ -169,7 +169,7 @@ export default function AdminPage() {
   };
 
   if (authLoading || (user && userDataLoading)) {
-    return <LoadingScreen />;
+    return <PageSkeleton />;
   }
 
   if (!user || (userData && !userData.isAdmin)) {

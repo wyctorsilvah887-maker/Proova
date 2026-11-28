@@ -62,7 +62,7 @@ import {
 import { getConsultantResponse, matchConsultantKey } from '@/lib/consultant-rules';
 import { ppPlanOf } from '@/lib/pp-plans';
 import { toast } from '@/hooks/use-toast';
-import { LoadingScreen } from '@/components/loading-screen';
+import { PageSkeleton } from '@/components/page-skeleton';
 import { getPushToken } from '@/lib/push-client';
 import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
 import { usePageTour } from '@/hooks/use-page-tour';
@@ -407,7 +407,7 @@ export default function SupportPage() {
   );
 
   if (authLoading || userDataLoading || (user && !userData)) {
-    return <LoadingScreen />;
+    return <PageSkeleton />;
   }
 
   return (

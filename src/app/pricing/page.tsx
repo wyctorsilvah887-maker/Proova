@@ -352,7 +352,7 @@ export default function PricingPage() {
                       <div className="pt-4">
                         <Button 
                           onClick={() => {
-                            if (plan.checkoutUrl) { trackEvent('checkout_click', `planos-${plan.id}`); window.open(plan.checkoutUrl, '_blank'); }
+                            if (plan.checkoutUrl) { trackEvent('checkout_click', `planos-${plan.id}`); try { sessionStorage.setItem('proova_checkout', String(Date.now())); } catch {} window.open(plan.checkoutUrl, '_blank'); }
                           }}
                           disabled={plan.disabled}
                           className={cn(

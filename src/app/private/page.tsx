@@ -35,7 +35,7 @@ import Link from 'next/link';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { LoadingScreen } from '@/components/loading-screen';
+import { PageSkeleton } from '@/components/page-skeleton';
 import { OnboardingTour, type TourStep } from '@/components/onboarding-tour';
 import { usePageTour } from '@/hooks/use-page-tour';
 import { getPushToken } from '@/lib/push-client';
@@ -267,7 +267,7 @@ export default function PrivateInboxPage() {
     [],
   );
 
-  if (authLoading || userDataLoading || (user && !userData)) return <LoadingScreen />;
+  if (authLoading || userDataLoading || (user && !userData)) return <PageSkeleton />;
 
   return (
     <div className="min-h-screen bg-muted/20 flex flex-col font-body text-foreground overflow-x-hidden">

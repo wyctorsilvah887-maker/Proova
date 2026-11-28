@@ -9,7 +9,7 @@ import { useUser, useFirestore, useDoc, useCollection } from '@/firebase';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { LoadingScreen } from '@/components/loading-screen';
+import { PageSkeleton } from '@/components/page-skeleton';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { SITE_URL } from '@/lib/site';
@@ -182,7 +182,7 @@ export default function AdminGrowthPage() {
     catch { toast({ variant: 'destructive', title: 'Não foi possível copiar', description: text }); }
   };
 
-  if (authLoading || (user && userDataLoading)) return <LoadingScreen />;
+  if (authLoading || (user && userDataLoading)) return <PageSkeleton />;
   if (!user || !isAdmin) {
     return (
       <div className="flex h-screen items-center justify-center bg-muted/30 px-4 font-body">
